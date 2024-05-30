@@ -932,7 +932,8 @@ contains
        g_tracer%requires_src_info = requires_src_info 
     elseif(trim(g_tracer%package_name) .eq. 'generic_cobalt' .or. &
            trim(g_tracer%package_name) .eq. 'generic_abiotic' .or. &
-           trim(g_tracer%package_name) .eq. 'generic_bling') then !Niki: later we can make this just else
+           trim(g_tracer%package_name) .eq. 'generic_bling' .or. &
+           trim(g_tracer%package_name) .eq. 'generic_wombatlite') then !Niki: later we can make this just else
        call  g_tracer_add_param('enforce_src_info', g_tracer%requires_src_info ,  .true.) 
     endif
        
@@ -3701,9 +3702,23 @@ contains
                 g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
              case('do14c')
                 g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
+             case('no3')
+                g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
+             case('o2')
+                g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
+             case('adic')
+                g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
              case default
                 write(errorstring, '(a)') trim(g_tracer%name)//' : cannot determine src_var_unit_conversion'
                 call mpp_error(FATAL, trim(sub_name) //': '//  trim(errorstring)) 
+             end select
+          elseif(g_tracer%src_var_unit .eq. 'moles_per_liter') then
+             select case (trim(g_tracer%name))
+             case('fe')
+                g_tracer%src_var_unit_conversion = 1000.0 / 1035.0
+             case default
+                write(errorstring, '(a)') trim(g_tracer%name)//' : cannot determine src_var_unit_conversion'
+                call mpp_error(FATAL, trim(sub_name) //': '//  trim(errorstring))
              end select
           else 
               write(errorstring, '(a)') trim(g_tracer%name)//' : src_var_unit is set in the field_table to '//&
