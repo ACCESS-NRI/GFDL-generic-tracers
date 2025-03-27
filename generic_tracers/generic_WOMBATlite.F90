@@ -146,6 +146,7 @@ module generic_WOMBATlite
         zoogmax, &
         zooepsmin, &
         zooepsmax, &
+        zooepsrat, &
         zprefphy, &
         zprefdet, &
         zoolmor, &
@@ -163,6 +164,7 @@ module generic_WOMBATlite
         dissara, &
         dissdet, &
         ligand, &
+        fcolloid, &
         knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
@@ -1363,6 +1365,10 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsmax', wombat%zooepsmax, 0.25/86400.0)
 
+    ! Rate of transition of epsilon from micro to mesozoo [per mmolC/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('zooepsrat', wombat%zooepsrat, 1.0/10.0)
+
     ! Zooplankton preference for phytoplankton [0-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefphy', wombat%zprefphy, 1.0)
@@ -1449,6 +1455,10 @@ module generic_WOMBATlite
     ! Background concentration of iron-binding ligand [umol/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('ligand', wombat%ligand, 0.5)
+
+    ! Fraction of dissolved iron in colloidal form [0-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('fcolloid', wombat%fcolloid, 0.5)
 
     ! Precipitation of Fe` as nanoparticles (in excess of solubility) [/d]
     !-----------------------------------------------------------------------
@@ -2654,7 +2664,7 @@ module generic_WOMBATlite
       ! Estimate total colloidal iron
       ! ... for now, we assume that 50% of all dFe is colloidal, and we separate this from the 
       !     equilibrium fractionation between Fe' and Fe-L below
-      wombat%fecol(i,j,k) = 0.5 * biofer 
+      wombat%fecol(i,j,k) = wombat%fcolloid * biofer 
 
       ! Determine equilibriuim fractionation of the remain dFe (non-colloidal fraction) into Fe' and L-Fe
       fe_keq = 10**( 17.27 - 1565.7 / ztemk ) * 1e-9 ! Temperature reduces solubility
@@ -2709,12 +2719,9 @@ module generic_WOMBATlite
       ! Grazing function ! [1/s]
       zooprey = wombat%zprefphy * biophy + wombat%zprefdet * biodet
       ! Epsilon (prey capture rate coefficient) is made a function of phytoplankton biomass (Fig 2 of Rohr et al., 2024; GRL)
-      !  - We add a temperature dependence that reduces epsilon in cool temperatures to enforce mesozooplankton at high lats
-      !  - We add a temperature dependence that elevates the minimum epsilon in the tropics
-      epsmin = wombat%zooepsmin * ( 1.5 * tanh(0.2*(Temp(i,j,k)-15.0)) + 2.5 )
-      g_peffect = 1.0 - (1.0 / (1.0 + exp(-3.0*(zooprey - 2.0*wombat%phybiot))))
-      g_teffect = 1.0 / (1. + exp(-(Temp(i,j,k)-10.0)))
-      wombat%zooeps(i,j,k) = epsmin + (wombat%zooepsmax - epsmin) * g_peffect * g_teffect
+      !  - scales towards lower values (mesozooplankton) as prey biomass increases
+      g_peffect = exp(-zooprey * wombat%zooepsrat)
+      wombat%zooeps(i,j,k) = wombat%zooepsmin + (wombat%zooepsmax - wombat%zooepsmin) * g_peffect 
       g_npz = wombat%zoogmax * fbc * (wombat%zooeps(i,j,k) * zooprey*zooprey) / &
               (wombat%zoogmax * fbc + (wombat%zooeps(i,j,k) * zooprey*zooprey))
 
