@@ -13,7 +13,7 @@
 ! </CONTACT>
 !
 ! <OVERVIEW>
-!  This module contains the generic version of WOMBATlite.
+!  This module contains the generic version of WOMBATmid.
 !  It is designed so that both GFDL Ocean models, GOLD and MOM, can use
 !  it.
 ! </OVERVIEW>
@@ -31,12 +31,13 @@
 !
 !  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT) is
 !  based on a NPZD (nutrient–phytoplankton–zooplankton–detritus) model.
-!  This is the "lite" version of WOMBAT which includes one class each of
+!  This is the "mid" version of WOMBAT which includes two classes each of
 !  phytoplankton, zooplankton and sinking detritus, as well as nitrate
-!  (NO3),  bio-available iron (Fe), dissolved inorganic carbon (DIC), 
-!  calcium carbonate (CaCO3), alkalinity (ALK), and oxygen (O2). Fe is 
-!  carried through the zooplankton and detrital pools as well.
-!  Gas exchange follows OCMIP2 protocols.
+!  (NO3), phosphate (PO4), bio-available iron (Fe), Silicate (SiO2), 
+!  dissolved inorganic carbon (DIC), dissolved organic carbon, calcium 
+!  carbonate (CaCO3), alkalinity (ALK), and oxygen (O2). Fe is carried 
+!  through the zooplankton and detrital pools as well.
+!  Gas exchange follows OCMIP2 / MOCSY protocols.
 ! </DESCRIPTION>
 !
 ! <INFO>
