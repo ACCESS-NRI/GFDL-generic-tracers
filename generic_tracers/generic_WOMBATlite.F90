@@ -108,7 +108,7 @@ module generic_WOMBATlite
   !=======================================================================
   ! Namelist Options
   !=======================================================================
-  character(len=10) :: co2_calc = 'ocmip2' ! other option is 'mocsy'
+  character(len=10) :: co2_calc = 'mocsy' ! other option is 'ocmip2'
 
   namelist /generic_wombatlite_nml/ co2_calc
 
