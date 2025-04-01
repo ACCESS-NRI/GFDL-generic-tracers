@@ -59,6 +59,19 @@
 !   which uses the set of routines authored by J. Orr. See reference at:
 !   http://ocmip5.ipsl.jussieu.fr/mocsy/index.html
 !  </DATA>
+!
+!  <DATA NAME="do_caco3_dynamics" TYPE="logical">
+!   If true, do dynamic CaCO3 precipitation, dissolution and ballasting
+!  </DATA>
+!
+!  <DATA NAME="do_burial" TYPE="logical">
+!   If true, permanently bury organics and CaCO3 in sediments
+!  </DATA>
+!
+!  <DATA NAME="do_conserve_tracers" TYPE="logical">
+!   If true and do_burial is true, add back the lost NO3 and Alk due to
+!   burial to surface
+!  </DATA>
 ! </NAMELIST>
 !
 !-----------------------------------------------------------------------
@@ -66,7 +79,7 @@
 module generic_WOMBATlite
 
   use field_manager_mod, only: fm_string_len
-  use mpp_mod,           only: input_nml_file, mpp_error, FATAL
+  use mpp_mod,           only: input_nml_file, mpp_error, FATAL, WARNING
   use fms_mod,           only: write_version_number, check_nml_error, stdout, stdlog
   use time_manager_mod,  only: time_type
   use constants_mod,     only: WTMCO2, WTMO2
@@ -108,9 +121,12 @@ module generic_WOMBATlite
   !=======================================================================
   ! Namelist Options
   !=======================================================================
-  character(len=10) :: co2_calc = 'mocsy' ! other option is 'ocmip2'
+  character(len=10) :: co2_calc  = 'mocsy' ! other option is 'ocmip2'
+  logical :: do_caco3_dynamics   = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
+  logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
+  logical :: do_conserve_tracers = .false. ! add back the lost NO3 and Alk due to burial to surface?
 
-  namelist /generic_wombatlite_nml/ co2_calc
+  namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_burial, do_conserve_tracers
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
@@ -122,9 +138,6 @@ module generic_WOMBATlite
     ! See user_add_params for descriptions of each parameter
     logical :: &
         init, &
-        caco3_dynamics, &
-        burial, &
-        conservetracers, &
         force_update_fluxes ! Set in generic_tracer_nml
 
     real :: &
@@ -524,6 +537,23 @@ module generic_WOMBATlite
       write (stdoutunit,*) trim(note_header), 'Using Mocsy CO2 routine'
     else
       call mpp_error(FATAL,"Unknown co2_calc option specified in generic_wombatlite_nml")
+    endif
+
+    if (do_caco3_dynamics) then
+      write (stdoutunit,*) trim(note_header), &
+          'Doing dynamic CaCO3 precipitation, dissolution and ballasting'
+    endif
+
+    if (do_burial) then
+      write (stdoutunit,*) trim(note_header), &
+          'Permanently burying organics and CaCO3 in sediments'
+      if (do_conserve_tracers) then
+        write (stdoutunit,*) trim(note_header), &
+          'Adding back the lost NO3 and Alk due to burial to surface'
+      endif
+    elseif (do_conserve_tracers) then
+      call mpp_error(WARNING, trim(warn_header) // &
+          'do_conserve_tracers = .true. is doing nothing because do_burial = .false.')
     endif
 
     ! Specify all prognostic and diagnostic tracers of this modules.
@@ -1405,18 +1435,6 @@ module generic_WOMBATlite
     ! Base CaCO3 sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('wcaco3', wombat%wcaco3, 4.0/86400.0)
-    
-    ! Do dynamic CaCO3 precipiation, dissolution and ballasting? 
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('caco3_dynamics', wombat%caco3_dynamics, .true. )
-
-    ! Permanental burial organics and CaCO3 in sediments? 
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('burial', wombat%burial, .true. )
-
-    ! Add back the lost NO3 and Alk due to burial to surface? 
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('conservetracers', wombat%conservetracers, .true. )
 
     ! CaCO3 remineralisation rate constant [1/s]
     !-----------------------------------------------------------------------
@@ -1865,7 +1883,7 @@ module generic_WOMBATlite
 
     ! Calculate burial of deposited detritus (Dunne et al., 2007)
     wombat%fbury(:,:) = 0.0
-    if (wombat%burial) then
+    if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
           orgflux = wombat%det_btm(i,j) / dt * 86400 * 1e3 ! mmol C m-2 day-1
@@ -1876,7 +1894,7 @@ module generic_WOMBATlite
 
     call g_tracer_get_pointer(tracer_list, 'detbury', 'field', wombat%p_detbury)
     call g_tracer_get_pointer(tracer_list, 'caco3bury', 'field', wombat%p_caco3bury)
-    if (wombat%conservetracers) then
+    if (do_conserve_tracers) then
       wombat%p_detbury(:,:,1) = wombat%det_btm(:,:) / dt * wombat%fbury(:,:)
       wombat%p_caco3bury(:,:,1) = wombat%caco3_btm(:,:) / dt * wombat%fbury(:,:)
     else
@@ -2712,7 +2730,7 @@ module generic_WOMBATlite
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      if (wombat%caco3_dynamics) then
+      if (do_caco3_dynamics) then
 
         ! PIC:POC ratio is a function of the substrate:inhibitor ratio, which is the 
         !  HCO3- to free H+ ions ratio (mol/umol), following Lehmann & Bach (2024). 
@@ -3208,7 +3226,7 @@ module generic_WOMBATlite
       fbc = wombat%bbioh ** (wombat%sedtemp(i,j))
       wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
       wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
-      if (wombat%caco3_dynamics) then
+      if (do_caco3_dynamics) then
         wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) * &
                                             max(0.1, (1.0 - wombat%sedomega_cal(i,j)))**(4.5)
       else
@@ -3248,7 +3266,7 @@ module generic_WOMBATlite
 
     ! Apply back burial loss of nitrogen and alkalinity to surface
     !-----------------------------------------------------------------------
-    if (wombat%conservetracers) then
+    if (do_conserve_tracers) then
       call g_tracer_get_pointer(tracer_list, 'detbury', 'field', wombat%p_detbury) ! [mol/m2/s]
       call g_tracer_get_pointer(tracer_list, 'caco3bury', 'field', wombat%p_caco3bury) ! [mol/m2/s]
       call g_tracer_get_pointer(tracer_list, 'no3', 'stf', wombat%p_no3_stf)
