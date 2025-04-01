@@ -220,7 +220,6 @@ module generic_WOMBATlite
         b_fe, &
         light_limit, &
         pprod_gross_2d, &
-        wdet100, &
         export_prod, &
         export_inorg, &
         npp2d, &
@@ -410,7 +409,6 @@ module generic_WOMBATlite
         id_phy_mu = -1, &
         id_pchl_mu = -1, &
         id_pprod_gross_2d = -1, &
-        id_wdet100 = -1, &
         id_export_prod = -1, &
         id_export_inorg = -1, &
         id_npp3d = -1, &
@@ -781,12 +779,6 @@ module generic_WOMBATlite
         'caco3_sed_depst', 'Rate of deposition of CaCO3 to sediment at base of water column', &
         'h', '1', 's', 'mol/m^2/s', 'f')
     wombat%id_caco3_sed_depst = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
-        'wdet100', 'Detritus export at 100 m (det*sinking rate)', &
-        'h', '1', 's', 'mol/m^2/s', 'f')
-    wombat%id_wdet100 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2482,11 +2474,6 @@ module generic_WOMBATlite
          
       enddo  !} k
 
-      ! dts: in WOMBAT v3, export production was calucated before updating the source terms so we do
-      ! the same here. pjb: need to fix this.
-      k = k100(i,j)
-      !wombat%export_prod(i,j) = (wombat%Rho_0 * wombat%wdetbio) * wombat%f_det(i,j,k) ! [mol/m2/s]
-      !wombat%export_inorg(i,j) = (wombat%Rho_0 * wombat%wcaco3) * wombat%f_caco3(i,j,k) ! [mol/m2/s]
     enddo; enddo
 
     wombat%no3_prev(:,:,:) = wombat%f_no3(:,:,:)
@@ -3176,6 +3163,10 @@ module generic_WOMBATlite
         wombat%p_wdetfe(i,j,:) = 0.0
         wombat%p_wcaco3(i,j,:) = 0.0
       endif
+      ! PJB: export production through 100 metres
+      k = k100(i,j)
+      wombat%export_prod(i,j) = (wombat%Rho_0 * wombat%p_wdet(i,j,k)) * wombat%f_det(i,j,k) ! [mol/m2/s]
+      wombat%export_inorg(i,j) = (wombat%Rho_0 * wombat%p_wcaco3(i,j,k)) * wombat%f_caco3(i,j,k) ! [mol/m2/s]
     enddo; enddo
 
     !-----------------------------------------------------------------------
@@ -3506,15 +3497,6 @@ module generic_WOMBATlite
             wombat%pprod_gross(i,j,k) * rho_dzt(i,j,k) ! [mol/m2/s]
       enddo; enddo; enddo
       used = g_send_data(wombat%id_pprod_gross_2d, wombat%pprod_gross_2d, model_time, &
-          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
-    endif
-
-    if (wombat%id_wdet100 .gt. 0) then
-      do j = jsc,jec; do i = isc,iec;
-        wombat%wdet100(i,j) = (wombat%Rho_0 * wombat%wdetbio) * wombat%f_det(i,j, &
-            minloc(abs(wombat%zm(i,j,:)-100), dim=1)) ! [mol/m2/s]
-      enddo; enddo
-      used = g_send_data(wombat%id_wdet100, wombat%wdet100, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
     endif
 
@@ -3974,7 +3956,6 @@ module generic_WOMBATlite
     allocate(wombat%pprod_gross(isd:ied, jsd:jed, 1:nk)); wombat%pprod_gross(:,:,:)=0.0
     allocate(wombat%pprod_gross_2d(isd:ied, jsd:jed)); wombat%pprod_gross_2d(:,:)=0.0
     allocate(wombat%zprod_gross(isd:ied, jsd:jed, 1:nk)); wombat%zprod_gross(:,:,:)=0.0
-    allocate(wombat%wdet100(isd:ied, jsd:jed)); wombat%wdet100(:,:)=0.0
     allocate(wombat%export_prod(isd:ied, jsd:jed)); wombat%export_prod(:,:)=0.0
     allocate(wombat%export_inorg(isd:ied, jsd:jed)); wombat%export_inorg(:,:)=0.0
     allocate(wombat%npp2d(isd:ied, jsd:jed)); wombat%npp2d(:,:)=0.0
@@ -4122,7 +4103,6 @@ module generic_WOMBATlite
         wombat%pprod_gross, &
         wombat%pprod_gross_2d, &
         wombat%zprod_gross, &
-        wombat%wdet100, &
         wombat%export_prod, &
         wombat%export_inorg, &
         wombat%npp2d, &
