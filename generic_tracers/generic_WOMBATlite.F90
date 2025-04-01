@@ -1633,7 +1633,6 @@ module generic_WOMBATlite
         units = 'mol/kg', &
         prog = .true., &
         move_vertical = .true., &
-        flux_bottom = .false., &
         btm_reservoir = .true.)
 
     ! Detrital iron content
@@ -1644,7 +1643,6 @@ module generic_WOMBATlite
         units = 'mol/kg', &
         prog = .true., &
         move_vertical = .true., &
-        flux_bottom = .false., &
         btm_reservoir = .true.)
 
     ! CaCO3
@@ -1655,7 +1653,6 @@ module generic_WOMBATlite
         units = 'mol/kg', &
         prog = .true., &
         move_vertical = .true., &
-        flux_bottom = .false., &
         btm_reservoir = .true.)
 
     ! DIC (Dissolved inorganic carbon)
@@ -1682,7 +1679,6 @@ module generic_WOMBATlite
         units = 'mol/kg', &
         prog = .true., &
         flux_gas = .true., &
-        flux_bottom = .false., &
         flux_gas_name = 'co2_pre_flux', &
         flux_gas_type = 'air_sea_gas_flux_generic', &
         flux_gas_molwt = WTMCO2, &
@@ -1697,8 +1693,7 @@ module generic_WOMBATlite
         longname = 'remineralised Dissolved Inorganic Carbon', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_bottom = .true., &
-        flux_virtual = .true.)
+        flux_bottom = .true.)
 
     ! Alk (Total carbonate alkalinity)
     !-----------------------------------------------------------------------
@@ -2033,7 +2028,6 @@ module generic_WOMBATlite
     real                                    :: phy_pisl, phy_pisl2 
     real                                    :: pchl_pisl, pchl_mumin, pchl_muopt
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
-    !real, dimension(:,:), allocatable       :: seddep, sedmask
     real, dimension(:), allocatable         :: wsink, wsinkcal
     real, dimension(4,61)                   :: zbgr
     real                                    :: max_wsink
@@ -2148,9 +2142,6 @@ module generic_WOMBATlite
     ! and pco2surf, so it makes sense to set these values here rather than
     ! recalculating them in set_boundary_values.
     
-    !allocate(sedmask(isc:iec,jsc:jec)); sedmask(:,:)=0.0
-    !allocate(seddep(isc:iec,jsc:jec)); seddep(:,:)=0.0
-
     call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau, &
         positive=.true.)
     call g_tracer_get_values(tracer_list, 'no3', 'field', wombat%f_no3, isd, jsd, ntau=tau, &
@@ -2541,7 +2532,7 @@ module generic_WOMBATlite
       wombat%phy_kni(i,j,k) = wombat%phykn * max(0.1, max(0.0, (biophy-wombat%phybiot))**0.37)
       wombat%phy_kfe(i,j,k) = wombat%phykf * max(0.1, max(0.0, (biophy-wombat%phybiot))**0.37)
       ! Nitrogen limitation (currently Michaelis-Menten term)
-      wombat%phy_lnit(i,j,k) = biono3 / (biono3 + wombat%phy_kni(i,j,k))
+      wombat%phy_lnit(i,j,k) = biono3 / (biono3 + wombat%phy_kni(i,j,k) + epsi)
       ! Iron limitation (Quota model, constants from Flynn & Hipkin 1999)
       phy_minqfe = 0.00167 / 55.85 * max(wombat%phyminqc, phy_chlc)*12 + &
                    1.21e-5 * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * wombat%phy_lnit(i,j,k) + &
@@ -2803,7 +2794,6 @@ module generic_WOMBATlite
       
       if (wombat%f_det(i,j,k) .gt. epsi) then
         wombat%detremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * wombat%f_det(i,j,k)**2.0 ! [molC/kg/s]
-        !if (wombat%zw(i,j,k) .ge. 180.0) wombat%detremi(i,j,k) = wombat%detremi(i,j,k) * 0.5
       else
         wombat%detremi(i,j,k) = 0.0
       endif
