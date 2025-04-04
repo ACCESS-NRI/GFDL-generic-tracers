@@ -60,10 +60,10 @@ endif()
 
 ################################################################################
 
+find_package(PkgConfig REQUIRED)
 find_package(MPI REQUIRED COMPONENTS Fortran)
 find_package(FMS COMPONENTS R8 REQUIRED)
-find_package(NetCDF REQUIRED COMPONENTS Fortran)
-find_package(PkgConfig REQUIRED)
+pkg_check_modules(NETCDF REQUIRED IMPORTED_TARGET "netcdf-fortran")
 pkg_check_modules(MOCSY REQUIRED IMPORTED_TARGET "mocsy")
 
 add_library(gtracers STATIC)
@@ -89,7 +89,7 @@ target_sources(gtracers PRIVATE
 
 target_link_libraries(gtracers PUBLIC
 			FMS::fms_r8
-			NetCDF::NetCDF_Fortran
+			PkgConfig::NetCDF
 			PkgConfig::MOCSY)
 
 install(TARGETS gtracers
