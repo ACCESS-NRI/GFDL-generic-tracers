@@ -60,6 +60,7 @@ endif()
 
 ################################################################################
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(MPI REQUIRED COMPONENTS Fortran)
 find_package(FMS COMPONENTS R8 REQUIRED)
 find_package(NetCDF REQUIRED COMPONENTS Fortran)
