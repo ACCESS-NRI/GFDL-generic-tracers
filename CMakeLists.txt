@@ -62,7 +62,6 @@ endif()
 
 find_package(MPI REQUIRED COMPONENTS Fortran)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(NETCDF REQUIRED IMPORTED_TARGET "netcdf-fortran")
 pkg_check_modules(FMS REQUIRED IMPORTED_TARGET "FMS")
 pkg_check_modules(MOCSY REQUIRED IMPORTED_TARGET "mocsy")
 
@@ -89,8 +88,7 @@ target_sources(gtracers PRIVATE
 
 target_link_libraries(gtracers PUBLIC
 			PkgConfig::FMS
-			PkgConfig::MOCSY
-			PkgConfig::NETCDF)
+			PkgConfig::MOCSY)
 
 install(TARGETS gtracers
         EXPORT GFDLGTracersTargets)
