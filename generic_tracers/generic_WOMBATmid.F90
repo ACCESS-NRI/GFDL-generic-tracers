@@ -171,6 +171,7 @@ module generic_WOMBATmid
         zooepsmin, &
         zooepsmax, &
         zooepsrat, &
+        zoooptqf, &
         zprefphy, &
         zprefdia, &
         zprefdet, &
@@ -361,6 +362,7 @@ module generic_WOMBATmid
         zooslopphy, &
         zooslopdia, &
         zooslopdet, &
+        zooassife, &
         reminr, &
         detremi, &
         pic2poc, &
@@ -460,6 +462,7 @@ module generic_WOMBATmid
         id_zooslopphy = -1, &
         id_zooslopdia = -1, &
         id_zooslopdet = -1, &
+        id_zooassife = -1, &
         id_reminr = -1, &
         id_detremi = -1, &
         id_pic2poc = -1, &
@@ -1143,6 +1146,11 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'zooassife', 'Assimilation efficiency of zooplankton for Fe', 'h', 'L', 's', '', 'f')
+    wombat%id_zooassife = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'reminr', 'Rate of remineralisation', 'h', 'L', 's', '/s', 'f')
     wombat%id_reminr = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -1568,6 +1576,10 @@ module generic_WOMBATmid
     ! Rate of transition of epsilon from micro to mesozoo [per mmolC/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsrat', wombat%zooepsrat, 1.0/10.0)
+
+    ! Zooplankton optimal quota of iron to carbon [mol/mol]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('zoooptqf', wombat%zoooptqf, 10e-6)
 
     ! Zooplankton preference for phytoplankton [0-1]
     !-----------------------------------------------------------------------
@@ -2239,7 +2251,7 @@ module generic_WOMBATmid
     real                                    :: swpar
     real                                    :: u_npz, g_npz, g_peffect, g_teffect
     real                                    :: biophy, biodia, biozoo, biodet, biono3, biofer, biocaco3
-    real                                    :: biophyfe, biodiafe, biophy1, zooprey
+    real                                    :: biophyfe, biodiafe, biozoofe, biophy1, zooprey
     real                                    :: fbc
     real                                    :: no3_bgc_change, caco3_bgc_change
     real                                    :: epsi = 1.0e-30
@@ -2251,6 +2263,9 @@ module generic_WOMBATmid
     real                                    :: pchl_pisl, pchl_mumin, pchl_muopt
     real                                    :: dia_pisl, dia_pisl2 
     real                                    :: dchl_pisl, dchl_mumin, dchl_muopt
+    real                                    :: zooslopphyfe, zooslopdiafe, zooslopdetfe, fe_deficiency
+    real                                    :: zooassiphyfe, zooassidiafe, zooassidetfe
+    real                                    :: zooexcrphyfe, zooexcrdiafe, zooexcrdetfe
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink, wsinkcal
     real, dimension(4,61)                   :: zbgr
@@ -2486,6 +2501,7 @@ module generic_WOMBATmid
     wombat%zooslopphy(:,:,:) = 0.0
     wombat%zooslopdia(:,:,:) = 0.0
     wombat%zooslopdet(:,:,:) = 0.0
+    wombat%zooassife(:,:,:) = 0.0
     wombat%reminr(:,:,:) = 0.0
     wombat%detremi(:,:,:) = 0.0
     wombat%pic2poc(:,:,:) = 0.0
@@ -2759,6 +2775,7 @@ module generic_WOMBATmid
       biophyfe = max(epsi, wombat%f_phyfe(i,j,k))/ mmol_m3_to_mol_kg  ![mmol/m3]
       biodiafe = max(epsi, wombat%f_diafe(i,j,k))/ mmol_m3_to_mol_kg  ![mmol/m3]
       biozoo   = max(epsi, wombat%f_zoo(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biozoofe = max(epsi, wombat%f_zoofe(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodet   = max(epsi, wombat%f_det(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biono3   = max(epsi, wombat%f_no3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biofer   = max(epsi, wombat%f_fe(i,j,k)  ) / umol_m3_to_mol_kg  ![umol/m3]
@@ -3010,6 +3027,11 @@ module generic_WOMBATmid
       g_npz = wombat%zoogmax * fbc * (wombat%zooeps(i,j,k) * zooprey*zooprey) / &
               (wombat%zoogmax * fbc + (wombat%zooeps(i,j,k) * zooprey*zooprey))
 
+      ! Zooplankton Fe uptake
+      fe_deficiency = wombat%zoooptqf - zoo_Fe2C
+      wombat%zooassife(i,j,k) = max(0.5, min(1.5, (1.0 + 2.0 * fe_deficiency / wombat%zoooptqf ) ))
+      wombat%zooassife(i,j,k) = min(0.9, max(0.1, wombat%zooassi * wombat%zooassife(i,j,k) ))
+
 
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -3075,6 +3097,16 @@ module generic_WOMBATmid
       wombat%zooslopphy(i,j,k) = wombat%zoograzphy(i,j,k) * (1.0 - wombat%zooassi)*(1.0-wombat%zooexcr)
       wombat%zooslopdia(i,j,k) = wombat%zoograzdia(i,j,k) * (1.0 - wombat%zooassi)*(1.0-wombat%zooexcr)
       wombat%zooslopdet(i,j,k) = wombat%zoograzdet(i,j,k) * (1.0 - wombat%zooassi)*(1.0-wombat%zooexcr)
+      zooslopphyfe = wombat%zooslopphy(i,j,k) * phy_Fe2C
+      zooslopdiafe = wombat%zooslopdia(i,j,k) * dia_Fe2C
+      zooslopdetfe = wombat%zooslopdet(i,j,k) * det_Fe2C
+      zooassiphyfe = wombat%zoograzphy(i,j,k) * wombat%zooassife(i,j,k) * phy_Fe2C 
+      zooassidiafe = wombat%zoograzdia(i,j,k) * wombat%zooassife(i,j,k) * dia_Fe2C
+      zooassidetfe = wombat%zoograzdet(i,j,k) * wombat%zooassife(i,j,k) * det_Fe2C
+      zooexcrphyfe = wombat%zoograzphy(i,j,k)*phy_Fe2C - zooassiphyfe - zooslopphyfe
+      zooexcrdiafe = wombat%zoograzdia(i,j,k)*dia_Fe2C - zooassidiafe - zooslopdiafe
+      zooexcrdetfe = wombat%zoograzdet(i,j,k)*det_Fe2C - zooassidetfe - zooslopdetfe
+
 
       if (biophy.gt.1e-3) then
         wombat%phyresp(i,j,k) = wombat%phylmor * fbc * wombat%f_phy(i,j,k) ! [molC/kg/s]
@@ -3202,9 +3234,9 @@ module generic_WOMBATmid
       ! Zooplankton iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%f_zoofe(i,j,k)  = wombat%f_zoofe(i,j,k) + dtsb * ( &
-                                 wombat%zooassi * wombat%zoograzphy(i,j,k) * phy_Fe2C + &
-                                 wombat%zooassi * wombat%zoograzdia(i,j,k) * dia_Fe2C + &
-                                 wombat%zooassi * wombat%zoograzdet(i,j,k) * det_Fe2C - &
+                                 zooassiphyfe + &
+                                 zooassidiafe + &
+                                 zooassidetfe - &
                                  wombat%zooresp(i,j,k) * zoo_Fe2C - &
                                  wombat%zoomort(i,j,k) * zoo_Fe2C )
 
@@ -3228,9 +3260,9 @@ module generic_WOMBATmid
       ! Detrital iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%f_detfe(i,j,k) = wombat%f_detfe(i,j,k) + dtsb * ( & 
-                                wombat%zooslopphy(i,j,k) * phy_Fe2C + &
-                                wombat%zooslopdia(i,j,k) * dia_Fe2C + &
-                                wombat%zooslopdet(i,j,k) * det_Fe2C + &
+                                zooslopphyfe + &
+                                zooslopdiafe + &
+                                zooslopdetfe + &
                                 wombat%phymort(i,j,k) * phy_Fe2C + &
                                 wombat%diamort(i,j,k) * dia_Fe2C + &
                                 wombat%zoomort(i,j,k) * zoo_Fe2C - &
@@ -3313,13 +3345,13 @@ module generic_WOMBATmid
                               wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k) )
 
       ! Extra equation for iron ! [molFe/kg]
-      !-----------------------------------------------------------------------
+      !----------------------------------------------------------------------
       wombat%f_fe(i,j,k) = wombat%f_fe(i,j,k) + dtsb * ( &
                              wombat%detremi(i,j,k) * det_Fe2C + &
                              wombat%zooresp(i,j,k) * zoo_Fe2C + &
-                             wombat%zooexcrphy(i,j,k) * phy_Fe2C + &
-                             wombat%zooexcrdia(i,j,k) * dia_Fe2C + &
-                             wombat%zooexcrdet(i,j,k) * det_Fe2C + &
+                             zooexcrphyfe + &
+                             zooexcrdiafe + &
+                             zooexcrdetfe + &
                              wombat%phyresp(i,j,k) * phy_Fe2C + &
                              wombat%diaresp(i,j,k) * dia_Fe2C - &
                              wombat%phy_dfeupt(i,j,k) - &
@@ -3332,9 +3364,9 @@ module generic_WOMBATmid
       wombat%fesources(i,j,k) = wombat%fesources(i,j,k) + dtsb * ( &
                                   wombat%detremi(i,j,k) * det_Fe2C + &
                                   wombat%zooresp(i,j,k) * zoo_Fe2C + &
-                                  wombat%zooexcrphy(i,j,k) * phy_Fe2C + &
-                                  wombat%zooexcrdia(i,j,k) * dia_Fe2C + &
-                                  wombat%zooexcrdet(i,j,k) * det_Fe2C + &
+                                  zooexcrphyfe + &
+                                  zooexcrdiafe + &
+                                  zooexcrdetfe + &
                                   wombat%phyresp(i,j,k) * phy_Fe2C + &
                                   wombat%diaresp(i,j,k) * dia_Fe2C)
       wombat%fesinks(i,j,k) = wombat%fesinks(i,j,k) + dtsb * ( & 
@@ -3925,6 +3957,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_zooslopdet, wombat%zooslopdet, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
+    if (wombat%id_zooassife .gt. 0) &
+      used = g_send_data(wombat%id_zooassife, wombat%zooassife, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
     if (wombat%id_reminr .gt. 0) &
       used = g_send_data(wombat%id_reminr, wombat%reminr, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -4468,6 +4504,7 @@ module generic_WOMBATmid
     allocate(wombat%zooslopphy(isd:ied, jsd:jed, 1:nk)); wombat%zooslopphy(:,:,:)=0.0
     allocate(wombat%zooslopdia(isd:ied, jsd:jed, 1:nk)); wombat%zooslopdia(:,:,:)=0.0
     allocate(wombat%zooslopdet(isd:ied, jsd:jed, 1:nk)); wombat%zooslopdet(:,:,:)=0.0
+    allocate(wombat%zooassife(isd:ied, jsd:jed, 1:nk)); wombat%zooassife(:,:,:)=0.0
     allocate(wombat%reminr(isd:ied, jsd:jed, 1:nk)); wombat%reminr(:,:,:)=0.0
     allocate(wombat%detremi(isd:ied, jsd:jed, 1:nk)); wombat%detremi(:,:,:)=0.0
     allocate(wombat%pic2poc(isd:ied, jsd:jed, 1:nk)); wombat%pic2poc(:,:,:)=0.0
@@ -4634,6 +4671,7 @@ module generic_WOMBATmid
         wombat%zooslopphy, &
         wombat%zooslopdia, &
         wombat%zooslopdet, &
+        wombat%zooassife, &
         wombat%reminr, &
         wombat%detremi, &
         wombat%pic2poc, &
