@@ -300,6 +300,8 @@ module generic_WOMBATmid
         f_diafe, &
         f_zoo, &
         f_zoofe, &
+        f_mes, &
+        f_mesfe, &
         f_det, &
         f_detfe, &
         f_o2, &
@@ -1491,7 +1493,7 @@ module generic_WOMBATmid
 
     ! Phytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phykf', wombat%phykf, 2.5)
+    call g_tracer_add_param('phykf', wombat%phykf, 1.0)
 
     ! Phytoplankton minimum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
@@ -1523,7 +1525,7 @@ module generic_WOMBATmid
 
     ! microphytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diakf', wombat%diakf, 2.5)
+    call g_tracer_add_param('diakf', wombat%diakf, 1.0)
 
     ! microphytoplankton minimum quota of chlorodiall to carbon [mg/mg]
     !-----------------------------------------------------------------------
@@ -1551,7 +1553,7 @@ module generic_WOMBATmid
 
     ! Zooplankton assimilation efficiency [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooassi', wombat%zooassi, 0.4)
+    call g_tracer_add_param('zooassi', wombat%zooassi, 0.35)
 
     ! Zooplankton excretion of unassimilated prey [0-1]
     !-----------------------------------------------------------------------
@@ -1567,7 +1569,7 @@ module generic_WOMBATmid
 
     ! Zooplankton minimum prey capture rate constant [m6/mmol2/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsmin', wombat%zooepsmin, 0.025/86400.0)
+    call g_tracer_add_param('zooepsmin', wombat%zooepsmin, 0.01/86400.0)
 
     ! Zooplankton maximum prey capture rate constant [m6/mmol2/s]
     !-----------------------------------------------------------------------
@@ -1609,11 +1611,11 @@ module generic_WOMBATmid
     
     ! Base detritus sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wdetbio', wombat%wdetbio, 18.0/86400.0)
+    call g_tracer_add_param('wdetbio', wombat%wdetbio, 20.0/86400.0)
     
     ! Detritus maximum sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wdetmax', wombat%wdetmax, 36.0/86400.0)
+    call g_tracer_add_param('wdetmax', wombat%wdetmax, 45.0/86400.0)
     
     ! Detritus remineralisation rate constant in sediments [1/s]
     !-----------------------------------------------------------------------
@@ -1632,7 +1634,7 @@ module generic_WOMBATmid
 
     ! Base CaCO3 sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wcaco3', wombat%wcaco3, 4.0/86400.0)
+    call g_tracer_add_param('wcaco3', wombat%wcaco3, 10.0/86400.0)
 
     ! CaCO3 remineralisation rate constant [1/s]
     !-----------------------------------------------------------------------
@@ -1666,7 +1668,7 @@ module generic_WOMBATmid
 
     ! Fraction of dissolved iron in colloidal form [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('fcolloid', wombat%fcolloid, 0.5)
+    call g_tracer_add_param('fcolloid', wombat%fcolloid, 0.25)
 
     ! Precipitation of Fe` as nanoparticles (in excess of solubility) [/d]
     !-----------------------------------------------------------------------
@@ -1857,6 +1859,22 @@ module generic_WOMBATmid
     call g_tracer_add(tracer_list, package_name, &
         name = 'zoofe', &
         longname = 'Zooplankton iron content', &
+        units = 'mol/kg', &
+        prog = .true.)
+    
+    ! Mesozooplankton
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'mes', &
+        longname = 'Mesozooplankton', &
+        units = 'mol/kg', &
+        prog = .true.)
+
+    ! Mesozooplankton iron content
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'mesfe', &
+        longname = 'Mesozooplankton iron content', &
         units = 'mol/kg', &
         prog = .true.)
 
@@ -2250,8 +2268,8 @@ module generic_WOMBATmid
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
     real                                    :: u_npz, g_npz, g_peffect, g_teffect
-    real                                    :: biophy, biodia, biozoo, biodet, biono3, biofer, biocaco3
-    real                                    :: biophyfe, biodiafe, biozoofe, biophy1, zooprey
+    real                                    :: biophy, biodia, biozoo, biomes, biodet, biono3, biofer, biocaco3
+    real                                    :: biophyfe, biodiafe, biozoofe, biomesfe, biophy1, zooprey
     real                                    :: fbc
     real                                    :: no3_bgc_change, caco3_bgc_change
     real                                    :: epsi = 1.0e-30
@@ -2273,7 +2291,7 @@ module generic_WOMBATmid
     real                                    :: ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: biof, biodoc, zno3, zfermin
-    real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, det_Fe2C
+    real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, mes_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe
     real                                    :: zoo_slmor, epsmin
@@ -2589,6 +2607,10 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'zoofe', 'field', wombat%f_zoofe, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'mes', 'field', wombat%f_mes, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'mesfe', 'field', wombat%f_mesfe, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'det', 'field', wombat%f_det, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'detfe', 'field', wombat%f_detfe, isd, jsd, ntau=tau, &
@@ -2776,6 +2798,8 @@ module generic_WOMBATmid
       biodiafe = max(epsi, wombat%f_diafe(i,j,k))/ mmol_m3_to_mol_kg  ![mmol/m3]
       biozoo   = max(epsi, wombat%f_zoo(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biozoofe = max(epsi, wombat%f_zoofe(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biomes   = max(epsi, wombat%f_mes(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biomesfe = max(epsi, wombat%f_mesfe(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodet   = max(epsi, wombat%f_det(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biono3   = max(epsi, wombat%f_no3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biofer   = max(epsi, wombat%f_fe(i,j,k)  ) / umol_m3_to_mol_kg  ![umol/m3]
@@ -2785,6 +2809,7 @@ module generic_WOMBATmid
       phy_Fe2C = max(epsi, wombat%f_phyfe(i,j,k))/ max(epsi, wombat%f_phy(i,j,k))
       dia_Fe2C = max(epsi, wombat%f_diafe(i,j,k))/ max(epsi, wombat%f_dia(i,j,k))
       zoo_Fe2C = max(epsi, wombat%f_zoofe(i,j,k))/ max(epsi, wombat%f_zoo(i,j,k))
+      mes_Fe2C = max(epsi, wombat%f_mesfe(i,j,k))/ max(epsi, wombat%f_mes(i,j,k))
       det_Fe2C = max(epsi, wombat%f_detfe(i,j,k))/ max(epsi, wombat%f_det(i,j,k))
 
 
@@ -3240,6 +3265,24 @@ module generic_WOMBATmid
                                  wombat%zooresp(i,j,k) * zoo_Fe2C - &
                                  wombat%zoomort(i,j,k) * zoo_Fe2C )
 
+      ! Mesozooplankton equation ! [molC/kg]
+      !-----------------------------------------------------------------------
+      wombat%f_mes(i,j,k)  = wombat%f_mes(i,j,k) !+ dtsb * ( &
+                               !wombat%mesassi * wombat%mesgrazphy(i,j,k) + &
+                               !wombat%mesassi * wombat%mesgrazdia(i,j,k) + &
+                               !wombat%mesassi * wombat%mesgrazdet(i,j,k) - &
+                               !wombat%mesresp(i,j,k) - &
+                               !wombat%mesmort(i,j,k) )
+
+      ! Mesomesplankton iron equation ! [molFe/kg]
+      !-----------------------------------------------------------------------
+      wombat%f_mesfe(i,j,k)  = wombat%f_mesfe(i,j,k) !+ dtsb * ( &
+                                 !mesassiphyfe + &
+                                 !mesassidiafe + &
+                                 !mesassidetfe - &
+                                 !wombat%mesresp(i,j,k) * mes_Fe2C - &
+                                 !wombat%mesmort(i,j,k) * mes_Fe2C )
+
       ! Estimate secondary productivity from zooplankton growth ! [molC/kg/s]
       wombat%zprod_gross(i,j,k) = wombat%zprod_gross(i,j,k) + dtsb * &
                                     wombat%zooassi * (wombat%zoograzphy(i,j,k) + &
@@ -3386,9 +3429,9 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
 
       n_pools(i,j,k,2) = wombat%f_no3(i,j,k) + (wombat%f_phy(i,j,k) + wombat%f_det(i,j,k) + &
-                          wombat%f_zoo(i,j,k) + wombat%f_dia(i,j,k)) * 16/122.0
+                          wombat%f_zoo(i,j,k) + wombat%f_mes(i,j,k) + wombat%f_dia(i,j,k)) * 16/122.0
       c_pools(i,j,k,2) = wombat%f_dic(i,j,k) + wombat%f_phy(i,j,k) + wombat%f_det(i,j,k) + &
-                         wombat%f_zoo(i,j,k) + wombat%f_caco3(i,j,k) + wombat%f_dia(i,j,k)
+                         wombat%f_zoo(i,j,k) + wombat%f_mes(i,j,k) + wombat%f_caco3(i,j,k) + wombat%f_dia(i,j,k)
 
       if (tn.gt.1) then
         if (abs(n_pools(i,j,k,2) - n_pools(i,j,k,1)).gt.1e-16) then
@@ -3405,6 +3448,7 @@ module generic_WOMBATmid
           print *, "       PHY (molN/kg) =", wombat%f_phy(i,j,k) * 16.0 / 122.0
           print *, "       DIA (molN/kg) =", wombat%f_dia(i,j,k) * 16.0 / 122.0
           print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k) * 16.0 / 122.0
+          print *, "       MES (molN/kg) =", wombat%f_mes(i,j,k) * 16.0 / 122.0
           print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
           print *, " "
           print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
@@ -3434,6 +3478,7 @@ module generic_WOMBATmid
           print *, "       PHY (molC/kg) =", wombat%f_phy(i,j,k)
           print *, "       DIA (molC/kg) =", wombat%f_dia(i,j,k)
           print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k)
+          print *, "       MES (molN/kg) =", wombat%f_mes(i,j,k)
           print *, "       DET (molN/kg) =", wombat%f_det(i,j,k)
           print *, "       CaCO3 (molC/kg) =", wombat%f_caco3(i,j,k)
           print *, "       Temp =", Temp(i,j,k)
@@ -3540,6 +3585,8 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'diafe', 'field', wombat%f_diafe, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'zoo', 'field', wombat%f_zoo, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'zoofe', 'field', wombat%f_zoofe, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'mes', 'field', wombat%f_mes, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'mesfe', 'field', wombat%f_mesfe, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'det', 'field', wombat%f_det, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'detfe', 'field', wombat%f_detfe, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau)
@@ -4428,6 +4475,8 @@ module generic_WOMBATmid
     allocate(wombat%f_diafe(isd:ied, jsd:jed, 1:nk)); wombat%f_diafe(:,:,:)=0.0
     allocate(wombat%f_zoo(isd:ied, jsd:jed, 1:nk)); wombat%f_zoo(:,:,:)=0.0
     allocate(wombat%f_zoofe(isd:ied, jsd:jed, 1:nk)); wombat%f_zoofe(:,:,:)=0.0
+    allocate(wombat%f_mes(isd:ied, jsd:jed, 1:nk)); wombat%f_mes(:,:,:)=0.0
+    allocate(wombat%f_mesfe(isd:ied, jsd:jed, 1:nk)); wombat%f_mesfe(:,:,:)=0.0
     allocate(wombat%f_det(isd:ied, jsd:jed, 1:nk)); wombat%f_det(:,:,:)=0.0
     allocate(wombat%f_detfe(isd:ied, jsd:jed, 1:nk)); wombat%f_detfe(:,:,:)=0.0
     allocate(wombat%f_o2(isd:ied, jsd:jed, 1:nk)); wombat%f_o2(:,:,:)=0.0
@@ -4596,6 +4645,8 @@ module generic_WOMBATmid
         wombat%f_diafe, &
         wombat%f_zoo, &
         wombat%f_zoofe, &
+        wombat%f_mes, &
+        wombat%f_mesfe, &
         wombat%f_det, &
         wombat%f_detfe, &
         wombat%f_o2, &
