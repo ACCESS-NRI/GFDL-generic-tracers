@@ -1615,7 +1615,7 @@ module generic_WOMBATmid
 
     ! Phytoplankton half saturation constant for nitrogen uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phykn', wombat%phykn, 1.0)
+    call g_tracer_add_param('phykn', wombat%phykn, 0.3)
 
     ! Phytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
@@ -1623,11 +1623,11 @@ module generic_WOMBATmid
 
     ! Phytoplankton minimum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.004)
+    call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.008)
 
     ! Phytoplankton optimal quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyoptqc', wombat%phyoptqc, 0.036)
+    call g_tracer_add_param('phyoptqc', wombat%phyoptqc, 0.040)
 
     ! Phytoplankton optimal quota of iron to carbon [mol/mol]
     !-----------------------------------------------------------------------
@@ -1703,7 +1703,7 @@ module generic_WOMBATmid
 
     ! Rate of transition of epsilon from nano to microzoo [per mmolC/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsrat', wombat%zooepsrat, 1.0/10.0)
+    call g_tracer_add_param('zooepsrat', wombat%zooepsrat, 0.2)
 
     ! Zooplankton optimal quota of iron to carbon [mol/mol]
     !-----------------------------------------------------------------------
@@ -1727,15 +1727,15 @@ module generic_WOMBATmid
 
     ! Zooplankton quadratic mortality rate constant [m3/mmolN/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooqmor', wombat%zooqmor, 0.05/86400.0)
+    call g_tracer_add_param('zooqmor', wombat%zooqmor, 0.1/86400.0)
 
     ! Mesozooplankton assimilation efficiency [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesassi', wombat%mesassi, 0.35)
+    call g_tracer_add_param('mesassi', wombat%mesassi, 0.60)
 
     ! Mesozooplankton excretion of unassimilated prey [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesexcr', wombat%mesexcr, 0.75)
+    call g_tracer_add_param('mesexcr', wombat%mesexcr, 0.50)
 
     ! Mesozooplankton half saturation coefficient for linear mortality
     !-----------------------------------------------------------------------
@@ -1747,7 +1747,7 @@ module generic_WOMBATmid
 
     ! Mesozooplankton minimum prey capture rate constant [m6/mmol2/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsmin', wombat%mesepsmin, 0.001/86400.0)
+    call g_tracer_add_param('mesepsmin', wombat%mesepsmin, 0.01/86400.0)
 
     ! Mesozooplankton maximum prey capture rate constant [m6/mmol2/s]
     !-----------------------------------------------------------------------
@@ -1755,7 +1755,7 @@ module generic_WOMBATmid
 
     ! Rate of transition of epsilon from micro to meso [per mmolC/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsrat', wombat%mesepsrat, 1.0/10.0)
+    call g_tracer_add_param('mesepsrat', wombat%mesepsrat, 0.2)
 
     ! Mesozooplankton optimal quota of iron to carbon [mol/mol]
     !-----------------------------------------------------------------------
@@ -1763,7 +1763,7 @@ module generic_WOMBATmid
 
     ! Mesozooplankton preference for phytoplankton [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.5)
+    call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.25)
 
     ! Mesozooplankton preference for microphytoplankton [0-1]
     !-----------------------------------------------------------------------
@@ -1775,7 +1775,7 @@ module generic_WOMBATmid
 
     ! Mesozooplankton preference for zooplankton [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefzoo', wombat%mprefzoo, 1.00)
+    call g_tracer_add_param('mprefzoo', wombat%mprefzoo, 1.0)
 
     ! Mesozooplankton respiration rate constant [1/s]
     !-----------------------------------------------------------------------
@@ -1793,7 +1793,7 @@ module generic_WOMBATmid
     
     ! Base detritus sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wdetbio', wombat%wdetbio, 20.0/86400.0)
+    call g_tracer_add_param('wdetbio', wombat%wdetbio, 25.0/86400.0)
     
     ! Detritus maximum sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
