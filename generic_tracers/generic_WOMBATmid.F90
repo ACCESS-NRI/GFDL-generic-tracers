@@ -2488,7 +2488,6 @@ module generic_WOMBATmid
     character(len=fm_string_len), parameter :: sub_name = 'generic_WOMBATmid_update_from_source'
     character(len=256), parameter           :: error_header = &
         '==>Error from ' // trim(mod_name) // '(' // trim(sub_name) // '): '
-    character(len=16000) :: mesg
 
     call g_tracer_get_common(isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, &
         grid_tmask=grid_tmask, grid_kmt=grid_kmt)
@@ -5200,17 +5199,5 @@ module generic_WOMBATmid
         wombat%sedomega_cal)
 
   end subroutine user_deallocate_arrays
-
-  function itoa(i) result(str)
-    integer, intent(in) :: i
-    character(len=32) :: str
-    write(str, '(I0)') i
-  end function itoa
-
-  function ftoa(x) result(str)
-    real(8), intent(in) :: x  ! or `real` if single precision
-    character(len=64) :: str
-    write(str, '(ES13.6)') x
-  end function ftoa
 
 end module generic_WOMBATmid
