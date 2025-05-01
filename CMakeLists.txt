@@ -95,6 +95,8 @@ target_link_libraries(gtracers PUBLIC
 install(TARGETS gtracers
         EXPORT GFDLGTracersTargets)
 
+target_include_directories(gtracers PUBLIC "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+
 install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ TYPE INCLUDE)
 
 install(EXPORT GFDLGTracersTargets
