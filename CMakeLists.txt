@@ -10,6 +10,7 @@ project(GFDLGTracers
 )
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
   message(STATUS "Setting build type to 'Relwithdebinfo' as none was specified.")
@@ -112,6 +113,16 @@ install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ TYPE INCLUDE)
 install(EXPORT GFDLGTracersTargets
   FILE GFDLGTracersTargets.cmake
   NAMESPACE GFDLGTracers::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GFDLGTracers
+)
+
+configure_package_config_file(
+  cmake/GFDLGTracersConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/GFDLGTracersConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GFDLGTracers
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/GFDLGTracersConfig.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GFDLGTracers
 )
 
