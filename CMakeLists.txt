@@ -9,7 +9,9 @@ project(libgtracers
   LANGUAGES Fortran
 )
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
   message(STATUS "Setting build type to 'Relwithdebinfo' as none was specified.")
@@ -61,9 +63,8 @@ endif()
 ################################################################################
 
 find_package(MPI REQUIRED COMPONENTS Fortran)
+find_package(fms COMPONENTS R8 REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(NETCDF REQUIRED IMPORTED_TARGET "netcdf-fortran")
-pkg_check_modules(FMS REQUIRED IMPORTED_TARGET "FMS")
 pkg_check_modules(MOCSY REQUIRED IMPORTED_TARGET "mocsy")
 
 add_library(gtracers STATIC)
@@ -88,18 +89,29 @@ target_sources(gtracers PRIVATE
 )
 
 target_link_libraries(gtracers PUBLIC
-			PkgConfig::FMS
-			PkgConfig::MOCSY
-			PkgConfig::NETCDF)
+			FMS::fms_r8
+			PkgConfig::MOCSY)
 
 install(TARGETS gtracers
         EXPORT GFDLGTracersTargets)
+
+target_include_directories(gtracers PUBLIC "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ TYPE INCLUDE)
 
 install(EXPORT GFDLGTracersTargets
   FILE GFDLGTracersTargets.cmake
   NAMESPACE GFDLGTracers::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GFDLGTracers
+)
+
+configure_package_config_file(
+  cmake/GFDLGTracersConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/GFDLGTracersConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GFDLGTracers
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/GFDLGTracersConfig.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GFDLGTracers
 )
 
