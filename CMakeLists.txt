@@ -11,6 +11,7 @@ project(GFDLGTracers
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(CheckFortranCompilerFlag)
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
   message(STATUS "Setting build type to 'Relwithdebinfo' as none was specified.")
@@ -37,6 +38,14 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 
   # Copied from MOM5/bin/mkmf.template.nci.gfortran
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fcray-pointer -fdefault-real-8 -ffree-line-length-none -fno-range-check -Waliasing -Wampersand -Warray-bounds -Wcharacter-truncation -Wconversion -Wline-truncation -Wintrinsics-std -Wsurprising -Wno-tabs -Wunderflow -Wunused-parameter -Wintrinsic-shadow -Wno-align-commons")
+  check_fortran_compiler_flag("-fallow-invalid-boz" _boz_flag)
+  check_fortran_compiler_flag("-fallow-argument-mismatch" _argmis_flag)
+  if(_boz_flag)
+    set(CMAKE_Fortran_FLAGS               "${CMAKE_Fortran_FLAGS} -fallow-invalid-boz" )
+  endif()
+  if(_argmis_flag)
+    set(CMAKE_Fortran_FLAGS               "${CMAKE_Fortran_FLAGS} -fallow-argument-mismatch" )
+  endif()
   set(CMAKE_Fortran_FLAGS_RELEASE "-O2")
   set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g")
   set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -W -fbounds-check")
@@ -44,7 +53,7 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
 
   # Copied from MOM5/bin/mkmf.template.nci
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-alias -safe-cray-ptr -fpe0 -ftz -assume byterecl -i4 -r8 -traceback -nowarn -check noarg_temp_created -assume nobuffered_io -convert big_endian -grecord-gcc-switches -align all")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-alias -safe-cray-ptr -fpe0 -ftz -assume byterecl -i4 -r8 -traceback -nowarn -check noarg_temp_created -assume nobuffered_io -convert big_endian -grecord-gcc-switches -fp-model precise -fp-model source -align all")
   set(CMAKE_Fortran_FLAGS_RELEASE "-g3 -O2 -xCORE-AVX2 -debug all -check none")
   set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g3 -O2 -xCORE-AVX2 -debug all -check none")
   set(CMAKE_Fortran_FLAGS_DEBUG "-g3 -O0 -debug all -check -check noarg_temp_created -check nopointer -warn -warn noerrors -ftrapuv")
@@ -52,7 +61,7 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
 
   # Copied from MOM5/bin/mkmf.template.nci
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-alias -safe-cray-ptr -fpe0 -ftz -assume byterecl -i4 -r8 -traceback -nowarn -check noarg_temp_created -assume nobuffered_io -convert big_endian -grecord-gcc-switches -align all")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-alias -safe-cray-ptr -fpe0 -ftz -assume byterecl -i4 -r8 -traceback -nowarn -check noarg_temp_created -assume nobuffered_io -convert big_endian -grecord-gcc-switches -fp-model precise -fp-model source -align all")
   set(CMAKE_Fortran_FLAGS_RELEASE "-g3 -O2 -xCORE-AVX2 -debug all -check none")
   set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g3 -O2 -xCORE-AVX2 -debug all -check none")
   set(CMAKE_Fortran_FLAGS_DEBUG "-g3 -O0 -debug all -check -check noarg_temp_created -check nopointer -warn -warn noerrors -ftrapuv")
