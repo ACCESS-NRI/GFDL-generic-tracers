@@ -11,9 +11,9 @@ include(CMakeFindDependencyMacro)
 # Request components
 set(_required_components ${GFDLGTracers_FIND_COMPONENTS})
 
-find_package(MPI REQUIRED COMPONENTS Fortran)
-find_package(fms COMPONENTS R8 REQUIRED)
-find_package(PkgConfig REQUIRED)
+find_dependency(MPI REQUIRED COMPONENTS Fortran)
+find_dependency(fms COMPONENTS R8 REQUIRED)
+find_dependency(PkgConfig REQUIRED)
 pkg_check_modules(MOCSY REQUIRED IMPORTED_TARGET "mocsy")
 
 # Run the normal Targets.cmake
