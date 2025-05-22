@@ -122,7 +122,11 @@ module generic_WOMBATlite
     ! See user_add_params for descriptions of each parameter
     logical :: &
         init, &
-        caco3_dynamics, &
+        sir_dynamics, &
+        diss_dynamics, &
+        caco3_ballast, &
+        fe_ph, &
+        caco3_scavenging, &
         burial, &
         conservetracers, &
         force_update_fluxes ! Set in generic_tracer_nml
@@ -1410,7 +1414,11 @@ module generic_WOMBATlite
     
     ! Do dynamic CaCO3 precipiation, dissolution and ballasting? 
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('caco3_dynamics', wombat%caco3_dynamics, .true. )
+    call g_tracer_add_param('sir_dynamics', wombat%sir_dynamics, .true. )
+    call g_tracer_add_param('diss_dynamics', wombat%diss_dynamics, .true. )
+    call g_tracer_add_param('caco3_ballast', wombat%caco3_ballast, .true. )
+    call g_tracer_add_param('fe_ph', wombat%fe_ph, .true. )
+    call g_tracer_add_param('caco3_scavenging', wombat%caco3_scavenging, .true. )
 
     ! Permanental burial organics and CaCO3 in sediments? 
     !-----------------------------------------------------------------------
@@ -2647,8 +2655,16 @@ module generic_WOMBATlite
       fesol3 = 10**(0.4511 - 0.3305*zval**0.5 - 1996.0/ztemk)
       fesol4 = 10**(-0.2965 - 0.7881*zval**0.5 - 4086.0/ztemk)
       fesol5 = 10**(4.4466 - 0.8505*zval**0.5 - 7980.0/ztemk)
-      hp = 10**(-7.9)
-      if (wombat%htotal(i,j,k).gt.0.0) hp = wombat%htotal(i,j,k)
+      if (wombat%fe_ph) then
+        if (wombat%htotal(i,j,k).gt.0.0) then
+          hp = wombat%htotal(i,j,k)
+        else
+          hp = 10**(-7.9)
+        endif
+      else
+        hp = 10**(-7.9)
+      endif
+      
       fe3sol = fesol1 * ( hp**3 + fesol2 * hp**2 + fesol3 * hp + fesol4 + fesol5 / hp ) *1e9
 
       ! Estimate total colloidal iron
@@ -2669,8 +2685,12 @@ module generic_WOMBATlite
       ! Precipitation of Fe' (creation of nanoparticles)
       wombat%feprecip(i,j,k) = max(0.0, ( wombat%feIII(i,j,k) - fe3sol ) ) * wombat%knano_dfe/86400.0
 
-      ! Scavenging of Fe` onto biogenic particles 
-      partic = (biodet + biocaco3)
+      ! Scavenging of Fe` onto biogenic particleas
+      if (wombat%caco3_scavenging) then
+        partic = (biodet + biocaco3)
+      else
+        partic = (biodet)
+      endif
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
       wombat%fescadet(i,j,k) = wombat%fescaven(i,j,k) * biodet / (partic+epsi) 
 
@@ -2727,7 +2747,7 @@ module generic_WOMBATlite
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      if (wombat%caco3_dynamics) then
+      if (wombat%sir_dynamics) then
 
         ! PIC:POC ratio is a function of the substrate:inhibitor ratio, which is the 
         !  HCO3- to free H+ ions ratio (mol/umol), following Lehmann & Bach (2024). 
@@ -2737,6 +2757,12 @@ module generic_WOMBATlite
         wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10**(-3.0 + 4.31 * &
                                           hco3 / (wombat%htotal(i,j,k)*1e6))) * &
                                          (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
+      else
+      
+        wombat%pic2poc(i,j,k) = wombat%f_inorg + 0.025
+      
+      endif
+      if (wombat%diss_dynamics) then
 
         ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
         !  concentration of POC, following Kwon et al., 2024, Science Advances; Table S1
@@ -2747,7 +2773,6 @@ module generic_WOMBATlite
 
       else
       
-        wombat%pic2poc(i,j,k) = wombat%f_inorg + 0.025
         wombat%dissrat(i,j,k) = wombat%caco3lrem
       
       endif
@@ -3161,8 +3186,10 @@ module generic_WOMBATlite
         biophy1  = max(epsi, wombat%f_phy(i,j,1) ) / mmol_m3_to_mol_kg  ![mmol/m3]
         wsink(:) = wombat%wdetbio * max(0.0, biophy1 - wombat%phybiot)**(0.21) 
         do k=1,nk
-          wsink(k) = wsink(k) + 10.0/86400.0 * min(1.0, & 
-                     (wombat%f_caco3(i,j,k) / (wombat%f_det(i,j,k) + wombat%f_caco3(i,j,k) + epsi)))
+          if (wombat%caco3_ballast) then
+             wsink(k) = wsink(k) + 10.0/86400.0 * min(1.0, & 
+                        (wombat%f_caco3(i,j,k) / (wombat%f_det(i,j,k) + wombat%f_caco3(i,j,k) + epsi)))
+          endif
           ! Increase sinking rate with depth to achieve power law behaviour  
           wsink(k) = wsink(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink(k)))
           ! Ensure that we don't violate the CFL criterion  
@@ -3220,7 +3247,7 @@ module generic_WOMBATlite
       fbc = wombat%bbioh ** (wombat%sedtemp(i,j))
       wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
       wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
-      if (wombat%caco3_dynamics) then
+      if (wombat%diss_dynamics) then
         wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) * &
                                             max(0.1, (1.0 - wombat%sedomega_cal(i,j)))**(4.5)
       else
