@@ -216,6 +216,7 @@ module generic_WOMBATlite
     real, dimension(:,:), allocatable :: &
         b_dic, &
         b_dicr, &
+        b_dich, &
         b_alk, &
         b_no3, &
         b_o2, &
@@ -267,6 +268,7 @@ module generic_WOMBATlite
         f_dic, &
         f_dicr, &
         f_dicp, &
+        f_dich, &
         f_alk, &
         f_no3, &
         f_phy, &
@@ -1688,11 +1690,21 @@ module generic_WOMBATlite
         flux_gas_restart_file = 'ocean_wombatlite_airsea_flux.res.nc', &
         flux_virtual = .true.)
 
-    ! DICr (remineralised dissolved inorganic carbon)
+    ! DICr (remineralised dissolved inorganic carbon from detritus)
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
         name = 'dicr', &
-        longname = 'remineralised Dissolved Inorganic Carbon', &
+        longname = 'detritus remineralised Dissolved Inorganic Carbon', &
+        units = 'mol/kg', &
+        prog = .true., &
+        flux_bottom = .true., &
+        flux_virtual = .true.)
+
+    ! DICh (remineralised dissolved inorganic carbon from caco3)
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'dich', &
+        longname = 'caco3 remineralised Dissolved Inorganic Carbon', &
         units = 'mol/kg', &
         prog = .true., &
         flux_bottom = .true., &
@@ -2340,9 +2352,11 @@ module generic_WOMBATlite
     call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau, &
-        positive=.true.) ! [mol/kg]
+        positive=.false.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'dich', 'field', wombat%f_dich, isd, jsd, ntau=tau, &
+        positive=.false.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'dicp', 'field', wombat%f_dicp, isd, jsd, ntau=tau, &
-        positive=.true.) ! [mol/kg]
+        positive=.false.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
  
@@ -2965,8 +2979,12 @@ module generic_WOMBATlite
                                wombat%zooexcrphy(i,j,k) + &
                                wombat%zooexcrdet(i,j,k) + &
                                wombat%phyresp(i,j,k) - &
-                               wombat%phygrow(i,j,k) - &
-                               wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k) - &
+                               wombat%phygrow(i,j,k) )
+
+      ! Equation for DICh ! [molC/kg]
+      !-----------------------------------------------------------------------
+      wombat%f_dich(i,j,k) = wombat%f_dich(i,j,k) + dtsb * ( &
+                               0.0 - wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k) - &
                                wombat%phymort(i,j,k) * wombat%pic2poc(i,j,k) - &
                                wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k) + &  
                                wombat%caldiss(i,j,k) )
@@ -3169,6 +3187,7 @@ module generic_WOMBATlite
     call g_tracer_set_values(tracer_list, 'fe', 'field', wombat%f_fe, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'dich', 'field', wombat%f_dich, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau)
 
 
@@ -3260,7 +3279,8 @@ module generic_WOMBATlite
       wombat%b_no3(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_o2(i,j) = -172./16. * wombat%b_no3(i,j) ! [mol/m2/s]
       wombat%b_dic(i,j) = 122./16. * wombat%b_no3(i,j) - wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
+      wombat%b_dicr(i,j) = 122./16. * wombat%b_no3(i,j) ! [mol/m2/s]
+      wombat%b_dich(i,j) = 0.0 - wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
     enddo; enddo
@@ -3281,6 +3301,7 @@ module generic_WOMBATlite
     call g_tracer_set_values(tracer_list, 'o2', 'btf', wombat%b_o2, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'btf', wombat%b_dic, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dicr', 'btf', wombat%b_dicr, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'dich', 'btf', wombat%b_dich, isd, jsd)
     call g_tracer_set_values(tracer_list, 'fe', 'btf', wombat%b_fe, isd, jsd)
     call g_tracer_set_values(tracer_list, 'alk', 'btf', wombat%b_alk, isd, jsd)
 
@@ -3975,6 +3996,7 @@ module generic_WOMBATlite
     allocate(wombat%f_dic(isd:ied, jsd:jed, 1:nk)); wombat%f_dic(:,:,:)=0.0
     allocate(wombat%f_dicp(isd:ied, jsd:jed, 1:nk)); wombat%f_dicp(:,:,:)=0.0
     allocate(wombat%f_dicr(isd:ied, jsd:jed, 1:nk)); wombat%f_dicr(:,:,:)=0.0
+    allocate(wombat%f_dich(isd:ied, jsd:jed, 1:nk)); wombat%f_dich(:,:,:)=0.0
     allocate(wombat%f_alk(isd:ied, jsd:jed, 1:nk)); wombat%f_alk(:,:,:)=0.0
     allocate(wombat%f_no3(isd:ied, jsd:jed, 1:nk)); wombat%f_no3(:,:,:)=0.0
     allocate(wombat%f_phy(isd:ied, jsd:jed, 1:nk)); wombat%f_phy(:,:,:)=0.0
@@ -3992,6 +4014,7 @@ module generic_WOMBATlite
     allocate(wombat%b_o2(isd:ied, jsd:jed)); wombat%b_o2(:,:)=0.0
     allocate(wombat%b_dic(isd:ied, jsd:jed)); wombat%b_dic(:,:)=0.0
     allocate(wombat%b_dicr(isd:ied, jsd:jed)); wombat%b_dicr(:,:)=0.0
+    allocate(wombat%b_dich(isd:ied, jsd:jed)); wombat%b_dich(:,:)=0.0
     allocate(wombat%b_fe(isd:ied, jsd:jed)); wombat%b_fe(:,:)=0.0
     allocate(wombat%b_alk(isd:ied, jsd:jed)); wombat%b_alk(:,:)=0.0
 
@@ -4123,6 +4146,7 @@ module generic_WOMBATlite
         wombat%f_dic, &
         wombat%f_dicp, &
         wombat%f_dicr, &
+        wombat%f_dich, &
         wombat%f_alk, &
         wombat%f_no3, &
         wombat%f_phy, &
@@ -4141,6 +4165,7 @@ module generic_WOMBATlite
         wombat%b_o2, &
         wombat%b_dic, &
         wombat%b_dicr, &
+        wombat%b_dich, &
         wombat%b_fe, &
         wombat%b_alk)
 
