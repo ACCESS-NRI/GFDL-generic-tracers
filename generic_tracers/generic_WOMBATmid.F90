@@ -257,6 +257,7 @@ module generic_WOMBATmid
         b_dicr, &
         b_alk, &
         b_no3, &
+        b_nh4, &
         b_o2, &
         b_fe, &
         pprod_gross_2d, &
@@ -294,6 +295,8 @@ module generic_WOMBATmid
         sedtemp, &
         sedsalt, &
         sedno3, &
+        sednh4, &
+        sedo2, &
         seddic, &
         sedalk, &
         sedhtotal, &
@@ -306,6 +309,7 @@ module generic_WOMBATmid
         f_dicp, &
         f_alk, &
         f_no3, &
+        f_nh4, &
         f_phy, &
         f_dia, &
         f_pchl, &
@@ -560,6 +564,8 @@ module generic_WOMBATmid
         id_sedtemp = -1, &
         id_sedsalt = -1, &
         id_sedno3 = -1, &
+        id_sednh4 = -1, &
+        id_sedo2 = -1, &
         id_seddic = -1, &
         id_sedalk = -1, &
         id_sedhtotal = -1, &
@@ -1445,6 +1451,16 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'sednh4', 'Ammonium at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+    wombat%id_sednh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'sedo2', 'Oxygen at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+    wombat%id_sedo2 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'seddic', 'Dissolved inorganic carbon at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_seddic = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -1958,6 +1974,17 @@ module generic_WOMBATmid
         prog = .true., &
         flux_bottom = .true., &
         flux_virtual = .true.)
+    
+    ! Ammonium
+    !-----------------------------------------------------------------------
+    ! dts: There is currently no sea-ice coupling of Nitrate
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'nh4', &
+        longname = 'Ammonium', &
+        units = 'mol/kg', &
+        prog = .true., &
+        flux_bottom = .true., &
+        flux_virtual = .true.)
 
     ! Phytoplankton
     !-----------------------------------------------------------------------
@@ -2450,7 +2477,7 @@ module generic_WOMBATmid
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
     real                                    :: u_npz, g_npz, m_npz, g_peffect
-    real                                    :: biophy, biodia, biozoo, biomes, biodet, biono3, biofer, biocaco3
+    real                                    :: biophy, biodia, biozoo, biomes, biodet, biono3, bionh4, biofer, biocaco3
     real                                    :: biophyfe, biodiafe, biozoofe, biomesfe, biophy1, zooprey, mesprey
     real                                    :: fbc
     real                                    :: no3_bgc_change, caco3_bgc_change
@@ -2752,6 +2779,8 @@ module generic_WOMBATmid
     wombat%sedtemp(:,:) = 0.0
     wombat%sedsalt(:,:) = 0.0
     wombat%sedno3(:,:) = 0.0
+    wombat%sednh4(:,:) = 0.0
+    wombat%sedo2(:,:) = 0.0
     wombat%seddic(:,:) = 0.0
     wombat%sedalk(:,:) = 0.0
     wombat%sedhtotal(:,:) = 0.0
@@ -2790,6 +2819,8 @@ module generic_WOMBATmid
     ! having to allocate all these field arrays
     ! dts attn: do we really want/need to force these to be positive?
     call g_tracer_get_values(tracer_list, 'no3', 'field', wombat%f_no3, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'nh4', 'field', wombat%f_nh4, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'phy', 'field', wombat%f_phy, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
@@ -3002,6 +3033,7 @@ module generic_WOMBATmid
       biomesfe = max(epsi, wombat%f_mesfe(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodet   = max(epsi, wombat%f_det(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biono3   = max(epsi, wombat%f_no3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      bionh4   = max(epsi, wombat%f_nh4(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biofer   = max(epsi, wombat%f_fe(i,j,k)  ) / umol_m3_to_mol_kg  ![umol/m3]
       biocaco3 = max(epsi, wombat%f_caco3(i,j,k))/ mmol_m3_to_mol_kg  ![mmol/m3]
       phy_chlc = max(epsi, wombat%f_pchl(i,j,k)) / max(epsi, wombat%f_phy(i,j,k))
@@ -3450,7 +3482,11 @@ module generic_WOMBATmid
                               wombat%diaresp(i,j,k) - &
                               wombat%phygrow(i,j,k) - &
                               wombat%diagrow(i,j,k) )
-
+    
+      ! Ammonium equation ! [molN/kg]
+      !----------------------------------------------------------------------
+      wombat%f_nh4(i,j,k) = wombat%f_nh4(i,j,k) + dtsb * 16./122. * ( 0.0 )
+                              
       ! Phytoplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_phy(i,j,k)  = wombat%f_phy(i,j,k) + dtsb * ( &
@@ -3907,6 +3943,7 @@ module generic_WOMBATmid
 
     ! Set tracers values
     call g_tracer_set_values(tracer_list, 'no3', 'field', wombat%f_no3, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'nh4', 'field', wombat%f_nh4, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'phy', 'field', wombat%f_phy, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'pchl', 'field', wombat%f_pchl, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'phyfe', 'field', wombat%f_phyfe, isd, jsd, ntau=tau)
@@ -3981,6 +4018,8 @@ module generic_WOMBATmid
         wombat%sedtemp(i,j) = Temp(i,j,k)
         wombat%sedsalt(i,j) = Salt(i,j,k)
         wombat%sedno3(i,j) = wombat%f_no3(i,j,k)
+        wombat%sednh4(i,j) = wombat%f_nh4(i,j,k)
+        wombat%sedo2(i,j) = wombat%f_o2(i,j,k)
         wombat%seddic(i,j) = wombat%f_dic(i,j,k) + wombat%p_det_sediment(i,j,1) / wombat%Rho_0  ![mol/kg] 
         wombat%sedalk(i,j) = wombat%f_alk(i,j,k)
         wombat%sedhtotal(i,j) = wombat%htotal(i,j,k)
@@ -4570,6 +4609,14 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_sedno3, wombat%sedno3, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
+    if (wombat%id_sednh4 .gt. 0) &
+      used = g_send_data(wombat%id_sednh4, wombat%sednh4, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+
+    if (wombat%id_sedo2 .gt. 0) &
+      used = g_send_data(wombat%id_sedo2, wombat%sedo2, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+
     if (wombat%id_seddic .gt. 0) &
       used = g_send_data(wombat%id_seddic, wombat%seddic, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
@@ -4861,6 +4908,7 @@ module generic_WOMBATmid
     allocate(wombat%f_dicr(isd:ied, jsd:jed, 1:nk)); wombat%f_dicr(:,:,:)=0.0
     allocate(wombat%f_alk(isd:ied, jsd:jed, 1:nk)); wombat%f_alk(:,:,:)=0.0
     allocate(wombat%f_no3(isd:ied, jsd:jed, 1:nk)); wombat%f_no3(:,:,:)=0.0
+    allocate(wombat%f_nh4(isd:ied, jsd:jed, 1:nk)); wombat%f_nh4(:,:,:)=0.0
     allocate(wombat%f_phy(isd:ied, jsd:jed, 1:nk)); wombat%f_phy(:,:,:)=0.0
     allocate(wombat%f_pchl(isd:ied, jsd:jed, 1:nk)); wombat%f_pchl(:,:,:)=0.0
     allocate(wombat%f_phyfe(isd:ied, jsd:jed, 1:nk)); wombat%f_phyfe(:,:,:)=0.0
@@ -5006,6 +5054,8 @@ module generic_WOMBATmid
     allocate(wombat%sedtemp(isd:ied, jsd:jed)); wombat%sedtemp(:,:)=0.0
     allocate(wombat%sedsalt(isd:ied, jsd:jed)); wombat%sedsalt(:,:)=0.0
     allocate(wombat%sedno3(isd:ied, jsd:jed)); wombat%sedno3(:,:)=0.0
+    allocate(wombat%sednh4(isd:ied, jsd:jed)); wombat%sednh4(:,:)=0.0
+    allocate(wombat%sedo2(isd:ied, jsd:jed)); wombat%sedo2(:,:)=0.0
     allocate(wombat%seddic(isd:ied, jsd:jed)); wombat%seddic(:,:)=0.0
     allocate(wombat%sedalk(isd:ied, jsd:jed)); wombat%sedalk(:,:)=0.0
     allocate(wombat%sedhtotal(isd:ied, jsd:jed)); wombat%sedhtotal(:,:)=0.0
@@ -5047,6 +5097,7 @@ module generic_WOMBATmid
         wombat%f_dicr, &
         wombat%f_alk, &
         wombat%f_no3, &
+        wombat%f_nh4, &
         wombat%f_phy, &
         wombat%f_pchl, &
         wombat%f_phyfe, &
@@ -5192,6 +5243,8 @@ module generic_WOMBATmid
         wombat%sedtemp, &
         wombat%sedsalt, &
         wombat%sedno3, &
+        wombat%sednh4, &
+        wombat%sedo2, &
         wombat%seddic, &
         wombat%sedalk, &
         wombat%sedhtotal, &
