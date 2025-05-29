@@ -414,7 +414,7 @@ module generic_WOMBATmid
         aoa_loxy, &
         aoa_lnh4, &
         aoa_mu, &
-        anammox, &
+        ammox, &
         no3_prev, &
         caco3_prev, &
         dic_correct, &
@@ -538,7 +538,7 @@ module generic_WOMBATmid
         id_aoa_loxy = -1, &
         id_aoa_lnh4 = -1, &
         id_aoa_mu = -1, &
-        id_anammox = -1, &
+        id_ammox = -1, &
         id_phy_mumax = -1, &
         id_phy_mu = -1, &
         id_pchl_mu = -1, &
@@ -1364,8 +1364,8 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'anammox', 'Ammonia Oxidation rate', 'h', 'L', 's', '[mol/kg/s]', 'f')
-    wombat%id_anammox = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'ammox', 'Ammonia Oxidation rate', 'h', 'L', 's', '[mol/kg/s]', 'f')
+    wombat%id_ammox = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1949,7 +1949,7 @@ module generic_WOMBATmid
 
     ! Ammonia Oxidizing Archaea maximum growth * biomass rate [/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoamumax', wombat%aoamumax, 0.5*0.05/86400.0)
+    call g_tracer_add_param('aoamumax', wombat%aoamumax, 0.025/86400.0)
 
     ! Nested timestep for the ecosystem model [s]
     !-----------------------------------------------------------------------
@@ -2833,7 +2833,7 @@ module generic_WOMBATmid
     wombat%aoa_loxy(:,:,:) = 0.0
     wombat%aoa_lnh4(:,:,:) = 0.0
     wombat%aoa_mu(:,:,:) = 0.0
-    wombat%anammox(:,:,:) = 0.0
+    wombat%ammox(:,:,:) = 0.0
     wombat%export_prod(:,:) = 0.0
     wombat%export_inorg(:,:) = 0.0
     wombat%dic_intmld(:,:) = 0.0
@@ -3144,6 +3144,7 @@ module generic_WOMBATmid
       wombat%phy_kni(i,j,k) = wombat%phykn * max(0.1, max(0.0, (biophy-wombat%phybiot))**0.37)
       wombat%phy_kfe(i,j,k) = wombat%phykf * max(0.1, max(0.0, (biophy-wombat%phybiot))**0.37)
       ! Nitrogen limitation (split into NH4 and NO3 uptake limitation terms, with NH4 uptake being 5x more preferred)
+      !   See Buchanan et al., (2025) Biogeosciences
       phy_limnh4 = bionh4 / (bionh4 + wombat%phy_kni(i,j,k) + epsi)
       phy_limno3 = biono3 / (biono3 + wombat%phy_kni(i,j,k) + epsi)
       phy_limdin = (biono3 + bionh4) / (biono3 + bionh4 + wombat%phy_kni(i,j,k) + epsi)
@@ -3160,6 +3161,7 @@ module generic_WOMBATmid
       wombat%dia_kni(i,j,k) = wombat%diakn * max(0.1, max(0.0, (biodia-wombat%diabiot))**0.37)
       wombat%dia_kfe(i,j,k) = wombat%diakf * max(0.1, max(0.0, (biodia-wombat%diabiot))**0.37)
       ! Nitrogen limitation (split into NH4 and NO3 uptake limitation terms, with NH4 uptake being 5x more preferred)
+      !   See Buchanan et al., (2025) Biogeosciences
       dia_limnh4 = bionh4 / (bionh4 + wombat%dia_kni(i,j,k) + epsi)
       dia_limno3 = biono3 / (biono3 + wombat%dia_kni(i,j,k) + epsi)
       dia_limdin = (biono3 + bionh4) / (biono3 + bionh4 + wombat%dia_kni(i,j,k) + epsi)
@@ -3467,9 +3469,9 @@ module generic_WOMBATmid
       endif
 
       if (wombat%f_nh4(i,j,k) .gt. epsi) then
-        wombat%anammox(i,j,k) = wombat%aoa_mu(i,j,k) * wombat%f_nh4(i,j,k)
+        wombat%ammox(i,j,k) = wombat%aoa_mu(i,j,k) * wombat%f_nh4(i,j,k) ! [molN/kg/s]
       else
-        wombat%anammox(i,j,k) = 0.0
+        wombat%ammox(i,j,k) = 0.0
       endif
 
       if (zooprey.gt.1e-3) then
@@ -3583,13 +3585,13 @@ module generic_WOMBATmid
 
       ! Nitrate equation ! [molN/kg]
       !----------------------------------------------------------------------
-      wombat%f_no3(i,j,k) = wombat%f_no3(i,j,k) + dtsb * ( wombat%anammox(i,j,k) ) - dtsb * 16./122. * ( &
+      wombat%f_no3(i,j,k) = wombat%f_no3(i,j,k) + dtsb * ( wombat%ammox(i,j,k) ) - dtsb * 16./122. * ( &
                               wombat%phygrow(i,j,k) * wombat%phy_lno3(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) + &
                               wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
     
       ! Ammonium equation ! [molN/kg]
       !----------------------------------------------------------------------
-      wombat%f_nh4(i,j,k) = wombat%f_nh4(i,j,k) - dtsb * ( wombat%anammox(i,j,k) ) + dtsb * 16./122. * ( &
+      wombat%f_nh4(i,j,k) = wombat%f_nh4(i,j,k) - dtsb * ( wombat%ammox(i,j,k) ) + dtsb * 16./122. * ( &
                               wombat%detremi(i,j,k) + &
                               wombat%zooresp(i,j,k) + &
                               wombat%mesresp(i,j,k) + &
@@ -3926,7 +3928,7 @@ module generic_WOMBATmid
           print *, "       MES (molN/kg) =", wombat%f_mes(i,j,k) * 16.0 / 122.0
           print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
           print *, " "
-          print *, "       anammox (molN/kg/s) =", wombat%anammox(i,j,k)
+          print *, "       ammox (molN/kg/s) =", wombat%ammox(i,j,k)
           print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
           print *, "       diagrow (molC/kg/s) =", wombat%diagrow(i,j,k)
           print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
@@ -4609,8 +4611,8 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_aoa_mu, wombat%aoa_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
     
-    if (wombat%id_anammox .gt. 0) &
-      used = g_send_data(wombat%id_anammox, wombat%anammox, model_time, &
+    if (wombat%id_ammox .gt. 0) &
+      used = g_send_data(wombat%id_ammox, wombat%ammox, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_pprod_gross_2d .gt. 0) then
@@ -5176,7 +5178,7 @@ module generic_WOMBATmid
     allocate(wombat%aoa_loxy(isd:ied, jsd:jed, 1:nk)); wombat%aoa_loxy(:,:,:)=0.0
     allocate(wombat%aoa_lnh4(isd:ied, jsd:jed, 1:nk)); wombat%aoa_lnh4(:,:,:)=0.0
     allocate(wombat%aoa_mu(isd:ied, jsd:jed, 1:nk)); wombat%aoa_mu(:,:,:)=0.0
-    allocate(wombat%anammox(isd:ied, jsd:jed, 1:nk)); wombat%anammox(:,:,:)=0.0
+    allocate(wombat%ammox(isd:ied, jsd:jed, 1:nk)); wombat%ammox(:,:,:)=0.0
     allocate(wombat%no3_prev(isd:ied, jsd:jed, 1:nk)); wombat%no3_prev(:,:,:)=0.0
     allocate(wombat%caco3_prev(isd:ied, jsd:jed, 1:nk)); wombat%caco3_prev(:,:,:)=0.0
     allocate(wombat%det_sed_remin(isd:ied, jsd:jed)); wombat%det_sed_remin(:,:)=0.0
@@ -5371,7 +5373,7 @@ module generic_WOMBATmid
         wombat%aoa_loxy, &
         wombat%aoa_lnh4, &
         wombat%aoa_mu, &
-        wombat%anammox, &
+        wombat%ammox, &
         wombat%no3_prev, &
         wombat%caco3_prev, &
         wombat%det_sed_remin, &
