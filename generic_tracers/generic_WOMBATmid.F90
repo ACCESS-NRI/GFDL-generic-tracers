@@ -165,6 +165,7 @@ module generic_WOMBATmid
         alphabio_dia, &
         abioa_dia, &
         bbioa_dia, &
+        alphabio_tri, &
         bbioh, &
         phykn, &
         phykf, &
@@ -182,6 +183,9 @@ module generic_WOMBATmid
         diamaxqf, &
         dialmor, &
         diaqmor, &
+        trikf, &
+        trichlc, &
+        trin2c, &
         zooassi, &
         zooexcr, &
         zookz, &
@@ -382,6 +386,9 @@ module generic_WOMBATmid
         dia_lno3, &
         dia_lfer, &
         dia_dfeupt, &
+        trimumax, &
+        tri_lfer, &
+        tri_lpar, &
         feIII, &
         felig, &
         fecol, &
@@ -444,6 +451,7 @@ module generic_WOMBATmid
         het_mu, &
         aox_lnh4, &
         aox_mu, &
+        nitrfix, &
         ammox, &
         anammox, &
         denitrif, &
@@ -516,6 +524,9 @@ module generic_WOMBATmid
         id_dia_lno3 = -1, &
         id_dia_lfer = -1, &
         id_dia_dfeupt = -1, &
+        id_trimumax = -1, &
+        id_tri_lfer = -1, &
+        id_tri_lpar = -1, &
         id_feIII = -1, &
         id_felig = -1, &
         id_fecol = -1, &
@@ -578,6 +589,7 @@ module generic_WOMBATmid
         id_het_mu = -1, &
         id_aox_lnh4 = -1, &
         id_aox_mu = -1, &
+        id_nitrfix = -1, &
         id_ammox = -1, &
         id_anammox = -1, &
         id_denitrif = -1, &
@@ -1151,6 +1163,21 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'tri_lfer', 'Limitation of trichodesmium by light', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_tri_lfer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'tri_lpar', 'Limitation of trichodesmium by light', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_tri_lpar = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'trimumax', 'Trichodesmium temperature-dependent maximum growth rate', 'h', 'L', 's', '/s', 'f')
+    wombat%id_trimumax = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'feIII', 'free iron (Fe3+)', 'h', 'L', 's', 'mol/kg', 'f')
     wombat%id_feIII = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -1461,6 +1488,11 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'nitrfix', 'Nitrogen fixation rate (NH4 production)', 'h', 'L', 's', '[mol/kg/s]', 'f')
+    wombat%id_nitrfix = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+        vardesc_temp = vardesc( &
         'ammox', 'Ammonia Oxidation rate (NH4 consumption)', 'h', 'L', 's', '[mol/kg/s]', 'f')
     wombat%id_ammox = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -1781,7 +1813,11 @@ module generic_WOMBATmid
 
     ! Initial slope of P-I curve for microphytoplankton [(mg Chl m-3)-1 (W m-2)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('alphabio_dia', wombat%alphabio_dia, 3.0)
+    call g_tracer_add_param('alphabio_dia', wombat%alphabio_dia, 2.0)
+
+    ! Initial slope of P-I curve for trichodesmium [(mg Chl m-3)-1 (W m-2)-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('alphabio_tri', wombat%alphabio_tri, 1.0)
 
     ! Autotrodia maximum growth rate parameter a for microphytoplankton [1/s]
     !-----------------------------------------------------------------------
@@ -1858,6 +1894,18 @@ module generic_WOMBATmid
     ! microphytoplankton quadratic mortality rate constant [m3/mmolN/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaqmor', wombat%diaqmor, 0.05/86400.0)
+
+    ! Trichodesmium half saturation constant for iron uptake [umolFe/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('trikf', wombat%trikf, 0.5)
+
+    ! Trichodesmium typical chlorophyll to carbon ratio [mg/mg]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('trichlc', wombat%trichlc, 0.01)
+
+    ! Trichodesmium typical nitrogen to carbon ratio [mol/mol]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('trin2c', wombat%trin2c, 50.0/300.0)
 
     ! Zooplankton assimilation efficiency [1]
     !-----------------------------------------------------------------------
@@ -2916,6 +2964,9 @@ module generic_WOMBATmid
     wombat%dia_lno3(:,:,:) = 0.0
     wombat%dia_lfer(:,:,:) = 0.0
     wombat%dia_dfeupt(:,:,:) = 0.0
+    wombat%tri_lfer(:,:,:) = 0.0
+    wombat%tri_lpar(:,:,:) = 0.0
+    wombat%trimumax(:,:,:) = 0.0
     wombat%feIII(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
@@ -2978,6 +3029,7 @@ module generic_WOMBATmid
     wombat%het_mu(:,:,:) = 0.0
     wombat%aox_lnh4(:,:,:) = 0.0
     wombat%aox_mu(:,:,:) = 0.0
+    wombat%nitrfix(:,:,:) = 0.0
     wombat%ammox(:,:,:) = 0.0
     wombat%anammox(:,:,:) = 0.0
     wombat%denitrif(:,:,:) = 0.0
@@ -3112,11 +3164,12 @@ module generic_WOMBATmid
     !    7.  Iron chemistry                                                 !
     !    8.  Mortality scalings and grazing                                 !
     !    9.  CaCO3 calculations                                             !
-    !    10. Facultative heterotrophy calculations                          !
-    !    11. Chemoautotroph calculations                                    !
-    !    12. Sources and sinks                                              !
-    !    13. Tracer tendencies                                              !
-    !    14. Check for conservation by ecosystem component                  !
+    !    10. Implicit nitrogen fixation                                     !
+    !    11. Facultative heterotrophy calculations                          !
+    !    12. Chemoautotroph calculations                                    !
+    !    13. Sources and sinks                                              !
+    !    14. Tracer tendencies                                              !
+    !    15. Check for conservation by ecosystem component                  !
     !                                                                       !
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------!
@@ -3585,6 +3638,32 @@ module generic_WOMBATmid
       
       endif
 
+
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !  [Step 10] Implicit nitrogen fixation                                 !
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      
+      if (do_open_n_cycle) then
+        ! Temperature dependent maximum growth rate of Trichodesmium (Jiang et al., 2018)
+        if (Temp(i,j,k).gt.17.2) then
+          wombat%trimumax(i,j,k) = ( ( -3.99e-4 * Temp(i,j,k)**3.0 ) + &
+                                     (  0.02685 * Temp(i,j,k)**2.0 ) + & 
+                                     ( -0.555 * Temp(i,j,k) ) + 3.633 ) / 86400.0
+        endif
+        ! Nutrient and light limitation terms
+        wombat%tri_lfer(i,j,k) = biofer / (biofer + wombat%trikf)
+        wombat%tri_lpar(i,j,k) = (1. - exp(-wombat%alphabio_tri * wombat%trichlc * wombat%radbio(i,j,k)))
+        ! Nitrogen fixation rate of Trichodesmium
+        wombat%nitrfix(i,j,k) = wombat%trimumax(i,j,k) * (1.0 - wombat%phy_lnit(i,j,k)) &
+                                * min(wombat%tri_lfer(i,j,k), wombat%tri_lpar(i,j,k)) &
+                                * wombat%trin2c * 1e-3  ! 1e-3 scaler to account for biomass
+      endif
+      
+
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -3634,6 +3713,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
+      ! Phytoplankton growth
       if ((wombat%f_no3(i,j,k) + wombat%f_nh4(i,j,k)) .gt. epsi) then
         wombat%phygrow(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
         wombat%diagrow(i,j,k) = wombat%dia_mu(i,j,k) * wombat%f_dia(i,j,k) ! [molC/kg/s]
@@ -3642,6 +3722,7 @@ module generic_WOMBATmid
         wombat%diagrow(i,j,k) = 0.0
       endif
 
+      ! Chemoautotrophy
       if (wombat%f_nh4(i,j,k) .gt. epsi) then
         wombat%ammox(i,j,k) = wombat%aoa_mu(i,j,k) * wombat%f_nh4(i,j,k) ! [molN/kg/s]
         wombat%anammox(i,j,k) = wombat%aox_mu(i,j,k) * wombat%f_nh4(i,j,k) ! [molN/kg/s]
@@ -3650,12 +3731,14 @@ module generic_WOMBATmid
         wombat%anammox(i,j,k) = 0.0
       endif
 
+      ! Denitrification
       if (wombat%f_no3(i,j,k) .gt. epsi) then
         wombat%denitrif(i,j,k) = wombat%het_mu(i,j,k) * wombat%f_no3(i,j,k) ! [molN/kg/s]
       else
         wombat%denitrif(i,j,k) = 0.0
       endif
 
+      ! Grazing by microzooplankton
       if (zooprey.gt.1e-3) then
         wombat%zoograzphy(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zprefphy*biophy)/zooprey ! [molC/kg/s]
         wombat%zoograzdia(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zprefdia*biodia)/zooprey ! [molC/kg/s]
@@ -3681,6 +3764,7 @@ module generic_WOMBATmid
       zooexcrdiafe = wombat%zoograzdia(i,j,k)*dia_Fe2C - zooassidiafe - zooslopdiafe
       zooexcrdetfe = wombat%zoograzdet(i,j,k)*det_Fe2C - zooassidetfe - zooslopdetfe
 
+      ! Grazing by mesozooplankton
       if (mesprey.gt.1e-3) then
         wombat%mesgrazphy(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mprefphy*biophy)/mesprey ! [molC/kg/s]
         wombat%mesgrazdia(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mprefdia*biodia)/mesprey ! [molC/kg/s]
@@ -3713,6 +3797,7 @@ module generic_WOMBATmid
       mesexcrdetfe = wombat%mesgrazdet(i,j,k)*det_Fe2C - mesassidetfe - messlopdetfe
       mesexcrzoofe = wombat%mesgrazzoo(i,j,k)*zoo_Fe2C - mesassizoofe - messlopzoofe
 
+      ! Mortality terms
       if (biophy.gt.1e-3) then
         wombat%phyresp(i,j,k) = wombat%phylmor * fbc * wombat%f_phy(i,j,k) ! [molC/kg/s]
         wombat%phymort(i,j,k) = wombat%phyqmor / mmol_m3_to_mol_kg * wombat%f_phy(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
@@ -3727,7 +3812,6 @@ module generic_WOMBATmid
         wombat%diaresp(i,j,k) = 0.0
         wombat%diamort(i,j,k) = 0.0
       endif
-      
       if (biozoo.gt.1e-3) then
         wombat%zooresp(i,j,k) = wombat%zoolmor * fbc * wombat%f_zoo(i,j,k) * zoo_slmor ! [molC/kg/s]
         wombat%zoomort(i,j,k) = wombat%zooqmor / mmol_m3_to_mol_kg * wombat%f_zoo(i,j,k) * wombat%f_zoo(i,j,k) ! [molC/kg/s]
@@ -3735,7 +3819,6 @@ module generic_WOMBATmid
         wombat%zooresp(i,j,k) = 0.0
         wombat%zoomort(i,j,k) = 0.0
       endif
-      
       if (biomes.gt.1e-3) then
         wombat%mesresp(i,j,k) = wombat%meslmor * fbc * wombat%f_mes(i,j,k) * mes_slmor ! [molC/kg/s]
         wombat%mesmort(i,j,k) = wombat%mesqmor / mmol_m3_to_mol_kg * wombat%f_mes(i,j,k) * wombat%f_mes(i,j,k) ! [molC/kg/s]
@@ -3744,12 +3827,14 @@ module generic_WOMBATmid
         wombat%mesmort(i,j,k) = 0.0
       endif
 
+      ! remineralisation
       if (wombat%f_det(i,j,k) .gt. epsi) then
         wombat%detremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * wombat%f_det(i,j,k)**2.0 ! [molC/kg/s]
       else
         wombat%detremi(i,j,k) = 0.0
       endif
       
+      ! dissolution
       if (wombat%f_caco3(i,j,k) .gt. epsi) then
         wombat%caldiss(i,j,k) = wombat%dissrat(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
       else
@@ -3776,8 +3861,9 @@ module generic_WOMBATmid
     
       ! Ammonium equation ! [molN/kg]
       !----------------------------------------------------------------------
-      wombat%f_nh4(i,j,k) = wombat%f_nh4(i,j,k) - dtsb * ( &
-                              wombat%ammox(i,j,k) + &
+      wombat%f_nh4(i,j,k) = wombat%f_nh4(i,j,k) + dtsb * ( &
+                              wombat%nitrfix(i,j,k) - &
+                              wombat%ammox(i,j,k) - &
                               wombat%anammox(i,j,k) ) &
                               + dtsb * 16./122. * ( &
                               wombat%detremi(i,j,k) + &
@@ -4591,6 +4677,18 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_dia_dfeupt, wombat%dia_dfeupt, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
+    if (wombat%id_tri_lfer .gt. 0) &
+      used = g_send_data(wombat%id_tri_lfer, wombat%tri_lfer, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_tri_lpar .gt. 0) &
+      used = g_send_data(wombat%id_tri_lpar, wombat%tri_lpar, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_trimumax .gt. 0) &
+      used = g_send_data(wombat%id_trimumax, wombat%trimumax, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
     if (wombat%id_feIII .gt. 0) &
       used = g_send_data(wombat%id_feIII, wombat%feIII, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -4839,6 +4937,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_aox_mu, wombat%aox_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
     
+    if (wombat%id_nitrfix .gt. 0) &
+      used = g_send_data(wombat%id_nitrfix, wombat%nitrfix, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
     if (wombat%id_ammox .gt. 0) &
       used = g_send_data(wombat%id_ammox, wombat%ammox, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -5359,6 +5461,9 @@ module generic_WOMBATmid
     allocate(wombat%dia_lno3(isd:ied, jsd:jed, 1:nk)); wombat%dia_lno3(:,:,:)=0.0
     allocate(wombat%dia_lfer(isd:ied, jsd:jed, 1:nk)); wombat%dia_lfer(:,:,:)=0.0
     allocate(wombat%dia_dfeupt(isd:ied, jsd:jed, 1:nk)); wombat%dia_dfeupt(:,:,:)=0.0
+    allocate(wombat%tri_lfer(isd:ied, jsd:jed, 1:nk)); wombat%tri_lfer(:,:,:)=0.0
+    allocate(wombat%tri_lpar(isd:ied, jsd:jed, 1:nk)); wombat%tri_lpar(:,:,:)=0.0
+    allocate(wombat%trimumax(isd:ied, jsd:jed, 1:nk)); wombat%trimumax(:,:,:)=0.0
     allocate(wombat%feIII(isd:ied, jsd:jed, 1:nk)); wombat%feIII(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
@@ -5421,6 +5526,7 @@ module generic_WOMBATmid
     allocate(wombat%het_mu(isd:ied, jsd:jed, 1:nk)); wombat%het_mu(:,:,:)=0.0
     allocate(wombat%aox_lnh4(isd:ied, jsd:jed, 1:nk)); wombat%aox_lnh4(:,:,:)=0.0
     allocate(wombat%aox_mu(isd:ied, jsd:jed, 1:nk)); wombat%aox_mu(:,:,:)=0.0
+    allocate(wombat%nitrfix(isd:ied, jsd:jed, 1:nk)); wombat%nitrfix(:,:,:)=0.0
     allocate(wombat%ammox(isd:ied, jsd:jed, 1:nk)); wombat%ammox(:,:,:)=0.0
     allocate(wombat%anammox(isd:ied, jsd:jed, 1:nk)); wombat%anammox(:,:,:)=0.0
     allocate(wombat%denitrif(isd:ied, jsd:jed, 1:nk)); wombat%denitrif(:,:,:)=0.0
@@ -5565,6 +5671,9 @@ module generic_WOMBATmid
         wombat%dia_lno3, &
         wombat%dia_lfer, &
         wombat%dia_dfeupt, &
+        wombat%tri_lfer, &
+        wombat%tri_lpar, &
+        wombat%trimumax, &
         wombat%feIII, &
         wombat%felig, &
         wombat%fecol, &
@@ -5625,6 +5734,7 @@ module generic_WOMBATmid
         wombat%het_mu, &
         wombat%aox_lnh4, &
         wombat%aox_mu, &
+        wombat%nitrfix, &
         wombat%ammox, &
         wombat%anammox, &
         wombat%denitrif, &
