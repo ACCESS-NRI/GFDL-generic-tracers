@@ -289,6 +289,7 @@ module generic_WOMBATmid
         b_dicr, &
         b_alk, &
         b_nh4, &
+        b_no3, &
         b_o2, &
         b_fe, &
         pprod_gross_2d, &
@@ -301,7 +302,9 @@ module generic_WOMBATmid
         det_sed_remin, &
         detfe_sed_remin, &
         caco3_sed_remin, &
+        det_sed_denit, &
         fbury, &
+        fdenit, &
         dic_intmld, &
         o2_intmld, &
         no3_intmld, &
@@ -455,6 +458,7 @@ module generic_WOMBATmid
         ammox, &
         anammox, &
         denitrif, &
+        fdenitrif, &
         no3_prev, &
         caco3_prev, &
         dic_correct, &
@@ -593,6 +597,7 @@ module generic_WOMBATmid
         id_ammox = -1, &
         id_anammox = -1, &
         id_denitrif = -1, &
+        id_fdenitrif = -1, &
         id_phy_mumax = -1, &
         id_phy_mu = -1, &
         id_pchl_mu = -1, &
@@ -626,7 +631,9 @@ module generic_WOMBATmid
         id_radbio_int100 = -1, &
         id_det_sed_remin = -1, &
         id_det_sed_depst = -1, &
+        id_det_sed_denit = -1, &
         id_fbury = -1, &
+        id_fdenit = -1, &
         id_detfe_sed_remin = -1, &
         id_detfe_sed_depst = -1, &
         id_caco3_sed_remin = -1, &
@@ -981,9 +988,21 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'det_sed_denit', 'Rate of denitrification (consuming NO3) in accumulated sediment', &
+        'h', '1', 's', 'molNO3/m^2/s', 'f')
+    wombat%id_det_sed_denit = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'fbury', 'Fraction of deposited detritus permanently buried beneath sediment', &
         'h', '1', 's', '[0-1]', 'f')
     wombat%id_fbury = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'fdenit', 'Fraction of detritus remineralised via denitrification', &
+        'h', '1', 's', '[0-1]', 'f')
+    wombat%id_fdenit = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1507,6 +1526,11 @@ module generic_WOMBATmid
     wombat%id_denitrif = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
+    vardesc_temp = vardesc( &
+        'fdenitrif', 'fraction of organic matter remineralised via denitrification', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_fdenitrif = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+    
     vardesc_temp = vardesc( &
         'pprod_gross_2d', 'Vertically integrated gross phytoplankton production', &
         'h', '1', 's', 'mol/m^2/s', 'f')
@@ -2104,7 +2128,7 @@ module generic_WOMBATmid
 
     ! Ammonia Oxidizing Archaea maximum growth * biomass rate [/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoamumax', wombat%aoamumax, 0.025/86400.0)
+    call g_tracer_add_param('aoamumax', wombat%aoamumax, 0.01/86400.0)
 
     ! Anaerobic heterotrophic bacteria half saturation constant for oxygen uptake [mmolO2/m3]
     !-----------------------------------------------------------------------
@@ -2120,7 +2144,7 @@ module generic_WOMBATmid
 
     ! Facultative heterotrophic bacteria maximum growth * biomass rate [/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('hetmumax', wombat%hetmumax, 0.025/86400.0)
+    call g_tracer_add_param('hetmumax', wombat%hetmumax, 0.01/86400.0)
 
     ! Anammox bacteria half saturation constant for ammonium uptake [mmolN/m3]
     !-----------------------------------------------------------------------
@@ -3033,6 +3057,7 @@ module generic_WOMBATmid
     wombat%ammox(:,:,:) = 0.0
     wombat%anammox(:,:,:) = 0.0
     wombat%denitrif(:,:,:) = 0.0
+    wombat%fdenitrif(:,:,:) = 0.0
     wombat%export_prod(:,:) = 0.0
     wombat%export_inorg(:,:) = 0.0
     wombat%dic_intmld(:,:) = 0.0
@@ -3660,7 +3685,7 @@ module generic_WOMBATmid
         ! Nitrogen fixation rate of Trichodesmium
         wombat%nitrfix(i,j,k) = wombat%trimumax(i,j,k) * (1.0 - wombat%phy_lnit(i,j,k)) &
                                 * min(wombat%tri_lfer(i,j,k), wombat%tri_lpar(i,j,k)) &
-                                * wombat%trin2c * 1e-3  ! 1e-3 scaler to account for biomass
+                                * wombat%trin2c * 1e-6  ! 1e-6 scaler to account for biomass in mol/kg
       endif
       
 
@@ -3731,11 +3756,21 @@ module generic_WOMBATmid
         wombat%anammox(i,j,k) = 0.0
       endif
 
+      ! remineralisation
+      if (wombat%f_det(i,j,k) .gt. epsi) then
+        wombat%detremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * wombat%f_det(i,j,k)**2.0 ! [molC/kg/s]
+      else
+        wombat%detremi(i,j,k) = 0.0
+      endif
+
       ! Denitrification
       if (wombat%f_no3(i,j,k) .gt. epsi) then
-        wombat%denitrif(i,j,k) = wombat%het_mu(i,j,k) * wombat%f_no3(i,j,k) ! [molN/kg/s]
+        wombat%denitrif(i,j,k) = min(wombat%het_mu(i,j,k) * wombat%f_det(i,j,k) * 94.0 / 122.0, &
+                                     0.9 * wombat%detremi(i,j,k) * 94.0 / 122.0 ) ! [molN/kg/s]
+        wombat%fdenitrif(i,j,k) = wombat%denitrif(i,j,k) * 122.0/94.0 / (wombat%detremi(i,j,k) + epsi)
       else
         wombat%denitrif(i,j,k) = 0.0
+        wombat%fdenitrif(i,j,k) = 0.0
       endif
 
       ! Grazing by microzooplankton
@@ -3827,13 +3862,6 @@ module generic_WOMBATmid
         wombat%mesmort(i,j,k) = 0.0
       endif
 
-      ! remineralisation
-      if (wombat%f_det(i,j,k) .gt. epsi) then
-        wombat%detremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * wombat%f_det(i,j,k)**2.0 ! [molC/kg/s]
-      else
-        wombat%detremi(i,j,k) = 0.0
-      endif
-      
       ! dissolution
       if (wombat%f_caco3(i,j,k) .gt. epsi) then
         wombat%caldiss(i,j,k) = wombat%dissrat(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
@@ -4034,7 +4062,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------
       if (wombat%f_o2(i,j,k) .gt. epsi) &
         wombat%f_o2(i,j,k) = wombat%f_o2(i,j,k) - 132./122. * dtsb * ( &
-                               wombat%detremi(i,j,k) + &
+                               wombat%detremi(i,j,k) * (1.0 - wombat%fdenitrif(i,j,k)) + &
                                wombat%zooresp(i,j,k) + &
                                wombat%mesresp(i,j,k) + &
                                wombat%zooexcrphy(i,j,k) + &
@@ -4458,15 +4486,24 @@ module generic_WOMBATmid
         wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) * &
                                             max(0.1, (1.0 - 0.2081))**(4.5)
       endif
-      
+      if (do_open_n_cycle) then
+        ! sedimentary denitrification (Bohlen et al., 2012 Global Biogeochemical Cycles)
+        !   Stoichiometry of 94 mol NO3 used per 122 mol organic carbon oxidised (Paulmier et al, 2009 BG)
+        !   Hard limit where denitrification is at maximum 90% responsible for organic matter remin
+        wombat%det_sed_denit(i,j) = wombat%det_sed_remin(i,j) * min(0.9 * 94.0/122.0, &
+                                    (0.083 + 0.21 * 0.98**((wombat%sedo2(i,j) - wombat%sedno3(i,j))/mmol_m3_to_mol_kg)))
+        wombat%fdenit(i,j) = wombat%det_sed_denit(i,j) * 122.0/94.0 / (wombat%det_sed_remin(i,j) + epsi)
+      endif
+
       ! Remineralisation of sediments to supply nutrient fields.
       ! btf values are positive from the water column into the sediment.
       wombat%b_nh4(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_o2(i,j) = -132./16. * wombat%b_nh4(i,j) ! [mol/m2/s]
+      wombat%b_no3(i,j) = wombat%det_sed_denit(i,j) ! [molN/m2/s]
+      wombat%b_o2(i,j) = -132./16. * wombat%b_nh4(i,j) * (1.0 - wombat%fdenit(i,j))! [mol/m2/s]
       wombat%b_dic(i,j) = 122./16. * wombat%b_nh4(i,j) - wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
       wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) + wombat%b_nh4(i,j) ! [mol/m2/s]
+      wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) + wombat%b_nh4(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
     enddo; enddo
 
 
@@ -4482,6 +4519,7 @@ module generic_WOMBATmid
     enddo; enddo
 
     call g_tracer_set_values(tracer_list, 'nh4', 'btf', wombat%b_nh4, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'no3', 'btf', wombat%b_no3, isd, jsd)
     call g_tracer_set_values(tracer_list, 'o2', 'btf', wombat%b_o2, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'btf', wombat%b_dic, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dicr', 'btf', wombat%b_dicr, isd, jsd)
@@ -4953,6 +4991,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_denitrif, wombat%denitrif, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
+    if (wombat%id_fdenitrif .gt. 0) &
+      used = g_send_data(wombat%id_fdenitrif, wombat%fdenitrif, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
     if (wombat%id_pprod_gross_2d .gt. 0) then
       wombat%pprod_gross_2d = 0.0
       do k = 1,nk; do j = jsc,jec; do i = isc,iec;
@@ -5071,6 +5113,14 @@ module generic_WOMBATmid
 
     if (wombat%id_detfe_sed_remin .gt. 0) &
       used = g_send_data(wombat%id_detfe_sed_remin, wombat%detfe_sed_remin, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+
+    if (wombat%id_det_sed_denit .gt. 0) &
+      used = g_send_data(wombat%id_det_sed_denit, wombat%det_sed_denit, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+
+    if (wombat%id_fdenit .gt. 0) &
+      used = g_send_data(wombat%id_fdenit, wombat%fdenit, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
     if (wombat%id_caco3_sed_remin .gt. 0) &
@@ -5419,6 +5469,7 @@ module generic_WOMBATmid
     allocate(wombat%f_fe(isd:ied, jsd:jed, 1:nk)); wombat%f_fe(:,:,:)=0.0
 
     allocate(wombat%b_nh4(isd:ied, jsd:jed)); wombat%b_nh4(:,:)=0.0
+    allocate(wombat%b_no3(isd:ied, jsd:jed)); wombat%b_no3(:,:)=0.0
     allocate(wombat%b_o2(isd:ied, jsd:jed)); wombat%b_o2(:,:)=0.0
     allocate(wombat%b_dic(isd:ied, jsd:jed)); wombat%b_dic(:,:)=0.0
     allocate(wombat%b_dicr(isd:ied, jsd:jed)); wombat%b_dicr(:,:)=0.0
@@ -5530,11 +5581,14 @@ module generic_WOMBATmid
     allocate(wombat%ammox(isd:ied, jsd:jed, 1:nk)); wombat%ammox(:,:,:)=0.0
     allocate(wombat%anammox(isd:ied, jsd:jed, 1:nk)); wombat%anammox(:,:,:)=0.0
     allocate(wombat%denitrif(isd:ied, jsd:jed, 1:nk)); wombat%denitrif(:,:,:)=0.0
+    allocate(wombat%fdenitrif(isd:ied, jsd:jed, 1:nk)); wombat%fdenitrif(:,:,:)=0.0
     allocate(wombat%no3_prev(isd:ied, jsd:jed, 1:nk)); wombat%no3_prev(:,:,:)=0.0
     allocate(wombat%caco3_prev(isd:ied, jsd:jed, 1:nk)); wombat%caco3_prev(:,:,:)=0.0
     allocate(wombat%det_sed_remin(isd:ied, jsd:jed)); wombat%det_sed_remin(:,:)=0.0
+    allocate(wombat%det_sed_denit(isd:ied, jsd:jed)); wombat%det_sed_denit(:,:)=0.0
     allocate(wombat%det_btm(isd:ied, jsd:jed)); wombat%det_btm(:,:)=0.0
     allocate(wombat%fbury(isd:ied, jsd:jed)); wombat%fbury(:,:)=0.0
+    allocate(wombat%fdenit(isd:ied, jsd:jed)); wombat%fdenit(:,:)=0.0
     allocate(wombat%detfe_sed_remin(isd:ied, jsd:jed)); wombat%detfe_sed_remin(:,:)=0.0
     allocate(wombat%detfe_btm(isd:ied, jsd:jed)); wombat%detfe_btm(:,:)=0.0
     allocate(wombat%caco3_sed_remin(isd:ied, jsd:jed)); wombat%caco3_sed_remin(:,:)=0.0
@@ -5630,6 +5684,7 @@ module generic_WOMBATmid
 
     deallocate( &
         wombat%b_nh4, &
+        wombat%b_no3, &
         wombat%b_o2, &
         wombat%b_dic, &
         wombat%b_dicr, &
@@ -5738,11 +5793,14 @@ module generic_WOMBATmid
         wombat%ammox, &
         wombat%anammox, &
         wombat%denitrif, &
+        wombat%fdenitrif, &
         wombat%no3_prev, &
         wombat%caco3_prev, &
         wombat%det_sed_remin, &
+        wombat%det_sed_denit, &
         wombat%det_btm, &
         wombat%fbury, &
+        wombat%fdenit, &
         wombat%detfe_sed_remin, &
         wombat%detfe_btm, &
         wombat%caco3_sed_remin, &
