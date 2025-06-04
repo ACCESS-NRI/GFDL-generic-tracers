@@ -4030,14 +4030,6 @@ module generic_WOMBATmid
                             + wombat%docremi(i,j,k) &
                             + wombat%zooresp(i,j,k) &
                             + wombat%mesresp(i,j,k) &
-                            + wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrdet(i,j,k) &
-                            + wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrdet(i,j,k) &
-                            + wombat%mesexcrbdet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) &
                             - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                             - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
                               
@@ -4218,6 +4210,14 @@ module generic_WOMBATmid
                             + wombat%bdetremi(i,j,k) &
                             + wombat%phyresp(i,j,k) &
                             + wombat%diaresp(i,j,k) &
+                            + wombat%zooexcrphy(i,j,k) &
+                            + wombat%zooexcrdia(i,j,k) &
+                            + wombat%zooexcrdet(i,j,k) &
+                            + wombat%mesexcrphy(i,j,k) &
+                            + wombat%mesexcrdia(i,j,k) &
+                            + wombat%mesexcrdet(i,j,k) &
+                            + wombat%mesexcrbdet(i,j,k) &
+                            + wombat%mesexcrzoo(i,j,k) &
                             - wombat%docremi(i,j,k) )
 
       ! Oxygen equation ! [molO2/kg]
@@ -4227,14 +4227,6 @@ module generic_WOMBATmid
                              + wombat%docremi(i,j,k) * (1.0 - wombat%fdenitrif(i,j,k)) &
                              + wombat%zooresp(i,j,k) &
                              + wombat%mesresp(i,j,k) &
-                             + wombat%zooexcrphy(i,j,k) &
-                             + wombat%zooexcrdia(i,j,k) &
-                             + wombat%zooexcrdet(i,j,k) &
-                             + wombat%mesexcrphy(i,j,k) &
-                             + wombat%mesexcrdia(i,j,k) &
-                             + wombat%mesexcrdet(i,j,k) &
-                             + wombat%mesexcrbdet(i,j,k) &
-                             + wombat%mesexcrzoo(i,j,k) &
                              - wombat%phygrow(i,j,k) &
                              - wombat%diagrow(i,j,k) ) &
                              - 40./16. * dtsb * ( wombat%ammox(i,j,k) )
@@ -4255,14 +4247,6 @@ module generic_WOMBATmid
                             + wombat%docremi(i,j,k) &
                             + wombat%zooresp(i,j,k) &
                             + wombat%mesresp(i,j,k) &
-                            + wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrdet(i,j,k) &
-                            + wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrdet(i,j,k) &
-                            + wombat%mesexcrbdet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) &
                             - wombat%phygrow(i,j,k) &
                             - wombat%diagrow(i,j,k) &
                             - wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k) &
@@ -4277,14 +4261,6 @@ module generic_WOMBATmid
                              + wombat%docremi(i,j,k) &
                              + wombat%zooresp(i,j,k) &
                              + wombat%mesresp(i,j,k) &
-                             + wombat%zooexcrphy(i,j,k) &
-                             + wombat%zooexcrdia(i,j,k) &
-                             + wombat%zooexcrdet(i,j,k) &
-                             + wombat%mesexcrphy(i,j,k) &
-                             + wombat%mesexcrdia(i,j,k) &
-                             + wombat%mesexcrdet(i,j,k) &
-                             + wombat%mesexcrbdet(i,j,k) &
-                             + wombat%mesexcrzoo(i,j,k) &
                              - wombat%phygrow(i,j,k) &
                              - wombat%diagrow(i,j,k) &
                              - wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k) &
@@ -4301,14 +4277,6 @@ module generic_WOMBATmid
                             + wombat%docremi(i,j,k) &
                             + wombat%zooresp(i,j,k) &
                             + wombat%mesresp(i,j,k) &
-                            + wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrdet(i,j,k) &
-                            + wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrdet(i,j,k) &
-                            + wombat%mesexcrbdet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) &
                             - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                             - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) ) &
                             + dtsb * ( 0.0 &
