@@ -2039,7 +2039,6 @@ module generic_WOMBATlite
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink, wsinkcal
     real, dimension(4,61)                   :: zbgr
-    real                                    :: max_wsink
     real                                    :: ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: biof, biodoc, zno3, zfermin
@@ -3173,6 +3172,8 @@ module generic_WOMBATlite
 
     ! Variable sinking rates of organic detritus (positive for sinking when GOLDtridiag == .true.)
     !                                            (negative for sinking when IOWtridiag ==.true.)
+    ! Note: sinking distances are limited in the vertdiff solver to prevent characteristics
+    ! crossing within a timestep
     do j = jsc,jec; do i = isc,iec;
       if (grid_kmt(i,j).gt.0) then
         biophy1  = max(epsi, wombat%f_phy(i,j,1) ) / mmol_m3_to_mol_kg  ![mmol/m3]
@@ -3182,9 +3183,6 @@ module generic_WOMBATlite
                      (wombat%f_caco3(i,j,k) / (wombat%f_det(i,j,k) + wombat%f_caco3(i,j,k) + epsi)))
           ! Increase sinking rate with depth to achieve power law behaviour  
           wsink(k) = wsink(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink(k)))
-          ! Ensure that we don't violate the CFL criterion  
-          max_wsink = dzt(i,j,k) * 0.5 / (dt * 2)  ! [m/s]
-          wsink(k) = min(wsink(k), max_wsink)
           ! CaCO3 sinks slower than general detritus because it tends to be smaller
           wsinkcal(k) = wsink(k) * wombat%wcaco3/wombat%wdetbio
         enddo
