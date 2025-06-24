@@ -3755,7 +3755,7 @@ module generic_WOMBATmid
       if (tn.gt.1) then
         if (abs(n_pools(i,j,k,2) - n_pools(i,j,k,1)).gt.1e-16) then
           print *, "--------------------------------------------"
-          print *, trim(error_header) // "Ecosystem model is not conserving nitrogen"
+          print *, trim(error_header) // " Ecosystem model is not conserving nitrogen"
           print *, "       Longitude index =", i
           print *, "       Latitude index =", j
           print *, "       Depth index and value =", k, wombat%zm(i,j,k)
@@ -3784,11 +3784,11 @@ module generic_WOMBATmid
           print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
           print *, "       diaresp (molC/kg/s) =", wombat%diaresp(i,j,k)
           print *, "--------------------------------------------"
-          call mpp_error(FATAL, trim(error_header) // "Terminating run due to non-conservation of tracer")
+          call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
         endif
         if (abs(c_pools(i,j,k,2) - c_pools(i,j,k,1)).gt.1e-16) then
           print *, "--------------------------------------------"
-          print *, trim(error_header) // "Ecosystem model is not conserving carbon"
+          print *, trim(error_header) // " Ecosystem model is not conserving carbon"
           print *, "       Longitude index =", i
           print *, "       Latitude index =", j
           print *, "       Depth index and value =", k, wombat%zm(i,j,k)
@@ -3830,7 +3830,7 @@ module generic_WOMBATmid
           print *, "       zoomort * pic2poc(i,j,k) (molC/kg/s) =", wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k)
           print *, "       caldiss (molC/kg/s) =", wombat%caldiss(i,j,k)
           print *, "--------------------------------------------"
-          call mpp_error(FATAL, trim(error_header) // "Terminating run due to non-conservation of tracer")
+          call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
         endif
       endif
 
