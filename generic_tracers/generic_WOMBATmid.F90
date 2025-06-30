@@ -240,7 +240,7 @@ module generic_WOMBATmid
         sio2, &
         co2_csurf, co2_alpha, co2_sc_no, pco2_csurf, &
         o2_csurf, o2_alpha, o2_sc_no, &
-        no3_vstf, dic_vstf, dicp_vstf, alk_vstf
+        no3_vstf, dic_vstf, alk_vstf
 
     real, dimension(:,:,:), allocatable :: &
         htotal, &
@@ -303,7 +303,6 @@ module generic_WOMBATmid
     real, dimension(:,:,:), allocatable :: &
         f_dic, &
         f_dicr, &
-        f_dicp, &
         f_alk, &
         f_no3, &
         f_phy, &
@@ -424,7 +423,6 @@ module generic_WOMBATmid
     real, dimension(:,:), pointer :: &
         p_no3_stf, &
         p_dic_stf, &
-        p_dicp_stf, &
         p_alk_stf
 
     !-----------------------------------------------------------------------
@@ -2107,18 +2105,14 @@ module generic_WOMBATmid
         flux_virtual = .true.)
 
     ! DICp (preformed Dissolved inorganic carbon)
+    ! dts: Note, we use flux_virtual=.true. only to ensure that an stf array is allocated for dicp.
+    ! The dicp stf is set to equal the dic stf in update_from_coupler.
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
         name = 'dicp', &
         longname = 'preformed Dissolved Inorganic Carbon', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_gas = .true., &
-        flux_gas_name = 'co2_pre_flux', &
-        flux_gas_type = 'air_sea_gas_flux_generic', &
-        flux_gas_molwt = WTMCO2, &
-        flux_gas_param = (/ as_coeff_wombatmid, 9.7561e-06 /), & ! dts: param(2) converts Pa -> atm
-        flux_gas_restart_file = 'ocean_wombatmid_airsea_flux.res.nc', &
         flux_virtual = .true.)
 
     ! DICr (remineralised dissolved inorganic carbon)
@@ -2234,6 +2228,10 @@ module generic_WOMBATmid
     integer, intent(in)                    :: ilb, jlb
     real, dimension(ilb:,jlb:), intent(in) :: salt_flux_added
 
+    integer :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau
+
+    call g_tracer_get_common(isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau)
+
     ! Account for virtual fluxes due to salt flux restoring/correction
     !-----------------------------------------------------------------------
     call g_tracer_get_pointer(tracer_list, 'no3', 'stf', wombat%p_no3_stf)
@@ -2244,13 +2242,12 @@ module generic_WOMBATmid
     wombat%dic_vstf(:,:) = (wombat%dic_global / wombat%sal_global) * salt_flux_added(:,:) ! [mol/m2/s]
     wombat%p_dic_stf(:,:) = wombat%p_dic_stf(:,:) + wombat%dic_vstf(:,:) ! [mol/m2/s]
 
-    call g_tracer_get_pointer(tracer_list, 'dicp', 'stf', wombat%p_dicp_stf)
-    wombat%dicp_vstf(:,:) = (wombat%dic_global / wombat%sal_global) * salt_flux_added(:,:) ! [mol/m2/s]
-    wombat%p_dicp_stf(:,:) = wombat%p_dicp_stf(:,:) + wombat%dicp_vstf(:,:) ! [mol/m2/s]
-
     call g_tracer_get_pointer(tracer_list, 'alk', 'stf', wombat%p_alk_stf)
     wombat%alk_vstf(:,:) = (wombat%alk_global / wombat%sal_global) * salt_flux_added(:,:) ! [mol/m2/s]
     wombat%p_alk_stf(:,:) = wombat%p_alk_stf(:,:) + wombat%alk_vstf(:,:) ! [mol/m2/s]
+
+    ! Set dicp stf equal to dic stf
+    call g_tracer_set_values(tracer_list, 'dicp', 'stf', wombat%p_dic_stf, isd, jsd)
 
   end subroutine generic_WOMBATmid_update_from_coupler
 
@@ -2617,8 +2614,6 @@ module generic_WOMBATmid
 
        call g_tracer_set_values(tracer_list, 'dic', 'alpha', wombat%co2_alpha, isd, jsd)
        call g_tracer_set_values(tracer_list, 'dic', 'csurf', wombat%co2_csurf, isd, jsd)
-       call g_tracer_set_values(tracer_list, 'dicp', 'alpha', wombat%co2_alpha, isd, jsd)
-       call g_tracer_set_values(tracer_list, 'dicp', 'csurf', wombat%co2_csurf, isd, jsd)
  
        wombat%co2_star(:,:,1) = wombat%co2_csurf(:,:)
     
@@ -2822,10 +2817,7 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau, &
-        positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'dicp', 'field', wombat%f_dicp, isd, jsd, ntau=tau, &
-        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
  
@@ -3899,7 +3891,6 @@ module generic_WOMBATmid
                                     - wombat%f_dic(i,j,k) ) * grid_tmask(i,j,k)
         wombat%f_alk(i,j,k) = wombat%f_alk(i,j,k) + wombat%alk_correct(i,j,k)
         wombat%f_dic(i,j,k) = wombat%f_dic(i,j,k) + wombat%dic_correct(i,j,k)
-        wombat%f_dicp(i,j,k) = max(wombat%dic_min * mmol_m3_to_mol_kg, wombat%f_dic(i,j,k))
       enddo
     enddo; enddo
 
@@ -4093,7 +4084,7 @@ module generic_WOMBATmid
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
     if (wombat%id_dicp_vstf .gt. 0) &
-      used = g_send_data(wombat%id_dicp_vstf, wombat%dicp_vstf, model_time, &
+      used = g_send_data(wombat%id_dicp_vstf, wombat%dic_vstf, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
     if (wombat%id_alk_vstf .gt. 0) &
@@ -4701,8 +4692,6 @@ module generic_WOMBATmid
 
       call g_tracer_set_values(tracer_list, 'dic', 'alpha', wombat%co2_alpha, isd, jsd)
       call g_tracer_set_values(tracer_list, 'dic', 'csurf', wombat%co2_csurf, isd, jsd)
-      call g_tracer_set_values(tracer_list, 'dicp', 'alpha', wombat%co2_alpha, isd, jsd)
-      call g_tracer_set_values(tracer_list, 'dicp', 'csurf', wombat%co2_csurf, isd, jsd)
 
       ! nnz: If source is called uncomment the following
       wombat%init = .false. !nnz: This is necessary since the above calls appear in source subroutine too.
@@ -4729,10 +4718,6 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'dic', 'alpha', wombat%co2_alpha, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'csurf', wombat%co2_csurf, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'sc_no', wombat%co2_sc_no, isd, jsd)
-
-    call g_tracer_set_values(tracer_list, 'dicp', 'alpha', wombat%co2_alpha, isd, jsd)
-    call g_tracer_set_values(tracer_list, 'dicp', 'csurf', wombat%co2_csurf, isd, jsd)
-    call g_tracer_set_values(tracer_list, 'dicp', 'sc_no', wombat%co2_sc_no, isd, jsd)
 
     call g_tracer_get_values(tracer_list, 'o2', 'alpha', wombat%o2_alpha, isd, jsd)
     call g_tracer_get_values(tracer_list, 'o2', 'csurf', wombat%o2_csurf ,isd, jsd)
@@ -4851,11 +4836,9 @@ module generic_WOMBATmid
     allocate(wombat%o2_sc_no(isd:ied, jsd:jed)); wombat%o2_sc_no(:,:)=0.0
     allocate(wombat%no3_vstf(isd:ied, jsd:jed)); wombat%no3_vstf(:,:)=0.0
     allocate(wombat%dic_vstf(isd:ied, jsd:jed)); wombat%dic_vstf(:,:)=0.0
-    allocate(wombat%dicp_vstf(isd:ied, jsd:jed)); wombat%dicp_vstf(:,:)=0.0
     allocate(wombat%alk_vstf(isd:ied, jsd:jed)); wombat%alk_vstf(:,:)=0.0
 
     allocate(wombat%f_dic(isd:ied, jsd:jed, 1:nk)); wombat%f_dic(:,:,:)=0.0
-    allocate(wombat%f_dicp(isd:ied, jsd:jed, 1:nk)); wombat%f_dicp(:,:,:)=0.0
     allocate(wombat%f_dicr(isd:ied, jsd:jed, 1:nk)); wombat%f_dicr(:,:,:)=0.0
     allocate(wombat%f_alk(isd:ied, jsd:jed, 1:nk)); wombat%f_alk(:,:,:)=0.0
     allocate(wombat%f_no3(isd:ied, jsd:jed, 1:nk)); wombat%f_no3(:,:,:)=0.0
@@ -5036,12 +5019,10 @@ module generic_WOMBATmid
         wombat%o2_sc_no, &
         wombat%no3_vstf, &
         wombat%dic_vstf, &
-        wombat%dicp_vstf, &
         wombat%alk_vstf)
 
     deallocate( &
         wombat%f_dic, &
-        wombat%f_dicp, &
         wombat%f_dicr, &
         wombat%f_alk, &
         wombat%f_no3, &
