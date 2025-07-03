@@ -212,7 +212,7 @@ module generic_WOMBATlite
         sio2, &
         co2_csurf, co2_alpha, co2_sc_no, pco2_csurf, &
         o2_csurf, o2_alpha, o2_sc_no, &
-        no3_vstf, dic_vstf, dicp_vstf, alk_vstf
+        no3_vstf, dic_vstf, alk_vstf
 
     real, dimension(:,:,:), allocatable :: &
         htotal, &
@@ -276,7 +276,6 @@ module generic_WOMBATlite
     real, dimension(:,:,:), allocatable :: &
         f_dic, &
         f_dicr, &
-        f_dicp, &
         f_alk, &
         f_no3, &
         f_phy, &
@@ -357,7 +356,6 @@ module generic_WOMBATlite
     real, dimension(:,:), pointer :: &
         p_no3_stf, &
         p_dic_stf, &
-        p_dicp_stf, &
         p_alk_stf
 
     !-----------------------------------------------------------------------
@@ -1682,18 +1680,14 @@ module generic_WOMBATlite
         flux_virtual = .true.)
 
     ! DICp (preformed Dissolved inorganic carbon)
+    ! dts: Note, we use flux_virtual=.true. only to ensure that an stf array is allocated for dicp.
+    ! The dicp stf is set to equal the dic stf in update_from_coupler.
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
         name = 'dicp', &
         longname = 'preformed Dissolved Inorganic Carbon', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_gas = .true., &
-        flux_gas_name = 'co2_pre_flux', &
-        flux_gas_type = 'air_sea_gas_flux_generic', &
-        flux_gas_molwt = WTMCO2, &
-        flux_gas_param = (/ as_coeff_wombatlite, 9.7561e-06 /), & ! dts: param(2) converts Pa -> atm
-        flux_gas_restart_file = 'ocean_wombatlite_airsea_flux.res.nc', &
         flux_virtual = .true.)
 
     ! DICr (remineralised dissolved inorganic carbon)
@@ -1809,6 +1803,10 @@ module generic_WOMBATlite
     integer, intent(in)                    :: ilb, jlb
     real, dimension(ilb:,jlb:), intent(in) :: salt_flux_added
 
+    integer :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau
+
+    call g_tracer_get_common(isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau)
+
     ! Account for virtual fluxes due to salt flux restoring/correction
     !-----------------------------------------------------------------------
     call g_tracer_get_pointer(tracer_list, 'no3', 'stf', wombat%p_no3_stf)
@@ -1819,13 +1817,12 @@ module generic_WOMBATlite
     wombat%dic_vstf(:,:) = (wombat%dic_global / wombat%sal_global) * salt_flux_added(:,:) ! [mol/m2/s]
     wombat%p_dic_stf(:,:) = wombat%p_dic_stf(:,:) + wombat%dic_vstf(:,:) ! [mol/m2/s]
 
-    call g_tracer_get_pointer(tracer_list, 'dicp', 'stf', wombat%p_dicp_stf)
-    wombat%dicp_vstf(:,:) = (wombat%dic_global / wombat%sal_global) * salt_flux_added(:,:) ! [mol/m2/s]
-    wombat%p_dicp_stf(:,:) = wombat%p_dicp_stf(:,:) + wombat%dicp_vstf(:,:) ! [mol/m2/s]
-
     call g_tracer_get_pointer(tracer_list, 'alk', 'stf', wombat%p_alk_stf)
     wombat%alk_vstf(:,:) = (wombat%alk_global / wombat%sal_global) * salt_flux_added(:,:) ! [mol/m2/s]
     wombat%p_alk_stf(:,:) = wombat%p_alk_stf(:,:) + wombat%alk_vstf(:,:) ! [mol/m2/s]
+
+    ! Set dicp stf equal to dic stf
+    call g_tracer_set_values(tracer_list, 'dicp', 'stf', wombat%p_dic_stf, isd, jsd)
 
   end subroutine generic_WOMBATlite_update_from_coupler
 
@@ -2039,7 +2036,6 @@ module generic_WOMBATlite
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink, wsinkcal
     real, dimension(4,61)                   :: zbgr
-    real                                    :: max_wsink
     real                                    :: ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: biof, biodoc, zno3, zfermin
@@ -2054,7 +2050,6 @@ module generic_WOMBATlite
     character(len=fm_string_len), parameter :: sub_name = 'generic_WOMBATlite_update_from_source'
     character(len=256), parameter           :: error_header = &
         '==>Error from ' // trim(mod_name) // '(' // trim(sub_name) // '): '
-    character(len=2048) :: mesg
 
     call g_tracer_get_common(isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, &
         grid_tmask=grid_tmask, grid_kmt=grid_kmt)
@@ -2185,8 +2180,6 @@ module generic_WOMBATlite
 
        call g_tracer_set_values(tracer_list, 'dic', 'alpha', wombat%co2_alpha, isd, jsd)
        call g_tracer_set_values(tracer_list, 'dic', 'csurf', wombat%co2_csurf, isd, jsd)
-       call g_tracer_set_values(tracer_list, 'dicp', 'alpha', wombat%co2_alpha, isd, jsd)
-       call g_tracer_set_values(tracer_list, 'dicp', 'csurf', wombat%co2_csurf, isd, jsd)
  
        wombat%co2_star(:,:,1) = wombat%co2_csurf(:,:)
     
@@ -2346,10 +2339,7 @@ module generic_WOMBATlite
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau, &
-        positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'dicp', 'field', wombat%f_dicp, isd, jsd, ntau=tau, &
-        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
  
@@ -3008,71 +2998,62 @@ module generic_WOMBATlite
 
       if (tn.gt.1) then
         if (abs(n_pools(i,j,k,2) - n_pools(i,j,k,1)).gt.1e-16) then
-          write (mesg, '( &
-              "Ecosystem model is not conserving nitrogen",/, &
-              "       Longitude index = ",i6,/, &
-              "       Latitude index = ",i6,/, &
-              "       Depth index and value = ",i6,",",ES13.6,/, &
-              "       Nested timestep number = ",i6,/,/, &
-              "       Biological N budget (molN/kg) at two timesteps = ",ES13.6,",",ES13.6,/,/, &
-              "       NO3 (molNO3/kg) = ",ES13.6,/, &
-              "       PHY (molN/kg) = ",ES13.6,/, &
-              "       ZOO (molN/kg) = ",ES13.6,/, &
-              "       DET (molN/kg) = ",ES13.6,/,/, &
-              "       phygrow (molC/kg/s) = ",ES13.6,/, &
-              "       detremi (molC/kg/s) = ",ES13.6,/, &
-              "       zooresp (molC/kg/s) = ",ES13.6,/, &
-              "       zooexcrphy (molC/kg/s) = ",ES13.6,/, &
-              "       zooexcrdet (molC/kg/s) = ",ES13.6,/, &
-              "       phyresp (molC/kg/s) = ",ES13.6,/ &
-              )') &
-              i, j, k, wombat%zm(i,j,k), tn, n_pools(i,j,k,1), n_pools(i,j,k,2), &
-              wombat%f_no3(i,j,k), wombat%f_phy(i,j,k) * 16/122.0, wombat%f_zoo(i,j,k) * 16/122.0, &
-              wombat%f_det(i,j,k) * 16/122.0, wombat%phygrow(i,j,k), wombat%detremi(i,j,k), &
-              wombat%zooresp(i,j,k), wombat%zooexcrphy(i,j,k), wombat%zooexcrdet(i,j,k), &
-              wombat%phyresp(i,j,k)
-          call mpp_error(FATAL, trim(error_header) // mesg)
+          print *, "--------------------------------------------"
+          print *, trim(error_header) // " Ecosystem model is not conserving nitrogen"
+          print *, "       Longitude index =", i
+          print *, "       Latitude index =", j
+          print *, "       Depth index and value =", k, wombat%zm(i,j,k)
+          print *, "       Nested timestep number =", tn
+          print *, " "
+          print *, "       Biological N budget (molN/kg) at two timesteps =", n_pools(i,j,k,1), n_pools(i,j,k,2)
+          print *, " "
+          print *, "       NO3 (molNO3/kg) =", wombat%f_no3(i,j,k)
+          print *, "       PHY (molN/kg) =", wombat%f_phy(i,j,k) * 16.0 / 122.0
+          print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k) * 16.0 / 122.0
+          print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
+          print *, " "
+          print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
+          print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
+          print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
+          print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
+          print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
+          print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
+          print *, "--------------------------------------------"
+          call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
         endif
         if (abs(c_pools(i,j,k,2) - c_pools(i,j,k,1)).gt.1e-16) then
-          write (mesg, '( &
-              "Ecosystem model is not conserving carbon",/, &
-              "       Longitude index = ",i6,/, &
-              "       Latitude index = ",i6,/, &
-              "       Depth index and value = ",i6,",",ES13.6,/, &
-              "       Nested timestep number = ",i6,/,/, &
-              "       Biological C budget (molC/kg) at two timesteps = ",ES13.6,",",ES13.6,/,/, &
-              "       DIC (molC/kg) = ",ES13.6,/, &
-              "       ALK (molC/kg) = ",ES13.6,/, &
-              "       PHY (molC/kg) = ",ES13.6,/, &
-              "       ZOO (molN/kg) = ",ES13.6,/, &
-              "       DET (molN/kg) = ",ES13.6,/, &
-              "       CaCO3 (molC/kg) = ",ES13.6,/, &
-              "       Temp = ",ES13.6,/, &
-              "       Salt = ",ES13.6,/, &
-              "       surface pCO2 = ",ES13.6,/, &
-              "       htotal = ",ES13.6,/,/, &
-              "       phygrow (molC/kg/s) = ",ES13.6,/, &
-              "       detremi (molC/kg/s) = ",ES13.6,/, &
-              "       zooresp (molC/kg/s) = ",ES13.6,/, &
-              "       zooexcrphy (molC/kg/s) = ",ES13.6,/, &
-              "       zooexcrdet (molC/kg/s) = ",ES13.6,/, &
-              "       phyresp (molC/kg/s) = ",ES13.6,/, &
-              "       zooslopphy * pic2poc(i,j,k) (molC/kg/s) = ",ES13.6,/, &
-              "       phymort * pic2poc(i,j,k) (molC/kg/s) = ",ES13.6,/, &
-              "       zoomort * pic2poc(i,j,k) (molC/kg/s) = ",ES13.6,/, &
-              "       caldiss (molC/kg/s) = ",ES13.6,/ &
-              )') &
-              i, j, k, wombat%zm(i,j,k), tn, c_pools(i,j,k,1), c_pools(i,j,k,2), &
-              wombat%f_dic(i,j,k), wombat%f_alk(i,j,k), wombat%f_phy(i,j,k), wombat%f_zoo(i,j,k), &
-              wombat%f_det(i,j,k), wombat%f_caco3(i,j,k), Temp(i,j,k), Salt(i,j,k), &
-              wombat%pco2_csurf(i,j), wombat%htotal(i,j,k), wombat%phygrow(i,j,k), &
-              wombat%detremi(i,j,k), wombat%zooresp(i,j,k), wombat%zooexcrphy(i,j,k), &
-              wombat%zooexcrdet(i,j,k), wombat%phyresp(i,j,k), &
-              wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k), &
-              wombat%phymort(i,j,k) * wombat%pic2poc(i,j,k), &
-              wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k), &
-              wombat%caldiss(i,j,k)
-          call mpp_error(FATAL, trim(error_header) // mesg)
+          print *, "--------------------------------------------"
+          print *, trim(error_header) // " Ecosystem model is not conserving carbon"
+          print *, "       Longitude index =", i
+          print *, "       Latitude index =", j
+          print *, "       Depth index and value =", k, wombat%zm(i,j,k)
+          print *, "       Nested timestep number =", tn
+          print *, " "
+          print *, "       Biological C budget (molC/kg) at two timesteps =", c_pools(i,j,k,1), c_pools(i,j,k,2)
+          print *, " "
+          print *, "       DIC (molC/kg) =", wombat%f_dic(i,j,k)
+          print *, "       ALK (molC/kg) =", wombat%f_alk(i,j,k)
+          print *, "       PHY (molC/kg) =", wombat%f_phy(i,j,k)
+          print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k)
+          print *, "       DET (molN/kg) =", wombat%f_det(i,j,k)
+          print *, "       CaCO3 (molC/kg) =", wombat%f_caco3(i,j,k)
+          print *, "       Temp =", Temp(i,j,k)
+          print *, "       Salt =", Salt(i,j,k)
+          print *, "       surface pCO2 =", wombat%pco2_csurf(i,j)
+          print *, "       htotal =", wombat%htotal(i,j,k)
+          print *, " "
+          print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
+          print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
+          print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
+          print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
+          print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
+          print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
+          print *, "       zooslopphy * pic2poc(i,j,k) (molC/kg/s) =", wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k)
+          print *, "       phymort * pic2poc(i,j,k) (molC/kg/s) =", wombat%phymort(i,j,k) * wombat%pic2poc(i,j,k)
+          print *, "       zoomort * pic2poc(i,j,k) (molC/kg/s) =", wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k)
+          print *, "       caldiss (molC/kg/s) =", wombat%caldiss(i,j,k)
+          print *, "--------------------------------------------"
+          call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
         endif
       endif
 
@@ -3142,7 +3123,6 @@ module generic_WOMBATlite
                                     - wombat%f_dic(i,j,k) ) * grid_tmask(i,j,k)
         wombat%f_alk(i,j,k) = wombat%f_alk(i,j,k) + wombat%alk_correct(i,j,k)
         wombat%f_dic(i,j,k) = wombat%f_dic(i,j,k) + wombat%dic_correct(i,j,k)
-        wombat%f_dicp(i,j,k) = max(wombat%dic_min * mmol_m3_to_mol_kg, wombat%f_dic(i,j,k))
       enddo
     enddo; enddo
 
@@ -3173,6 +3153,8 @@ module generic_WOMBATlite
 
     ! Variable sinking rates of organic detritus (positive for sinking when GOLDtridiag == .true.)
     !                                            (negative for sinking when IOWtridiag ==.true.)
+    ! Note: sinking distances are limited in the vertdiff solver to prevent characteristics
+    ! crossing within a timestep
     do j = jsc,jec; do i = isc,iec;
       if (grid_kmt(i,j).gt.0) then
         biophy1  = max(epsi, wombat%f_phy(i,j,1) ) / mmol_m3_to_mol_kg  ![mmol/m3]
@@ -3182,9 +3164,6 @@ module generic_WOMBATlite
                      (wombat%f_caco3(i,j,k) / (wombat%f_det(i,j,k) + wombat%f_caco3(i,j,k) + epsi)))
           ! Increase sinking rate with depth to achieve power law behaviour  
           wsink(k) = wsink(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink(k)))
-          ! Ensure that we don't violate the CFL criterion  
-          max_wsink = dzt(i,j,k) * 0.5 / (dt * 2)  ! [m/s]
-          wsink(k) = min(wsink(k), max_wsink)
           ! CaCO3 sinks slower than general detritus because it tends to be smaller
           wsinkcal(k) = wsink(k) * wombat%wcaco3/wombat%wdetbio
         enddo
@@ -3332,7 +3311,7 @@ module generic_WOMBATlite
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
     if (wombat%id_dicp_vstf .gt. 0) &
-      used = g_send_data(wombat%id_dicp_vstf, wombat%dicp_vstf, model_time, &
+      used = g_send_data(wombat%id_dicp_vstf, wombat%dic_vstf, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
     if (wombat%id_alk_vstf .gt. 0) &
@@ -3804,8 +3783,6 @@ module generic_WOMBATlite
 
       call g_tracer_set_values(tracer_list, 'dic', 'alpha', wombat%co2_alpha, isd, jsd)
       call g_tracer_set_values(tracer_list, 'dic', 'csurf', wombat%co2_csurf, isd, jsd)
-      call g_tracer_set_values(tracer_list, 'dicp', 'alpha', wombat%co2_alpha, isd, jsd)
-      call g_tracer_set_values(tracer_list, 'dicp', 'csurf', wombat%co2_csurf, isd, jsd)
 
       ! nnz: If source is called uncomment the following
       wombat%init = .false. !nnz: This is necessary since the above calls appear in source subroutine too.
@@ -3832,10 +3809,6 @@ module generic_WOMBATlite
     call g_tracer_set_values(tracer_list, 'dic', 'alpha', wombat%co2_alpha, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'csurf', wombat%co2_csurf, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'sc_no', wombat%co2_sc_no, isd, jsd)
-
-    call g_tracer_set_values(tracer_list, 'dicp', 'alpha', wombat%co2_alpha, isd, jsd)
-    call g_tracer_set_values(tracer_list, 'dicp', 'csurf', wombat%co2_csurf, isd, jsd)
-    call g_tracer_set_values(tracer_list, 'dicp', 'sc_no', wombat%co2_sc_no, isd, jsd)
 
     call g_tracer_get_values(tracer_list, 'o2', 'alpha', wombat%o2_alpha, isd, jsd)
     call g_tracer_get_values(tracer_list, 'o2', 'csurf', wombat%o2_csurf ,isd, jsd)
@@ -3954,11 +3927,9 @@ module generic_WOMBATlite
     allocate(wombat%o2_sc_no(isd:ied, jsd:jed)); wombat%o2_sc_no(:,:)=0.0
     allocate(wombat%no3_vstf(isd:ied, jsd:jed)); wombat%no3_vstf(:,:)=0.0
     allocate(wombat%dic_vstf(isd:ied, jsd:jed)); wombat%dic_vstf(:,:)=0.0
-    allocate(wombat%dicp_vstf(isd:ied, jsd:jed)); wombat%dicp_vstf(:,:)=0.0
     allocate(wombat%alk_vstf(isd:ied, jsd:jed)); wombat%alk_vstf(:,:)=0.0
 
     allocate(wombat%f_dic(isd:ied, jsd:jed, 1:nk)); wombat%f_dic(:,:,:)=0.0
-    allocate(wombat%f_dicp(isd:ied, jsd:jed, 1:nk)); wombat%f_dicp(:,:,:)=0.0
     allocate(wombat%f_dicr(isd:ied, jsd:jed, 1:nk)); wombat%f_dicr(:,:,:)=0.0
     allocate(wombat%f_alk(isd:ied, jsd:jed, 1:nk)); wombat%f_alk(:,:,:)=0.0
     allocate(wombat%f_no3(isd:ied, jsd:jed, 1:nk)); wombat%f_no3(:,:,:)=0.0
@@ -4100,12 +4071,10 @@ module generic_WOMBATlite
         wombat%o2_sc_no, &
         wombat%no3_vstf, &
         wombat%dic_vstf, &
-        wombat%dicp_vstf, &
         wombat%alk_vstf)
 
     deallocate( &
         wombat%f_dic, &
-        wombat%f_dicp, &
         wombat%f_dicr, &
         wombat%f_alk, &
         wombat%f_no3, &
