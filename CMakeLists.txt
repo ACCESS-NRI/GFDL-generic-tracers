@@ -97,7 +97,7 @@ target_sources(gtracers PRIVATE
 
 target_link_libraries(gtracers PUBLIC
 			FMS::fms_r8
-			PkgConfig::MOCSY)
+			MOCSY::MOCSY)
 
 install(TARGETS gtracers
         EXPORT GFDLGTracersTargets)
