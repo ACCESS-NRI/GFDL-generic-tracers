@@ -761,7 +761,6 @@ module generic_WOMBATmid
           'Checking that the ecosystem model conserves carbon'
     endif
 
-
     ! Specify all prognostic and diagnostic tracers of this modules.
     call user_add_tracers(tracer_list)
 
