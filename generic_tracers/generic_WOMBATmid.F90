@@ -3907,7 +3907,6 @@ module generic_WOMBATmid
                               wombat%diaresp(i,j,k) - &
                               wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) - &
                               wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
-                              
       ! Phytoplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_phy(i,j,k)  = wombat%f_phy(i,j,k) + dtsb * ( &
