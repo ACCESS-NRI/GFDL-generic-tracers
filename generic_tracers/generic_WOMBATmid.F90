@@ -1526,7 +1526,7 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'fdenitrif', 'fraction of organic matter remineralised via denitrification', 'h', 'L', 's', '[0-1]', 'f')
+        'fdenitrif', 'Fraction of organic matter remineralised via denitrification', 'h', 'L', 's', '[0-1]', 'f')
     wombat%id_fdenitrif = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
     
