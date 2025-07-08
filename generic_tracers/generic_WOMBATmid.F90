@@ -3182,7 +3182,7 @@ module generic_WOMBATmid
     !    1.  Light attenuation through water column                         !
     !    2.  Nutrient limitation of phytoplankton                           !
     !    3.  Temperature-dependence of heterotrophy                         !
-    !    4.  Light limitation of phytoplankton                              !   
+    !    4.  Light limitation of phytoplankton                              !
     !    5.  Growth of chlorophyll                                          !
     !    6.  Phytoplankton uptake of iron                                   !
     !    7.  Iron chemistry                                                 !
