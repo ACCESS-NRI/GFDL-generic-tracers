@@ -72,8 +72,7 @@ endif()
 
 find_package(MPI REQUIRED COMPONENTS Fortran)
 find_package(fms COMPONENTS R8 REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(MOCSY REQUIRED IMPORTED_TARGET "mocsy")
+find_package(mocsy REQUIRED)
 
 add_library(gtracers STATIC)
 
@@ -99,7 +98,7 @@ target_sources(gtracers PRIVATE
 
 target_link_libraries(gtracers PUBLIC
 			FMS::fms_r8
-			PkgConfig::MOCSY)
+		  mocsy::mocsy)
 
 install(TARGETS gtracers
         EXPORT GFDLGTracersTargets)
