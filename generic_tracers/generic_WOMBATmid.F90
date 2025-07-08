@@ -272,7 +272,7 @@ module generic_WOMBATmid
         sio2, &
         co2_csurf, co2_alpha, co2_sc_no, pco2_csurf, &
         o2_csurf, o2_alpha, o2_sc_no, &
-        no3_vstf, nh4_vstf, dic_vstf, dicp_vstf, alk_vstf
+        no3_vstf, nh4_vstf, dic_vstf, alk_vstf
 
 
     real, dimension(:,:,:), allocatable :: &
@@ -3154,10 +3154,7 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau, &
-        positive=.false.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'dicp', 'field', wombat%f_dicp, isd, jsd, ntau=tau, &
-        positive=.false.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
  
