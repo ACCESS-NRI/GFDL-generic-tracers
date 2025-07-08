@@ -1521,7 +1521,7 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'denitrif', 'denitrification rate (NO3 consumption)', 'h', 'L', 's', '[mol/kg/s]', 'f')
+        'denitrif', 'Denitrification rate (NO3 consumption)', 'h', 'L', 's', '[mol/kg/s]', 'f')
     wombat%id_denitrif = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
