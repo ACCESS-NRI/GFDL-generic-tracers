@@ -1,0 +1,24 @@
+# Copyright ACCESS-NRI and contributors. See the top-level LICENSE file for details.
+
+@PACKAGE_INIT@
+
+if(NOT GFDLGTracers_FIND_QUIETLY)
+  message(STATUS "Found GFDLGTracers: ${PACKAGE_PREFIX_DIR}")
+endif()
+
+include(CMakeFindDependencyMacro)
+
+# Request components
+set(_required_components ${GFDLGTracers_FIND_COMPONENTS})
+
+find_dependency(MPI REQUIRED COMPONENTS Fortran)
+find_dependency(fms COMPONENTS R8 REQUIRED)
+find_dependency(mocsy REQUIRED)
+
+# Run the normal Targets.cmake
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+include("${CMAKE_CURRENT_LIST_DIR}/GFDLGTracersTargets.cmake")
+list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+
+# Check the requested components are valid
+check_required_components(_required_components)
