@@ -137,7 +137,7 @@ module generic_WOMBATmid
   !=======================================================================
   character(len=10) :: co2_calc  = 'mocsy' ! other option is 'ocmip2'
   logical :: do_caco3_dynamics   = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
-  logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
+  logical :: do_burial           = .false.  ! permanently bury organics and CaCO3 in sediments?
   logical :: do_conserve_tracers = .false. ! add back the lost NO3 and Alk due to burial to surface?
   logical :: do_open_n_cycle     = .true.  ! N cycle has denitrification, anammox and nitrogen fixation?
   logical :: do_check_n_conserve = .false. ! check that the N fluxes balance in the ecosystem
@@ -2751,10 +2751,12 @@ module generic_WOMBATmid
     call g_tracer_get_pointer(tracer_list, 'det_sediment', 'field', wombat%p_det_sediment)
     wombat%p_det_sediment(:,:,1) = wombat%p_det_sediment(:,:,1) + (wombat%det_btm(:,:) + wombat%bdet_btm(:,:)) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'det', 'btm_reservoir', 0.0)
+    call g_tracer_set_values(tracer_list, 'bdet', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment)
     wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + (wombat%detfe_btm(:,:) + wombat%bdetfe_btm(:,:)) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'detfe', 'btm_reservoir', 0.0)
+    call g_tracer_set_values(tracer_list, 'bdetfe', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment)
     wombat%p_caco3_sediment(:,:,1) =  wombat%p_caco3_sediment(:,:,1) + wombat%caco3_btm(:,:) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
@@ -2895,6 +2897,7 @@ module generic_WOMBATmid
     real                                    :: mesexcrphyfe, mesexcrdiafe, mesexcrdetfe, mesexcrbdetfe, mesexcrzoofe
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink1, wsink2, wsinkcal
+    real                                    :: max_wsink
     real, dimension(4,61)                   :: zbgr
     real                                    :: ztemk, I_ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
@@ -3701,7 +3704,7 @@ module generic_WOMBATmid
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
       biof = max(1/3., biophy / (biophy + 0.03))
-      biodoc = 10.0 + (1.0 - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) * 40.0 ! proxy of DOC (mmol/m3)
+      biodoc = 40.0 + (1.0 - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) * 40.0 ! proxy of DOC (mmol/m3)
       ! Colloidal shunt associated with small particles and DOC (Tagliabue et al., 2023)
       if (wombat%zw(i,j,k).le.hblt_depth(i,j)) then
         zval = (      (12.*biof*biodoc + 9.*biodet) + 2.5*biodet + 128.*biof*biodoc + 725.*biodet )*wombat%kcoag_dfe
@@ -4600,7 +4603,6 @@ module generic_WOMBATmid
           ! Increase sinking rate with depth to achieve power law behaviour  
           wsink1(k) = wsink1(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink1(k)))
           wsink2(k) = wsink2(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink2(k)))
-          ! Ensure that we don't violate the CFL criterion  
           ! CaCO3 sinks slower than general detritus because it tends to be smaller
           wsinkcal(k) = wsink1(k) * wombat%wcaco3/wombat%wdetbio
         enddo
