@@ -26,6 +26,8 @@ endif()
 
 cmake_path(APPEND CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR} "include")
 
+option(BUILD_SHARED_LIBS "Build shared/dynamic libraries" OFF)
+
 ################################################################################
 # Fortran
 ################################################################################
@@ -61,11 +63,11 @@ endif()
 ################################################################################
 
 find_package(MPI REQUIRED COMPONENTS Fortran)
+find_package(FMS REQUIRED COMPONENTS R8)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(FMS REQUIRED IMPORTED_TARGET "FMS")
 pkg_check_modules(MOCSY REQUIRED IMPORTED_TARGET "mocsy")
 
-add_library(gtracers STATIC)
+add_library(gtracers)
 
 target_sources(gtracers PRIVATE
   generic_tracers/FMS_coupler_util.F90
@@ -87,8 +89,19 @@ target_sources(gtracers PRIVATE
   generic_tracers/generic_WOMBATmid.F90
 )
 
+set_target_properties(gtracers PROPERTIES POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
+
+# "Creating CMake Libraries - That others can find and use."
+# https://www.youtube.com/watch?v=08f5Dav72aE
+target_include_directories(gtracers
+  PUBLIC
+  # Generic Tracers has no header files but creates modules
+  # "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generic_tracers>"
+  "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
 target_link_libraries(gtracers PUBLIC
-			PkgConfig::FMS
+			FMS::fms_r8
 			PkgConfig::MOCSY)
 
 install(TARGETS gtracers
