@@ -3239,7 +3239,15 @@ module generic_WOMBATlite
         wombat%sedmask(i,j) = grid_tmask(i,j,k)
       endif
 
-      ! There's a units issue here. Pearse will add a comment about this.
+      ! pjb: Sum the water column concentration of DIC and the organic carbon content of the
+      ! sediment to approximate the interstitial (i.e., porewater) DIC concentration.
+      ! We assume that the organic carbon content of the sediment (p_det_sediment) in mol/m2 is
+      ! relevant over one meter, and therefore can be automatically converted to mol/m3 and then
+      ! subsequently converted through the mol/kg using Rho_0. With this assumption these arrays
+      ! can be added together.
+      ! We add these arrays together to simulate the reducing conditions of organic-rich sediments,
+      ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
+      ! CaCO3 within the sediment as organic matter accumulates.
       wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%Rho_0
     enddo; enddo
 
