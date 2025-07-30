@@ -1,0 +1,11 @@
+spack:
+  specs:
+  # *_compiler is defined in the .github/build-ci/data/standard.json file
+  - access-generic-tracers@git.{{ ref }} ~use_access_fms
+  packages:
+    all:
+      require:
+      - '%{{ oneapi_compiler }} target=x86_64'
+  concretizer:
+    unify: false
+  view: false
