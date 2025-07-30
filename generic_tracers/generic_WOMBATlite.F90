@@ -72,6 +72,15 @@
 !   If true and do_burial is true, add back the lost NO3 and Alk due to
 !   burial to surface
 !  </DATA>
+!
+!  <DATA NAME="do_check_n_conserve" TYPE="logical">
+!   If true, check that the ecosystem model conserves nitrogen. NOTE:
+!   not appropriate if dentirification, anammox and nitrogen fixation are on.
+!  </DATA>
+!
+!  <DATA NAME="do_check_c_conserve" TYPE="logical">
+!   If true, check that the ecosystem model conserves carbon
+!  </DATA>
 ! </NAMELIST>
 !
 !-----------------------------------------------------------------------
@@ -125,8 +134,11 @@ module generic_WOMBATlite
   logical :: do_caco3_dynamics   = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
   logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
   logical :: do_conserve_tracers = .false. ! add back the lost NO3 and Alk due to burial to surface?
+  logical :: do_check_n_conserve = .true.  ! check that the N fluxes balance in the ecosystem
+  logical :: do_check_c_conserve = .true.  ! check that the C fluxes balance in the ecosystem
 
-  namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_burial, do_conserve_tracers
+  namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_burial, do_conserve_tracers, &
+                                    do_check_n_conserve, do_check_c_conserve
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
@@ -553,6 +565,16 @@ module generic_WOMBATlite
     elseif (do_conserve_tracers) then
       call mpp_error(WARNING, trim(warn_header) // &
           'do_conserve_tracers = .true. is doing nothing because do_burial = .false.')
+    endif
+
+    if (do_check_n_conserve) then
+      write (stdoutunit,*) trim(note_header), &
+          'Checking that the ecosystem model conserves nitrogen'
+    endif
+
+    if (do_check_c_conserve) then
+      write (stdoutunit,*) trim(note_header), &
+          'Checking that the ecosystem model conserves carbon'
     endif
 
     ! Specify all prognostic and diagnostic tracers of this modules.
@@ -3004,65 +3026,69 @@ module generic_WOMBATlite
                          wombat%f_zoo(i,j,k) + wombat%f_caco3(i,j,k)
 
       if (tn.gt.1) then
-        if (abs(n_pools(i,j,k,2) - n_pools(i,j,k,1)).gt.1e-16) then
-          print *, "--------------------------------------------"
-          print *, trim(error_header) // " Ecosystem model is not conserving nitrogen"
-          print *, "       Longitude index =", i
-          print *, "       Latitude index =", j
-          print *, "       Depth index and value =", k, wombat%zm(i,j,k)
-          print *, "       Nested timestep number =", tn
-          print *, " "
-          print *, "       Biological N budget (molN/kg) at two timesteps =", n_pools(i,j,k,1), n_pools(i,j,k,2)
-          print *, "       Difference in budget between timesteps =", n_pools(i,j,k,2) - n_pools(i,j,k,1)
-          print *, " "
-          print *, "       NO3 (molNO3/kg) =", wombat%f_no3(i,j,k)
-          print *, "       PHY (molN/kg) =", wombat%f_phy(i,j,k) * 16.0 / 122.0
-          print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k) * 16.0 / 122.0
-          print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
-          print *, " "
-          print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
-          print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
-          print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
-          print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
-          print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
-          print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
-          print *, "--------------------------------------------"
-          call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
+        if (do_check_n_conserve) then
+          if (abs(n_pools(i,j,k,2) - n_pools(i,j,k,1)).gt.1e-16) then
+            print *, "--------------------------------------------"
+            print *, trim(error_header) // " Ecosystem model is not conserving nitrogen"
+            print *, "       Longitude index =", i
+            print *, "       Latitude index =", j
+            print *, "       Depth index and value =", k, wombat%zm(i,j,k)
+            print *, "       Nested timestep number =", tn
+            print *, " "
+            print *, "       Biological N budget (molN/kg) at two timesteps =", n_pools(i,j,k,1), n_pools(i,j,k,2)
+            print *, "       Difference in budget between timesteps =", n_pools(i,j,k,2) - n_pools(i,j,k,1)
+            print *, " "
+            print *, "       NO3 (molNO3/kg) =", wombat%f_no3(i,j,k)
+            print *, "       PHY (molN/kg) =", wombat%f_phy(i,j,k) * 16.0 / 122.0
+            print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k) * 16.0 / 122.0
+            print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
+            print *, " "
+            print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
+            print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
+            print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
+            print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
+            print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
+            print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
+            print *, "--------------------------------------------"
+            call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
+          endif
         endif
-        if (abs(c_pools(i,j,k,2) - c_pools(i,j,k,1)).gt.1e-16) then
-          print *, "--------------------------------------------"
-          print *, trim(error_header) // " Ecosystem model is not conserving carbon"
-          print *, "       Longitude index =", i
-          print *, "       Latitude index =", j
-          print *, "       Depth index and value =", k, wombat%zm(i,j,k)
-          print *, "       Nested timestep number =", tn
-          print *, " "
-          print *, "       Biological C budget (molC/kg) at two timesteps =", c_pools(i,j,k,1), c_pools(i,j,k,2)
-          print *, "       Difference in budget between timesteps =", c_pools(i,j,k,2) - c_pools(i,j,k,1)
-          print *, " "
-          print *, "       DIC (molC/kg) =", wombat%f_dic(i,j,k)
-          print *, "       ALK (molC/kg) =", wombat%f_alk(i,j,k)
-          print *, "       PHY (molC/kg) =", wombat%f_phy(i,j,k)
-          print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k)
-          print *, "       DET (molN/kg) =", wombat%f_det(i,j,k)
-          print *, "       CaCO3 (molC/kg) =", wombat%f_caco3(i,j,k)
-          print *, "       Temp =", Temp(i,j,k)
-          print *, "       Salt =", Salt(i,j,k)
-          print *, "       surface pCO2 =", wombat%pco2_csurf(i,j)
-          print *, "       htotal =", wombat%htotal(i,j,k)
-          print *, " "
-          print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
-          print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
-          print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
-          print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
-          print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
-          print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
-          print *, "       zooslopphy * pic2poc(i,j,k) (molC/kg/s) =", wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k)
-          print *, "       phymort * pic2poc(i,j,k) (molC/kg/s) =", wombat%phymort(i,j,k) * wombat%pic2poc(i,j,k)
-          print *, "       zoomort * pic2poc(i,j,k) (molC/kg/s) =", wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k)
-          print *, "       caldiss (molC/kg/s) =", wombat%caldiss(i,j,k)
-          print *, "--------------------------------------------"
-          call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
+        if (do_check_c_conserve) then
+            if (abs(c_pools(i,j,k,2) - c_pools(i,j,k,1)).gt.1e-16) then
+            print *, "--------------------------------------------"
+            print *, trim(error_header) // " Ecosystem model is not conserving carbon"
+            print *, "       Longitude index =", i
+            print *, "       Latitude index =", j
+            print *, "       Depth index and value =", k, wombat%zm(i,j,k)
+            print *, "       Nested timestep number =", tn
+            print *, " "
+            print *, "       Biological C budget (molC/kg) at two timesteps =", c_pools(i,j,k,1), c_pools(i,j,k,2)
+            print *, "       Difference in budget between timesteps =", c_pools(i,j,k,2) - c_pools(i,j,k,1)
+            print *, " "
+            print *, "       DIC (molC/kg) =", wombat%f_dic(i,j,k)
+            print *, "       ALK (molC/kg) =", wombat%f_alk(i,j,k)
+            print *, "       PHY (molC/kg) =", wombat%f_phy(i,j,k)
+            print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k)
+            print *, "       DET (molN/kg) =", wombat%f_det(i,j,k)
+            print *, "       CaCO3 (molC/kg) =", wombat%f_caco3(i,j,k)
+            print *, "       Temp =", Temp(i,j,k)
+            print *, "       Salt =", Salt(i,j,k)
+            print *, "       surface pCO2 =", wombat%pco2_csurf(i,j)
+            print *, "       htotal =", wombat%htotal(i,j,k)
+            print *, " "
+            print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
+            print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
+            print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
+            print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
+            print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
+            print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
+            print *, "       zooslopphy * pic2poc(i,j,k) (molC/kg/s) =", wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k)
+            print *, "       phymort * pic2poc(i,j,k) (molC/kg/s) =", wombat%phymort(i,j,k) * wombat%pic2poc(i,j,k)
+            print *, "       zoomort * pic2poc(i,j,k) (molC/kg/s) =", wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k)
+            print *, "       caldiss (molC/kg/s) =", wombat%caldiss(i,j,k)
+            print *, "--------------------------------------------"
+            call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
+          endif
         endif
       endif
 
