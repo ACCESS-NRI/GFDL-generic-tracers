@@ -32,6 +32,7 @@ jobs:
     uses: access-nri/build-ci/.github/workflows/ci.yml@v2
     with:
       spack-manifest-path: ${{ matrix.file }}
+      spack-manifest-data-path: .github/build-ci/data/standard.json
       allow-ssh-into-spack-install: false  # If true, PR author must ssh into instance to complete job
       # spack-packages-ref: main
       # spack-config-ref: main
