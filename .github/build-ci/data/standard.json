@@ -1,0 +1,5 @@
+{
+  "intel_compiler": "intel@2021.10.0",
+  "gcc_compiler": "gcc@13.2.0",
+  "oneapi_compiler": "oneapi@2025.2.0"
+}
