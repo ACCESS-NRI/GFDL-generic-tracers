@@ -1,0 +1,38 @@
+name: Build
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  pre-ci:
+    name: Pre-CI
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up matrix
+        id: set-matrix
+        # Find all relevant files under .github/build-ci/manifests
+        # then output them as a JSON array (minus the last comma)
+        run: |
+          files=$(find .github/build-ci/manifests/ -iname '*.j2' -printf '"%p",')
+          echo "matrix=[${files%,}]" >> $GITHUB_OUTPUT
+
+  ci:
+    name: CI
+    needs: pre-ci
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        file: ${{ fromJson(needs.pre-ci.outputs.matrix) }}
+    uses: access-nri/build-ci/.github/workflows/ci.yml@v2
+    with:
+      spack-manifest-path: ${{ matrix.file }}
+      allow-ssh-into-spack-install: false  # If true, PR author must ssh into instance to complete job
+      # spack-packages-ref: main
+      # spack-config-ref: main
+      # spack-ref: releases/v0.22
