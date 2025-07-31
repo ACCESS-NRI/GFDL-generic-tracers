@@ -34,12 +34,13 @@
 !  This is the "mid" version of WOMBAT which includes two classes each of
 !  phytoplankton, zooplankton and sinking detritus, as well as nitrate
 !  (NO3), ammonium (NH4), bio-available iron (Fe), dissolved organic carbon
-!  (DOC) and nitrogen (DON), an explicit bacterial biomass pool, dissolved 
+!  (DOC) and nitrogen (DON), a heterotrophic bacterial biomass pool (BAC), 
+!  a chemoautotrophic ammonia oxidizing archaea pool (AOA), dissolved 
 !  inorganic carbon (DIC), calcium carbonate (CaCO3), alkalinity (ALK), 
 !  and oxygen (O2). Fe is carried through all exosystem biomass pools 
-!  except bacteria, which has constant C:N:Fe ratios. C:N ratios are fixed 
-!  in all biomass pools except for dissolved organics, since we represent
-!  both DOC and DON. Gas exchange follows MOCSY protocols.
+!  except bacteria and archaea, which has constant C:N:Fe ratios. C:N ratios 
+!  are fixed in all biomass pools except for dissolved organics, since we 
+!  represent both DOC and DON. Gas exchange follows MOCSY protocols.
 ! </DESCRIPTION>
 !
 ! <INFO>
@@ -256,6 +257,8 @@ module generic_WOMBATmid
         aoakn, &
         aoako, &
         aoamumax, &
+        aoa_C2N, &
+        aoa_C2Fe, &
         bac_Vmax_doc, &
         bac_Vmax_no3, &
         bac_poxy, &
@@ -397,6 +400,7 @@ module generic_WOMBATmid
         f_doc, &
         f_don, &
         f_bac, &
+        f_aoa, &
         f_o2, &
         f_caco3, &
         f_fe, &
@@ -2308,6 +2312,14 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoamumax', wombat%aoamumax, 0.025/86400.0)
 
+    ! Ammonia oxidizing archaea biomass carbon to nitrogen ratio [mol C / mol N]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('aoa_C2N', wombat%aoa_C2N, 5.0)
+
+    ! Ammonia oxidizing archaea biomass carbon to iron ratio [mol C / mol Fe]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('aoa_C2Fe', wombat%aoa_C2Fe, 1.0/20e-6)
+
     ! Facultative heterotrophic bacteria maximum rate of uptake of DOC [mmol/m3/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac_Vmax_doc', wombat%bac_Vmax_doc, 6.7/86400.0)
@@ -2653,6 +2665,14 @@ module generic_WOMBATmid
     call g_tracer_add(tracer_list, package_name, &
         name = 'bac', &
         longname = 'Facultative heterotrophic bacteria', &
+        units = 'mol/kg', &
+        prog = .true.)
+
+    ! Ammonia oxidizing archaea
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'aoa', &
+        longname = 'Ammonia oxidizing archaea', &
         units = 'mol/kg', &
         prog = .true.)
     
@@ -3036,7 +3056,8 @@ module generic_WOMBATmid
     real                                    :: zooprefphy, zooprefdia, zooprefdet
     real                                    :: mesprefphy, mesprefdia, mesprefdet, mesprefbdet, mesprefzoo
     real                                    :: biono3, bionh4, biooxy, biofer
-    real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobac, biodoc, biodon, biocaco3
+    real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet
+    real                                    :: bioaoa, biobac, biodoc, biodon, biocaco3
     real                                    :: biophyfe, biodiafe, biozoofe, biomesfe, zooprey, mesprey
     real                                    :: fbc
     real                                    :: no3_bgc_change, caco3_bgc_change
@@ -3454,6 +3475,8 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'bac', 'field', wombat%f_bac, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau, &
@@ -3643,6 +3666,7 @@ module generic_WOMBATmid
       biodoc   = max(epsi, wombat%f_doc(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodon   = max(epsi, wombat%f_don(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biobac   = max(epsi, wombat%f_bac(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      bioaoa   = max(epsi, wombat%f_aoa(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biono3   = max(epsi, wombat%f_no3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       bionh4   = max(epsi, wombat%f_nh4(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biooxy   = max(epsi, wombat%f_o2(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
@@ -3714,7 +3738,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      ! Temperature dependance of heterotrophy (applies to bact and zoo)
+      ! Temperature dependance of heterotrophy (applies to bac and zoo)
       fbc = wombat%bbioh ** (Temp(i,j,k))
 
       ! Variable rates of remineralisation
@@ -4547,6 +4571,10 @@ module generic_WOMBATmid
                             - wombat%bacmor1(i,j,k) &
                             - wombat%bacmor2(i,j,k) )
     
+      ! Ammonia oxidizing archaea ! [molC/kg]
+      !-----------------------------------------------------------------------
+      wombat%f_aoa(i,j,k) = wombat%f_aoa(i,j,k) + dtsb * ( 0.0 )
+    
       ! Oxygen equation ! [molO2/kg]
       !-----------------------------------------------------------------------
       if (wombat%f_o2(i,j,k) .gt. epsi) &
@@ -4687,10 +4715,10 @@ module generic_WOMBATmid
       n_pools(i,j,k,2) = wombat%f_no3(i,j,k) + wombat%f_nh4(i,j,k) + wombat%f_don(i,j,k) &
                           + ( wombat%f_phy(i,j,k) + wombat%f_det(i,j,k) + wombat%f_bdet(i,j,k) &
                           +   wombat%f_zoo(i,j,k) + wombat%f_mes(i,j,k) + wombat%f_dia(i,j,k) ) * 16/122.0 &
-                          + ( wombat%f_bac(i,j,k) / wombat%bac_C2N )
+                          + ( wombat%f_bac(i,j,k) / wombat%bac_C2N ) + ( wombat%f_aoa(i,j,k) / wombat%aoa_C2N )
       c_pools(i,j,k,2) = wombat%f_dic(i,j,k) + wombat%f_phy(i,j,k) + wombat%f_det(i,j,k) + wombat%f_bdet(i,j,k) + &
                          wombat%f_zoo(i,j,k) + wombat%f_mes(i,j,k) + wombat%f_caco3(i,j,k) + wombat%f_dia(i,j,k) + &
-                         wombat%f_doc(i,j,k) + wombat%f_bac(i,j,k)
+                         wombat%f_doc(i,j,k) + wombat%f_bac(i,j,k) + wombat%f_aoa(i,j,k)
 
       if (tn.gt.1) then
         if (do_check_n_conserve) then
@@ -4713,7 +4741,8 @@ module generic_WOMBATmid
           print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
           print *, "       BDET (molN/kg) =", wombat%f_bdet(i,j,k) * 16.0 / 122.0
           print *, "       DON (molN/kg) =", wombat%f_don(i,j,k)
-          print *, "       BAC (molN/kg) =", wombat%f_bac(i,j,k) * 1.0 / 5.0
+          print *, "       BAC (molN/kg) =", wombat%f_bac(i,j,k) / wombat%bac_C2N
+          print *, "       AOA (molN/kg) =", wombat%f_aoa(i,j,k) / wombat%aoa_C2N
           print *, " "
           print *, "       ammox (molN/kg/s) =", wombat%ammox(i,j,k)
           print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
@@ -4762,6 +4791,7 @@ module generic_WOMBATmid
           print *, "       DET (molC/kg) =", wombat%f_det(i,j,k)
           print *, "       BDET (molC/kg) =", wombat%f_bdet(i,j,k)
           print *, "       BAC (molC/kg) =", wombat%f_bac(i,j,k)
+          print *, "       AOA (molC/kg) =", wombat%f_aoa(i,j,k)
           print *, "       DOC (molC/kg) =", wombat%f_doc(i,j,k)
           print *, "       CaCO3 (molC/kg) =", wombat%f_caco3(i,j,k)
           print *, "       Temp =", Temp(i,j,k)
@@ -4887,6 +4917,7 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'doc', 'field', wombat%f_doc, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac', 'field', wombat%f_bac, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'fe', 'field', wombat%f_fe, isd, jsd, ntau=tau)
@@ -6032,6 +6063,7 @@ module generic_WOMBATmid
     allocate(wombat%f_doc(isd:ied, jsd:jed, 1:nk)); wombat%f_doc(:,:,:)=0.0
     allocate(wombat%f_don(isd:ied, jsd:jed, 1:nk)); wombat%f_don(:,:,:)=0.0
     allocate(wombat%f_bac(isd:ied, jsd:jed, 1:nk)); wombat%f_bac(:,:,:)=0.0
+    allocate(wombat%f_aoa(isd:ied, jsd:jed, 1:nk)); wombat%f_aoa(:,:,:)=0.0
     allocate(wombat%f_o2(isd:ied, jsd:jed, 1:nk)); wombat%f_o2(:,:,:)=0.0
     allocate(wombat%f_caco3(isd:ied, jsd:jed, 1:nk)); wombat%f_caco3(:,:,:)=0.0
     allocate(wombat%f_fe(isd:ied, jsd:jed, 1:nk)); wombat%f_fe(:,:,:)=0.0
@@ -6267,6 +6299,7 @@ module generic_WOMBATmid
         wombat%f_doc, &
         wombat%f_don, &
         wombat%f_bac, &
+        wombat%f_aoa, &
         wombat%f_o2, &
         wombat%f_caco3, &
         wombat%f_fe)
