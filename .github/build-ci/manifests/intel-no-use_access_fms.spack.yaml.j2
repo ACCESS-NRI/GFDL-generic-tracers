@@ -5,7 +5,7 @@ spack:
   packages:
     fms:
       require:
-        - '@git.2025.02=2025.02 ~openmp'
+        - '@git.2025.02=2025.02 ~openmp precision=64'
     all:
       require:
       - '%{{ intel_compiler }} target=x86_64'
