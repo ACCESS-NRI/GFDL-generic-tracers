@@ -264,9 +264,11 @@ module generic_WOMBATmid
         bac_knh4, &
         bac_kfer, &
         bac_yoxy, &
-        bac_yaerC, &
+        bac_yaerC_min, &
+        bac_yaerC_max, &
         bac_yno3, &
-        bac_yanaC, &
+        bac_yanaC_min, &
+        bac_yanaC_max, &
         bac_C2N, &
         bac_C2Fe, &
         baclmor, &
@@ -506,6 +508,8 @@ module generic_WOMBATmid
         bac_lfer, &
         bac_mu, &
         bac_kdoc, &
+        bac_yaerC, &
+        bac_yanaC, &
         bac_fanaer, &
         bacmor1, &
         bacmor2, &
@@ -662,6 +666,8 @@ module generic_WOMBATmid
         id_bac_lfer = -1, &
         id_bac_mu = -1, &
         id_bac_kdoc = -1, &
+        id_bac_yaerC = -1, &
+        id_bac_yanaC = -1, &
         id_bac_fanaer = -1, &
         id_bacmor1 = -1, &
         id_bacmor2 = -1, &
@@ -1659,6 +1665,16 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'bac_yaerC', 'Aerobic biomass yield of facultative heterotrophic bacteria', 'h', 'L', 's', 'molDOC/molB', 'f')
+    wombat%id_bac_yaerC = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'bac_yanaC', 'Anaerobic biomass yield of facultative heterotrophic bacteria', 'h', 'L', 's', 'molDOC/molB', 'f')
+    wombat%id_bac_yanaC = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'bac_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
     wombat%id_bac_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -2339,17 +2355,25 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac_kfer', wombat%bac_kfer, 0.5)
 
-    ! Facultative heterotrophic bacteria aerobic biomass yield per DOC [mol DOC / mol Biomass]
+    ! Facultative heterotrophic bacteria aerobic minimum biomass yield per DOC [mol DOC / mol Biomass]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac_yaerC', wombat%bac_yaerC, 6.7)
+    call g_tracer_add_param('bac_yaerC_min', wombat%bac_yaerC_min, 2.0)
+
+    ! Facultative heterotrophic bacteria aerobic maximum biomass yield per DOC [mol DOC / mol Biomass]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bac_yaerC_max', wombat%bac_yaerC_max, 20.0)
 
     ! Facultative heterotrophic bacteria aerobic biomass yield per O2 [mol O2/ mol Biomass]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac_yoxy', wombat%bac_yoxy, 6.3)
 
-    ! Facultative heterotrophic bacteria anaerobic biomass yield per DOC [mol DOC / mol Biomass]
+    ! Facultative heterotrophic bacteria minimum anaerobic biomass yield per DOC [mol DOC / mol Biomass]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac_yanaC', wombat%bac_yanaC, 9.1)
+    call g_tracer_add_param('bac_yanaC_min', wombat%bac_yanaC_min, 2.0*1.4)
+
+        ! Facultative heterotrophic bacteria maximum anaerobic biomass yield per DOC [mol DOC / mol Biomass]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bac_yanaC_max', wombat%bac_yanaC_max, 20.0*1.4)
 
     ! Facultative heterotrophic bacteria aerobic biomass yield per NO3 [mol NO3/ mol Biomass]
     !-----------------------------------------------------------------------
@@ -3043,7 +3067,7 @@ module generic_WOMBATmid
     real                                    :: pi = 3.14159265358979
     integer                                 :: ichl, iter, max_iter
     real                                    :: par_phy_mldsum, par_z_mldsum
-    real                                    :: chl, zchl, zval, phy_chlc, dia_chlc
+    real                                    :: chl, ndet, carb, zchl, zval, phy_chlc, dia_chlc
     real                                    :: phy_limnh4, phy_limno3, phy_limdin
     real                                    :: dia_limnh4, dia_limno3, dia_limdin
     real                                    :: phy_pisl, phy_pisl2 
@@ -3060,6 +3084,7 @@ module generic_WOMBATmid
     real, dimension(:), allocatable         :: wsink1, wsink2, wsinkcal
     real                                    :: max_wsink
     real, dimension(4,61)                   :: zbgr
+    real, dimension(3)                      :: dbgr, cbgr
     real                                    :: ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: biof, zno3, zfermin
@@ -3099,9 +3124,9 @@ module generic_WOMBATmid
     umol_m3_to_mol_kg = 1.e-3 * mmol_m3_to_mol_kg
    
 
-    !=======================================================================
-    ! Attenuation coefficients for blue, green and red light
-    !=======================================================================
+    !==========================================================================
+    ! Attenuation coefficients for blue, green and red light due to chlorophyll
+    !==========================================================================
     ! Chlorophyll      ! Blue attenuation    ! Green attenuation   ! Red attenuation
     zbgr(1, 1) =  0.010; zbgr(2, 1) = 0.01618; zbgr(3, 1) = 0.07464; zbgr(4, 1) = 0.3780
     zbgr(1, 2) =  0.011; zbgr(2, 2) = 0.01654; zbgr(3, 2) = 0.07480; zbgr(4, 2) = 0.37823
@@ -3164,6 +3189,29 @@ module generic_WOMBATmid
     zbgr(1,59) =  7.943; zbgr(2,59) = 0.41125; zbgr(3,59) = 0.24378; zbgr(4,59) = 0.54147
     zbgr(1,60) =  8.912; zbgr(2,60) = 0.44336; zbgr(3,60) = 0.25725; zbgr(4,60) = 0.55457
     zbgr(1,61) = 10.000; zbgr(2,61) = 0.47804; zbgr(3,61) = 0.27178; zbgr(4,61) = 0.56870
+
+    !===================================================================================
+    ! Attenuation coefficients for blue, green and red light due to detritus (m2 / mg N)
+    !  Source: Dutkiewicz et al.(2015) Biogeosciences 12, 4447-4481, Fig. 1b
+    !          collated into NetCDF file by Mark Baird for EMS model
+    !           - csiro_mass_specific_iops_library.nc
+    !          assume blue (450-495 nm), green (495-570 nm) and red (620-750 nm)
+    !          to create values, we average absorption within these wavelengths
+    !===================================================================================
+    ! Blue attenuation    ! Green attenuation   ! Red attenuation
+    dbgr(1) = 0.01006;    dbgr(2) = 0.009007;   dbgr(3) = 0.007264
+
+    !===================================================================================
+    ! Attenuation coefficients for blue, green and red light due to CaCO3 (m2 / kg CaCO3)
+    !  Source: Soja-Wozniak et al., 2019 J. Geophys. Res. (Oceans) 124 https://doi.org/10.1029/2019JC014998
+    !          collated into NetCDF file by Mark Baird for EMS model
+    !           - csiro_mass_specific_iops_library.nc
+    !          assume blue (450-495 nm), green (495-570 nm) and red (620-750 nm)
+    !          to create values, we average absorption within these wavelengths
+    !===================================================================================
+    ! Blue attenuation    ! Green attenuation   ! Red attenuation
+    cbgr(1) = 1.55641;    cbgr(2) = 3.200139;   cbgr(3) = 20.068027
+
 
     !=======================================================================
     ! Surface gas fluxes
@@ -3339,6 +3387,8 @@ module generic_WOMBATmid
     wombat%bac_lfer(:,:,:) = 1.0
     wombat%bac_mu(:,:,:) = 0.0
     wombat%bac_kdoc(:,:,:) = 10.0
+    wombat%bac_yaerC(:,:,:) = 6.7
+    wombat%bac_yanaC(:,:,:) = 9.3
     wombat%bac_fanaer(:,:,:) = 0.0
     wombat%bacmor1(:,:,:) = 0.0
     wombat%bacmor2(:,:,:) = 0.0
@@ -3528,13 +3578,17 @@ module generic_WOMBATmid
 
         ! chlorophyll concentration conversion from mol/kg --> mg/m3 for look-up table
         chl = (wombat%f_pchl(i,j,k) + wombat%f_dchl(i,j,k)) * 12.0 / mmol_m3_to_mol_kg 
+        ! detritus concentration conversion from mol/kg --> mgN/m3 for look-up table
+        ndet = (wombat%f_det(i,j,k) + wombat%f_bdet(i,j,k)) * 16.0/122.0 * 14.0 / mmol_m3_to_mol_kg
+        ! CaCO3 concentration conversion from mol/kg --> kg/m3 for look-up table
+        carb = wombat%f_caco3(i,j,k) / mmol_m3_to_mol_kg * 100.09 * 1e-3 * 1e-3 ! convert to kg/m3
 
         ! Attenuation coefficients given chlorophyll concentration
         zchl = max(0.05, min(10.0, chl) )
         ichl = nint( 41 + 20.0*log10(zchl) + epsi )
-        ek_bgr(k,1) = zbgr(2,ichl) * dzt(i,j,k)
-        ek_bgr(k,2) = zbgr(3,ichl) * dzt(i,j,k)
-        ek_bgr(k,3) = zbgr(4,ichl) * dzt(i,j,k)
+        ek_bgr(k,1) = (zbgr(2,ichl) + ndet * dbgr(1) + carb * cbgr(1)) * dzt(i,j,k) ! [/m * m]
+        ek_bgr(k,2) = (zbgr(3,ichl) + ndet * dbgr(2) + carb * cbgr(2)) * dzt(i,j,k) ! [/m * m]
+        ek_bgr(k,3) = (zbgr(4,ichl) + ndet * dbgr(3) + carb * cbgr(3)) * dzt(i,j,k) ! [/m * m]
 
         ! BGR light available in the water column
         if (swpar.gt.0.0) then
@@ -4029,15 +4083,19 @@ module generic_WOMBATmid
         ! 5. The affinity of bacteria for DOC decreases as the DOC:DON ratio increases
       
       ! Uptake of DOC (i.e., DOC-limited growth)
-      wombat%bac_kdoc(i,j,k) = max(wombat%bac_kdoc_min, wombat%bac_kdoc_max &
-                               * max(0.0, min(1.0, (1.0/(wombat%bac_C2N**2) / (dom_N2C + 1.0/(wombat%bac_C2N**2))) )) )
+      wombat%bac_kdoc(i,j,k) = wombat%bac_kdoc_min + 2.0 * (wombat%bac_kdoc_max - wombat%bac_kdoc_min) &
+                               * max(0.0, min(1.0, dom_N2C / (dom_N2C + (1.0/wombat%bac_C2N)) )) 
+      wombat%bac_yaerC(i,j,k) = wombat%bac_yaerC_min + 2.0 * (wombat%bac_yaerC_max - wombat%bac_yaerC_min) &
+                                * max(0.0, min(1.0, dom_N2C / (dom_N2C + (1.0/wombat%bac_C2N)) )) 
+      wombat%bac_yanaC(i,j,k) = wombat%bac_yanaC_min + 2.0 * (wombat%bac_yanaC_max - wombat%bac_yanaC_min) &
+                                * max(0.0, min(1.0, dom_N2C / (dom_N2C + (1.0/wombat%bac_C2N)) )) 
       bac_Vdoc = wombat%bac_Vmax_doc * biodoc / (biodoc + wombat%bac_kdoc(i,j,k))
       ! Aerobic growth
       bac_Voxy = biooxy * wombat%bac_poxy
-      bac_muaer = max(0.0, min( (bac_Voxy/wombat%bac_yoxy), (bac_Vdoc/wombat%bac_yaerC) ) ) * fbc
+      bac_muaer = max(0.0, min( (bac_Voxy/wombat%bac_yoxy), (bac_Vdoc/wombat%bac_yaerC(i,j,k)) ) ) * fbc
       ! Anaerobic growth (will always be lower than aerobic growth when DOC is limiting)
       bac_Vno3 = wombat%bac_Vmax_no3 * biono3 / (biono3 + wombat%bac_kno3)
-      bac_muana = max(0.0, min( (bac_Vno3/wombat%bac_yno3), (bac_Vdoc/wombat%bac_yanaC) ) ) * fbc
+      bac_muana = max(0.0, min( (bac_Vno3/wombat%bac_yno3), (bac_Vdoc/wombat%bac_yanaC(i,j,k)) ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
 
       ! Save occurance of anaerobic growth to array
@@ -4048,10 +4106,9 @@ module generic_WOMBATmid
       ! Determine if bacteria are limited by N or Fe
       if (wombat%bac_mu(i,j,k)*wombat%f_bac(i,j,k).gt.0.0) then
         ! Initial estimate of the C biomass growth, DOC and DON assimilation rate by bacteria
-        wombat%bacgrow(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * 1.0/wombat%bac_yaerC * (1. - wombat%bac_fanaer(i,j,k)) &
-                                + wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * 1.0/wombat%bac_yanaC * wombat%bac_fanaer(i,j,k) ! [molC/kg/s]
-        wombat%docremi(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yaerC * (1. - wombat%bac_fanaer(i,j,k)) & 
-                                + wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yanaC * wombat%bac_fanaer(i,j,k) ! [molC/kg/s]
+        wombat%bacgrow(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) ! [molC/kg/s]
+        wombat%docremi(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yaerC(i,j,k) * (1. - wombat%bac_fanaer(i,j,k)) & 
+                                + wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yanaC(i,j,k) * wombat%bac_fanaer(i,j,k) ! [molC/kg/s]
         wombat%donremi(i,j,k) = wombat%docremi(i,j,k) * dom_N2C ! [molN/kg/s]
 
         ! Determine degree of N limitation of bacteria and adjust growth rate
@@ -4098,10 +4155,9 @@ module generic_WOMBATmid
         wombat%bac_mu(i,j,k) = wombat%bac_mu(i,j,k) * min(wombat%bac_lfer(i,j,k), wombat%bac_lnit(i,j,k))
         
         ! Final calculation after growth rate adjustment due to possible N or Fe limitation
-        wombat%bacgrow(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * 1.0/wombat%bac_yaerC * (1. - wombat%bac_fanaer(i,j,k)) &
-                                + wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * 1.0/wombat%bac_yanaC * wombat%bac_fanaer(i,j,k) ! [molC/kg/s]
-        wombat%docremi(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yaerC * (1. - wombat%bac_fanaer(i,j,k)) & 
-                                + wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yanaC * wombat%bac_fanaer(i,j,k) ! [molC/kg/s]
+        wombat%bacgrow(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) ! [molC/kg/s]
+        wombat%docremi(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yaerC(i,j,k) * (1. - wombat%bac_fanaer(i,j,k)) & 
+                                + wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yanaC(i,j,k) * wombat%bac_fanaer(i,j,k) ! [molC/kg/s]
         wombat%donremi(i,j,k) = wombat%docremi(i,j,k) * dom_N2C ! [molN/kg/s]
         wombat%bacufer(i,j,k) = wombat%bacgrow(i,j,k) / wombat%bac_C2Fe ! [molFe/kg/s]
         wombat%bacresp(i,j,k) = wombat%bac_mu(i,j,k) * wombat%f_bac(i,j,k) * wombat%bac_yoxy * (1. - wombat%bac_fanaer(i,j,k)) ! [molO2/kg/s]
@@ -5527,8 +5583,12 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_bac_mu, wombat%bac_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac_kdoc .gt. 0) &
-      used = g_send_data(wombat%id_bac_kdoc, wombat%bac_kdoc, model_time, &
+    if (wombat%id_bac_yaerC .gt. 0) &
+      used = g_send_data(wombat%id_bac_yaerC, wombat%bac_yaerC, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_bac_yanaC .gt. 0) &
+      used = g_send_data(wombat%id_bac_yanaC, wombat%bac_yanaC, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_bac_fanaer .gt. 0) &
@@ -6158,6 +6218,8 @@ module generic_WOMBATmid
     allocate(wombat%bac_lfer(isd:ied, jsd:jed, 1:nk)); wombat%bac_lfer(:,:,:)=0.0
     allocate(wombat%bac_mu(isd:ied, jsd:jed, 1:nk)); wombat%bac_mu(:,:,:)=0.0
     allocate(wombat%bac_kdoc(isd:ied, jsd:jed, 1:nk)); wombat%bac_kdoc(:,:,:)=0.0
+    allocate(wombat%bac_yaerC(isd:ied, jsd:jed, 1:nk)); wombat%bac_yaerC(:,:,:)=0.0
+    allocate(wombat%bac_yanaC(isd:ied, jsd:jed, 1:nk)); wombat%bac_yanaC(:,:,:)=0.0
     allocate(wombat%bac_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bac_fanaer(:,:,:)=0.0
     allocate(wombat%bacmor1(isd:ied, jsd:jed, 1:nk)); wombat%bacmor1(:,:,:)=0.0
     allocate(wombat%bacmor2(isd:ied, jsd:jed, 1:nk)); wombat%bacmor2(:,:,:)=0.0
@@ -6391,6 +6453,8 @@ module generic_WOMBATmid
         wombat%bac_lfer, &
         wombat%bac_mu, &
         wombat%bac_kdoc, &
+        wombat%bac_yaerC, &
+        wombat%bac_yanaC, &
         wombat%bac_fanaer, &
         wombat%bacmor1, &
         wombat%bacmor2, &
