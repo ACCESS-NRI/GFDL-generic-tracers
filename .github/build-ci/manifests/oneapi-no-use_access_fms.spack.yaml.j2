@@ -6,6 +6,9 @@ spack:
     fms:
       require:
         - '@git.2025.02=2025.02'
+    gcc-runtime:
+      require:
+        - '%gcc'
     all:
       require:
       - '%{{ oneapi_compiler }} target=x86_64'
