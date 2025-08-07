@@ -942,7 +942,8 @@ contains
     elseif(trim(g_tracer%package_name) .eq. 'generic_cobalt' .or. &
            trim(g_tracer%package_name) .eq. 'generic_abiotic' .or. &
            trim(g_tracer%package_name) .eq. 'generic_bling' .or. &
-           trim(g_tracer%package_name) .eq. 'generic_wombatlite') then !Niki: later we can make this just else
+           trim(g_tracer%package_name) .eq. 'generic_wombatlite' .or. &
+           trim(g_tracer%package_name) .eq. 'generic_wombatmid') then !Niki: later we can make this just else
        call  g_tracer_add_param('enforce_src_info', g_tracer%requires_src_info ,  .true.) 
     endif
        
