@@ -401,6 +401,7 @@ module generic_WOMBATmid
         f_doc, &
         f_don, &
         f_bac, &
+        f_aoa, &
         f_o2, &
         f_caco3, &
         f_fe, &
@@ -2697,6 +2698,14 @@ module generic_WOMBATmid
         units = 'mol/kg', &
         prog = .true.)
     
+    ! AOA
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'aoa', &
+        longname = 'Ammonia oxidizing archaea', &
+        units = 'mol/kg', &
+        prog = .true.)
+    
     ! CaCO3
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
@@ -3521,6 +3530,8 @@ module generic_WOMBATmid
     call g_tracer_get_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'bac', 'field', wombat%f_bac, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
@@ -4629,6 +4640,10 @@ module generic_WOMBATmid
                             - wombat%bacmor1(i,j,k) &
                             - wombat%bacmor2(i,j,k) )
     
+      ! AOA ! [molC/kg]
+      !-----------------------------------------------------------------------
+      wombat%f_aoa(i,j,k) = wombat%f_aoa(i,j,k) + dtsb * ( 0.0 )
+      
       ! Oxygen equation ! [molO2/kg]
       !-----------------------------------------------------------------------
       if (wombat%f_o2(i,j,k) .gt. epsi) &
@@ -4971,6 +4986,7 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'doc', 'field', wombat%f_doc, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac', 'field', wombat%f_bac, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'fe', 'field', wombat%f_fe, isd, jsd, ntau=tau)
@@ -6163,6 +6179,7 @@ module generic_WOMBATmid
     allocate(wombat%f_doc(isd:ied, jsd:jed, 1:nk)); wombat%f_doc(:,:,:)=0.0
     allocate(wombat%f_don(isd:ied, jsd:jed, 1:nk)); wombat%f_don(:,:,:)=0.0
     allocate(wombat%f_bac(isd:ied, jsd:jed, 1:nk)); wombat%f_bac(:,:,:)=0.0
+    allocate(wombat%f_aoa(isd:ied, jsd:jed, 1:nk)); wombat%f_aoa(:,:,:)=0.0
     allocate(wombat%f_o2(isd:ied, jsd:jed, 1:nk)); wombat%f_o2(:,:,:)=0.0
     allocate(wombat%f_caco3(isd:ied, jsd:jed, 1:nk)); wombat%f_caco3(:,:,:)=0.0
     allocate(wombat%f_fe(isd:ied, jsd:jed, 1:nk)); wombat%f_fe(:,:,:)=0.0
@@ -6400,6 +6417,7 @@ module generic_WOMBATmid
         wombat%f_doc, &
         wombat%f_don, &
         wombat%f_bac, &
+        wombat%f_aoa, &
         wombat%f_o2, &
         wombat%f_caco3, &
         wombat%f_fe)
