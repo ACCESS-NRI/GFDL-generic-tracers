@@ -209,12 +209,12 @@ module generic_WOMBATmid
         zooCassim, &
         zooFeingest, &
         zooFeassim, &
-        zooexcr, &
+        zooexcrdom, &
         zookz, &
         zoogmax, &
-        zooepsmin, &
-        zooepsmax, &
-        zooepsrat, &
+        zooepsphy, &
+        zooepsdia, &
+        zooepsdet, &
         zprefphy, &
         zprefdia, &
         zprefdet, &
@@ -224,12 +224,14 @@ module generic_WOMBATmid
         mesCassim, &
         mesFeingest, &
         mesFeassim, &
-        mesexcr, &
+        mesexcrdom, &
         meskz, &
         mesgmax, &
-        mesepsmin, &
-        mesepsmax, &
-        mesepsrat, &
+        mesepsphy, &
+        mesepsdia, &
+        mesepsdet, &
+        mesepsbdet, &
+        mesepszoo, &
         mprefphy, &
         mprefdia, &
         mprefdet, &
@@ -1429,7 +1431,7 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooeps', 'Zooplankton prey capture rate coefficient', 'h', 'L', 's', 'm^6/mmolC^2/s', 'f')
+        'zooeps', 'Zooplankton community-wide prey capture rate coefficient', 'h', 'L', 's', 'm^6/mmolC^2/s', 'f')
     wombat%id_zooeps = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -1504,7 +1506,7 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'meseps', 'mesozooplankton prey capture rate coefficient', 'h', 'L', 's', 'm^6/mmolC^2/s', 'f')
+        'meseps', 'mesozooplankton community-wide prey capture rate coefficient', 'h', 'L', 's', 'm^6/mmolC^2/s', 'f')
     wombat%id_meseps = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -2188,9 +2190,9 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.90)
 
-    ! Zooplankton excretion of unassimilated prey [0-1]
+    ! Zooplankton fraction of excretion to DOM [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooexcr', wombat%zooexcr, 0.75)
+    call g_tracer_add_param('zooexcrdom', wombat%zooexcrdom, 0.20)
 
     ! Zooplankton half saturation coefficient for linear mortality
     !-----------------------------------------------------------------------
@@ -2200,17 +2202,23 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zoogmax', wombat%zoogmax, 3.0/86400.0)
 
-    ! Zooplankton minimum prey capture rate constant [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for nanophytoplankton [m6/mmol2/s]
+    !  - e.g., ciliates feeding on small (nano/pico)phytoplankton
+    !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsmin', wombat%zooepsmin, 0.10/86400.0)
+    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.50/86400.0)
 
-    ! Zooplankton maximum prey capture rate constant [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for microphytoplankton [m6/mmol2/s]
+    !  - e.g., larger ciliates feeding on smaller diatoms and other microphytoplankton
+    !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsmax', wombat%zooepsmax, 0.50/86400.0)
+    call g_tracer_add_param('zooepsdia', wombat%zooepsdia, 0.25/86400.0)
 
-    ! Rate of transition of epsilon from nano to microzoo [per mmolC/m3]
+    ! Zooplankton prey capture rate constant for small detritus [m6/mmol2/s]
+    !  - e.g., protozoa grazing on slowly sinking detrital particles
+    !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsrat', wombat%zooepsrat, 0.2)
+    call g_tracer_add_param('zooepsdet', wombat%zooepsdet, 0.10/86400.0)
 
     ! Zooplankton preference for phytoplankton [0-1]
     !-----------------------------------------------------------------------
@@ -2248,9 +2256,9 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesFeassim', wombat%mesFeassim, 0.90)
 
-    ! Mesozooplankton excretion of unassimilated prey [0-1]
+    ! Mesozooplankton fraction of excretion to DOM [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesexcr', wombat%mesexcr, 0.50)
+    call g_tracer_add_param('mesexcrdom', wombat%mesexcrdom, 0.20)
 
     ! Mesozooplankton half saturation coefficient for linear mortality
     !-----------------------------------------------------------------------
@@ -2260,18 +2268,36 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesgmax', wombat%mesgmax, 1.0/86400.0)
 
-    ! Mesozooplankton minimum prey capture rate constant [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for nanophytoplankton [m6/mmol2/s]
+    !  - e.g., appendicularians filter feeding on small phytoplankton
+    !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsmin', wombat%mesepsmin, 0.01/86400.0)
+    call g_tracer_add_param('mesepsphy', wombat%mesepsphy, 0.11/86400.0)
 
-    ! Mesozooplankton maximum prey capture rate constant [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for microphytoplankton [m6/mmol2/s]
+    !  - e.g., copepods preying on diatoms and other microphytoplankton
+    !  - aim for half-saturation coefficent B1/2 = 4.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsmax', wombat%mesepsmax, 0.10/86400.0)
+    call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.06/86400.0)
 
-    ! Rate of transition of epsilon from micro to meso [per mmolC/m3]
+    ! Mesozooplankton prey capture rate constant for small detritus [m6/mmol2/s]
+    !  - e.g., appendicularians filter feeding on fine detritus
+    !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsrat', wombat%mesepsrat, 0.2)
+    call g_tracer_add_param('mesepsdet', wombat%mesepsdet, 0.08/86400.0)
 
+    ! Mesozooplankton prey capture rate constant for large detritus [m6/mmol2/s]
+    !  - e.g., copepods consuming sinking aggregates of marine snow
+    !  - aim for half-saturation coefficent B1/2 = 10.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('mesepsbdet', wombat%mesepsbdet, 0.01/86400.0)
+
+    ! Mesozooplankton prey capture rate constant for microzooplankton [m6/mmol2/s]
+    !  - e.g., chaetognaths preying on copepods; copepods consuming ciliates
+    !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.04/86400.0)
+    
     ! Mesozooplankton preference for phytoplankton [0-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.05)
@@ -3142,7 +3168,7 @@ module generic_WOMBATmid
     real                                    :: rdtts ! 1 / dt
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
-    real                                    :: u_npz, g_npz, m_npz, g_peffect
+    real                                    :: u_npz, g_npz, m_npz, Xzoo, Xmes
     real                                    :: biono3, bionh4, biooxy, biofer
     real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobac, biodoc, biodon, biocaco3
     real                                    :: biophyfe, biodiafe, biozoofe, biomesfe, zooprey, mesprey
@@ -4064,12 +4090,13 @@ module generic_WOMBATmid
      
       !!!~~~ Zooplankton ~~~!!!
       ! Grazing function ! [1/s]
-      ! Based on Gentleman et al., (2003) DSRII - normalize the prey preference kernal to reflect dietary fractions
+      ! normalize the prey preference kernal to reflect dietary fractions (Gentleman et al., (2003) DSRII)
       wombat%zooprefphy(i,j,k) = wombat%zprefphy / (wombat%zprefphy + wombat%zprefdia + wombat%zprefdet)
       wombat%zooprefdia(i,j,k) = wombat%zprefdia / (wombat%zprefphy + wombat%zprefdia + wombat%zprefdet)
       wombat%zooprefdet(i,j,k) = wombat%zprefdet / (wombat%zprefphy + wombat%zprefdia + wombat%zprefdet)
       
-      ! Gentleman et al. (2003) DSRII - add a switching component designed to weight the diet towards abundant prey
+      ! Gentleman et al. (2003) DSRII 
+      !   - add a switching component designed to weight the diet towards abundant prey
       !   - see their Eq. 19
       ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
       !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
@@ -4080,29 +4107,34 @@ module generic_WOMBATmid
         wzphy = (wombat%zooprefphy(i,j,k) * biophy)**wombat%zoopreyswitch
         wzdia = (wombat%zooprefdia(i,j,k) * biodia)**wombat%zoopreyswitch
         wzdet = (wombat%zooprefdet(i,j,k) * biodet)**wombat%zoopreyswitch
-        wzsum = wzphy + wzdia + wzdet
+        wzsum = wzphy + wzdia + wzdet + epsi
         wombat%zooprefphy(i,j,k) = wzphy / wzsum
         wombat%zooprefdia(i,j,k) = wzdia / wzsum
         wombat%zooprefdet(i,j,k) = wzdet / wzsum
       endif
-      zooprey = wombat%zooprefphy(i,j,k) * biophy + wombat%zooprefdia(i,j,k) * biodia + wombat%zooprefdet(i,j,k) * biodet
-      ! Epsilon (prey capture rate coefficient) is made a function of prey density (Fig 2 of Rohr et al., 2024; GRL)
-      !  - scales towards lower values (microzooplankton) as prey biomass increases
-      g_peffect = exp(-zooprey * wombat%zooepsrat)
-      wombat%zooeps(i,j,k) = wombat%zooepsmin + (wombat%zooepsmax - wombat%zooepsmin) * g_peffect 
-      g_npz = wombat%zoogmax * fbc * (wombat%zooeps(i,j,k) * zooprey*zooprey) / &
-              (wombat%zoogmax * fbc + (wombat%zooeps(i,j,k) * zooprey*zooprey))
+      ! Compute sum of prey-specific Type-III terms to obtain grazing rate [1/s]
+      !  - this avoids "perfect substitution" of prey types and aligns with reccommendations of Gentleman et al. (2003)
+      Xzoo = (  wombat%zooepsphy * (wombat%zooprefphy(i,j,k) * biophy)**2 &
+              + wombat%zooepsdia * (wombat%zooprefdia(i,j,k) * biodia)**2 &
+              + wombat%zooepsdet * (wombat%zooprefdet(i,j,k) * biodet)**2)
+      g_npz = wombat%zoogmax * fbc * Xzoo / (wombat%zoogmax * fbc + Xzoo)
+      ! find "apparent" community epsilon (prey capture rate coefficient)
+      wombat%zooeps(i,j,k) = Xzoo / ( (wombat%zooprefphy(i,j,k) * biophy)**2 &
+                                    + (wombat%zooprefdia(i,j,k) * biodia)**2 &
+                                    + (wombat%zooprefdet(i,j,k) * biodet)**2 )
+      
 
       !!!~~~ Mesozooplankton ~~~!!!
       ! Grazing function ! [1/s]
-      ! Based on Gentleman et al., (2003) DSRII - normalize the prey preference kernal to reflect dietary fractions
+      ! normalize the prey preference kernal to reflect dietary fractions (Gentleman et al., (2003) DSRII)
       wombat%mesprefphy(i,j,k) = wombat%mprefphy / (wombat%mprefphy + wombat%mprefdia + wombat%mprefdet + wombat%mprefbdet + wombat%mprefzoo)
       wombat%mesprefdia(i,j,k) = wombat%mprefdia / (wombat%mprefphy + wombat%mprefdia + wombat%mprefdet + wombat%mprefbdet + wombat%mprefzoo)
       wombat%mesprefdet(i,j,k) = wombat%mprefdet / (wombat%mprefphy + wombat%mprefdia + wombat%mprefdet + wombat%mprefbdet + wombat%mprefzoo)
       wombat%mesprefbdet(i,j,k) = wombat%mprefbdet / (wombat%mprefphy + wombat%mprefdia + wombat%mprefdet + wombat%mprefbdet + wombat%mprefzoo)
       wombat%mesprefzoo(i,j,k) = wombat%mprefzoo / (wombat%mprefphy + wombat%mprefdia + wombat%mprefdet + wombat%mprefbdet + wombat%mprefzoo)
       denom = wombat%mesprefphy(i,j,k) + wombat%mesprefdia(i,j,k) + wombat%mesprefdet(i,j,k) + wombat%mesprefbdet(i,j,k) + wombat%mesprefzoo(i,j,k)
-      ! Gentleman et al. (2003) DSRII - add a switching component designed to weight the diet towards abundant prey
+      ! Gentleman et al. (2003) DSRII 
+      !   - add a switching component designed to weight the diet towards abundant prey
       !   - see their Eq. 19
       ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
       !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
@@ -4115,23 +4147,29 @@ module generic_WOMBATmid
         wzdet = (wombat%mesprefdet(i,j,k) * biodet)**wombat%mespreyswitch
         wzbdet = (wombat%mesprefbdet(i,j,k) * biobdet)**wombat%mespreyswitch
         wzzoo = (wombat%mesprefzoo(i,j,k) * biozoo)**wombat%mespreyswitch
-        wzsum = wzphy + wzdia + wzdet + wzbdet + wzzoo
+        wzsum = wzphy + wzdia + wzdet + wzbdet + wzzoo + epsi
         wombat%mesprefphy(i,j,k) = wzphy / wzsum
         wombat%mesprefdia(i,j,k) = wzdia / wzsum
         wombat%mesprefdet(i,j,k) = wzdet / wzsum
         wombat%mesprefbdet(i,j,k) = wzbdet / wzsum
         wombat%mesprefzoo(i,j,k) = wzzoo / wzsum
       endif
-      mesprey = wombat%mesprefphy(i,j,k) * biophy + wombat%mesprefdia(i,j,k) * biodia + wombat%mesprefdet(i,j,k) * biodet &
-                + wombat%mesprefbdet(i,j,k) * biobdet + wombat%mesprefzoo(i,j,k) * biozoo
-      ! Epsilon (prey capture rate coefficient) is made a function of prey density (Fig 2 of Rohr et al., 2024; GRL)
-      !  - scales towards lower values (mesozooplankton) as prey biomass increases
-      g_peffect = exp(-mesprey * wombat%mesepsrat)
-      wombat%meseps(i,j,k) = wombat%mesepsmin + (wombat%mesepsmax - wombat%mesepsmin) * g_peffect 
-      m_npz = wombat%mesgmax * fbc * (wombat%meseps(i,j,k) * mesprey*mesprey) / &
-              (wombat%mesgmax * fbc + (wombat%meseps(i,j,k) * mesprey*mesprey))
+      ! Compute sum of prey-specific Type-III terms to obtain grazing rate [1/s]
+      !  - this avoids "perfect substitution" of prey types and aligns with reccommendations of Gentleman et al. (2003)
+      Xmes = (  wombat%mesepsphy * (wombat%mesprefphy(i,j,k) * biophy)**2 &
+              + wombat%mesepsdia * (wombat%mesprefdia(i,j,k) * biodia)**2 &
+              + wombat%mesepsdet * (wombat%mesprefdet(i,j,k) * biodet)**2 &
+              + wombat%mesepsdet * (wombat%mesprefbdet(i,j,k) * biobdet)**2 &
+              + wombat%mesepsdet * (wombat%mesprefzoo(i,j,k) * biozoo)**2 )
+      m_npz = wombat%mesgmax * fbc * Xmes / (wombat%mesgmax * fbc + Xmes)
+      ! find "apparent" community epsilon (prey capture rate coefficient)
+      wombat%meseps(i,j,k) = Xmes / ( (wombat%mesprefphy(i,j,k) * biophy)**2 &
+                                    + (wombat%mesprefdia(i,j,k) * biodia)**2 &
+                                    + (wombat%mesprefdet(i,j,k) * biodet)**2 &
+                                    + (wombat%mesprefbdet(i,j,k) * biobdet)**2 &
+                                    + (wombat%mesprefzoo(i,j,k) * biozoo)**2 )
 
-
+    
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -4368,10 +4406,13 @@ module generic_WOMBATmid
       endif
       
       ! Grazing by microzooplankton
-      if (zooprey.gt.1e-3) then
-        wombat%zoograzphy(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zooprefphy(i,j,k)*biophy)/zooprey ! [molC/kg/s]
-        wombat%zoograzdia(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zooprefdia(i,j,k)*biodia)/zooprey ! [molC/kg/s]
-        wombat%zoograzdet(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zooprefdet(i,j,k)*biodet)/zooprey ! [molC/kg/s]
+      if (Xzoo.gt.epsi) then
+        !wombat%zoograzphy(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zooprefphy(i,j,k)*biophy)/zooprey ! [molC/kg/s]
+        !wombat%zoograzdia(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zooprefdia(i,j,k)*biodia)/zooprey ! [molC/kg/s]
+        !wombat%zoograzdet(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zooprefdet(i,j,k)*biodet)/zooprey ! [molC/kg/s]
+        wombat%zoograzphy(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * wombat%zooepsphy*(wombat%zooprefphy(i,j,k)*biophy)**2 / Xzoo ! [molC/kg/s]
+        wombat%zoograzdia(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * wombat%zooepsdia*(wombat%zooprefdia(i,j,k)*biodia)**2 / Xzoo ! [molC/kg/s]
+        wombat%zoograzdet(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * wombat%zooepsdet*(wombat%zooprefdet(i,j,k)*biodet)**2 / Xzoo ! [molC/kg/s]
       else
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdia(i,j,k) = 0.0
@@ -4394,12 +4435,17 @@ module generic_WOMBATmid
       zooexcrdetfe = wombat%zoograzdet(i,j,k) * det_Fe2C * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
 
       ! Grazing by mesozooplankton
-      if (mesprey.gt.1e-3) then
-        wombat%mesgrazphy(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefphy(i,j,k)*biophy)/mesprey ! [molC/kg/s]
-        wombat%mesgrazdia(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefdia(i,j,k)*biodia)/mesprey ! [molC/kg/s]
-        wombat%mesgrazdet(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefdet(i,j,k)*biodet)/mesprey ! [molC/kg/s]
-        wombat%mesgrazbdet(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefbdet(i,j,k)*biobdet)/mesprey ! [molC/kg/s]
-        wombat%mesgrazzoo(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefzoo(i,j,k)*biozoo)/mesprey ! [molC/kg/s]
+      if (Xmes.gt.epsi) then
+        !wombat%mesgrazphy(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefphy(i,j,k)*biophy)/mesprey ! [molC/kg/s]
+        !wombat%mesgrazdia(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefdia(i,j,k)*biodia)/mesprey ! [molC/kg/s]
+        !wombat%mesgrazdet(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefdet(i,j,k)*biodet)/mesprey ! [molC/kg/s]
+        !wombat%mesgrazbdet(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefbdet(i,j,k)*biobdet)/mesprey ! [molC/kg/s]
+        !wombat%mesgrazzoo(i,j,k) = m_npz * wombat%f_mes(i,j,k) * (wombat%mesprefzoo(i,j,k)*biozoo)/mesprey ! [molC/kg/s]
+        wombat%mesgrazphy(i,j,k) = m_npz * wombat%f_mes(i,j,k) * wombat%mesepsphy*(wombat%mesprefphy(i,j,k)*biophy)**2 / Xmes ! [molC/kg/s]
+        wombat%mesgrazdia(i,j,k) = m_npz * wombat%f_mes(i,j,k) * wombat%mesepsdia*(wombat%mesprefdia(i,j,k)*biodia)**2 / Xmes ! [molC/kg/s]
+        wombat%mesgrazdet(i,j,k) = m_npz * wombat%f_mes(i,j,k) * wombat%mesepsdet*(wombat%mesprefdet(i,j,k)*biodet)**2 / Xmes ! [molC/kg/s]
+        wombat%mesgrazbdet(i,j,k) = m_npz * wombat%f_mes(i,j,k) * wombat%mesepsbdet*(wombat%mesprefbdet(i,j,k)*biobdet)**2 / Xmes ! [molC/kg/s]
+        wombat%mesgrazzoo(i,j,k) = m_npz * wombat%f_mes(i,j,k) * wombat%mesepszoo*(wombat%mesprefzoo(i,j,k)*biozoo)**2 / Xmes ! [molC/kg/s]
       else
         wombat%mesgrazphy(i,j,k) = 0.0
         wombat%mesgrazdia(i,j,k) = 0.0
@@ -4505,6 +4551,14 @@ module generic_WOMBATmid
                             + dtsb * 16./122. * ( 0.0 &
                             + wombat%zooresp(i,j,k) &
                             + wombat%mesresp(i,j,k) &
+                            + wombat%zooexcrphy(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%zooexcrdia(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%zooexcrdet(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%mesexcrphy(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrdia(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrbdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrzoo(i,j,k)*(1.0-wombat%mesexcrdom) &
                             - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                             - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
                               
@@ -4687,14 +4741,14 @@ module generic_WOMBATmid
                             + wombat%bdetremi(i,j,k) &
                             + wombat%phyresp(i,j,k) &
                             + wombat%diaresp(i,j,k) &
-                            + wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrdet(i,j,k) &
-                            + wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrdet(i,j,k) &
-                            + wombat%mesexcrbdet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) &
+                            + wombat%zooexcrphy(i,j,k)*wombat%zooexcrdom &
+                            + wombat%zooexcrdia(i,j,k)*wombat%zooexcrdom &
+                            + wombat%zooexcrdet(i,j,k)*wombat%zooexcrdom &
+                            + wombat%mesexcrphy(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrdia(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrdet(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrbdet(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrzoo(i,j,k)*wombat%mesexcrdom &
                             - wombat%docremi(i,j,k) &
                             + wombat%bacmor1(i,j,k) &
                             + wombat%bacmor2(i,j,k) )
@@ -4710,14 +4764,14 @@ module generic_WOMBATmid
                             + wombat%bdetremi(i,j,k) &
                             + wombat%phyresp(i,j,k) &
                             + wombat%diaresp(i,j,k) &
-                            + wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrdet(i,j,k) &
-                            + wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrdet(i,j,k) &
-                            + wombat%mesexcrbdet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) )
+                            + wombat%zooexcrphy(i,j,k)*wombat%zooexcrdom &
+                            + wombat%zooexcrdia(i,j,k)*wombat%zooexcrdom &
+                            + wombat%zooexcrdet(i,j,k)*wombat%zooexcrdom &
+                            + wombat%mesexcrphy(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrdia(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrdet(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrbdet(i,j,k)*wombat%mesexcrdom &
+                            + wombat%mesexcrzoo(i,j,k)*wombat%mesexcrdom )
     
       ! Heterotrophic bacteria ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -4736,6 +4790,14 @@ module generic_WOMBATmid
         wombat%f_o2(i,j,k) = wombat%f_o2(i,j,k) - 132./122. * dtsb * ( 0.0 &
                              + wombat%zooresp(i,j,k) &
                              + wombat%mesresp(i,j,k) &
+                             + wombat%zooexcrphy(i,j,k)*(1.0-wombat%zooexcrdom) &
+                             + wombat%zooexcrdia(i,j,k)*(1.0-wombat%zooexcrdom) &
+                             + wombat%zooexcrdet(i,j,k)*(1.0-wombat%zooexcrdom) &
+                             + wombat%mesexcrphy(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrdia(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrbdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrzoo(i,j,k)*(1.0-wombat%mesexcrdom) &
                              - wombat%phygrow(i,j,k) &
                              - wombat%diagrow(i,j,k) ) &
                              - 40./16. * dtsb * ( wombat%ammox(i,j,k) ) &
@@ -4757,6 +4819,14 @@ module generic_WOMBATmid
                             + (wombat%docremi(i,j,k) - wombat%bacgrow(i,j,k)) &
                             + wombat%zooresp(i,j,k) &
                             + wombat%mesresp(i,j,k) &
+                            + wombat%zooexcrphy(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%zooexcrdia(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%zooexcrdet(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%mesexcrphy(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrdia(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrbdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrzoo(i,j,k)*(1.0-wombat%mesexcrdom) &
                             - wombat%phygrow(i,j,k) &
                             - wombat%diagrow(i,j,k) &
                             - wombat%phydoc(i,j,k) &
@@ -4773,6 +4843,14 @@ module generic_WOMBATmid
                              + (wombat%docremi(i,j,k) - wombat%bacgrow(i,j,k)) &
                              + wombat%zooresp(i,j,k) &
                              + wombat%mesresp(i,j,k) &
+                             + wombat%zooexcrphy(i,j,k)*(1.0-wombat%zooexcrdom) &
+                             + wombat%zooexcrdia(i,j,k)*(1.0-wombat%zooexcrdom) &
+                             + wombat%zooexcrdet(i,j,k)*(1.0-wombat%zooexcrdom) &
+                             + wombat%mesexcrphy(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrdia(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrbdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                             + wombat%mesexcrzoo(i,j,k)*(1.0-wombat%mesexcrdom) &
                              - wombat%phygrow(i,j,k) &
                              - wombat%diagrow(i,j,k) &
                              - wombat%phydoc(i,j,k) &
@@ -4790,6 +4868,14 @@ module generic_WOMBATmid
                             + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
                             + wombat%zooresp(i,j,k) &
                             + wombat%mesresp(i,j,k) &
+                            + wombat%zooexcrphy(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%zooexcrdia(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%zooexcrdet(i,j,k)*(1.0-wombat%zooexcrdom) &
+                            + wombat%mesexcrphy(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrdia(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrbdet(i,j,k)*(1.0-wombat%mesexcrdom) &
+                            + wombat%mesexcrzoo(i,j,k)*(1.0-wombat%mesexcrdom) &
                             - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                             - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) ) &
                             + dtsb * ( 0.0 &
