@@ -4511,7 +4511,7 @@ module generic_WOMBATmid
       aoa_Voxy = biooxy * wombat%aoa_poxy
       aoa_Vnh4 = wombat%aoa_ynh4 * wombat%aoa_mumax(i,j,k) * wombat%aoa_lnh4(i,j,k)  ! Note: yield * max growth rate = Vmax
       ! 3. Redefine growth rate based on these limitations
-      wombat%aoa_mu(i,j,k) = min( (aoa_Voxy/wombat%aoa_yoxy), (aoa_Vnh4/wombat%aoa_ynh4) ) * wombat%aoa_mumax(i,j,k)
+      wombat%aoa_mu(i,j,k) = min( (aoa_Voxy/wombat%aoa_yoxy), (aoa_Vnh4/wombat%aoa_ynh4) )
       
       if (do_anammox) then
         ! Anaerobic ammonium oxidation (anammox)
