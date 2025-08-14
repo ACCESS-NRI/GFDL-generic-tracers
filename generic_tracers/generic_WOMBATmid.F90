@@ -318,8 +318,12 @@ module generic_WOMBATmid
         Rho_0, &
         a_0, a_1, a_2, a_3, a_4, a_5, &
         b_0, b_1, b_2, b_3, c_0, &
-        a1_co2, a2_co2, a3_co2, a4_co2, &
-        a1_o2, a2_o2, a3_o2, a4_o2
+        a1_co2, a2_co2, a3_co2, a4_co2, a5_co2, &
+        a1_o2, a2_o2, a3_o2, a4_o2, a5_o2, &
+        a_1_n2o, a_2_n2o, a_3_n2o, a_4_n2o, &
+        b_1_n2o, b_2_n2o, b_3_n2o, &
+        a1_n2o, a2_n2o, a3_n2o, a4_n2o, a5_n2o
+
 
     character(len=fm_string_len) :: ice_restart_file
     character(len=fm_string_len) :: ocean_restart_file
@@ -333,6 +337,7 @@ module generic_WOMBATmid
         sio2, &
         co2_csurf, co2_alpha, co2_sc_no, pco2_csurf, &
         o2_csurf, o2_alpha, o2_sc_no, &
+        n2o_csurf, n2o_alpha, n2o_sc_no, &
         no3_vstf, nh4_vstf, dic_vstf, alk_vstf
 
 
@@ -582,7 +587,7 @@ module generic_WOMBATmid
         zm
 
     real, dimension(:,:,:,:), pointer :: &
-        p_o2
+        p_o2, p_n2o
 
     real, dimension(:,:,:), pointer :: &
         p_det_sediment, &
@@ -2173,20 +2178,39 @@ module generic_WOMBATmid
     ! Schmidt number coefficients [1]
     !-----------------------------------------------------------------------
     ! Compute the Schmidt number of CO2 in seawater using the
-    ! formulation presented by Wanninkhof (1992, J. Geophys. Res., 97,
-    ! 7373-7382).
-    call g_tracer_add_param('a1_co2', wombat%a1_co2,  2073.1)
-    call g_tracer_add_param('a2_co2', wombat%a2_co2, -125.62)
-    call g_tracer_add_param('a3_co2', wombat%a3_co2,  3.6276)
-    call g_tracer_add_param('a4_co2', wombat%a4_co2, -0.043219)
+    ! formulation proposed by Wanninkhof (2014, Limnology and Oceanography: Methods, 12, 351-362) 
+    call g_tracer_add_param('a1_co2', wombat%a1_co2,  2116.8)
+    call g_tracer_add_param('a2_co2', wombat%a2_co2, -136.25)
+    call g_tracer_add_param('a3_co2', wombat%a3_co2,  4.7353)
+    call g_tracer_add_param('a4_co2', wombat%a4_co2, -0.092307)
+    call g_tracer_add_param('a5_co2', wombat%a5_co2,  0.0007555)
 
     ! Compute the Schmidt number of O2 in seawater using the
-    ! formulation proposed by Keeling et al. (1998, Global Biogeochem.
-    ! Cycles, 12, 141-163).
-    call g_tracer_add_param('a1_o2', wombat%a1_o2, 1638.0)
-    call g_tracer_add_param('a2_o2', wombat%a2_o2, -81.83)
-    call g_tracer_add_param('a3_o2', wombat%a3_o2, 1.483)
-    call g_tracer_add_param('a4_o2', wombat%a4_o2, -0.008004)
+    ! formulation proposed by Wanninkhof (2014, Limnology and Oceanography: Methods, 12, 351-362) 
+    call g_tracer_add_param('a1_o2', wombat%a1_o2, 1920.4)
+    call g_tracer_add_param('a2_o2', wombat%a2_o2, -135.6)
+    call g_tracer_add_param('a3_o2', wombat%a3_o2, 5.2122)
+    call g_tracer_add_param('a4_o2', wombat%a4_o2, -0.10939)
+    call g_tracer_add_param('a5_o2', wombat%a5_o2, 0.00093777)
+
+    ! Coefficients for N2O solubility [1] (Weiss & Price, 1980, Marine Chemistry, 8, 347-359)
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('a_1_n2o', wombat%a_1_n2o, -168.2459)
+    call g_tracer_add_param('a_2_n2o', wombat%a_2_n2o, 226.0894)
+    call g_tracer_add_param('a_3_n2o', wombat%a_3_n2o, 93.2817)
+    call g_tracer_add_param('a_4_n2o', wombat%a_4_n2o, -1.48693)
+    call g_tracer_add_param('b_1_n2o', wombat%b_1_n2o, -0.060361)
+    call g_tracer_add_param('b_2_n2o', wombat%b_2_n2o, 0.033765)
+    call g_tracer_add_param('b_3_n2o', wombat%b_3_n2o, -0.0051862)
+    
+    ! Compute the Schmidt number of N2O in seawater using the
+    ! formulation proposed by Wanninkof (2014) Limnology and Oceanography: Methods, 12, 351-362.
+    call g_tracer_add_param('a1_n2o', wombat%a1_n2o, 2356.2)
+    call g_tracer_add_param('a2_n2o', wombat%a2_n2o, -166.38)
+    call g_tracer_add_param('a3_n2o', wombat%a3_n2o, 6.3952)
+    call g_tracer_add_param('a4_n2o', wombat%a4_n2o, -0.13422)
+    call g_tracer_add_param('a5_n2o', wombat%a5_n2o, 0.0011506)
+
 
     ! Initial H+ concentration [mol/kg]
     !-----------------------------------------------------------------------
@@ -3039,7 +3063,15 @@ module generic_WOMBATmid
         name = 'n2o', &
         longname = 'Nitrous oxide', &
         units = 'mol/kg', &
-        prog = .true.)
+        prog = .true., &
+        flux_gas = .true., &
+        flux_bottom = .false., &
+        flux_gas_name = 'n2o_flux', &
+        flux_gas_type = 'air_sea_gas_flux_generic', &
+        flux_gas_molwt = WTMCO2, & !pjb: N2O molar mass is 44.01 g/mol, same as CO2
+        flux_gas_param = (/ as_coeff_wombatmid, 9.7561e-06 /), & ! dts: param(2) converts Pa -> atm
+        flux_gas_restart_file = 'ocean_wombatmid_airsea_flux.res.nc', &
+        flux_virtual = .false.)
     
     ! CaCO3
     !-----------------------------------------------------------------------
@@ -6681,8 +6713,8 @@ module generic_WOMBATmid
     real, dimension(ilb:,jlb:,:), optional, intent(in) :: dzt
 
     integer                                 :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
-    real                                    :: sal, ST, o2_saturation
-    real                                    :: tt, tk, ts, ts2, ts3, ts4, ts5
+    real                                    :: sal, ST, o2_solubility, n2o_solubility
+    real                                    :: tt, tk, tk100, ts, ts2, ts3, ts4, ts5
     real                                    :: mmol_m3_to_mol_kg
     real, dimension(:,:,:), pointer         :: grid_tmask
     character(len=fm_string_len), parameter :: sub_name = 'generic_WOMBATmid_set_boundary_values'
@@ -6692,6 +6724,7 @@ module generic_WOMBATmid
         grid_tmask=grid_tmask)
 
     call g_tracer_get_pointer(tracer_list, 'o2', 'field', wombat%p_o2)
+    call g_tracer_get_pointer(tracer_list, 'n2o', 'field', wombat%p_n2o)
    
     ! Some unit conversion factors
     mmol_m3_to_mol_kg = 1.e-3 / wombat%Rho_0
@@ -6747,13 +6780,12 @@ module generic_WOMBATmid
 
     do j=jsc,jec ; do i=isc,iec
       !-----------------------------------------------------------------------
-      ! Compute the Schmidt number of CO2 in seawater using the formulation
-      ! presented by Wanninkhof (1992, J. Geophys. Res., 97, 7373-7382).
+      !  Compute the Schmidt number of O2 in seawater using Wanninkhof (2014)
       !-----------------------------------------------------------------------
       ST = SST(i,j)
-      wombat%co2_sc_no(i,j) = wombat%a1_co2 + ST*(wombat%a2_co2 + ST*(wombat%a3_co2 + &
-          ST*wombat%a4_co2)) * grid_tmask(i,j,1)
-      
+      wombat%co2_sc_no(i,j) = wombat%a1_co2 + ST * (wombat%a2_co2 + ST * (wombat%a3_co2 + ST &
+          * (wombat%a4_co2 + ST * wombat%a5_co2))) * grid_tmask(i,j,1)
+    
       wombat%co2_alpha(i,j) = wombat%co2_alpha(i,j) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
       wombat%co2_csurf(i,j) = wombat%co2_csurf(i,j) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
     enddo; enddo
@@ -6778,13 +6810,16 @@ module generic_WOMBATmid
       !
       ! *** Note: the "a3*ts^2" term (in the paper) is incorrect. ***
       ! *** It shouldn't be there.                                ***
+      ! *** PJB & DTS : Also note that Garcia & Gordon (1992) solve 
+      !     their polynomial for the concentration of O2 in mol/kg,
+      !     which already includes the atm-1 concentration (0.20946) 
       !
-      ! o2_saturation is defined between T(freezing) <= T <= 40 deg C and
+      ! o2_solubility is defined between T(freezing) <= T <= 40 deg C and
       !                                   0 permil <= S <= 42 permil
       ! We impose these bounds here.
       !
       ! check value: T = 10 deg C, S = 35 permil,
-      !              o2_saturation = 0.282015 mol m-3
+      !              o2_solubility = 0.282015 / 0.20946 mol m-3
       !-----------------------------------------------------------------------
       sal = SSS(i,j) ; ST = SST(i,j)
 
@@ -6798,22 +6833,19 @@ module generic_WOMBATmid
       ts4 = ts3 * ts
       ts5 = ts4 * ts
 
-      o2_saturation = (1000.0/22391.6) * grid_tmask(i,j,1) *  & !convert from ml/l to mol m-3
+      ! Note that we divide by 0.20946 to convert mol m-3 to mol m-3 atm-1
+      o2_solubility = (1000.0/22391.6) * grid_tmask(i,j,1) *  & !convert from ml/l to mol m-3
           exp( wombat%a_0 + wombat%a_1*ts + wombat%a_2*ts2 + wombat%a_3*ts3 + wombat%a_4*ts4 + &
               wombat%a_5*ts5 + (wombat%b_0 + wombat%b_1*ts + wombat%b_2*ts2 + wombat%b_3*ts3 + &
-              wombat%c_0*sal)*sal)
+              wombat%c_0*sal)*sal) / 0.20946
 
       !-----------------------------------------------------------------------
-      !  Compute the Schmidt number of O2 in seawater using the
-      !  formulation proposed by Keeling et al. (1998, Global Biogeochem.
-      !  Cycles, 12, 141-163).
+      !  Compute the Schmidt number of O2 in seawater using Wanninkhof (2014)
       !-----------------------------------------------------------------------
-      wombat%o2_sc_no(i,j)  = wombat%a1_o2 + ST * (wombat%a2_o2 + ST * (wombat%a3_o2 + ST * &
-          wombat%a4_o2 )) * grid_tmask(i,j,1)
+      wombat%o2_sc_no(i,j) = wombat%a1_o2 + ST * (wombat%a2_o2 + ST * (wombat%a3_o2 + ST &
+          * (wombat%a4_o2 + ST * wombat%a5_o2))) * grid_tmask(i,j,1)
 
-      ! renormalize the alpha value for atm o2
-      ! data table override for o2_flux_pcair_atm is now set to 0.21
-      wombat%o2_alpha(i,j) = (o2_saturation / 0.21)
+      wombat%o2_alpha(i,j) = o2_solubility ! already in mol/m3 atm-1 (see above)
       wombat%o2_csurf(i,j) = wombat%p_o2(i,j,1,tau) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
     enddo; enddo
 
@@ -6823,6 +6855,54 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'o2', 'csurf', wombat%o2_csurf, isd, jsd)
     call g_tracer_set_values(tracer_list, 'o2', 'sc_no', wombat%o2_sc_no, isd, jsd)
 
+    call g_tracer_get_values(tracer_list, 'n2o', 'alpha', wombat%n2o_alpha, isd, jsd)
+    call g_tracer_get_values(tracer_list, 'n2o', 'csurf', wombat%n2o_csurf ,isd, jsd)
+
+    do j=jsc,jec ; do i=isc,iec
+      !-----------------------------------------------------------------------
+      ! Compute the nitrous oxide saturation concentration at 1 atm total
+      ! pressure in mol/kg given the temperature (t, in deg C) and 
+      ! salinity (s, in permil)
+      !
+      ! From Weiss and Price (1980), Marine Chemistry.
+      ! The formula used is from page 353, eq (13). We use coefficients from
+      ! their Table 2, column 4, for "F" in units of mol/kg/atm.
+      !
+      ! n2o_solubility is defined between T(freezing) <= T <= 40 deg C 
+      ! We impose these bounds here.
+      !
+      ! check value: T = 20 deg C, S = 35 permil,
+      !     n2o_solubility = 0.026883995 mol kg-1 atm-1
+      !-----------------------------------------------------------------------
+      sal = SSS(i,j) ; ST = SST(i,j)
+
+      sal = min(40.0, max(0.0, sal))
+      tk = 273.15 + min(40.0, max(0.0, ST))
+      tk100 = tk/100.0
+      
+      ! mol kg-1 atm-1
+      n2o_solubility = exp( wombat%a_1_n2o + wombat%a_2_n2o*(100.0/tk) &
+                            + wombat%a_3_n2o*log(tk100) + wombat%a_4_n2o*tk100**2 &
+                            + sal * ( wombat%b_1_n2o + wombat%b_2_n2o*tk100 &
+                                      + wombat%b_3_n2o*tk100**2 ) ) * grid_tmask(i,j,1)
+
+      !-----------------------------------------------------------------------
+      !  Compute the Schmidt number of N2o in seawater using the
+      !  formulation proposed by Wanninkhof (2014) Limnology and Oceanography: Methods, 12, 351-362.
+      !-----------------------------------------------------------------------
+      wombat%n2o_sc_no(i,j) = wombat%a1_n2o + ST * (wombat%a2_n2o + ST * (wombat%a3_n2o + ST &
+          * (wombat%a4_n2o + ST * wombat%a5_n2o))) * grid_tmask(i,j,1)
+
+      wombat%n2o_alpha(i,j) = n2o_solubility * wombat%Rho_0 ! Converts from mol/kg to mol/m3
+      wombat%n2o_csurf(i,j) = wombat%p_n2o(i,j,1,tau) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
+    enddo; enddo
+
+    ! Set %csurf, %alpha and %sc_no for these tracers. This will mark them
+    ! for sending fluxes to coupler
+    call g_tracer_set_values(tracer_list, 'n2o', 'alpha', wombat%n2o_alpha, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'n2o', 'csurf', wombat%n2o_csurf, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'n2o', 'sc_no', wombat%n2o_sc_no, isd, jsd)
+    
   end subroutine generic_WOMBATmid_set_boundary_values
 
   !#######################################################################
@@ -6879,6 +6959,9 @@ module generic_WOMBATmid
     allocate(wombat%o2_csurf(isd:ied, jsd:jed)); wombat%o2_csurf(:,:)=0.0
     allocate(wombat%o2_alpha(isd:ied, jsd:jed)); wombat%o2_alpha(:,:)=0.0
     allocate(wombat%o2_sc_no(isd:ied, jsd:jed)); wombat%o2_sc_no(:,:)=0.0
+    allocate(wombat%n2o_csurf(isd:ied, jsd:jed)); wombat%n2o_csurf(:,:)=0.0
+    allocate(wombat%n2o_alpha(isd:ied, jsd:jed)); wombat%n2o_alpha(:,:)=0.0
+    allocate(wombat%n2o_sc_no(isd:ied, jsd:jed)); wombat%n2o_sc_no(:,:)=0.0
     allocate(wombat%no3_vstf(isd:ied, jsd:jed)); wombat%no3_vstf(:,:)=0.0
     allocate(wombat%nh4_vstf(isd:ied, jsd:jed)); wombat%nh4_vstf(:,:)=0.0
     allocate(wombat%dic_vstf(isd:ied, jsd:jed)); wombat%dic_vstf(:,:)=0.0
@@ -7144,6 +7227,9 @@ module generic_WOMBATmid
         wombat%o2_csurf, &
         wombat%o2_alpha, &
         wombat%o2_sc_no, &
+        wombat%n2o_csurf, &
+        wombat%n2o_alpha, &
+        wombat%n2o_sc_no, &
         wombat%no3_vstf, &
         wombat%nh4_vstf, &
         wombat%dic_vstf, &
