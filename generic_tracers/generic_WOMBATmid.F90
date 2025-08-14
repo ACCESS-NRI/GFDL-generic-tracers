@@ -32,14 +32,16 @@
 !  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT) is
 !  based on a NPZD (nutrient–phytoplankton–zooplankton–detritus) model.
 !  This is the "mid" version of WOMBAT which includes two classes each of
-!  phytoplankton, zooplankton and sinking detritus, as well as nitrate
-!  (NO3), ammonium (NH4), bio-available iron (Fe), dissolved organic carbon
-!  (DOC) and nitrogen (DON), an explicit bacterial biomass pool, dissolved 
-!  inorganic carbon (DIC), calcium carbonate (CaCO3), alkalinity (ALK), 
-!  and oxygen (O2). Fe is carried through all exosystem biomass pools 
-!  except bacteria, which has constant C:N:Fe ratios. C:N ratios are fixed 
-!  in all biomass pools except for dissolved organics, since we represent
-!  both DOC and DON. Gas exchange follows MOCSY protocols.
+!  phytoplankton, zooplankton and sinking detritus, as well as nitrate (NO3)
+!  ammonium (NH4), nitrous oxide (N2O), dissolved iron (Fe), dissolved 
+!  organic carbon matter that is split into carbon (DOC) and nitrogen (DON), 
+!  an explicit heterotrophic bacteria (BAC) and ammonia oxidizing archaea 
+!  (AOA), dissolved inorganic carbon (DIC), calcium carbonate (CaCO3), 
+!  alkalinity (ALK), and oxygen (O2). Fe is carried through all exosystem 
+!  biomass pools except bacteria and ammonia oxidizing archaea (AOA), 
+!  which has constant C:N:Fe ratios. C:N ratios are fixed in all biomass 
+!  pools except for dissolved organics, since we represent both DOC and DON. 
+!  Gas exchange follows MOCSY protocols.
 ! </DESCRIPTION>
 !
 ! <INFO>
@@ -423,6 +425,7 @@ module generic_WOMBATmid
         f_don, &
         f_bac, &
         f_aoa, &
+        f_n2o, &
         f_o2, &
         f_caco3, &
         f_fe, &
@@ -3022,11 +3025,19 @@ module generic_WOMBATmid
         units = 'mol/kg', &
         prog = .true.)
     
-    ! AOA
+    ! Ammonia oxidizing archaea
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
         name = 'aoa', &
         longname = 'Ammonia oxidizing archaea', &
+        units = 'mol/kg', &
+        prog = .true.)
+    
+    ! Nitrous oxide (N2O)
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'n2o', &
+        longname = 'Nitrous oxide', &
         units = 'mol/kg', &
         prog = .true.)
     
@@ -3884,6 +3895,8 @@ module generic_WOMBATmid
     call g_tracer_get_values(tracer_list, 'bac', 'field', wombat%f_bac, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'n2o', 'field', wombat%f_n2o, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
@@ -4915,6 +4928,10 @@ module generic_WOMBATmid
                             + wombat%mesexcrzoo(i,j,k)*(1.0-wombat%mesexcrdom) &
                             - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                             - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
+    
+      ! Nitrous oxide equation ! [molN/kg]
+      !----------------------------------------------------------------------
+      wombat%f_n2o(i,j,k) = wombat%f_n2o(i,j,k) + dtsb * ( 0.0 ) 
                               
       ! Phytoplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -5588,6 +5605,7 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac', 'field', wombat%f_bac, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'n2o', 'field', wombat%f_n2o, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'fe', 'field', wombat%f_fe, isd, jsd, ntau=tau)
@@ -6889,6 +6907,7 @@ module generic_WOMBATmid
     allocate(wombat%f_don(isd:ied, jsd:jed, 1:nk)); wombat%f_don(:,:,:)=0.0
     allocate(wombat%f_bac(isd:ied, jsd:jed, 1:nk)); wombat%f_bac(:,:,:)=0.0
     allocate(wombat%f_aoa(isd:ied, jsd:jed, 1:nk)); wombat%f_aoa(:,:,:)=0.0
+    allocate(wombat%f_n2o(isd:ied, jsd:jed, 1:nk)); wombat%f_n2o(:,:,:)=0.0
     allocate(wombat%f_o2(isd:ied, jsd:jed, 1:nk)); wombat%f_o2(:,:,:)=0.0
     allocate(wombat%f_caco3(isd:ied, jsd:jed, 1:nk)); wombat%f_caco3(:,:,:)=0.0
     allocate(wombat%f_fe(isd:ied, jsd:jed, 1:nk)); wombat%f_fe(:,:,:)=0.0
@@ -7154,6 +7173,7 @@ module generic_WOMBATmid
         wombat%f_don, &
         wombat%f_bac, &
         wombat%f_aoa, &
+        wombat%f_n2o, &
         wombat%f_o2, &
         wombat%f_caco3, &
         wombat%f_fe)
