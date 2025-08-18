@@ -500,6 +500,7 @@ module generic_WOMBATmid
         trimumax, &
         tri_lfer, &
         tri_lpar, &
+        sileqc, &
         feIII, &
         felig, &
         fecol, &
@@ -708,6 +709,7 @@ module generic_WOMBATmid
         id_trimumax = -1, &
         id_tri_lfer = -1, &
         id_tri_lpar = -1, &
+        id_sileqc = -1, &
         id_feIII = -1, &
         id_felig = -1, &
         id_fecol = -1, &
@@ -1476,6 +1478,11 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'trimumax', 'Trichodesmium temperature-dependent maximum growth rate', 'h', 'L', 's', '/s', 'f')
     wombat%id_trimumax = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'sileqc', 'equilibrium concentration of silicic acid', 'h', 'L', 's', 'mol/kg', 'f')
+    wombat%id_sileqc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2640,10 +2647,14 @@ module generic_WOMBATmid
     call g_tracer_add_param('zooepsdet', wombat%zooepsdet, 0.10/86400.0)
 
     ! Zooplankton preference for bacteria 1 [0-1]
+    ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
+    !  of microzooplankton grazing/biomass gain comes from bacterivory
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefbac1', wombat%zprefbac1, 0.1)
 
     ! Zooplankton preference for bacteria 2 [0-1]
+    ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
+    !  of microzooplankton grazing/biomass gain comes from bacterivory
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefbac2', wombat%zprefbac2, 0.1)
 
@@ -3830,6 +3841,7 @@ module generic_WOMBATmid
     real                                    :: dzt_bot, dzt_bot_os
     real                                    :: bac_Vdoc, bac_Voxy, bac_Vno3, bac_Vn2o, bac_muana, bac_muaer, bac_limnh4
     real                                    :: aoa_Vnh4, aoa_Voxy
+    real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect
     real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools, si_pools
     logical                                 :: used, converged
 
@@ -4048,6 +4060,7 @@ module generic_WOMBATmid
     wombat%tri_lfer(:,:,:) = 0.0
     wombat%tri_lpar(:,:,:) = 0.0
     wombat%trimumax(:,:,:) = 0.0
+    wombat%sileqc(:,:,:) = 0.0
     wombat%feIII(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
@@ -4332,14 +4345,15 @@ module generic_WOMBATmid
     !    5.  Growth of chlorophyll                                          !
     !    6.  Phytoplankton uptake of iron                                   !
     !    7.  Iron chemistry                                                 !
-    !    8.  Mortality scalings and grazing                                 !
-    !    9.  CaCO3 calculations                                             !
-    !    10. Implicit nitrogen fixation                                     !
-    !    11. Facultative heterotrophy calculations                          !
-    !    12. Chemoautotroph calculations                                    !
-    !    13. Sources and sinks                                              !
-    !    14. Tracer tendencies                                              !
-    !    15. Check for conservation by ecosystem component                  !
+    !    8.  Silicic acid chemistry                                         !
+    !    9.  Mortality scalings and grazing                                 !
+    !    10. CaCO3 calculations                                             !
+    !    11. Implicit nitrogen fixation                                     !
+    !    12. Facultative heterotrophy calculations                          !
+    !    13. Chemoautotroph calculations                                    !
+    !    14. Sources and sinks                                              !
+    !    15. Tracer tendencies                                              !
+    !    16. Check for conservation by ecosystem component                  !
     !                                                                       !
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------!
@@ -4687,13 +4701,13 @@ module generic_WOMBATmid
                                   wombat%dia_fedoreg(i,j,k) * biodia) * mmol_m3_to_mol_kg
 
 
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !  [Step 7] Iron chemistry (Aumont et al., 2015; GMD)                   !
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
+      !-------------------------------------------------------------------------------------!
+      !-------------------------------------------------------------------------------------!
+      !-------------------------------------------------------------------------------------!
+      !  [Step 7] Iron chemistry (Aumont et al., 2015 GMD & Tagliabue et al., 2023 Nature)  !
+      !-------------------------------------------------------------------------------------!
+      !-------------------------------------------------------------------------------------!
+      !-------------------------------------------------------------------------------------!
 
       ! Estimate solubility of Fe3+ (free Fe) in solution using temperature, pH and salinity
       ztemk = max(5.0, Temp(i,j,k)) + 273.15    ! temperature in kelvin
@@ -4769,7 +4783,35 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 8] Mortality scalings and grazing                              !
+      !  [Step 8] Silicic acid chemistry                                      !
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+
+      ! Solve for the equilibrium of silicic acid (Si(OH)4) in seawater
+      ! Do so via first-principles thermodynamics, where
+      ! K(T,P) = y * m(eq) / ( a(H2O)**2 )
+        ! 1. K(T,P0) is the thermodynamic equilibrium constant
+        ! 2. gamma0 is the activity coefficient of neutral H4Si(OH)4 in seawater
+        ! 3. alphaH2O is the activity of water in seawater and ~ 0.999
+        ! 4. deltaV0 is the change in standard partial molar volume of adding 
+        !    Si(OH)4 to seawater from amorphorus silica
+        ! 5. spmvcorrect is the pressure correction. The P-dependence follows the 
+        !    HKF/SUPCRT approach using standard partial molal volumes 
+        ! 6. sileqc is the equilibrium molality of Si(OH)4 in seawater (mol/kg)
+        !    accounting for temperature, salinity and pressure effects
+      zval = max(273.15, Temp(i,j,k) + 273.15)  ! temperature in Kelvin
+      K_am_silica = 10**( -8.476 - 485.24/zval - 2.268e-6*zval*zval + 3.068 * log10(zval) ) ! Gunnarsson & Arnorsson (2000)
+      gamma0 = 1.0 + 0.0053 * Salt(i,j,k) - 0.000034 * Salt(i,j,k)**2 ! Svenko 2014 Mar. Chem.
+      alphaH2O = 0.999  ! activity of water in seawater (from TEOS-10)
+      deltaV0 = -9.9 * 1e-6 ! m3/mol, (Willey 1982 Geochim. et Cosmochim. Acta) (also see Loucaides et al., 2012 Mar. Chem.)
+      spmvcorrect = exp( -deltaV0/(8.31432 * zval) * wombat%zm(i,j,k) * 1.0e4 ) ! 1.0e4 converts dbar to Pa
+      wombat%sileqc(i,j,k) = (K_am_silica * spmvcorrect) * alphaH2O**2.0 / gamma0 ! mol/kg
+
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !  [Step 9] Mortality scalings and grazing                              !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -4900,7 +4942,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 9] CaCO3 calculations                                          !
+      !  [Step 10] CaCO3 calculations                                         !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -4934,7 +4976,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 10] Implicit nitrogen fixation                                 !
+      !  [Step 11] Implicit nitrogen fixation                                 !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -4959,7 +5001,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 10] Facultative bacterial heterotrophy                         !
+      !  [Step 12] Facultative bacterial heterotrophy                         !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5132,7 +5174,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 11] Chemoautotroph calculations                                !
+      !  [Step 13] Chemoautotroph calculations                                !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5170,7 +5212,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 12] Sources and sinks                                          !
+      !  [Step 14] Sources and sinks                                          !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5424,7 +5466,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 13] Tracer tendencies                                          !
+      !  [Step 15] Tracer tendencies                                          !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -6013,7 +6055,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 14] Check for conservation of mass by ecosystem component      !
+      !  [Step 16] Check for conservation of mass by ecosystem component      !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -6668,6 +6710,10 @@ module generic_WOMBATmid
 
     if (wombat%id_feIII .gt. 0) &
       used = g_send_data(wombat%id_feIII, wombat%feIII, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_sileqc .gt. 0) &
+      used = g_send_data(wombat%id_sileqc, wombat%sileqc, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_felig .gt. 0) &
@@ -7774,6 +7820,7 @@ module generic_WOMBATmid
     allocate(wombat%tri_lpar(isd:ied, jsd:jed, 1:nk)); wombat%tri_lpar(:,:,:)=0.0
     allocate(wombat%trimumax(isd:ied, jsd:jed, 1:nk)); wombat%trimumax(:,:,:)=0.0
     allocate(wombat%feIII(isd:ied, jsd:jed, 1:nk)); wombat%feIII(:,:,:)=0.0
+    allocate(wombat%sileqc(isd:ied, jsd:jed, 1:nk)); wombat%sileqc(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
     allocate(wombat%feprecip(isd:ied, jsd:jed, 1:nk)); wombat%feprecip(:,:,:)=0.0
@@ -8072,6 +8119,7 @@ module generic_WOMBATmid
         wombat%tri_lpar, &
         wombat%trimumax, &
         wombat%feIII, &
+        wombat%sileqc, &
         wombat%felig, &
         wombat%fecol, &
         wombat%feprecip, &
