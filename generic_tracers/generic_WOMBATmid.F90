@@ -5468,8 +5468,12 @@ module generic_WOMBATmid
     
       ! Silicic acid equation ! [molSi/kg] 
       !----------------------------------------------------------------------
-      wombat%f_sil(i,j,k) = wombat%f_sil(i,j,k) + dtsb * ( 0.0 )
-
+      wombat%f_sil(i,j,k) = wombat%f_sil(i,j,k) + dtsb * ( 0.0 &
+                            - wombat%diagrow(i,j,k) * 16.0/122.0 &
+                            + wombat%diaresp(i,j,k) * dia_Si2C &
+                            + wombat%bdetremi(i,j,k) * bdet_Si2C )
+                               
+                            
       ! Nitrous oxide equation ! [molN2/kg] 
       !  pjb: note that we track N2O in units of mol N2/kg, accounting for the two N atoms
       !----------------------------------------------------------------------
@@ -5534,7 +5538,12 @@ module generic_WOMBATmid
 
       ! Microphytoplankton silicon equation ! [molSi/kg] 
       !----------------------------------------------------------------------
-      wombat%f_diasi(i,j,k) = wombat%f_diasi(i,j,k) + dtsb * ( 0.0 )
+      wombat%f_diasi(i,j,k) = wombat%f_diasi(i,j,k) + dtsb * ( 0.0 &
+                              + wombat%diagrow(i,j,k) * 16.0/122.0 &
+                              - wombat%diaresp(i,j,k) * dia_Si2C &
+                              - wombat%diamort(i,j,k) * dia_Si2C &
+                              - wombat%mesgrazdia(i,j,k) * dia_Si2C &
+                              - wombat%zoograzdia(i,j,k) * dia_Si2C )
       
       ! Estimate primary productivity from phytoplankton growth ! [molC/kg/s]
       wombat%pprod_gross(i,j,k) = wombat%pprod_gross(i,j,k) + dtsb * ( 0.0 &
@@ -5684,7 +5693,11 @@ module generic_WOMBATmid
       
       ! Microphytoplankton silicon equation ! [molSi/kg] 
       !----------------------------------------------------------------------
-      wombat%f_bdetsi(i,j,k) = wombat%f_bdetsi(i,j,k) + dtsb * ( 0.0 )
+      wombat%f_bdetsi(i,j,k) = wombat%f_bdetsi(i,j,k) + dtsb * ( 0.0 &
+                               + wombat%diamort(i,j,k) * dia_Si2C &
+                               + wombat%mesgrazdia(i,j,k) * dia_Si2C &
+                               + wombat%zoograzdia(i,j,k) * dia_Si2C &
+                               - wombat%bdetremi(i,j,k) * bdet_Si2C )
       
       ! Dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
