@@ -4864,7 +4864,7 @@ module generic_WOMBATmid
         ! 4. Dissolution rate of biogenic silica (/s) composed of the above terms
       wombat%disssi(i,j,k) = disssi_temp * disssi_usat * disssi_bact
 
-      
+
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5572,10 +5572,13 @@ module generic_WOMBATmid
                             - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
     
       ! Silicic acid equation ! [molSi/kg] 
+      !   Microzooplankton grazing on diatoms produces clean, small, largely suspended 
+      !   pieces of biogenic silica prone to rapid dissolution [Krause et al., 2010 L&O]
       !----------------------------------------------------------------------
       wombat%f_sil(i,j,k) = wombat%f_sil(i,j,k) + dtsb * ( 0.0 &
                             - wombat%diagrow(i,j,k) * 16.0/122.0 &
                             + wombat%diaresp(i,j,k) * dia_Si2C &
+                            + wombat%zoograzdia(i,j,k) * dia_Si2C &
                             + wombat%bsidiss(i,j,k) )
                                
                             
@@ -5796,12 +5799,14 @@ module generic_WOMBATmid
                                + wombat%fescabdet(i,j,k) &
                                + wombat%fecoag2bdet(i,j,k) )
       
-      ! Microphytoplankton silicon equation ! [molSi/kg] 
+      ! Microphytoplankton silicon equation ! [molSi/kg]
+      !   Copepod egestion (fecal pellets) represented 42-107% of biogenic silica export at
+      !   100 metres in the spring bloom at the Antarctic Polar Front [Dagg et al., 2003 DSRII]
+      !   So all mesozooplankton grazing on diatoms goes to egestion, no dissolution
       !----------------------------------------------------------------------
       wombat%f_bdetsi(i,j,k) = wombat%f_bdetsi(i,j,k) + dtsb * ( 0.0 &
                                + wombat%diamort(i,j,k) * dia_Si2C &
                                + wombat%mesgrazdia(i,j,k) * dia_Si2C &
-                               + wombat%zoograzdia(i,j,k) * dia_Si2C &
                                - wombat%bsidiss(i,j,k)  )
       
       ! Dissolved organic carbon equation ! [molC/kg]
