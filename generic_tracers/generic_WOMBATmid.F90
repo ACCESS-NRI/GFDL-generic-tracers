@@ -282,6 +282,8 @@ module generic_WOMBATmid
         knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
+        bsi_fbac, &
+        bsi_kbac, &
         aoa_knh4, &
         aoa_poxy, &
         aoa_ynh4, &
@@ -498,6 +500,8 @@ module generic_WOMBATmid
         tri_lfer, &
         tri_lpar, &
         sileqc, &
+        disssi, &
+        bsidiss, &
         feIII, &
         felig, &
         fecol, &
@@ -707,6 +711,8 @@ module generic_WOMBATmid
         id_tri_lfer = -1, &
         id_tri_lpar = -1, &
         id_sileqc = -1, &
+        id_disssi = -1, &
+        id_bsidiss = -1, &
         id_feIII = -1, &
         id_felig = -1, &
         id_fecol = -1, &
@@ -1480,6 +1486,16 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'sileqc', 'equilibrium concentration of silicic acid', 'h', 'L', 's', 'mol/kg', 'f')
     wombat%id_sileqc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'disssi', 'dissolution rate of biogenic silica', 'h', 'L', 's', '/s', 'f')
+    wombat%id_disssi = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'bsidiss', 'dissolution of biogenic silica', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_bsidiss = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2881,6 +2897,14 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 5e-8)
 
+    ! Factor increase in biogenic silica dissolution caused by bacterial activity [ ]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bsi_fbac', wombat%bsi_fbac, 5.0)
+
+    ! Half-saturation coefficient modulating increase in biogenic silica dissolution due to bacterial activity [molC/kg]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bsi_kbac', wombat%bsi_kbac, 0.5/1.035e6)
+
     ! Ammonia Oxidizing Archaea half saturation constant for NH4 uptake [mmolN/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_knh4', wombat%aoa_knh4, 0.1)
@@ -3790,6 +3814,7 @@ module generic_WOMBATmid
     real                                    :: no3_bgc_change, caco3_bgc_change
     real                                    :: epsi = 1.0e-30
     real                                    :: pi = 3.14159265358979
+    real                                    :: Rgas = 8.314462168 ! J/(K mol)
     integer                                 :: ichl, iter, max_iter
     real                                    :: par_phy_mldsum, par_z_mldsum
     real                                    :: chl, ndet, carb, zchl, zval, phy_chlc, dia_chlc
@@ -3822,7 +3847,7 @@ module generic_WOMBATmid
     real                                    :: avedetbury, avecaco3bury
     real                                    :: bac_Vdoc, bac_Voxy, bac_Vno3, bac_Vn2o, bac_muana, bac_muaer, bac_limnh4
     real                                    :: aoa_Vnh4, aoa_Voxy
-    real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect
+    real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect, disssi_temp, disssi_usat, disssi_bact
     real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools, si_pools
     logical                                 :: used, converged
 
@@ -4042,6 +4067,8 @@ module generic_WOMBATmid
     wombat%tri_lpar(:,:,:) = 0.0
     wombat%trimumax(:,:,:) = 0.0
     wombat%sileqc(:,:,:) = 0.0
+    wombat%disssi(:,:,:) = 0.0
+    wombat%bsidiss(:,:,:) = 0.0
     wombat%feIII(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
@@ -4781,9 +4808,39 @@ module generic_WOMBATmid
       gamma0 = 1.0 + 0.0053 * Salt(i,j,k) - 0.000034 * Salt(i,j,k)**2 ! Svenko 2014 Mar. Chem.
       alphaH2O = 0.999  ! activity of water in seawater (from TEOS-10)
       deltaV0 = -9.9 * 1e-6 ! m3/mol, (Willey 1982 Geochim. et Cosmochim. Acta) (also see Loucaides et al., 2012 Mar. Chem.)
-      spmvcorrect = exp( -deltaV0/(8.31432 * zval) * wombat%zm(i,j,k) * 1.0e4 ) ! 1.0e4 converts dbar to Pa
+      spmvcorrect = exp( -deltaV0/(Rgas * zval) * wombat%zm(i,j,k) * 1.0e4 ) ! 1.0e4 converts dbar to Pa
       wombat%sileqc(i,j,k) = (K_am_silica * spmvcorrect) * alphaH2O**2.0 / gamma0 ! mol/kg
 
+      ! Dissolution of biogenic silica into silicic acid
+        ! 1. Temperature effect (Arrhenius) 
+        !    - activation energy of 84 kJ/mol (Greenwood et al., 2005 Aqu. Geochem.)
+        !    - Greenwood et al. (2005) finds dissolution rates [1/s] at a given temperature
+        !      equal to exp(20 - 10050/T), with T in Kelvin (Figure 4). We use 40ºC, which is
+        !      their lowest temperature, thus 313.15 in Kelvin
+        !    - NOTE: Greenwood also estimate a pH dependence, but make their rate measurements 
+        !            at pH 10 - 14. We ignore this for now, but it may be worth revisiting
+      disssi_temp = exp(20.0 - 10050.0/313.15) * exp( -84.0*1e3/Rgas * (1./zval - 1./313.15) ) ! [1/s]
+        ! 2. Undersaturation term with an exponent of 2.0
+        !    - see Eq. 2.13 and fits of this equation to ocean data in Figures 3.20 and 3.21 in
+        !      Rickert, D., Dissolution kinetics of biogenic silica in marine environments, Ber. Polarforsch., 351, 2000.
+        !    - From Van Cappellen et al., (2002) Global Biogeochemical Cycles:
+        !      "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors 
+        !       demonstrate that at very high degrees of undersaturation the dissolution kinetics switch 
+        !       from a linear dependence on the degree of undersaturation to an exponential one [Van Cappellen 
+        !       and Qiu, 1997b; Rickert, 2000]."
+        !    - We therefore assume substantial undersaturation, which is the case in most of the ocean
+      disssi_usat = max(0.0, (1 - wombat%f_sil(i,j,k) / wombat%sileqc(i,j,k))**2.0 )
+        ! 3. Bio-interference term?
+        !    - "The removal of organic or inorganic coatings enhance the reactivity by at least an order of magnitude."
+        !      Ricket et al., 2002 Geochim. et Cosmochim. Acta
+        !    - Diatom frustule dissolution increased by order of magnitude with bacteria (Bidle & Azam 1999 Nature) 
+        !    - During a bloom off Monterey Bay, anti-biotics decreased dissolution by ~50% (Bidle et al., 2003 Limnol. Oceanogr.)
+      disssi_bact = 1.0 + wombat%bsi_fbac * (wombat%f_bac1(i,j,k) + wombat%f_bac2(i,j,k)) &
+                    / ( wombat%f_bac1(i,j,k) + wombat%f_bac2(i,j,k) + wombat%bsi_kbac )
+        ! 4. Dissolution rate of biogenic silica (/s) composed of the above terms
+      wombat%disssi(i,j,k) = disssi_temp * disssi_usat * disssi_bact
+
+      
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5438,6 +5495,12 @@ module generic_WOMBATmid
       else
         wombat%caldiss(i,j,k) = 0.0
       endif
+      ! dissolution
+      if (wombat%f_bdetsi(i,j,k) .gt. epsi) then
+        wombat%bsidiss(i,j,k) = wombat%disssi(i,j,k) * wombat%f_bdetsi(i,j,k) ! [mol/kg/s]
+      else
+        wombat%bsidiss(i,j,k) = 0.0
+      endif
 
 
       !-----------------------------------------------------------------------!
@@ -5490,7 +5553,7 @@ module generic_WOMBATmid
       wombat%f_sil(i,j,k) = wombat%f_sil(i,j,k) + dtsb * ( 0.0 &
                             - wombat%diagrow(i,j,k) * 16.0/122.0 &
                             + wombat%diaresp(i,j,k) * dia_Si2C &
-                            + wombat%bdetremi(i,j,k) * bdet_Si2C )
+                            + wombat%bsidiss(i,j,k) )
                                
                             
       ! Nitrous oxide equation ! [molN2/kg] 
@@ -5716,7 +5779,7 @@ module generic_WOMBATmid
                                + wombat%diamort(i,j,k) * dia_Si2C &
                                + wombat%mesgrazdia(i,j,k) * dia_Si2C &
                                + wombat%zoograzdia(i,j,k) * dia_Si2C &
-                               - wombat%bdetremi(i,j,k) * bdet_Si2C )
+                               - wombat%bsidiss(i,j,k)  )
       
       ! Dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -6646,6 +6709,14 @@ module generic_WOMBATmid
 
     if (wombat%id_sileqc .gt. 0) &
       used = g_send_data(wombat%id_sileqc, wombat%sileqc, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_disssi .gt. 0) &
+      used = g_send_data(wombat%id_disssi, wombat%disssi, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_bsidiss .gt. 0) &
+      used = g_send_data(wombat%id_bsidiss, wombat%bsidiss, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_felig .gt. 0) &
@@ -7753,6 +7824,8 @@ module generic_WOMBATmid
     allocate(wombat%trimumax(isd:ied, jsd:jed, 1:nk)); wombat%trimumax(:,:,:)=0.0
     allocate(wombat%feIII(isd:ied, jsd:jed, 1:nk)); wombat%feIII(:,:,:)=0.0
     allocate(wombat%sileqc(isd:ied, jsd:jed, 1:nk)); wombat%sileqc(:,:,:)=0.0
+    allocate(wombat%disssi(isd:ied, jsd:jed, 1:nk)); wombat%disssi(:,:,:)=0.0
+    allocate(wombat%bsidiss(isd:ied, jsd:jed, 1:nk)); wombat%bsidiss(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
     allocate(wombat%feprecip(isd:ied, jsd:jed, 1:nk)); wombat%feprecip(:,:,:)=0.0
@@ -8052,6 +8125,8 @@ module generic_WOMBATmid
         wombat%trimumax, &
         wombat%feIII, &
         wombat%sileqc, &
+        wombat%disssi, &
+        wombat%bsidiss, &
         wombat%felig, &
         wombat%fecol, &
         wombat%feprecip, &
