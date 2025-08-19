@@ -162,6 +162,7 @@ module generic_WOMBATlite
         wcaco3, &
         caco3lrem, &
         caco3lrem_sed, &
+        sir_slope, &
         f_inorg, &
         disscal, &
         dissara, &
@@ -1443,6 +1444,10 @@ module generic_WOMBATlite
     ! CaCO3 inorganic fraction [1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.04)
+
+    ! Slope of the PIC:POC ratio to the substrate-Inhibitor Ratio [1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('sir_slope', wombat%sir_slope, 4.31)
 
     ! CaCO3 dissolution factor due to calcite undersaturation
     !-----------------------------------------------------------------------
@@ -2768,7 +2773,7 @@ module generic_WOMBATlite
         !  We also add a T-dependent function to scale down CaCO3 production in waters colder 
         !  than 3 degrees C based off the observation of no E hux growth beneath this (Fielding 2013; L&O)
         hco3 = wombat%f_dic(i,j,k) - wombat%co3(i,j,k) - wombat%co2_star(i,j,k)
-        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10**(-3.0 + 4.31 * &
+        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10**(-3.0 + wombat%sir_slope * &
                                           hco3 / (wombat%htotal(i,j,k)*1e6))) * &
                                          (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
       else
