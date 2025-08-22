@@ -7,8 +7,8 @@ site_name: wombat
 site_url: !ENV [SITE_URL, "http://access-nri.github.io/wombat/"]
 
 # Git repository (Adds a link to the GitHub repository at the top)
-repo_url: https://github.com/ACCESS-NRI/wombat
-repo_name: ACCESS-NRI/wombat
+repo_url: https://github.com/ACCESS-NRI/GFDL-generic-tracers
+repo_name: ACCESS-NRI/GFDL-generic-tracers
 edit_uri: blob/main/documentation/docs/ #hopefully will fix the edit button from 404'ing, https://github.com/mkdocs/mkdocs/issues/2416
 
 # Theme
@@ -54,18 +54,18 @@ theme:
 copyright: Copyright &copy; 2025 ACCESS-NRI
 
 plugins:
-  - include-configuration-stubs:
-      repo: ACCESS-NRI/wombat
-      main_website:
-        pattern: "dev-* release-*"
-        ref_type: branch
-      preview_website:
-        pattern: ""
-        ref_type: branch
-      stubs_parent_url: pages/configurations
-      stubs_nav_path: Configurations
-      stubs_dir: documentation/stub
-
+#  - include-configuration-stubs:
+#      repo: ACCESS-NRI/wombat
+#      main_website:
+#        pattern: "dev-* release-*"
+#        ref_type: branch
+#      preview_website:
+#        pattern: ""
+#        ref_type: branch
+#      stubs_parent_url: pages/configurations
+#      stubs_nav_path: Configurations
+#      stubs_dir: documentation/stub
+#
   - git-revision-date-localized:
       type: date
       enable_creation_date: false
