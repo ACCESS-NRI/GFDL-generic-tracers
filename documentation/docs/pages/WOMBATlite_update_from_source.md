@@ -60,7 +60,53 @@ The euphotic depth is defined as the depth where `radbio` falls below the 1% thr
 
 ### 2. Nutrient limitation of phytoplankton
 
+At the start of each vertical loop the code computes biomass of phytoplankton (`biophy`, $B_{phy}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass 
+is used to scale how both nitrate (`biono3`, $NO_{3}$, [mmol NO$_3$ m<sup>-3</sup>]) and dissolved iron (`biofer`, $dFe$, [$\mu$mol NO<sub>3</sub> m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, Wickman et al. (2024) show
+that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
+
+$aff = V^{-0.57}$
+
+Additionally, the authors demonstrate that the volume of the average phytoplankton cell is related to the density (i.e., concentration) of phytoplankton via
+
+$V = (B_{phy})^{0.65}$
  
+when combining panels c and f of their Figure 1. This then relates the affinity of an average cell to the concentration of phytoplankton biomass as
+
+$aff = (B_{phy})^{-0.37}$
+
+With this information, we allow the half-saturation terms for nitrate (`phy_kni(i,j,k)`, $K_{phy}^{N}$, [mmol N m<sup>-3</sup>]) and dissolved iron  (`phy_kfe(i,j,k)`, $K_{phy}^{Fe}$, [$\mu$mol dFe m<sup>-3</sup>]) uptake to vary as a function of phytoplankton biomass concentration. We set reference values for the half-saturation coefficient of nitrate (`phykn`, $K_{phy}^{N,0}$, [mmol N m<sup>-3</sup>]) and dissolved iron (`phykf`, $K_{phy}^{Fe,0}$, [$\mu$mol dFe m<sup>-3</sup>]) as input parameters to the model, and also set a threshold phytoplankton concentration (`phybiot`, $B_{phy}^{thresh}$, [mmol C m<sup>-3</sup>]) beneath which cell size cannot decrease and affinity can no longer increase. At this minimum, where affinity is maximised, the half-saturation coefficients are bounded to be 10% of their reference values.
+
+$K_{phy}^{N} = K_{phy}^{N,0} * \max(0.1, \max(0.0, (B_{phy}-B_{phy}^{thresh}))^{0.37} )$
+$K_{phy}^{Fe} = K_{phy}^{Fe,0} * \max(0.1, \max(0.0, (B_{phy}-B_{phy}^{thresh}))^{0.37} )$
+
+Limitation of phytoplankton growth by nitrate (`phy_lnit(i,j,k)`, $L_{phy}^{N}$), [dimensionless]) then follows the Monod equation:
+
+$L_{phy}^{N} = \frac{NO_3}{NO_3 + K_{phy}^{N}}$
+ 
+where $NO_3$ is the ambient nitrate concentration (`biono3`, $NO_3$, [mmol N m<sup>-3</sup>]).
+
+For iron the model employs an internal quota approach (Droop, 19XX). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{phy}^{-Fe:C}$, [mol/mol]) and an optimal quota for growth (`phy_optqfe`, $Q_{phy}^{*Fe:C}$, [mol/mol]). The minimum iron quota, $Q_{phy}^{-Fe:C}$, is dependent on the chlorophyll content of the cell and the degree of nitrogen limitation according to
+
+$$
+\begin{align}
+Q_{phy}^{-Fe:C} = & 0.00167 / 55.85 * Q_{phy}^{Chl:C} * 12 \\
+&  + 1.21 \times 10^{-5} * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * L_{phy}^{N} \\
+&  + 1.15 \times 10^{-4} * 14.0 / 55.85 / 7.625 * 0.5 * L_{phy}^{N}
+\end{align}
+$$
+
+The minimum iron requirements of the cell for growth increases as the ratio of chlorophyll to carbon increases (`phy_chlc`, $Q_{phy}^{Chl:C}$, [mol/mol]) and as the cell becomes less nitrate limited (i.e., performs more nitrate reduction). The coefficients applied to chlorophyll content and nitrate use derive from Flynn & Hipkin (1999).
+
+The Fe limitation factor (`phy_lfer(i,j,k)`, $L_{phy}^{Fe}$), [dimensionless]) is computed from the present Fe:C quota of the phytoplankton cells (`phy_Fe2C`, $Q_{phy}^{Fe:C}$, [mol/mol]) relative to these quotas.
+
+$L_{phy}^{Fe} = \max(0.0, \min(1.0, \frac{ Q_{phy}^{Fe:C} - Q_{phy}^{-Fe:C} }{Q_{phy}^{*Fe:C}} )) $
+
+If the cell is Fe‑replete (ratio much greater than $Q_{phy}^{*Fe:C}$) then Fe does not limit growth. If the cell is Fe‑deplete then the growth rate is reduced proportionally.
+
+
+### 3. Temperature‑dependent heterotrophy and remineralisation
+
+
  The maximum potential growth rate for phytoplankton, phy_mumax(i,j,k), is prescribed by an Eppley curve based on water temperature Temp(i,j,k):
 
 \mu_{\max} = \mu_{ ext{ref}} imes \expigl(r_{ ext{Eppley}} (T- T_{ ext{ref}})igr),
