@@ -95,9 +95,9 @@ markdown_extensions:
 # Navigation
 nav:
   - Home: pages/index.md
-  # List other pages here
-  # Sub-pages can be listed as nested items
-  # Documentation reference (https://www.mkdocs.org/user-guide/configuration/#nav)
+
+  - Model description:
+    - WOMBATlite: pages/Model_description/WOMBATlite_model_description.md
 
 # Footer
 extra:
