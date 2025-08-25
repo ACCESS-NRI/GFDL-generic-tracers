@@ -3926,7 +3926,7 @@ module generic_WOMBATmid
     real, dimension(3)                      :: dbgr, cbgr
     real                                    :: ztemk, I_ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
-    real                                    :: biof, zno3, zfermin
+    real                                    :: biof, zno3, zfermin, shear
     real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, mes_Fe2C, det_Fe2C, bdet_Fe2C, dom_N2C, dia_Si2C, bdet_Si2C
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe, dia_maxqsi 
@@ -4861,46 +4861,45 @@ module generic_WOMBATmid
       endif
       fe3sol = fesol1 * ( hp*hp*hp + fesol2*hp*hp + fesol3*hp + fesol4 + fesol5/hp ) *1e9
 
-      ! Estimate total colloidal iron
-      ! ... for now, we assume that 50% of all dFe is colloidal, and we separate this from the 
-      !     equilibrium fractionation between Fe' and Fe-L below
-      wombat%fecol(i,j,k) = wombat%fcolloid * biofer 
+      ! Estimate total colloidal iron (variable, with a 10% and 90% bound)
+      wombat%fecol(i,j,k) = max(0.1*biofer, biofer - fe3sol)
 
-      ! Determine equilibriuim fractionation of the remain dFe (non-colloidal fraction) into Fe' and L-Fe
+      ! Determine equilibriuim fractionation of the remaining dFe (non-colloidal fraction) into Fe' and L-Fe
       fe_keq = 10.0**( 17.27 - 1565.7 * I_ztemk ) * 1e-9 ! Temperature reduces solubility
-      fe_par = 0.47587 * wombat%radbio(i,j,k) ! Light increases solubility. dts: 0.47587=4.77e-7*0.5/10.0**(-6.3)
+      !  - Resolve for soluble Fe after accounting for colloidal fraction above
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
-      fe_tfe = (1.0 + fe_par) * fe_sfe
-      wombat%feIII(i,j,k) = ( -( 1. + wombat%ligand * fe_keq + fe_par - fe_sfe * fe_keq ) &
-                             + SQRT( ( 1. + wombat%ligand * fe_keq + fe_par - fe_sfe * fe_keq )**2 &
-                                      + 4. * fe_tfe * fe_keq) ) / ( 2. * fe_keq + epsi )
-      wombat%felig(i,j,k) = max(0.0, fe_sfe - wombat%feIII(i,j,k))
+      zval = 1.0 + wombat%ligand * fe_keq - fe_sfe * fe_keq
+      wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*fe_keq*fe_sfe ) ) &
+                            / ( 2.*fe_keq + epsi )
+      wombat%feIII(i,j,k) = max(0.0, min(wombat%feIII(i,j,k), fe_sfe) )
+      wombat%felig(i,j,k) = fe_sfe - wombat%feIII(i,j,k)
 
       ! Precipitation of Fe' (creation of nanoparticles)
       wombat%feprecip(i,j,k) = max(0.0, ( wombat%feIII(i,j,k) - fe3sol ) ) * wombat%knano_dfe/86400.0
 
       ! Scavenging of Fe` onto biogenic particles 
-      partic = (biodet + biobdet + biocaco3)
+      partic = (biodet + biobdet*(1.0+bdet_Si2C) + biocaco3) ! total particle concentration [mmol/m3]
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
       wombat%fescadet(i,j,k) = wombat%fescaven(i,j,k) * biodet / (partic+epsi) 
       wombat%fescabdet(i,j,k) = wombat%fescaven(i,j,k) * biobdet / (partic+epsi) 
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
-      biof = max(1/3., biophy / (biophy + 0.03))
+      biof = (biophy + biodia) / (biophy + biodia + 0.03)
+      shear = merge(1.0, 0.01, wombat%zw(i,j,k) <= hblt_depth(i,j))
       ! Colloidal shunt associated with small particles and DOC (Tagliabue et al., 2023)
-      if (wombat%zw(i,j,k).le.hblt_depth(i,j)) then
-        zval = (      (12.*biof*biodoc + 9.*biodet) + 2.5*biodet + 128.*biof*biodoc + 725.*biodet )*wombat%kcoag_dfe
-      else
-        zval = ( 0.01*(12.*biof*biodoc + 9.*biodet) + 2.5*biodet + 128.*biof*biodoc + 725.*biodet )*wombat%kcoag_dfe
-      endif
+      fesol1 = 12.0 * 3 * 0.3 * biof  ! NOTE: we recycle "fesol#" because they are already defined as real variables
+      fesol2 = 9.05
+      fesol3 = 2.49
+      fesol4 = 127.8 * 3 * 0.3 * biof
+      fesol5 = 725.7
+      zval = ( shear*(fesol1*(biodoc+40.0) + fesol2*biodet) + fesol3*biodet &
+               + fesol4*(biodoc+40.0) + fesol5*biodet ) * wombat%kcoag_dfe
       wombat%fecoag2det(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
       ! Colloidal shunt associated with big particles (Tagliabue et al., 2023)
-      if (wombat%zw(i,j,k).le.hblt_depth(i,j)) then
-        zval = ((      2.0 + 1.37) * biobdet )*wombat%kcoag_dfe
-      else
-        zval = (( 0.01*2.0 + 1.37) * biobdet )*wombat%kcoag_dfe
-      endif
+      fesol1 = 1.37
+      fesol2 = 1.94
+      zval = (( shear*2.0 + fesol1)*biobdet + fesol2*biobdet ) * wombat%kcoag_dfe
       wombat%fecoag2bdet(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
       
       ! Convert the terms back to mol/kg
@@ -6631,7 +6630,7 @@ module generic_WOMBATmid
 
         !!!~~~ Organic carbon and iron ~~~!!!
         wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
-        wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
+        wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * 0.25 * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
         
         !!!~~~ Biogenic silica ~~~!!!
         zval = max(273.15, wombat%sedtemp(i,j) + 273.15)  ! temperature in Kelvin
