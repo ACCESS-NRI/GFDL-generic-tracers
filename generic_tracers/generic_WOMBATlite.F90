@@ -3296,10 +3296,10 @@ module generic_WOMBATlite
       wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
       if (do_caco3_dynamics) then
         wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) * &
-                                            max(0.1, (1.0 - wombat%sedomega_cal(i,j)))**(4.5)
+                                            max(0.3, (1.0 - wombat%sedomega_cal(i,j)))**(4.5)
       else
         wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) * &
-                                            max(0.1, (1.0 - 0.2081))**(4.5)
+                                            max(0.3, (1.0 - 0.2081))**(4.5)
       endif
       
       ! Remineralisation of sediments to supply nutrient fields.
