@@ -292,6 +292,7 @@ module generic_WOMBATmid
         kcoag_dfe, &
         bsi_fbac, &
         bsi_kbac, &
+        bsilrem_sed, &
         aoa_knh4, &
         aoa_poxy, &
         aoa_ynh4, &
@@ -339,7 +340,6 @@ module generic_WOMBATmid
         alk_global, &
         no3_global, &
         nh4_global, &
-        sio2_surf, &
         dic_min, &
         dic_max, &
         alk_min, &
@@ -366,7 +366,6 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     real, dimension(:,:), allocatable :: &
         htotallo, htotalhi,  &
-        sio2, &
         co2_csurf, co2_alpha, co2_sc_no, pco2_csurf, &
         o2_csurf, o2_alpha, o2_sc_no, &
         n2o_csurf, n2o_alpha, n2o_sc_no, &
@@ -2503,10 +2502,6 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('alk_max', wombat%alk_max, 3000.0)
 
-    ! Global average surface concentration of inorganic silicate [mol/kg]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('sio2_surf', wombat%sio2_surf, 35.0e-3 / 1035.0)
-
     !=======================================================================
     ! NPZD parameters
     !=======================================================================
@@ -2595,9 +2590,9 @@ module generic_WOMBATmid
     ! microphytoplankton half saturation constant for silicic acid uptake [mmolSi/m3]
     !  - minimal Ks in natural assemblages of 0.5 - 0.9 mmolSi/m3
     !    [Nelson & Brzezinski, 1990, Marine Ecology Progress Series, 62, 283-292]
-    !  - We set 2.0 here as default due to recalculation of variable Ksi below
+    !  - We set 5.0 here as default due to recalculation of variable Ksi below
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diaks', wombat%diaks, 2.0)
+    call g_tracer_add_param('diaks', wombat%diaks, 5.0)
 
     ! microphytoplankton minimum quota of chlorodiall to carbon [mg/mg]
     !-----------------------------------------------------------------------
@@ -2985,11 +2980,18 @@ module generic_WOMBATmid
 
     ! Factor increase in biogenic silica dissolution caused by bacterial activity [ ]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bsi_fbac', wombat%bsi_fbac, 5.0)
+    call g_tracer_add_param('bsi_fbac', wombat%bsi_fbac, 10.0)
 
-    ! Half-saturation coefficient modulating increase in biogenic silica dissolution due to bacterial activity [molC/kg]
+    ! Half-saturation coefficient modulating increase in biogenic silica dissolution due to bacterial activity [mmolC/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bsi_kbac', wombat%bsi_kbac, 0.5/1.035e6)
+    call g_tracer_add_param('bsi_kbac', wombat%bsi_kbac, 0.5)
+
+    ! Rate of biogenic silica dissolution in the sediments when at near-total undersaturation [/s]
+    !-----------------------------------------------------------------------
+    !  Maximum rate of ~1.0 nmol/g biogenic silica s-1 at 0 degrees and 0 cm sediment depth at near-total
+    !  undersaturation, equivalent to 2.8e-8 /s dissolution rate [Fig. 11 in Van Cappellen & Qiu, 1997]
+    !  - this very low rate accounts for the factors in sediments that retard dissolution [Van Cappellen et al., 2002 GBC]
+    call g_tracer_add_param('bsilrem_sed', wombat%bsilrem_sed, 2.8e-8)
 
     ! Ammonia Oxidizing Archaea half saturation constant for NH4 uptake [mmolN/m3]
     !-----------------------------------------------------------------------
@@ -4083,7 +4085,7 @@ module generic_WOMBATmid
            Temp(:,:,k), Salt(:,:,k), &
            min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%f_dic(:,:,k), wombat%dic_min*mmol_m3_to_mol_kg)), &
            max(wombat%f_no3(:,:,k) / 16., 1e-9), &
-           wombat%sio2(:,:), &
+           wombat%f_sil(:,:,k), &
            min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%f_alk(:,:,k), wombat%alk_min*mmol_m3_to_mol_kg)), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
            wombat%htotal(:,:,k), &
@@ -4103,7 +4105,7 @@ module generic_WOMBATmid
            Temp(:,:,k), Salt(:,:,k), &
            min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%f_dic(:,:,k), wombat%dic_min*mmol_m3_to_mol_kg)), &
            max(wombat%f_no3(:,:,k) / 16., 1e-9), &
-           wombat%sio2(:,:), &
+           wombat%f_sil(:,:,k), &
            min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%f_alk(:,:,k), wombat%alk_min*mmol_m3_to_mol_kg)), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
            wombat%htotal(:,:,k), &
@@ -4665,7 +4667,7 @@ module generic_WOMBATmid
       !!!~~~ Microphytoplankton ~~~!!!
       wombat%dia_kni(i,j,k) = wombat%diakn * max(0.1, max(0.0, (biodia-wombat%diabiot))**0.37)
       wombat%dia_kfe(i,j,k) = wombat%diakf * max(0.1, max(0.0, (biodia-wombat%diabiot))**0.37)
-      wombat%dia_ksi(i,j,k) = wombat%diaks * max(0.25, max(0.0, (biodia-wombat%diabiot))**0.37)
+      wombat%dia_ksi(i,j,k) = wombat%diaks * max(0.1, max(0.0, (biodia-wombat%diabiot))**0.37)
       ! Nitrogen limitation (split into NH4 and NO3 uptake limitation terms, with NH4 uptake being 5x more preferred)
       !   See Buchanan et al., (2025) Biogeosciences
       dia_limnh4 = bionh4 / (bionh4 + wombat%dia_kni(i,j,k) + epsi)
@@ -4814,21 +4816,21 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      ! 1. Maximum silicon content of a diatom cell 
-      ! 2. Ensure that silicic acid uptake can decrease in response to high cell quotas
-      ! 3. We purposefully do not up-regulate silicic acid uptake because the mechanism 
-      !    of highly silicified diatoms is associated with slow growth and therefore 
-      !    less dilution of the cell quota, not increased silicic acid uptake
+      ! 1. Ensure that silicic acid uptake can decrease in response to high cell quotas
+      ! 2. We purposefully do not up-regulate silicic acid uptake because the mechanism 
+      !    of highly silicified diatoms is associated with slow growth (and vice versa) 
+      !    and therefore less dilution of the cell quota, not increased silicic acid uptake
       !    - light limitation of growth increases Si:C by 3-fold [Liu et al., 2016 Frontiers in Marine Science]
       !    - iron limitation of growth increases Si:C by 3-fold [Hutchins & Bruland 1998; Takeda 1998]
+      !    These studies report such effects because growth rates slow, but Si uptake does not change
       !    Also, note we use a T-independent maximum uptake rate for silicic acid "diaVmaxs",
       !    which ensures that slower growing diatoms in the cold polar regions take up more Si 
       !    per C than faster growing diatoms in the warm tropics [Baines et al., 2010 GBC]
       
       !!!~~~ Microphytoplankton ~~~!!!
-      dia_maxqsi = biodia * wombat%diamaxqs  !mmol Si / m3
-      wombat%dia_sidoreg(i,j,k) = max(0.0, (1.0 - biodiasi/dia_maxqsi) / &
-                                  abs(1.05 - biodiasi/dia_maxqsi) )
+      !  NOTE: "zval" below is different from "dia_lsil" above due to use of "diamaxqs" instead of "diaoptqs"
+      zval = min(1.0, max(0.0, (dia_Si2C - wombat%diaminqs) / (wombat%diamaxqs - wombat%diaminqs) ))
+      wombat%dia_sidoreg(i,j,k) = max(0.0, (1.0 - zval)**0.5)
       wombat%dia_silupt(i,j,k) = max(0.0, (wombat%diaVmaxs * biodia &
                                      * biosil / (biosil + wombat%dia_ksi(i,j,k)) &
                                      * wombat%dia_sidoreg(i,j,k) )) * mmol_m3_to_mol_kg ! [molSi/kg/s]
@@ -4965,8 +4967,7 @@ module generic_WOMBATmid
         !      Ricket et al., 2002 Geochim. et Cosmochim. Acta
         !    - Diatom frustule dissolution increased by order of magnitude with bacteria (Bidle & Azam 1999 Nature) 
         !    - During a bloom off Monterey Bay, anti-biotics decreased dissolution by ~50% (Bidle et al., 2003 Limnol. Oceanogr.)
-      disssi_bact = 1.0 + wombat%bsi_fbac * (wombat%f_bac1(i,j,k) + wombat%f_bac2(i,j,k)) &
-                    / ( wombat%f_bac1(i,j,k) + wombat%f_bac2(i,j,k) + wombat%bsi_kbac )
+      disssi_bact = 1.0 + wombat%bsi_fbac * (biobac1 + biobac2) / ( biobac1 + biobac2 + wombat%bsi_kbac )
         ! 4. Dissolution rate of biogenic silica (/s) composed of the above terms
       wombat%disssi(i,j,k) = disssi_temp * disssi_usat * disssi_bact
 
@@ -6614,7 +6615,7 @@ module generic_WOMBATmid
         wombat%sedtemp(:,:), wombat%sedsalt(:,:), &
         min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%seddic(:,:), wombat%dic_min*mmol_m3_to_mol_kg)), &
         max(wombat%sedno3(:,:) / 16., 1e-9), &
-        wombat%sio2(:,:), & ! dts: This is currently constant, equal to wombat%sio2_surf
+        wombat%sedsil(:,:), &
         min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%sedalk(:,:), wombat%alk_min*mmol_m3_to_mol_kg)), &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_lo, &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_hi, &
@@ -6624,39 +6625,57 @@ module generic_WOMBATmid
         omega_calc=wombat%sedomega_cal(:,:))
 
     do j = jsc,jec; do i = isc,iec;
-      fbc = wombat%bbioh ** (wombat%sedtemp(i,j))
-      wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
-      wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
-      wombat%detsi_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detsi_sediment(i,j,1) ! [mol/m2/s]
-      if (do_caco3_dynamics) then
-        wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
-                                      * max((1.0 - wombat%omegamax_sed), (1.0 - wombat%sedomega_cal(i,j)))**(4.5)
-      else
-        wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
-                                      * (1.0 - 0.2081)**(4.5)
-      endif
-      if (do_benthic_denitrification) then
-        ! sedimentary denitrification (Bohlen et al., 2012 Global Biogeochemical Cycles)
-        !   Stoichiometry of 94 mol NO3 used per 122 mol organic carbon oxidised (Paulmier et al, 2009 BG)
-        !   Hard limit where denitrification is at maximum 90% responsible for organic matter remin
-        wombat%det_sed_denit(i,j) = wombat%det_sed_remin(i,j) * min(0.9 * 94.0/122.0, &
-                                    (0.083 + 0.21 * 0.98**((wombat%sedo2(i,j) - wombat%sedno3(i,j))/mmol_m3_to_mol_kg)))
-        wombat%fdenit(i,j) = wombat%det_sed_denit(i,j) * 122.0/94.0 / (wombat%det_sed_remin(i,j) + epsi)
-      else
-        wombat%det_sed_denit(i,j) = 0.0 ! [mol/m2/s]
-        wombat%fdenit(i,j) = 0.0
-      endif
+      k = grid_kmt(i,j)
+      if (k .gt. 0) then
+        fbc = wombat%bbioh ** (wombat%sedtemp(i,j))
 
-      ! Remineralisation of sediments to supply nutrient fields.
-      ! btf values are positive from the water column into the sediment.
-      wombat%b_nh4(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_no3(i,j) = wombat%det_sed_denit(i,j) ! [molN/m2/s]
-      wombat%b_o2(i,j) = -132./16. * wombat%b_nh4(i,j) * (1.0 - wombat%fdenit(i,j))! [mol/m2/s]
-      wombat%b_dic(i,j) = 122./16. * wombat%b_nh4(i,j) - wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
-      wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_sil(i,j) = -1.0 * wombat%detsi_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) + wombat%b_nh4(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
+        !!!~~~ Organic carbon and iron ~~~!!!
+        wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
+        wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
+        
+        !!!~~~ Biogenic silica ~~~!!!
+        zval = max(273.15, wombat%sedtemp(i,j) + 273.15)  ! temperature in Kelvin
+        biobac1  = max(epsi, wombat%f_bac1(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+        biobac2  = max(epsi, wombat%f_bac2(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+        ! Activation energy of 50 kJ/mol for dissolution in sediments at reference temperature 5 degC [Van Cappellen, 1996]
+        disssi_temp = wombat%bsilrem_sed * exp( -50.0*1e3/Rgas * (1./zval - 1./278.15) ) ! [1/s]
+        disssi_usat = max(0.0, (1 - wombat%sedsil(i,j) / wombat%sileqc(i,j,k))**2.0 )
+        disssi_bact = 1.0 + wombat%bsi_fbac * max(0.0, (biobac1 + biobac2) / ( biobac1 + biobac2 + wombat%bsi_kbac ))
+        wombat%detsi_sed_remin(i,j) = wombat%p_detsi_sediment(i,j,1) * disssi_temp * disssi_usat * disssi_bact! [mol/m2/s]
+        
+        !!!~~~ CaCO3 dissolution ~~~!!!
+        if (do_caco3_dynamics) then
+            wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
+                                        * max((1.0 - wombat%omegamax_sed), (1.0 - wombat%sedomega_cal(i,j)))**(4.5)
+        else
+            wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
+                                        * (1.0 - 0.2081)**(4.5)
+        endif
+
+        !!!~~~ Benthic denitrification ~~~!!!
+        if (do_benthic_denitrification) then
+          ! sedimentary denitrification (Bohlen et al., 2012 Global Biogeochemical Cycles)
+          !   Stoichiometry of 94 mol NO3 used per 122 mol organic carbon oxidised (Paulmier et al, 2009 BG)
+          !   Hard limit where denitrification is at maximum 90% responsible for organic matter remin
+          wombat%det_sed_denit(i,j) = wombat%det_sed_remin(i,j) * min(0.9 * 94.0/122.0, &
+                                      (0.083 + 0.21 * 0.98**((wombat%sedo2(i,j) - wombat%sedno3(i,j))/mmol_m3_to_mol_kg)))
+          wombat%fdenit(i,j) = wombat%det_sed_denit(i,j) * 122.0/94.0 / (wombat%det_sed_remin(i,j) + epsi)
+        else
+          wombat%det_sed_denit(i,j) = 0.0 ! [mol/m2/s]
+          wombat%fdenit(i,j) = 0.0
+        endif
+
+        ! Remineralisation of sediments to supply nutrient fields.
+        ! btf values are positive from the water column into the sediment.
+        wombat%b_nh4(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_no3(i,j) = wombat%det_sed_denit(i,j) ! [molN/m2/s]
+        wombat%b_o2(i,j) = -132./16. * wombat%b_nh4(i,j) * (1.0 - wombat%fdenit(i,j))! [mol/m2/s]
+        wombat%b_dic(i,j) = 122./16. * wombat%b_nh4(i,j) - wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
+        wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_sil(i,j) = -1.0 * wombat%detsi_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) + wombat%b_nh4(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
+      endif
     enddo; enddo
 
 
@@ -7729,7 +7748,7 @@ module generic_WOMBATmid
           SST(:,:), SSS(:,:), &
           min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%f_dic(:,:,1), wombat%dic_min*mmol_m3_to_mol_kg)), &
           max(wombat%f_no3(:,:,1) / 16., 1e-9), &
-          wombat%sio2(:,:), &
+          wombat%f_sil(:,:,1), &
           min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%f_alk(:,:,1), wombat%alk_min*mmol_m3_to_mol_kg)), &
           wombat%htotallo(:,:), wombat%htotalhi(:,:), &
           wombat%htotal(:,:,1), &
@@ -7921,7 +7940,6 @@ module generic_WOMBATmid
     allocate(wombat%omega_cal(isd:ied, jsd:jed, 1:nk)); wombat%omega_cal(:,:,:)=1.0
     allocate(wombat%co3(isd:ied, jsd:jed, 1:nk)); wombat%co3(:,:,:)=0.0
     allocate(wombat%co2_star(isd:ied, jsd:jed, 1:nk)); wombat%co2_star(:,:,:)=0.0
-    allocate(wombat%sio2(isd:ied, jsd:jed)); wombat%sio2(:,:)=wombat%sio2_surf
     allocate(wombat%co2_csurf(isd:ied, jsd:jed)); wombat%co2_csurf(:,:)=0.0
     allocate(wombat%co2_alpha(isd:ied, jsd:jed)); wombat%co2_alpha(:,:)=0.0
     allocate(wombat%co2_sc_no(isd:ied, jsd:jed)); wombat%co2_sc_no(:,:)=0.0
