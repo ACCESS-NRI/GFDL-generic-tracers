@@ -39,10 +39,12 @@
 !  (BAC1 & BAC2) and ammonia oxidizing archaea (AOA), dissolved inorganic 
 !  carbon (DIC), calcium carbonate (CaCO3), alkalinity (ALK), and oxygen 
 !  (O2). Fe is carried through all exosystem biomass pools except bacteria 
-!  and AOA, who have constant C:N:Fe ratios. C:N ratios are fixed in all 
-!  biomass pools except for dissolved organics, since we represent both DOC 
-!  and DON. Si is carried through microphytoplankton, large detrtis and, 
-!  like for carbon and Fe, is deposited into a sediment pool.
+!  and AOA, who have constant C:N:Fe ratios. Fe is additionally routed to 
+!  small and large authigenic Fe particle pools (AFe and bAFe) via the 
+!  "colloidal shunt". C:N ratios are fixed in all biomass pools except 
+!  for dissolved organics, since we represent both DOC and DON. Si is 
+!  carried through microphytoplankton, large detrtis and, like for carbon 
+!  and Fe, is deposited into a sediment pool.
 !  Gas exchange follows MOCSY protocols.
 ! </DESCRIPTION>
 !
@@ -290,6 +292,8 @@ module generic_WOMBATmid
         knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
+        wafe, &
+        wbafe, &
         bsi_fbac, &
         bsi_kbac, &
         bsilrem_sed, &
@@ -401,6 +405,8 @@ module generic_WOMBATmid
         bdetfe_btm, &
         bdetsi_btm, &
         caco3_btm, &
+        afe_btm, &
+        bafe_btm, &
         det_sed_remin, &
         detfe_sed_remin, &
         detsi_sed_remin, &
@@ -473,6 +479,8 @@ module generic_WOMBATmid
         f_o2, &
         f_caco3, &
         f_fe, &
+        f_afe, &
+        f_bafe, &
         pprod_gross, &
         zprod_gross, &
         radbio, &
@@ -669,7 +677,10 @@ module generic_WOMBATmid
         p_wbdet, &
         p_wbdetfe, &
         p_wbdetsi, &
-        p_wcaco3
+        p_wcaco3, &
+        p_wafe, &
+        p_wbafe
+        
 
     real, dimension(:,:), pointer :: &
         p_no3_stf, &
@@ -2978,6 +2989,14 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 5e-8)
 
+    ! Sinking speed of authigenic iron (oxyhydroxide) [m/s]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('wafe', wombat%wafe, 0.5/86400.0)
+
+    ! Sinking speed of bigger authigenic iron (oxyhydroxide) [m/s]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('wbafe', wombat%wbafe, 10.0/86400.0)
+
     ! Factor increase in biogenic silica dissolution caused by bacterial activity [ ]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bsi_fbac', wombat%bsi_fbac, 10.0)
@@ -3565,6 +3584,27 @@ module generic_WOMBATmid
         flux_drydep = .true., &
         flux_param  = (/ 1.0 /), & ! dts: conversion to mol/m2/s done in data_table
         flux_bottom = .true.)
+    
+    ! Authigenic Fe
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'afe', &
+        longname = 'Authigenic iron', &
+        units = 'mol/kg', &
+        prog = .true., &
+        move_vertical = .true., &
+        btm_reservoir = .true.)
+    
+    ! Authigenic Fe (from big aggregates)
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'bafe', &
+        longname = 'Authigenic iron (bigger aggregates)', &
+        units = 'mol/kg', &
+        prog = .true., &
+        move_vertical = .true., &
+        btm_reservoir = .true.)
+        
 
     !=======================================================================
     ! Diagnostic Tracers
@@ -3739,6 +3779,9 @@ module generic_WOMBATmid
     call g_tracer_get_values(tracer_list, 'bdetfe', 'btm_reservoir', wombat%bdetfe_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'bdetsi', 'btm_reservoir', wombat%bdetsi_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'caco3', 'btm_reservoir', wombat%caco3_btm, isd, jsd)
+    call g_tracer_get_values(tracer_list, 'afe', 'btm_reservoir', wombat%afe_btm, isd, jsd)
+    call g_tracer_get_values(tracer_list, 'bafe', 'btm_reservoir', wombat%bafe_btm, isd, jsd)
+    
 
     ! Calculate burial of deposited detritus (Dunne et al., 2007)
     wombat%fbury(:,:) = 0.0
@@ -3778,6 +3821,11 @@ module generic_WOMBATmid
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment)
     wombat%p_caco3_sediment(:,:,1) =  wombat%p_caco3_sediment(:,:,1) + wombat%caco3_btm(:,:) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'caco3', 'btm_reservoir', 0.0)
+
+    ! Bury all authigenic Fe in sediment
+    call g_tracer_set_values(tracer_list, 'afe', 'btm_reservoir', 0.0)
+    call g_tracer_set_values(tracer_list, 'bafe', 'btm_reservoir', 0.0)
+
 
     ! Send diagnostics
     !-----------------------------------------------------------------------
@@ -4419,6 +4467,10 @@ module generic_WOMBATmid
     call g_tracer_get_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'fe', 'field', wombat%f_fe, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'afe', 'field', wombat%f_afe, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'bafe', 'field', wombat%f_bafe, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
@@ -6147,7 +6199,7 @@ module generic_WOMBATmid
                             - wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k) &
                             - wombat%mesmort(i,j,k) * wombat%pic2poc(i,j,k) )
 
-      ! Extra equation for iron ! [molFe/kg]
+      ! Equation for dissolved iron ! [molFe/kg]
       !----------------------------------------------------------------------
       wombat%f_fe(i,j,k) = wombat%f_fe(i,j,k) + dtsb * ( 0.0 &
                            + wombat%detremi(i,j,k) * det_Fe2C &
@@ -6224,7 +6276,15 @@ module generic_WOMBATmid
                               + wombat%fescaven(i,j,k) &
                               + wombat%fecoag2det(i,j,k) &
                               + wombat%fecoag2bdet(i,j,k)) 
-
+    
+      ! Equation for authigenic iron (oxyhydroxide) ! [molFe/kg]
+      !----------------------------------------------------------------------
+      wombat%f_afe(i,j,k) = wombat%f_afe(i,j,k) + dtsb * ( 0.0 )
+      
+      ! Equation for bigger authigenic iron (oxyhydroxide) ! [molFe/kg]
+      !----------------------------------------------------------------------
+      wombat%f_bafe(i,j,k) = wombat%f_bafe(i,j,k) + dtsb * ( 0.0 )
+      
 
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -6484,6 +6544,8 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'fe', 'field', wombat%f_fe, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'afe', 'field', wombat%f_afe, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'bafe', 'field', wombat%f_bafe, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'dicr', 'field', wombat%f_dicr, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau)
@@ -6498,7 +6560,9 @@ module generic_WOMBATmid
     call g_tracer_get_pointer(tracer_list, 'bdetfe', 'vmove', wombat%p_wbdetfe) ! [m/s]
     call g_tracer_get_pointer(tracer_list, 'bdetsi', 'vmove', wombat%p_wbdetsi) ! [m/s]
     call g_tracer_get_pointer(tracer_list, 'caco3', 'vmove', wombat%p_wcaco3) ! [m/s]
-
+    call g_tracer_get_pointer(tracer_list, 'afe', 'vmove', wombat%p_wafe) ! [m/s]
+    call g_tracer_get_pointer(tracer_list, 'bafe', 'vmove', wombat%p_wbafe) ! [m/s]
+    
     ! Variable sinking rates of organic detritus (positive for sinking when GOLDtridiag == .true.)
     !                                            (negative for sinking when IOWtridiag ==.true.)
     ! Note: sinking distances are limited in the vertdiff solver to prevent characteristics
@@ -6524,6 +6588,8 @@ module generic_WOMBATmid
         wombat%p_wbdetfe(i,j,:) = wsink2(:)
         wombat%p_wbdetsi(i,j,:) = wsink2(:)
         wombat%p_wcaco3(i,j,:) = wsinkcal(:)
+        wombat%p_wafe(i,j,:) = wombat%wafe
+        wombat%p_wbafe(i,j,:) = wombat%wbafe
       else
         wombat%p_wdet(i,j,:) = 0.0
         wombat%p_wdetfe(i,j,:) = 0.0
@@ -6531,6 +6597,8 @@ module generic_WOMBATmid
         wombat%p_wbdetfe(i,j,:) = 0.0
         wombat%p_wbdetsi(i,j,:) = 0.0
         wombat%p_wcaco3(i,j,:) = 0.0
+        wombat%p_wafe(i,j,:) = 0.0
+        wombat%p_wbafe(i,j,:) = 0.0
       endif
       ! PJB: export production through 100 metres
       k = k100(i,j)
@@ -7985,6 +8053,8 @@ module generic_WOMBATmid
     allocate(wombat%f_o2(isd:ied, jsd:jed, 1:nk)); wombat%f_o2(:,:,:)=0.0
     allocate(wombat%f_caco3(isd:ied, jsd:jed, 1:nk)); wombat%f_caco3(:,:,:)=0.0
     allocate(wombat%f_fe(isd:ied, jsd:jed, 1:nk)); wombat%f_fe(:,:,:)=0.0
+    allocate(wombat%f_afe(isd:ied, jsd:jed, 1:nk)); wombat%f_afe(:,:,:)=0.0
+    allocate(wombat%f_bafe(isd:ied, jsd:jed, 1:nk)); wombat%f_bafe(:,:,:)=0.0
 
     allocate(wombat%b_nh4(isd:ied, jsd:jed)); wombat%b_nh4(:,:)=0.0
     allocate(wombat%b_no3(isd:ied, jsd:jed)); wombat%b_no3(:,:)=0.0
@@ -8189,6 +8259,8 @@ module generic_WOMBATmid
     allocate(wombat%bdetsi_btm(isd:ied, jsd:jed)); wombat%bdetsi_btm(:,:)=0.0
     allocate(wombat%caco3_sed_remin(isd:ied, jsd:jed)); wombat%caco3_sed_remin(:,:)=0.0
     allocate(wombat%caco3_btm(isd:ied, jsd:jed)); wombat%caco3_btm(:,:)=0.0
+    allocate(wombat%afe_btm(isd:ied, jsd:jed)); wombat%afe_btm(:,:)=0.0
+    allocate(wombat%bafe_btm(isd:ied, jsd:jed)); wombat%bafe_btm(:,:)=0.0
     allocate(wombat%zw(isd:ied, jsd:jed, 1:nk)); wombat%zw(:,:,:)=0.0
     allocate(wombat%zm(isd:ied, jsd:jed, 1:nk)); wombat%zm(:,:,:)=0.0
 
@@ -8289,7 +8361,9 @@ module generic_WOMBATmid
         wombat%f_n2o, &
         wombat%f_o2, &
         wombat%f_caco3, &
-        wombat%f_fe)
+        wombat%f_fe, &
+        wombat%f_afe, &
+        wombat%f_bafe)
 
     deallocate( &
         wombat%b_nh4, &
@@ -8492,6 +8566,8 @@ module generic_WOMBATmid
         wombat%bdetsi_btm, &
         wombat%caco3_sed_remin, &
         wombat%caco3_btm, &
+        wombat%afe_btm, &
+        wombat%bafe_btm, &
         wombat%zw, &
         wombat%zm)
 
