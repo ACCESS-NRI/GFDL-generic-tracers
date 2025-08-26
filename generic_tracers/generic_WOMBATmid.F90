@@ -213,6 +213,7 @@ module generic_WOMBATmid
         meslmor, &
         mesqmor, &
         detlrem, &
+        bottom_thickness, &
         detlrem_sed, &
         wdetbio, &
         wdetmax, &
@@ -1645,7 +1646,7 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'seddep', 'Depth of the sediment', 'h', '1', 's', 'm', 'f')
+        'seddep', 'Depth of the bottom layer', 'h', '1', 's', 'm', 'f')
     wombat%id_seddep = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -1655,52 +1656,52 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedtemp', 'Temperature at the deepest grid cell', 'h', '1', 's', 'deg C', 'f')
+        'sedtemp', 'Temperature in the bottom layer', 'h', '1', 's', 'deg C', 'f')
     wombat%id_sedtemp = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedsalt', 'Salinity at the deepest grid cell', 'h', '1', 's', 'psu', 'f')
+        'sedsalt', 'Salinity in the bottom layer', 'h', '1', 's', 'psu', 'f')
     wombat%id_sedsalt = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedno3', 'Nitrate at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+        'sedno3', 'Nitrate concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_sedno3 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sednh4', 'Ammonium at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+        'sednh4', 'Ammonium concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_sednh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedo2', 'Oxygen at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+        'sedo2', 'Oxygen concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_sedo2 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'seddic', 'Dissolved inorganic carbon at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+        'seddic', 'Dissolved inorganic carbon concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_seddic = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedalk', 'Alkalinity at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+        'sedalk', 'Alkalinity concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_sedalk = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedhtotal', 'H+ ions at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+        'sedhtotal', 'H+ ion concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_sedhtotal = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedco3', 'CO3 ions at the deepest grid cell', 'h', '1', 's', 'mol/kg', 'f')
+        'sedco3', 'CO3 ion concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_sedco3 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sedomega_cal', 'Calcite saturation state at the deepest grid cell', 'h', '1', 's', ' ', 'f')
+        'sedomega_cal', 'Calcite saturation state in the bottom layer', 'h', '1', 's', ' ', 'f')
     wombat%id_sedomega_cal = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -2050,6 +2051,11 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('wdetmax', wombat%wdetmax, 45.0/86400.0)
     
+    ! Bottom thickness [m]
+    !-----------------------------------------------------------------------
+    ! Thickness over which tracer values are integrated to define the bottom layer
+    call g_tracer_add_param('bottom_thickness', wombat%bottom_thickness, 1.0)
+
     ! Detritus remineralisation rate constant in sediments [1/s]
     !-----------------------------------------------------------------------
     ! This would normally equal detlrem, but we set the default value to be
@@ -2743,7 +2749,7 @@ module generic_WOMBATmid
     real, dimension(:,ilb:,jlb:,:), intent(in) :: opacity_band
 
     integer                                 :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, tn
-    integer                                 :: i, j, k, n, nz
+    integer                                 :: i, j, k, n, nz, k_bot
     real, dimension(:,:,:), pointer         :: grid_tmask
     integer, dimension(:,:), pointer        :: grid_kmt
     integer, dimension(:,:), allocatable    :: kmeuph ! deepest level of euphotic zone
@@ -2789,6 +2795,7 @@ module generic_WOMBATmid
     real                                    :: zoo_slmor, mes_slmor, epsmin
     real                                    :: hco3, diss_cal, diss_ara, diss_det
     real                                    :: avedetbury, avecaco3bury
+    real                                    :: dzt_bot, dzt_bot_os
     real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools
     logical                                 :: used
 
@@ -4219,6 +4226,7 @@ module generic_WOMBATmid
             print *, "       Nested timestep number =", tn
             print *, " "
             print *, "       Biological N budget (molN/kg) at two timesteps =", n_pools(i,j,k,1), n_pools(i,j,k,2)
+            print *, "       Difference in budget between timesteps =", n_pools(i,j,k,2) - n_pools(i,j,k,1)
             print *, " "
             print *, "       NO3 (molNO3/kg) =", wombat%f_no3(i,j,k)
             print *, "       NH4 (molNH4/kg) =", wombat%f_nh4(i,j,k)
@@ -4256,6 +4264,7 @@ module generic_WOMBATmid
             print *, "       Nested timestep number =", tn
             print *, " "
             print *, "       Biological C budget (molC/kg) at two timesteps =", c_pools(i,j,k,1), c_pools(i,j,k,2)
+            print *, "       Difference in budget between timesteps =", c_pools(i,j,k,2) - c_pools(i,j,k,1)
             print *, " "
             print *, "       DIC (molC/kg) =", wombat%f_dic(i,j,k)
             print *, "       ALK (molC/kg) =", wombat%f_alk(i,j,k)
@@ -4432,20 +4441,63 @@ module generic_WOMBATmid
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment) ! [mol/m2]
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment) ! [mol/m2]
 
+    ! Get bottom conditions, including those that influence bottom fluxes. Bottom conditions are
+    ! calculated over a layer defined by wombat%bottom_thickness (default 1 m). This is done because
+    ! the bottom layers in MOM6 are usually "vanished" layers. This approach is based on what is done
+    ! in COBALT v3.
     do j = jsc,jec; do i = isc,iec;
-      k = grid_kmt(i,j)
-      if (k .gt. 0) then
-      ! Get bottom conditions: mask, PO4, temp, salt, DIC, Alk, H+ ion
-        wombat%seddep(i,j) = wombat%zw(i,j,k)
+      if (grid_kmt(i,j).gt.0) then
+        k_bot = 0
+        dzt_bot = 0.0
+        do k = grid_kmt(i,j),1,-1
+            if (dzt_bot .lt. wombat%bottom_thickness) then
+            k_bot = k
+            dzt_bot = dzt_bot + dzt(i,j,k) ! [m]
+            wombat%sedtemp(i,j) = wombat%sedtemp(i,j) + Temp(i,j,k) * dzt(i,j,k) ! [m*degC]
+            wombat%sedsalt(i,j) = wombat%sedsalt(i,j) + Salt(i,j,k) * dzt(i,j,k) ! [m*psu]
+            wombat%sedno3(i,j) = wombat%sedno3(i,j) + wombat%f_no3(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%sednh4(i,j) = wombat%sednh4(i,j) + wombat%f_nh4(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%sedo2(i,j) = wombat%sedo2(i,j) + wombat%f_o2(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%f_dic(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%sedalk(i,j) = wombat%sedalk(i,j) + wombat%f_alk(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) + wombat%htotal(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            endif
+        enddo
+        ! Subtract off overshoot
+        dzt_bot_os = dzt_bot - wombat%bottom_thickness
+        wombat%sedtemp(i,j) = wombat%sedtemp(i,j) - Temp(i,j,k_bot) * dzt_bot_os ! [m*degC]
+        wombat%sedsalt(i,j) = wombat%sedsalt(i,j) - Salt(i,j,k_bot) * dzt_bot_os ! [m*psu]
+        wombat%sedno3(i,j) = wombat%sedno3(i,j) - wombat%f_no3(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%sednh4(i,j) = wombat%sednh4(i,j) - wombat%f_nh4(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%sedo2(i,j) = wombat%sedo2(i,j) - wombat%f_o2(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%seddic(i,j) = wombat%seddic(i,j) - wombat%f_dic(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%sedalk(i,j) = wombat%sedalk(i,j) - wombat%f_alk(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) - wombat%htotal(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        ! Convert to mol/kg
+        wombat%sedtemp(i,j) = wombat%sedtemp(i,j) / wombat%bottom_thickness ! [degC]
+        wombat%sedsalt(i,j) = wombat%sedsalt(i,j) / wombat%bottom_thickness ! [psu]
+        wombat%sedno3(i,j) = wombat%sedno3(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%sednh4(i,j) = wombat%sednh4(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%sedo2(i,j) = wombat%sedo2(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%seddic(i,j) = wombat%seddic(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%sedalk(i,j) = wombat%sedalk(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) / wombat%bottom_thickness ! [mol/kg]
+
+        ! Set seddep as full depth minus half the bottom thickness and sedmask from bottom layer
+        k = grid_kmt(i,j)
+        wombat%seddep(i,j) = max(0.0, wombat%zw(i,j,k) - (wombat%bottom_thickness / 2.0))
         wombat%sedmask(i,j) = grid_tmask(i,j,k)
-        wombat%sedtemp(i,j) = Temp(i,j,k)
-        wombat%sedsalt(i,j) = Salt(i,j,k)
-        wombat%sedno3(i,j) = wombat%f_no3(i,j,k)
-        wombat%sednh4(i,j) = wombat%f_nh4(i,j,k)
-        wombat%sedo2(i,j) = wombat%f_o2(i,j,k)
-        wombat%seddic(i,j) = wombat%f_dic(i,j,k) + wombat%p_det_sediment(i,j,1) / wombat%Rho_0  ![mol/kg] 
-        wombat%sedalk(i,j) = wombat%f_alk(i,j,k)
-        wombat%sedhtotal(i,j) = wombat%htotal(i,j,k)
+
+        ! pjb: Sum the water column concentration of DIC and the organic carbon content of the
+        ! sediment to approximate the interstitial (i.e., porewater) DIC concentration.
+        ! We assume that the organic carbon content of the sediment (p_det_sediment) in mol/m2 is
+        ! relevant over one meter, and therefore can be automatically converted to mol/m3 and then
+        ! subsequently converted through the mol/kg using Rho_0. With this assumption these arrays
+        ! can be added together.
+        ! We add these arrays together to simulate the reducing conditions of organic-rich sediments,
+        ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
+        ! CaCO3 within the sediment as organic matter accumulates.
+        wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%Rho_0
       endif
     enddo; enddo
 
@@ -4453,7 +4505,7 @@ module generic_WOMBATmid
         wombat%sedtemp(:,:), wombat%sedsalt(:,:), &
         min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%seddic(:,:), wombat%dic_min*mmol_m3_to_mol_kg)), &
         max(wombat%sedno3(:,:) / 16., 1e-9), &
-        wombat%sio2(:,:), &
+        wombat%sio2(:,:), & ! dts: This is currently constant, equal to wombat%sio2_surf
         min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%sedalk(:,:), wombat%alk_min*mmol_m3_to_mol_kg)), &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_lo, &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_hi, &
