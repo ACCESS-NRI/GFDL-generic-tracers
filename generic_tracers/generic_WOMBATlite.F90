@@ -3228,53 +3228,53 @@ module generic_WOMBATlite
     ! the bottom layers in MOM6 are usually "vanished" layers. This approach is based on what is done
     ! in COBALT v3.
     do j = jsc,jec; do i = isc,iec;
-      k_bot = 0
-      dzt_bot = 0.0
-      do k = grid_kmt(i,j),1,-1
-        if (dzt_bot .lt. wombat%bottom_thickness) then
-          k_bot = k
-          dzt_bot = dzt_bot + dzt(i,j,k) ! [m]
-          wombat%sedtemp(i,j) = wombat%sedtemp(i,j) + Temp(i,j,k) * dzt(i,j,k) ! [m*degC]
-          wombat%sedsalt(i,j) = wombat%sedsalt(i,j) + Salt(i,j,k) * dzt(i,j,k) ! [m*psu]
-          wombat%sedno3(i,j) = wombat%sedno3(i,j) + wombat%f_no3(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
-          wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%f_dic(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
-          wombat%sedalk(i,j) = wombat%sedalk(i,j) + wombat%f_alk(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
-          wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) + wombat%htotal(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
-        endif
-      enddo
-      ! Subtract off overshoot
-      dzt_bot_os = dzt_bot - wombat%bottom_thickness
-      wombat%sedtemp(i,j) = wombat%sedtemp(i,j) - Temp(i,j,k_bot) * dzt_bot_os ! [m*degC]
-      wombat%sedsalt(i,j) = wombat%sedsalt(i,j) - Salt(i,j,k_bot) * dzt_bot_os ! [m*psu]
-      wombat%sedno3(i,j) = wombat%sedno3(i,j) - wombat%f_no3(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
-      wombat%seddic(i,j) = wombat%seddic(i,j) - wombat%f_dic(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
-      wombat%sedalk(i,j) = wombat%sedalk(i,j) - wombat%f_alk(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
-      wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) - wombat%htotal(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
-      ! Convert to mol/kg
-      wombat%sedtemp(i,j) = wombat%sedtemp(i,j) / wombat%bottom_thickness ! [degC]
-      wombat%sedsalt(i,j) = wombat%sedsalt(i,j) / wombat%bottom_thickness ! [psu]
-      wombat%sedno3(i,j) = wombat%sedno3(i,j) / wombat%bottom_thickness ! [mol/kg]
-      wombat%seddic(i,j) = wombat%seddic(i,j) / wombat%bottom_thickness ! [mol/kg]
-      wombat%sedalk(i,j) = wombat%sedalk(i,j) / wombat%bottom_thickness ! [mol/kg]
-      wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) / wombat%bottom_thickness ! [mol/kg]
+      if (grid_kmt(i,j).gt.0) then
+        k_bot = 0
+        dzt_bot = 0.0
+        do k = grid_kmt(i,j),1,-1
+            if (dzt_bot .lt. wombat%bottom_thickness) then
+            k_bot = k
+            dzt_bot = dzt_bot + dzt(i,j,k) ! [m]
+            wombat%sedtemp(i,j) = wombat%sedtemp(i,j) + Temp(i,j,k) * dzt(i,j,k) ! [m*degC]
+            wombat%sedsalt(i,j) = wombat%sedsalt(i,j) + Salt(i,j,k) * dzt(i,j,k) ! [m*psu]
+            wombat%sedno3(i,j) = wombat%sedno3(i,j) + wombat%f_no3(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%f_dic(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%sedalk(i,j) = wombat%sedalk(i,j) + wombat%f_alk(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) + wombat%htotal(i,j,k) * dzt(i,j,k) ! [m*mol/kg]
+            endif
+        enddo
+        ! Subtract off overshoot
+        dzt_bot_os = dzt_bot - wombat%bottom_thickness
+        wombat%sedtemp(i,j) = wombat%sedtemp(i,j) - Temp(i,j,k_bot) * dzt_bot_os ! [m*degC]
+        wombat%sedsalt(i,j) = wombat%sedsalt(i,j) - Salt(i,j,k_bot) * dzt_bot_os ! [m*psu]
+        wombat%sedno3(i,j) = wombat%sedno3(i,j) - wombat%f_no3(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%seddic(i,j) = wombat%seddic(i,j) - wombat%f_dic(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%sedalk(i,j) = wombat%sedalk(i,j) - wombat%f_alk(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) - wombat%htotal(i,j,k_bot) * dzt_bot_os ! [m*mol/kg]
+        ! Convert to mol/kg
+        wombat%sedtemp(i,j) = wombat%sedtemp(i,j) / wombat%bottom_thickness ! [degC]
+        wombat%sedsalt(i,j) = wombat%sedsalt(i,j) / wombat%bottom_thickness ! [psu]
+        wombat%sedno3(i,j) = wombat%sedno3(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%seddic(i,j) = wombat%seddic(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%sedalk(i,j) = wombat%sedalk(i,j) / wombat%bottom_thickness ! [mol/kg]
+        wombat%sedhtotal(i,j) = wombat%sedhtotal(i,j) / wombat%bottom_thickness ! [mol/kg]
 
-      ! Set seddep as full depth minus half the bottom thickness and sedmask from bottom layer
-      k = grid_kmt(i,j)
-      if (k .gt. 0) then
+        ! Set seddep as full depth minus half the bottom thickness and sedmask from bottom layer
+        k = grid_kmt(i,j)
         wombat%seddep(i,j) = max(0.0, wombat%zw(i,j,k) - (wombat%bottom_thickness / 2.0))
         wombat%sedmask(i,j) = grid_tmask(i,j,k)
-      endif
 
-      ! pjb: Sum the water column concentration of DIC and the organic carbon content of the
-      ! sediment to approximate the interstitial (i.e., porewater) DIC concentration.
-      ! We assume that the organic carbon content of the sediment (p_det_sediment) in mol/m2 is
-      ! relevant over one meter, and therefore can be automatically converted to mol/m3 and then
-      ! subsequently converted through the mol/kg using Rho_0. With this assumption these arrays
-      ! can be added together.
-      ! We add these arrays together to simulate the reducing conditions of organic-rich sediments,
-      ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
-      ! CaCO3 within the sediment as organic matter accumulates.
-      wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%Rho_0
+        ! pjb: Sum the water column concentration of DIC and the organic carbon content of the
+        ! sediment to approximate the interstitial (i.e., porewater) DIC concentration.
+        ! We assume that the organic carbon content of the sediment (p_det_sediment) in mol/m2 is
+        ! relevant over one meter, and therefore can be automatically converted to mol/m3 and then
+        ! subsequently converted through the mol/kg using Rho_0. With this assumption these arrays
+        ! can be added together.
+        ! We add these arrays together to simulate the reducing conditions of organic-rich sediments,
+        ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
+        ! CaCO3 within the sediment as organic matter accumulates.
+        wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%Rho_0
+      endif
     enddo; enddo
 
     call FMS_ocmip2_co2calc(CO2_dope_vec, wombat%sedmask(:,:), &
