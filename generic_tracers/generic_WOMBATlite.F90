@@ -2058,13 +2058,13 @@ module generic_WOMBATlite
     real                                    :: pi = 3.14159265358979
     integer                                 :: ichl
     real                                    :: par_phy_mldsum, par_z_mldsum
-    real                                    :: chl, zchl, zval, phy_chlc
+    real                                    :: chl, zchl, zval, sqrt_zval, phy_chlc
     real                                    :: phy_pisl, phy_pisl2 
     real                                    :: pchl_pisl, pchl_mumin, pchl_muopt
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink, wsinkcal
     real, dimension(4,61)                   :: zbgr
-    real                                    :: ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
+    real                                    :: ztemk, I_ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: biof, biodoc, zno3, zfermin
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
@@ -2670,15 +2670,20 @@ module generic_WOMBATlite
 
       ! Estimate solubility of Fe3+ (free Fe) in solution using temperature, pH and salinity
       ztemk = max(5.0, Temp(i,j,k)) + 273.15    ! temperature in kelvin
+      I_ztemk = 1.0 / ztemk
       zval = 19.924 * Salt(i,j,k) / ( 1000. - 1.005 * Salt(i,j,k))
-      fesol1 = 10**(-13.486 - 0.1856*zval**0.5 + 0.3073*zval + 5254.0/ztemk)
-      fesol2 = 10**(2.517 - 0.8885*zval**0.5 + 0.2139*zval - 1320.0/ztemk)
-      fesol3 = 10**(0.4511 - 0.3305*zval**0.5 - 1996.0/ztemk)
-      fesol4 = 10**(-0.2965 - 0.7881*zval**0.5 - 4086.0/ztemk)
-      fesol5 = 10**(4.4466 - 0.8505*zval**0.5 - 7980.0/ztemk)
-      hp = 10**(-7.9)
-      if (wombat%htotal(i,j,k).gt.0.0) hp = wombat%htotal(i,j,k)
-      fe3sol = fesol1 * ( hp**3 + fesol2 * hp**2 + fesol3 * hp + fesol4 + fesol5 / hp ) *1e9
+      sqrt_zval = sqrt(zval)
+      fesol1 = 10.0**(-13.486 - 0.1856*sqrt_zval + 0.3073*zval + 5254.0*I_ztemk)
+      fesol2 = 10.0**(2.517 - 0.8885*sqrt_zval + 0.2139*zval - 1320.0*I_ztemk)
+      fesol3 = 10.0**(0.4511 - 0.3305*sqrt_zval - 1996.0*I_ztemk)
+      fesol4 = 10.0**(-0.2965 - 0.7881*sqrt_zval - 4086.0*I_ztemk)
+      fesol5 = 10.0**(4.4466 - 0.8505*sqrt_zval - 7980.0*I_ztemk)
+      if (wombat%htotal(i,j,k).gt.0.0) then
+        hp = wombat%htotal(i,j,k)
+      else
+        hp = 1.25893e-08 ! dts: =10.0**(-7.9)
+      endif
+      fe3sol = fesol1 * ( hp*hp*hp + fesol2*hp*hp + fesol3*hp + fesol4 + fesol5/hp ) *1e9
 
       ! Estimate total colloidal iron
       ! ... for now, we assume that 50% of all dFe is colloidal, and we separate this from the 
@@ -2686,8 +2691,8 @@ module generic_WOMBATlite
       wombat%fecol(i,j,k) = wombat%fcolloid * biofer 
 
       ! Determine equilibriuim fractionation of the remain dFe (non-colloidal fraction) into Fe' and L-Fe
-      fe_keq = 10**( 17.27 - 1565.7 / ztemk ) * 1e-9 ! Temperature reduces solubility
-      fe_par = 4.77e-7 * wombat%radbio(i,j,k) * 0.5 / 10**(-6.3) ! Light increases solubility
+      fe_keq = 10.0**( 17.27 - 1565.7 * I_ztemk ) * 1e-9 ! Temperature reduces solubility
+      fe_par = 0.47587 * wombat%radbio(i,j,k) ! Light increases solubility. dts: 0.47587=4.77e-7*0.5/10.0**(-6.3)
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
       fe_tfe = (1.0 + fe_par) * fe_sfe
       wombat%feIII(i,j,k) = ( -( 1. + wombat%ligand * fe_keq + fe_par - fe_sfe * fe_keq ) &
@@ -2760,7 +2765,7 @@ module generic_WOMBATlite
         !  We also add a T-dependent function to scale down CaCO3 production in waters colder 
         !  than 3 degrees C based off the observation of no E hux growth beneath this (Fielding 2013; L&O)
         hco3 = wombat%f_dic(i,j,k) - wombat%co3(i,j,k) - wombat%co2_star(i,j,k)
-        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10**(-3.0 + 4.31 * &
+        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(-3.0 + 4.31 * &
                                           hco3 / (wombat%htotal(i,j,k)*1e6))) * &
                                          (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
 
