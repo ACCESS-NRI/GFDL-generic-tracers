@@ -185,6 +185,7 @@ module generic_WOMBATlite
         wcaco3, &
         caco3lrem, &
         caco3lrem_sed, &
+        omegamax_sed, &
         f_inorg, &
         disscal, &
         dissara, &
@@ -1471,6 +1472,12 @@ module generic_WOMBATlite
     ! CaCO3 remineralization rate constant in sediments [1/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('caco3lrem_sed', wombat%caco3lrem_sed, 0.01/86400.0)
+
+    ! Ceiling of omega in the sediments (controls rate of CaCO3 dissolution) [0-1]
+    ! - if == 1.0, then there may be at minimum no dissolution of CaCO3
+    ! - if < 1.0, then there is always some dissolution of CaCO3 when when supersaturated
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('omegamax_sed', wombat%omegamax_sed, 0.7)
 
     ! CaCO3 inorganic fraction [1]
     !-----------------------------------------------------------------------
@@ -3300,11 +3307,11 @@ module generic_WOMBATlite
       wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
       wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
       if (do_caco3_dynamics) then
-        wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) * &
-                                            max(0.1, (1.0 - wombat%sedomega_cal(i,j)))**(4.5)
+        wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
+                                      * max((1.0-wombat%omegamax_sed), (1.0-wombat%sedomega_cal(i,j)))**(4.5)
       else
-        wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) * &
-                                            max(0.1, (1.0 - 0.2081))**(4.5)
+        wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
+                                      * (1.0 - 0.2081)**(4.5)
       endif
       
       ! Remineralisation of sediments to supply nutrient fields.
