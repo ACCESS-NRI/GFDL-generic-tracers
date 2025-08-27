@@ -182,6 +182,7 @@ module generic_WOMBATmid
         diamaxqf, &
         dialmor, &
         diaqmor, &
+        chlkWm2, &
         trikf, &
         trichlc, &
         trin2c, &
@@ -1918,6 +1919,10 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaqmor', wombat%diaqmor, 0.05/86400.0)
 
+    ! Chlorophyll darkness growth reduction half-saturation coefficient [W/m2]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('chlkWm2', wombat%chlkWm2, 5.0)
+
     ! Trichodesmium half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('trikf', wombat%trikf, 0.5)
@@ -2777,7 +2782,7 @@ module generic_WOMBATmid
     real                                    :: pi = 3.14159265358979
     integer                                 :: ichl
     real                                    :: par_phy_mldsum, par_z_mldsum
-    real                                    :: chl, zchl, zval, sqrt_zval, phy_chlc, dia_chlc
+    real                                    :: chl, zchl, zval, sqrt_zval, phy_chlc, dia_chlc, phi
     real                                    :: phy_limnh4, phy_limno3, phy_limdin
     real                                    :: dia_limnh4, dia_limno3, dia_limdin
     real                                    :: phy_pisl, phy_pisl2 
@@ -3460,6 +3465,10 @@ module generic_WOMBATmid
       ! 1. Light limitation of chlorophyll production
       ! 2. minimum and optimal rates of chlorophyll growth
       ! 3. Calculate mg Chl m-3 s-1
+
+      ! Reduced chlorophyll growth during extended periods of darkness
+      phi = wombat%radmld(i,j,1) / (wombat%radmld(i,j,1) + wombat%chlkWm2)
+
       !!!~~~ Phytoplankton ~~~!!!
       pchl_pisl = phy_pisl / ( wombat%phy_mumax(i,j,k) * 86400.0 * & 
                   (1. - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) + epsi )
@@ -3469,8 +3478,8 @@ module generic_WOMBATmid
       wombat%pchl_mu(i,j,k) = (pchl_muopt - pchl_mumin) * wombat%pchl_lpar(i,j,k) * &
                                min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))
       if ( (phy_pisl * wombat%radmld(i,j,k)) .gt. 0.0 ) then
-        wombat%pchl_mu(i,j,k) = pchl_mumin + wombat%pchl_mu(i,j,k) / &
-                                (phy_pisl * wombat%radmld(i,j,k))
+        wombat%pchl_mu(i,j,k) = phi * ( pchl_mumin + wombat%pchl_mu(i,j,k) / &
+                                (phy_pisl * wombat%radmld(i,j,k)) )
       endif
       wombat%pchl_mu(i,j,k) = wombat%pchl_mu(i,j,k) / 12.0 * mmol_m3_to_mol_kg  ![mol/kg/s]
 
@@ -3483,8 +3492,8 @@ module generic_WOMBATmid
       wombat%dchl_mu(i,j,k) = (dchl_muopt - dchl_mumin) * wombat%dchl_lpar(i,j,k) * &
                                min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k))
       if ( (dia_pisl * wombat%radmld(i,j,k)) .gt. 0.0 ) then
-        wombat%dchl_mu(i,j,k) = dchl_mumin + wombat%dchl_mu(i,j,k) / &
-                                (dia_pisl * wombat%radmld(i,j,k))
+        wombat%dchl_mu(i,j,k) = phi * ( dchl_mumin + wombat%dchl_mu(i,j,k) / &
+                                (dia_pisl * wombat%radmld(i,j,k)) )
       endif
       wombat%dchl_mu(i,j,k) = wombat%dchl_mu(i,j,k) / 12.0 * mmol_m3_to_mol_kg  ![mol/kg/s]
 
