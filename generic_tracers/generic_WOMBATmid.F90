@@ -288,10 +288,13 @@ module generic_WOMBATmid
         dissara, &
         dissdet, &
         ligand, &
-        fcolloid, &
         knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
+        kagg_col, &
+        kagg_kcol, &
+        kafe_dfe, &
+        kbafe_dfe, &
         wafe, &
         wbafe, &
         bsi_fbac, &
@@ -525,10 +528,12 @@ module generic_WOMBATmid
         fecol, &
         feprecip, &
         fescaven, &
-        fescadet, &
-        fescabdet, &
-        fecoag2det, &
-        fecoag2bdet, &
+        fescaafe, &
+        fescabafe, &
+        fecoag2afe, &
+        fecoag2bafe, &
+        afediss, &
+        bafediss, &
         fesources, &
         fesinks, &
         phy_feupreg, &
@@ -743,10 +748,12 @@ module generic_WOMBATmid
         id_fecol = -1, &
         id_feprecip = -1, &
         id_fescaven = -1, &
-        id_fescadet = -1, &
-        id_fescabdet = -1, &
-        id_fecoag2det = -1, &
-        id_fecoag2bdet = -1, &
+        id_fescaafe = -1, &
+        id_fescabafe = -1, &
+        id_fecoag2afe = -1, &
+        id_fecoag2bafe = -1, &
+        id_afediss = -1, &
+        id_bafediss = -1, &
         id_fesources = -1, &
         id_fesinks = -1, &
         id_phy_feupreg = -1, &
@@ -1565,23 +1572,33 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'fescadet', 'Scavenging of free Fe onto organic detritus', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_fescadet = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'fescaafe', 'Scavenging of free Fe onto authigenic particles due to smaller organics', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_fescaafe = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'fescabdet', 'Scavenging of free Fe onto organic big detritus', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_fescabdet = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'fescabafe', 'Scavenging of free Fe onto authigenic particles due to larger organics', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_fescabafe = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'fecoag2det', 'Coagulation of colloidal dFe onto detritus', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_fecoag2det = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'fecoag2afe', 'Coagulation of colloidal dFe onto authigenic particles', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_fecoag2afe = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'fecoag2bdet', 'Coagulation of colloidal dFe onto big detritus', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_fecoag2bdet = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'fecoag2bafe', 'Coagulation of colloidal dFe onto big authigenic particles', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_fecoag2bafe = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'afediss', 'Dissolution of colloidal authigenic Fe particles', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_afediss = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'bafediss', 'Dissolution of bigger colloidal authigenic Fe particles', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_bafediss = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2971,11 +2988,7 @@ module generic_WOMBATmid
 
     ! Background concentration of iron-binding ligand [umol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ligand', wombat%ligand, 0.5)
-
-    ! Fraction of dissolved iron in colloidal form [0-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('fcolloid', wombat%fcolloid, 0.25)
+    call g_tracer_add_param('ligand', wombat%ligand, 0.7)
 
     ! Precipitation of Fe` as nanoparticles (in excess of solubility) [/d]
     !-----------------------------------------------------------------------
@@ -2986,8 +2999,28 @@ module generic_WOMBATmid
     call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 5e-2)
 
     ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 d-1]
+    !  1e-5 ---> coagulation at roughly 0.1 per day in productive surface waters
+    !            and 1/1000 per day in deep ocean
+    !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
+    !            and 1/10000 per day in deep ocean
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 5e-8)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-7)
+
+    ! Rate of aggregation of colloidal iron into authigenic Fe particles [d-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('kagg_col', wombat%kagg_col, 0.1)
+
+    ! Half-saturation coefficient modulating aggregation of colloidal iron [umolFe/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('kagg_kcol', wombat%kagg_kcol, 2.0)
+
+    ! Rate of dissolution of authigenic iron into dissolved Fe [d-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('kafe_dfe', wombat%kafe_dfe, 1e-4)
+
+    ! Rate of dissolution of larger authigenic iron into dissolved Fe [d-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('kbafe_dfe', wombat%kbafe_dfe, 1e-4)
 
     ! Sinking speed of authigenic iron (oxyhydroxide) [m/s]
     !-----------------------------------------------------------------------
@@ -3974,6 +4007,7 @@ module generic_WOMBATmid
     real, dimension(3)                      :: dbgr, cbgr
     real                                    :: ztemk, I_ztemk, fe_keq, fe_par, fe_sfe, fe_tfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
+    real                                    :: feagg1, feagg2, feagg3, feagg4, feagg5
     real                                    :: biof, zno3, zfermin, shear
     real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, mes_Fe2C, det_Fe2C, bdet_Fe2C, dom_N2C, dia_Si2C, bdet_Si2C
     real                                    :: phy_minqfe, phy_maxqfe
@@ -4214,12 +4248,14 @@ module generic_WOMBATmid
     wombat%fecol(:,:,:) = 0.0
     wombat%feprecip(:,:,:) = 0.0
     wombat%fescaven(:,:,:) = 0.0
-    wombat%fescadet(:,:,:) = 0.0
-    wombat%fescabdet(:,:,:) = 0.0
+    wombat%fescaafe(:,:,:) = 0.0
+    wombat%fescabafe(:,:,:) = 0.0
     wombat%fesources(:,:,:) = 0.0
     wombat%fesinks(:,:,:) = 0.0
-    wombat%fecoag2det(:,:,:) = 0.0
-    wombat%fecoag2bdet(:,:,:) = 0.0
+    wombat%fecoag2afe(:,:,:) = 0.0
+    wombat%fecoag2bafe(:,:,:) = 0.0
+    wombat%afediss(:,:,:) = 0.0
+    wombat%bafediss(:,:,:) = 0.0
     wombat%phy_feupreg(:,:,:) = 0.0
     wombat%phy_fedoreg(:,:,:) = 0.0
     wombat%phygrow(:,:,:) = 0.0
@@ -4913,7 +4949,7 @@ module generic_WOMBATmid
       endif
       fe3sol = fesol1 * ( hp*hp*hp + fesol2*hp*hp + fesol3*hp + fesol4 + fesol5/hp ) *1e9
 
-      ! Estimate total colloidal iron (variable, with a 10% and 90% bound)
+      ! Estimate total colloidal iron (variable, with a 10% of total dissolved Fe floor)
       wombat%fecol(i,j,k) = max(0.1*biofer, biofer - fe3sol)
 
       ! Determine equilibriuim fractionation of the remaining dFe (non-colloidal fraction) into Fe' and L-Fe
@@ -4932,35 +4968,42 @@ module generic_WOMBATmid
       ! Scavenging of Fe` onto biogenic particles 
       partic = (biodet + biobdet*(1.0+bdet_Si2C) + biocaco3) ! total particle concentration [mmol/m3]
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
-      wombat%fescadet(i,j,k) = wombat%fescaven(i,j,k) * biodet / (partic+epsi) 
-      wombat%fescabdet(i,j,k) = wombat%fescaven(i,j,k) * biobdet / (partic+epsi) 
+      wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet + biocaco3) / (partic+epsi) 
+      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * biobdet * (1.0+bdet_Si2C) / (partic+epsi) 
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
       biof = (biophy + biodia) / (biophy + biodia + 0.03)
       shear = merge(1.0, 0.01, wombat%zw(i,j,k) <= hblt_depth(i,j))
       ! Colloidal shunt associated with small particles and DOC (Tagliabue et al., 2023)
-      fesol1 = 12.0 * 3 * 0.3 * biof  ! NOTE: we recycle "fesol#" because they are already defined as real variables
-      fesol2 = 9.05
-      fesol3 = 2.49
-      fesol4 = 127.8 * 3 * 0.3 * biof
-      fesol5 = 725.7
-      zval = ( shear*(fesol1*(biodoc+40.0) + fesol2*biodet) + fesol3*biodet &
-               + fesol4*(biodoc+40.0) + fesol5*biodet ) * wombat%kcoag_dfe
-      wombat%fecoag2det(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
+      feagg1 = 12.0 * 3 * 0.3 * biof  ! NOTE: we recycle "fesol#" because they are already defined as real variables
+      feagg2 = 9.05
+      feagg3 = 2.49
+      feagg4 = 127.8 * 3 * 0.3 * biof
+      feagg5 = 725.7
+      zval = ( shear*(feagg1*(biodoc+40.0) + feagg2*biodet) + feagg3*biodet &
+               + feagg4*(biodoc+40.0) + feagg5*biodet ) * wombat%kcoag_dfe
+      wombat%fecoag2afe(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
+      ! Include an aggregation of colloidal authigenic Fe when concentration of colloidal Fe is high
+      wombat%fecoag2afe(i,j,k) = wombat%fecoag2afe(i,j,k) + wombat%kagg_col / 86400.0 &
+                                 * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4) 
       ! Colloidal shunt associated with big particles (Tagliabue et al., 2023)
-      fesol1 = 1.37
-      fesol2 = 1.94
-      zval = (( shear*2.0 + fesol1)*biobdet + fesol2*biobdet ) * wombat%kcoag_dfe
-      wombat%fecoag2bdet(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
-      
+      feagg1 = 1.37
+      feagg2 = 1.94
+      zval = (( shear*2.0 + feagg1)*biobdet + feagg2*biobdet ) * wombat%kcoag_dfe
+      wombat%fecoag2bafe(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
+
+      ! dissolution of Fe from authigenic particles back to dissolved phase
+      wombat%afediss(i,j,k) = wombat%kafe_dfe * wombat%f_afe(i,j,k) / 86400.0
+      wombat%bafediss(i,j,k) = wombat%kbafe_dfe * wombat%f_bafe(i,j,k) / 86400.0
+
       ! Convert the terms back to mol/kg
       wombat%feprecip(i,j,k) = wombat%feprecip(i,j,k) * umol_m3_to_mol_kg
       wombat%fescaven(i,j,k) = wombat%fescaven(i,j,k) * umol_m3_to_mol_kg
-      wombat%fescadet(i,j,k) = wombat%fescadet(i,j,k) * umol_m3_to_mol_kg
-      wombat%fescabdet(i,j,k) = wombat%fescabdet(i,j,k) * umol_m3_to_mol_kg
-      wombat%fecoag2det(i,j,k) = wombat%fecoag2det(i,j,k) * umol_m3_to_mol_kg
-      wombat%fecoag2bdet(i,j,k) = wombat%fecoag2bdet(i,j,k) * umol_m3_to_mol_kg
+      wombat%fescaafe(i,j,k) = wombat%fescaafe(i,j,k) * umol_m3_to_mol_kg
+      wombat%fescabafe(i,j,k) = wombat%fescabafe(i,j,k) * umol_m3_to_mol_kg
+      wombat%fecoag2afe(i,j,k) = wombat%fecoag2afe(i,j,k) * umol_m3_to_mol_kg
+      wombat%fecoag2bafe(i,j,k) = wombat%fecoag2bafe(i,j,k) * umol_m3_to_mol_kg
       wombat%feIII(i,j,k) = wombat%feIII(i,j,k) * umol_m3_to_mol_kg
       wombat%felig(i,j,k) = wombat%felig(i,j,k) * umol_m3_to_mol_kg
       wombat%fecol(i,j,k) = wombat%fecol(i,j,k) * umol_m3_to_mol_kg
@@ -5919,9 +5962,7 @@ module generic_WOMBATmid
                               + wombat%zoomort(i,j,k) * zoo_Fe2C &
                               - wombat%zoograzdet(i,j,k) * det_Fe2C &
                               - wombat%mesgrazdet(i,j,k) * det_Fe2C &
-                              - wombat%detremi(i,j,k) * det_Fe2C &
-                              + wombat%fescadet(i,j,k) &
-                              + wombat%fecoag2det(i,j,k) )
+                              - wombat%detremi(i,j,k) * det_Fe2C )
 
       ! Big detritus equation ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -5953,9 +5994,7 @@ module generic_WOMBATmid
                                + mesegesbdetfe &
                                + mesegeszoofe &
                                - wombat%mesgrazbdet(i,j,k) * bdet_Fe2C &
-                               - wombat%bdetremi(i,j,k) * bdet_Fe2C &
-                               + wombat%fescabdet(i,j,k) &
-                               + wombat%fecoag2bdet(i,j,k) )
+                               - wombat%bdetremi(i,j,k) * bdet_Fe2C )
       
       ! Compact, fast sinking detrital silicon equation ! [molSi/kg]
       !   Copepod egestion (fecal pellets) represented 42-107% of biogenic silica export at
@@ -6235,8 +6274,10 @@ module generic_WOMBATmid
                            + wombat%aoamor2(i,j,k) / wombat%aoa_C2Fe &
                            - wombat%feprecip(i,j,k) &
                            - wombat%fescaven(i,j,k) &
-                           - wombat%fecoag2det(i,j,k) &
-                           - wombat%fecoag2bdet(i,j,k) )
+                           - wombat%fecoag2afe(i,j,k) &
+                           - wombat%fecoag2bafe(i,j,k) &
+                           + wombat%afediss(i,j,k) &
+                           + wombat%bafediss(i,j,k) )
 
       ! Collect dFe sources and sinks for diagnostic output
       wombat%fesources(i,j,k) = wombat%fesources(i,j,k) + dtsb * ( 0.0 &
@@ -6265,7 +6306,9 @@ module generic_WOMBATmid
                                 + mesexcrbdetfe &
                                 + mesexcrzoofe &
                                 + wombat%phylyse(i,j,k) * phy_Fe2C &
-                                + wombat%dialyse(i,j,k) * dia_Fe2C)
+                                + wombat%dialyse(i,j,k) * dia_Fe2C &
+                                + wombat%afediss(i,j,k) &
+                                + wombat%bafediss(i,j,k))
       wombat%fesinks(i,j,k) = wombat%fesinks(i,j,k) + dtsb * ( 0.0 & 
                               + wombat%phy_dfeupt(i,j,k) &
                               + wombat%dia_dfeupt(i,j,k) &
@@ -6274,16 +6317,22 @@ module generic_WOMBATmid
                               + wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
                               + wombat%feprecip(i,j,k) &
                               + wombat%fescaven(i,j,k) &
-                              + wombat%fecoag2det(i,j,k) &
-                              + wombat%fecoag2bdet(i,j,k)) 
+                              + wombat%fecoag2afe(i,j,k) &
+                              + wombat%fecoag2bafe(i,j,k)) 
     
       ! Equation for authigenic iron (oxyhydroxide) ! [molFe/kg]
       !----------------------------------------------------------------------
-      wombat%f_afe(i,j,k) = wombat%f_afe(i,j,k) + dtsb * ( 0.0 )
+      wombat%f_afe(i,j,k) = wombat%f_afe(i,j,k) + dtsb * ( 0.0 &
+                            + wombat%fecoag2afe(i,j,k) &
+                            + wombat%fescaafe(i,j,k) &
+                            - wombat%afediss(i,j,k) )
       
       ! Equation for bigger authigenic iron (oxyhydroxide) ! [molFe/kg]
       !----------------------------------------------------------------------
-      wombat%f_bafe(i,j,k) = wombat%f_bafe(i,j,k) + dtsb * ( 0.0 )
+      wombat%f_bafe(i,j,k) = wombat%f_bafe(i,j,k) + dtsb * ( 0.0 &
+                             + wombat%fecoag2bafe(i,j,k) &
+                             + wombat%fescabafe(i,j,k) &
+                             - wombat%bafediss(i,j,k) )
       
 
       !-----------------------------------------------------------------------!
@@ -7012,20 +7061,28 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_fescaven, wombat%fescaven, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_fescadet .gt. 0) &
-      used = g_send_data(wombat%id_fescadet, wombat%fescadet, model_time, &
+    if (wombat%id_fescaafe .gt. 0) &
+      used = g_send_data(wombat%id_fescaafe, wombat%fescaafe, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_fescabdet .gt. 0) &
-      used = g_send_data(wombat%id_fescabdet, wombat%fescabdet, model_time, &
+    if (wombat%id_fescabafe .gt. 0) &
+      used = g_send_data(wombat%id_fescabafe, wombat%fescabafe, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_fecoag2det .gt. 0) &
-      used = g_send_data(wombat%id_fecoag2det, wombat%fecoag2det, model_time, &
+    if (wombat%id_fecoag2afe .gt. 0) &
+      used = g_send_data(wombat%id_fecoag2afe, wombat%fecoag2afe, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_fecoag2bdet .gt. 0) &
-      used = g_send_data(wombat%id_fecoag2bdet, wombat%fecoag2bdet, model_time, &
+    if (wombat%id_fecoag2bafe .gt. 0) &
+      used = g_send_data(wombat%id_fecoag2bafe, wombat%fecoag2bafe, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_afediss .gt. 0) &
+      used = g_send_data(wombat%id_afediss, wombat%afediss, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_bafediss .gt. 0) &
+      used = g_send_data(wombat%id_bafediss, wombat%bafediss, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_fesources .gt. 0) &
@@ -8115,10 +8172,12 @@ module generic_WOMBATmid
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
     allocate(wombat%feprecip(isd:ied, jsd:jed, 1:nk)); wombat%feprecip(:,:,:)=0.0
     allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
-    allocate(wombat%fescadet(isd:ied, jsd:jed, 1:nk)); wombat%fescadet(:,:,:)=0.0
-    allocate(wombat%fescabdet(isd:ied, jsd:jed, 1:nk)); wombat%fescabdet(:,:,:)=0.0
-    allocate(wombat%fecoag2det(isd:ied, jsd:jed, 1:nk)); wombat%fecoag2det(:,:,:)=0.0
-    allocate(wombat%fecoag2bdet(isd:ied, jsd:jed, 1:nk)); wombat%fecoag2bdet(:,:,:)=0.0
+    allocate(wombat%fescaafe(isd:ied, jsd:jed, 1:nk)); wombat%fescaafe(:,:,:)=0.0
+    allocate(wombat%fescabafe(isd:ied, jsd:jed, 1:nk)); wombat%fescabafe(:,:,:)=0.0
+    allocate(wombat%fecoag2afe(isd:ied, jsd:jed, 1:nk)); wombat%fecoag2afe(:,:,:)=0.0
+    allocate(wombat%fecoag2bafe(isd:ied, jsd:jed, 1:nk)); wombat%fecoag2bafe(:,:,:)=0.0
+    allocate(wombat%afediss(isd:ied, jsd:jed, 1:nk)); wombat%afediss(:,:,:)=0.0
+    allocate(wombat%bafediss(isd:ied, jsd:jed, 1:nk)); wombat%bafediss(:,:,:)=0.0
     allocate(wombat%fesources(isd:ied, jsd:jed, 1:nk)); wombat%fesources(:,:,:)=0.0
     allocate(wombat%fesinks(isd:ied, jsd:jed, 1:nk)); wombat%fesinks(:,:,:)=0.0
     allocate(wombat%phy_feupreg(isd:ied, jsd:jed, 1:nk)); wombat%phy_feupreg(:,:,:)=0.0
@@ -8424,10 +8483,12 @@ module generic_WOMBATmid
         wombat%fecol, &
         wombat%feprecip, &
         wombat%fescaven, &
-        wombat%fescadet, &
-        wombat%fescabdet, &
-        wombat%fecoag2det, &
-        wombat%fecoag2bdet, &
+        wombat%fescaafe, &
+        wombat%fescabafe, &
+        wombat%fecoag2afe, &
+        wombat%fecoag2bafe, &
+        wombat%afediss, &
+        wombat%bafediss, &
         wombat%fesources, &
         wombat%fesinks, &
         wombat%phy_feupreg, &
