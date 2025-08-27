@@ -2765,8 +2765,8 @@ module generic_WOMBATlite
         !  We also add a T-dependent function to scale down CaCO3 production in waters colder 
         !  than 3 degrees C based off the observation of no E hux growth beneath this (Fielding 2013; L&O)
         hco3 = wombat%f_dic(i,j,k) - wombat%co3(i,j,k) - wombat%co2_star(i,j,k)
-        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(-3.0 + 4.31 * &
-                                          hco3 / (wombat%htotal(i,j,k)*1e6))) * &
+        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(-3.0 + 4.31e-6 * &
+                                          hco3 / wombat%htotal(i,j,k))) * &
                                          (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
 
         ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
