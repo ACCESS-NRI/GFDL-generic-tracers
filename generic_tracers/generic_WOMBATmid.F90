@@ -288,7 +288,6 @@ module generic_WOMBATmid
         dissara, &
         dissdet, &
         ligand, &
-        knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -304,6 +303,7 @@ module generic_WOMBATmid
         aoa_poxy, &
         aoa_ynh4, &
         aoa_yoxy, &
+        aoa_yn2omin, &
         aoa_C2N, &
         aoa_C2Fe, &
         aoalmor, &
@@ -526,7 +526,6 @@ module generic_WOMBATmid
         feIII, &
         felig, &
         fecol, &
-        feprecip, &
         fescaven, &
         fescaafe, &
         fescabafe, &
@@ -745,7 +744,6 @@ module generic_WOMBATmid
         id_feIII = -1, &
         id_felig = -1, &
         id_fecol = -1, &
-        id_feprecip = -1, &
         id_fescaven = -1, &
         id_fescaafe = -1, &
         id_fescabafe = -1, &
@@ -1558,11 +1556,6 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'fecol', 'Colloidal dissolved iron', 'h', 'L', 's', 'mol/kg', 'f')
     wombat%id_fecol = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
-        'feprecip', 'Precipitation of free Fe onto nanoparticles', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_feprecip = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2989,10 +2982,6 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('ligand', wombat%ligand, 0.7)
 
-    ! Precipitation of Fe` as nanoparticles (in excess of solubility) [/d]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('knano_dfe', wombat%knano_dfe, 0.1)
-
     ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 d-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 5e-2)
@@ -3056,6 +3045,14 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5)
 
+    ! Ammonia Oxidizing Archaea minimum biomass yield of N2O [mol N2O / mol Biomass]
+    !  Frey et al. (2023) find a baseline yield of ~0.5% in oxic conditions 
+    !  (i.e., when O2 is not limiting), which we note here is in excess of the baseline
+    !  yields of other studies (Ji et al., 2018; Santoro et al., 2011; Qin et al., 2017)
+    !  that place the baseline near 0.05 - 0.1%
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('aoa_yn2omin', wombat%aoa_yn2omin, 0.05)
+    
     ! Ammonia Oxidizing Archaea biomass yield per NH4 [mol NH4 / mol Biomass]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_ynh4', wombat%aoa_ynh4, 11.0)
@@ -4240,7 +4237,6 @@ module generic_WOMBATmid
     wombat%feIII(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
-    wombat%feprecip(:,:,:) = 0.0
     wombat%fescaven(:,:,:) = 0.0
     wombat%fescaafe(:,:,:) = 0.0
     wombat%fescabafe(:,:,:) = 0.0
@@ -4955,9 +4951,6 @@ module generic_WOMBATmid
       wombat%feIII(i,j,k) = max(0.0, min(wombat%feIII(i,j,k), fe_sfe) )
       wombat%felig(i,j,k) = fe_sfe - wombat%feIII(i,j,k)
 
-      ! Precipitation of Fe' (creation of nanoparticles)
-      wombat%feprecip(i,j,k) = max(0.0, ( wombat%feIII(i,j,k) - fe3sol ) ) * wombat%knano_dfe/86400.0
-
       ! Scavenging of Fe` onto biogenic particles 
       partic = (biodet + biobdet*(1.0+bdet_Si2C) + biocaco3) ! total particle concentration [mmol/m3]
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
@@ -4991,7 +4984,6 @@ module generic_WOMBATmid
       wombat%bafediss(i,j,k) = wombat%kbafe_dfe * wombat%f_bafe(i,j,k) / 86400.0
 
       ! Convert the terms back to mol/kg
-      wombat%feprecip(i,j,k) = wombat%feprecip(i,j,k) * umol_m3_to_mol_kg
       wombat%fescaven(i,j,k) = wombat%fescaven(i,j,k) * umol_m3_to_mol_kg
       wombat%fescaafe(i,j,k) = wombat%fescaafe(i,j,k) * umol_m3_to_mol_kg
       wombat%fescabafe(i,j,k) = wombat%fescabafe(i,j,k) * umol_m3_to_mol_kg
@@ -5443,7 +5435,7 @@ module generic_WOMBATmid
       !    They find a maximum yield of 3% per mol NO2 produced and a baseline yield of ~0.5% in
       !    oxic conditions (i.e., when O2 is not limiting), which we note here is in excess of the 
       !    baseline yields of other studies (Ji et al., 2018; Santoro et al., 2011; Qin et al., 2017)
-      wombat%aoa_yn2o(i,j,k) = min(3.0, (0.2 / (biooxy + epsi) + 0.5)) * 0.01
+      wombat%aoa_yn2o(i,j,k) = min(3.0, (0.2 / (biooxy + epsi) + wombat%aoa_yn2omin)) * 0.01
       ! Because Frey give yield of N2O in % per mol NO2 produced, we must solve for mol N2O per mol biomass
       !  - aNH4 + bO2 --> cBiomass + dN2O + eNO3    |    and Y = N2O produced in % of NO3 produced 
       !  - d = (a - c) * Y / (2*Y + 1)
@@ -6265,7 +6257,6 @@ module generic_WOMBATmid
                            + wombat%bac2mor2(i,j,k) / wombat%bac2_C2Fe &
                            + wombat%aoamor1(i,j,k) / wombat%aoa_C2Fe &
                            + wombat%aoamor2(i,j,k) / wombat%aoa_C2Fe &
-                           - wombat%feprecip(i,j,k) &
                            - wombat%fescaven(i,j,k) &
                            - wombat%fecoag2afe(i,j,k) &
                            - wombat%fecoag2bafe(i,j,k) &
@@ -6308,7 +6299,6 @@ module generic_WOMBATmid
                               + wombat%bac1ufer(i,j,k) &
                               + wombat%bac2ufer(i,j,k) &
                               + wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
-                              + wombat%feprecip(i,j,k) &
                               + wombat%fescaven(i,j,k) &
                               + wombat%fecoag2afe(i,j,k) &
                               + wombat%fecoag2bafe(i,j,k)) 
@@ -6992,10 +6982,6 @@ module generic_WOMBATmid
 
     if (wombat%id_fecol .gt. 0) &
       used = g_send_data(wombat%id_fecol, wombat%fecol, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
-    if (wombat%id_feprecip .gt. 0) &
-      used = g_send_data(wombat%id_feprecip, wombat%feprecip, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_fescaven .gt. 0) &
@@ -8111,7 +8097,6 @@ module generic_WOMBATmid
     allocate(wombat%bsidiss(isd:ied, jsd:jed, 1:nk)); wombat%bsidiss(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
-    allocate(wombat%feprecip(isd:ied, jsd:jed, 1:nk)); wombat%feprecip(:,:,:)=0.0
     allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
     allocate(wombat%fescaafe(isd:ied, jsd:jed, 1:nk)); wombat%fescaafe(:,:,:)=0.0
     allocate(wombat%fescabafe(isd:ied, jsd:jed, 1:nk)); wombat%fescabafe(:,:,:)=0.0
@@ -8422,7 +8407,6 @@ module generic_WOMBATmid
         wombat%bsidiss, &
         wombat%felig, &
         wombat%fecol, &
-        wombat%feprecip, &
         wombat%fescaven, &
         wombat%fescaafe, &
         wombat%fescabafe, &

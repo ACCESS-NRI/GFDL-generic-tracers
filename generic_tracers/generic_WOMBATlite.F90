@@ -1498,7 +1498,7 @@ module generic_WOMBATlite
 
     ! CaCO3 dissolution factor due to detritus remineralisation creating anoxic microenvironment
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dissdet', wombat%dissdet, 0.100)
+    call g_tracer_add_param('dissdet', wombat%dissdet, 0.200)
 
     ! Background concentration of iron-binding ligand [umol/m3]
     !-----------------------------------------------------------------------
