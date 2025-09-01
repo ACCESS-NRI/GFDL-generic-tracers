@@ -3063,12 +3063,6 @@ module generic_WOMBATlite
             print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k) * 16.0 / 122.0
             print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
             print *, " "
-            print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
-            print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
-            print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
-            print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
-            print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
-            print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
             print *, "--------------------------------------------"
             call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
           endif
@@ -3096,16 +3090,6 @@ module generic_WOMBATlite
             print *, "       surface pCO2 =", wombat%pco2_csurf(i,j)
             print *, "       htotal =", wombat%htotal(i,j,k)
             print *, " "
-            print *, "       phygrow (molC/kg/s) =", wombat%phygrow(i,j,k)
-            print *, "       detremi (molC/kg/s) =", wombat%detremi(i,j,k)
-            print *, "       zooresp (molC/kg/s) =", wombat%zooresp(i,j,k)
-            print *, "       zooexcrphy (molC/kg/s) =", wombat%zooexcrphy(i,j,k)
-            print *, "       zooexcrdet (molC/kg/s) =", wombat%zooexcrdet(i,j,k)
-            print *, "       phyresp (molC/kg/s) =", wombat%phyresp(i,j,k)
-            print *, "       zooslopphy * pic2poc(i,j,k) (molC/kg/s) =", wombat%zooslopphy(i,j,k) * wombat%pic2poc(i,j,k)
-            print *, "       phymort * pic2poc(i,j,k) (molC/kg/s) =", wombat%phymort(i,j,k) * wombat%pic2poc(i,j,k)
-            print *, "       zoomort * pic2poc(i,j,k) (molC/kg/s) =", wombat%zoomort(i,j,k) * wombat%pic2poc(i,j,k)
-            print *, "       caldiss (molC/kg/s) =", wombat%caldiss(i,j,k)
             print *, "--------------------------------------------"
             call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
           endif
