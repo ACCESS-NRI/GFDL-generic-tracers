@@ -44,7 +44,8 @@
 !  "colloidal shunt". C:N ratios are fixed in all biomass pools except 
 !  for dissolved organics, since we represent both DOC and DON. Si is 
 !  carried through microphytoplankton, large detrtis and, like for carbon 
-!  and Fe, is deposited into a sediment pool.
+!  and Fe, is deposited into a sediment pool. Finally, we also track the
+!  nominal oxidation state of carbon within DOM (NOSDOC).
 !  Gas exchange follows MOCSY protocols.
 ! </DESCRIPTION>
 !
@@ -479,6 +480,7 @@ module generic_WOMBATmid
         f_bdetsi, &
         f_doc, &
         f_don, &
+        f_nosdoc, &
         f_bac1, &
         f_bac2, &
         f_aoa, &
@@ -3532,6 +3534,14 @@ module generic_WOMBATmid
         units = 'mol/kg', &
         prog = .true.)
     
+    ! Nominal oxidation state of dissolved organic carbon
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'nosdoc', &
+        longname = 'Nominal oxidation state of dissolved organic carbon', &
+        units = 'none', &
+        prog = .true.)
+    
     ! Facultative heterotrophic bacteria #1
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
@@ -4562,6 +4572,8 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'nosdoc', 'field', wombat%f_nosdoc, isd, jsd, ntau=tau, &
+        positive=.false.) ! [unitless]
     call g_tracer_get_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau, &
@@ -6138,6 +6150,10 @@ module generic_WOMBATmid
                             + wombat%mesexcrbdet(i,j,k)*wombat%mesexcrdom &
                             + wombat%mesexcrzoo(i,j,k)*wombat%mesexcrdom )
     
+      ! Nominal oxidation state of dissolved organic carbon equation ! [unitless]
+      !-----------------------------------------------------------------------
+      wombat%f_nosdoc(i,j,k) = wombat%f_nosdoc(i,j,k) !+ dtsb * ( 
+
       ! Heterotrophic bacteria #1 ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_bac1(i,j,k) = wombat%f_bac1(i,j,k) + dtsb * ( &
@@ -6601,6 +6617,7 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'bdetsi', 'field', wombat%f_bdetsi, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'doc', 'field', wombat%f_doc, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'nosdoc', 'field', wombat%f_nosdoc, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau)
@@ -8219,6 +8236,7 @@ module generic_WOMBATmid
     allocate(wombat%f_bdetsi(isd:ied, jsd:jed, 1:nk)); wombat%f_bdetsi(:,:,:)=0.0
     allocate(wombat%f_doc(isd:ied, jsd:jed, 1:nk)); wombat%f_doc(:,:,:)=0.0
     allocate(wombat%f_don(isd:ied, jsd:jed, 1:nk)); wombat%f_don(:,:,:)=0.0
+    allocate(wombat%f_nosdoc(isd:ied, jsd:jed, 1:nk)); wombat%f_nosdoc(:,:,:)=0.0
     allocate(wombat%f_bac1(isd:ied, jsd:jed, 1:nk)); wombat%f_bac1(:,:,:)=0.0
     allocate(wombat%f_bac2(isd:ied, jsd:jed, 1:nk)); wombat%f_bac2(:,:,:)=0.0
     allocate(wombat%f_aoa(isd:ied, jsd:jed, 1:nk)); wombat%f_aoa(:,:,:)=0.0
@@ -8530,6 +8548,7 @@ module generic_WOMBATmid
         wombat%f_bdetsi, &
         wombat%f_doc, &
         wombat%f_don, &
+        wombat%f_nosdoc, &
         wombat%f_bac1, &
         wombat%f_bac2, &
         wombat%f_aoa, &
