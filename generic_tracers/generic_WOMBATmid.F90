@@ -2937,7 +2937,7 @@ module generic_WOMBATmid
     ! Base radius of nanophytoplankton [µm]
     !  2–20 µm in diameter
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyrad0', wombat%phyrad0, 5.0)
+    call g_tracer_add_param('phyrad0', wombat%phyrad0, 10.0)
     
     ! Base radius of microphytoplankton [µm]
     !  20–200 µm in diameter
@@ -2946,7 +2946,7 @@ module generic_WOMBATmid
 
     ! Base radius of microzooplankton [µm]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoorad0', wombat%zoorad0, 10.0)
+    call g_tracer_add_param('zoorad0', wombat%zoorad0, 40.0)
 
     ! Base radius of mesoozooplankton [µm]
     ! Hatton et al. 2021 Sci Adv - near 1mm
@@ -5252,8 +5252,8 @@ module generic_WOMBATmid
               + wombat%mesepsphy * (wombat%mesprefphy(i,j,k) * biophy)**2 &
               + wombat%mesepsdia * (wombat%mesprefdia(i,j,k) * biodia)**2 &
               + wombat%mesepsdet * (wombat%mesprefdet(i,j,k) * biodet)**2 &
-              + wombat%mesepsdet * (wombat%mesprefbdet(i,j,k) * biobdet)**2 &
-              + wombat%mesepsdet * (wombat%mesprefzoo(i,j,k) * biozoo)**2 )
+              + wombat%mesepsbdet * (wombat%mesprefbdet(i,j,k) * biobdet)**2 &
+              + wombat%mesepszoo * (wombat%mesprefzoo(i,j,k) * biozoo)**2 )
       m_npz = wombat%mesgmax * fbc * Xmes / (wombat%mesgmax * fbc + Xmes)
       ! find "apparent" community epsilon (prey capture rate coefficient)
       wombat%meseps(i,j,k) = Xmes / ( (wombat%mesprefbac1(i,j,k) * biobac1)**2 &
