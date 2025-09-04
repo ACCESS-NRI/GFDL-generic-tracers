@@ -6661,9 +6661,9 @@ module generic_WOMBATmid
           rad_det = min(1e-3, max(1e-6, 0.5 * (rad_phy + rad_zoo)))
         endif
         if (biodia + biomes .gt. epsi) then
-          rad_bdet = min(1e-3, max(1e-6,(rad_dia*biodia + rad_mes*biomes) / (biodia + biomes)))
+          rad_bdet = min(1e-3, max(1e-6, (rad_dia*biodia + rad_mes*biomes) / (biodia + biomes)))
         else
-          rad_bdet = min(1e-3, max(1e-6,0.5 * (rad_dia + rad_mes)))
+          rad_bdet = min(1e-3, max(1e-6, 0.5 * (rad_dia + rad_mes)))
         endif
 
         ! Run through the water column and compute the sinking rates via Rubey's equation:
@@ -6676,7 +6676,7 @@ module generic_WOMBATmid
         
           ! 2. Compute seawater dynamic viscosity
           !  2a. Compute seawater dynamic viscosity at atmospheric pressure
-          !    - Equations 22 and 23 from Sharqawy et al., 2010, DOI:10.1016/j.desal.2010.03.019
+          !    - Equations 22 and 23 from Sharqawy et al., 2010, https://doi.org/10.5004/dwt.2010.1079
           !      based off Isdale et al. (1972) "Physical properties of sea water solutions: viscosity, Desalination"
           !      that relate temperature (0 - 180 degC) and salinity (0 - 150 psu) to dynamic viscosity (kg/m/s)
           at = 1.541 + 1.998e-2*Temp(i,j,k) - 9.52e-5*Temp(i,j,k)**2 
@@ -6697,7 +6697,7 @@ module generic_WOMBATmid
           T_hat   = (Temp(i,j,k)+273.15) / T_star
           rho_hat = rho_w / rho_star
           invT_hat = 1.0 / T_hat
-          mu0 = 100*T_hat**0.5 / ( mu0_H(1) + mu0_H(2)*invT_hat &
+          mu0 = 100*sqrt(T_hat) / ( mu0_H(1) + mu0_H(2)*invT_hat &
                                  + mu0_H(3)*(invT_hat**2) + mu0_H(4)*(invT_hat**3) )
           poly = 0.0
           do iter = 1,21
@@ -6739,11 +6739,11 @@ module generic_WOMBATmid
           rho_large = (1.0 - wombat%detphi) * rho_large + wombat%detphi * 1025.0 ! [kg/m3]
 
           ! 4. Compute the Rubey equation for sinking rates of particles (see Rubey, 1933)
-          wsink1(k) = ( ( 4.0/3.0 * 9.8 * 1025.0 * (rho_small - 1025.0) * rad_det**3.0 &
-                          + 9.0*wombat%dynvis_sw(i,j,k)**2.0 )**0.5 - 3.0*wombat%dynvis_sw(i,j,k) ) &
+          wsink1(k) = ( sqrt( 4.0/3.0 * 9.8 * 1025.0 * (rho_small - 1025.0) * rad_det**3.0 &
+                          + 9.0*wombat%dynvis_sw(i,j,k)**2.0 ) - 3.0*wombat%dynvis_sw(i,j,k) ) &
                       / (1025.0 * rad_det) ! [m/s]
-          wsink2(k) = ( ( 4.0/3.0 * 9.8 * 1025.0 * (rho_large - 1025.0) * rad_bdet**3.0 &
-                          + 9.0*wombat%dynvis_sw(i,j,k)**2.0 )**0.5 - 3.0*wombat%dynvis_sw(i,j,k) ) &
+          wsink2(k) = ( sqrt( 4.0/3.0 * 9.8 * 1025.0 * (rho_large - 1025.0) * rad_bdet**3.0 &
+                          + 9.0*wombat%dynvis_sw(i,j,k)**2.0 ) - 3.0*wombat%dynvis_sw(i,j,k) ) &
                       / (1025.0 * rad_bdet) ! [m/s]
 
         enddo 
