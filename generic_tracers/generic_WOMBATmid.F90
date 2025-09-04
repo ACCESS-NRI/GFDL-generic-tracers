@@ -4008,6 +4008,7 @@ module generic_WOMBATmid
     integer, dimension(21)                  :: mu1_i, mu1_j
     real, dimension(21)                     :: mu1_H
     real                                    :: P_MPa, rho0, rho_w, at, bt, mu_w, mu_w_iapws, T_hat, rho_hat, invT_hat, mu0, mu1, poly
+    real                                    :: invT_hat2, invT_hat3, temp2, temp3, temp4, temp5
     integer                                 :: ichl, iter
     real                                    :: rad_phy, rad_dia, rad_zoo, rad_mes, rad_det, rad_bdet
     real                                    :: mass_det, mass_bdet, mass_caco3, mass_bsi, mass_small, mass_large
@@ -4117,7 +4118,7 @@ module generic_WOMBATmid
         0.0698452,      & ! i=3, j=4
         0.00872102,     & ! i=4, j=5
         -0.00435673,    & ! i=3, j=6
-        0.000593264     & ! i=5, j=6
+        -0.000593264     & ! i=5, j=6
             /)
 
     !==========================================================================
@@ -6674,13 +6675,17 @@ module generic_WOMBATmid
         wsink2(:) = 0.0
         do k = 1,nk
         
+          temp2 = Temp(i,j,k) * Temp(i,j,k)
+          temp3 = temp2 * Temp(i,j,k)
+          temp4 = temp3 * Temp(i,j,k)
+          temp5 = temp4 * Temp(i,j,k)
           ! 2. Compute seawater dynamic viscosity
           !  2a. Compute seawater dynamic viscosity at atmospheric pressure
           !    - Equations 22 and 23 from Sharqawy et al., 2010, https://doi.org/10.5004/dwt.2010.1079
           !      based off Isdale et al. (1972) "Physical properties of sea water solutions: viscosity, Desalination"
           !      that relate temperature (0 - 180 degC) and salinity (0 - 150 psu) to dynamic viscosity (kg/m/s)
-          at = 1.541 + 1.998e-2*Temp(i,j,k) - 9.52e-5*Temp(i,j,k)**2 
-          bt = 7.974 - 7.561e-2*Temp(i,j,k) + 4.724e-4*Temp(i,j,k)**2
+          at = 1.541 + 1.998e-2*Temp(i,j,k) - 9.52e-5*temp2
+          bt = 7.974 - 7.561e-2*Temp(i,j,k) + 4.724e-4*temp2
           mu_w = 4.2844e-5 + 1.0/(0.157 * (Temp(i,j,k) + 64.993)**2 - 91.296)
           wombat%dynvis_sw(i,j,k) = mu_w * (1 + at*Salt(i,j,k)*1e-3 + bt*(Salt(i,j,k)*1e-3)**2)
           !  2b. Find the effect of T and density changes on pure water using the IAPWS formulation
@@ -6690,22 +6695,29 @@ module generic_WOMBATmid
           ! ---- mu0(T^) : dilute-gas term (Eq. 11 in IAPWS 2008)
           ! ---- mu1(T^,rho^) : contribution to viscosity by finite density (Eq. 12 in IAPWS 2008)
           P_MPa  = (101325.0 + 9.81 * 1025.0 * wombat%zm(i,j,k)) * 1e-6  ! [MPa]
-          rho0 = 999.842594 + 6.793952e-2*Temp(i,j,k) - 9.095290e-3*Temp(i,j,k)**2 &
-                 + 1.001685e-4*Temp(i,j,k)**3 - 1.120083e-6*Temp(i,j,k)**4 &
-                 + 6.536332e-9*Temp(i,j,k)**5  ! kg/m^3
-          rho_w = rho0 / (1.0 - (P_MPa - 0.101325) / 2.2e9)
+          rho0 = 999.842594 + 6.793952e-2*Temp(i,j,k) - 9.095290e-3*temp2 &
+                 + 1.001685e-4*temp3 - 1.120083e-6*temp4 + 6.536332e-9*temp5  ! kg/m^3
+          rho_w = rho0 / (1.0 - (P_MPa - 0.101325) / 2.2e3)
           T_hat   = (Temp(i,j,k)+273.15) / T_star
           rho_hat = rho_w / rho_star
           invT_hat = 1.0 / T_hat
-          mu0 = 100*sqrt(T_hat) / ( mu0_H(1) + mu0_H(2)*invT_hat &
-                                 + mu0_H(3)*(invT_hat**2) + mu0_H(4)*(invT_hat**3) )
+          invT_hat2 = invT_hat * invT_hat
+          invT_hat3 = invT_hat2 * invT_hat
+          ! Find the dynamic viscosity at the dilute gas-limit (mu0)
+          mu0 = 100*sqrt(T_hat) / ( mu0_H(1) + mu0_H(2)*invT_hat + mu0_H(3)*invT_hat2 + mu0_H(4)*invT_hat3 )
+          ! Find the dynamic viscosity at the dilute gas-limit (mu1)
+          at = 1.0 / T_hat - 1.0
+          bt = rho_hat - 1.0
           poly = 0.0
           do iter = 1,21
-            poly = poly + mu1_H(iter) * (invT_hat - 1.0)**(mu1_i(iter)) * ( (rho_hat - 1.0)**(mu1_j(iter)) )
+            zval = mu1_H(iter) * at**mu1_i(iter) * bt**mu1_j(iter)
+            poly = poly + zval
           enddo
           mu1 = exp(rho_hat * poly)
           mu_w_iapws = (mu0 * mu1) * mu_star  ! [Pa·s = kg/m/s]
           !  2c. Salinity corrected viscosity * pressure factor (i.e., mu_w_iapws / mu_w)
+          !      NOTE: the dynamic viscosity of water actually decreases with pressure at 
+          !            low temperatures (Percy W. Bridgman 1925 "The Viscosity of Liquids under Pressure")
           wombat%dynvis_sw(i,j,k) = wombat%dynvis_sw(i,j,k) * mu_w_iapws / mu_w
 
           ! 3. Apply mineral ballasting to size classes (CaCO3 --> small, BSi --> large) and determine mass
