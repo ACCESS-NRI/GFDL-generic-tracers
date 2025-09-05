@@ -98,6 +98,10 @@
 !   If true, do benthic denitrification
 !  </DATA>
 !
+!  <DATA NAME="do_viscous_sinking" TYPE="logical">
+!   If true, do computation of dynamic viscosity
+!  </DATA>
+!
 !  <DATA NAME="do_check_n_conserve" TYPE="logical">
 !   If true, check that the ecosystem model conserves nitrogen. NOTE:
 !   not appropriate if dentirification, anammox and nitrogen fixation are on.
@@ -168,13 +172,14 @@ module generic_WOMBATmid
   logical :: do_anammox          = .true.  ! N cycle has anammox?
   logical :: do_wc_denitrification = .true.  ! N cycle has water column denitrification?
   logical :: do_benthic_denitrification = .true.  ! N cycle has N loss in sediments?
+  logical :: do_viscous_sinking  = .true.  ! Rubey's formula uses a non-constant dynamic viscosity?
   logical :: do_check_n_conserve = .false. ! check that the N fluxes balance in the ecosystem
   logical :: do_check_c_conserve = .true.  ! check that the C fluxes balance in the ecosystem
   logical :: do_check_si_conserve = .true.  ! check that the Si fluxes balance in the ecosystem
 
   namelist /generic_wombatmid_nml/ co2_calc, do_caco3_dynamics, do_burial, do_conserve_tracers, &
                                    do_nitrogen_fixation, do_anammox, do_wc_denitrification, do_benthic_denitrification, &
-                                   do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
+                                   do_viscous_sinking, do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
@@ -1015,7 +1020,7 @@ module generic_WOMBATmid
 
     if (do_caco3_dynamics) then
       write (stdoutunit,*) trim(note_header), &
-          'Doing dynamic CaCO3 precipitation, dissolution and ballasting'
+          'Doing dynamic CaCO3 precipitation and dissolution'
     endif
 
     if (do_burial) then
@@ -1056,6 +1061,11 @@ module generic_WOMBATmid
     if (do_benthic_denitrification) then
       write (stdoutunit,*) trim(note_header), &
           'Doing benthic denitrification'
+    endif
+
+    if (do_viscous_sinking) then
+      write (stdoutunit,*) trim(note_header), &
+          'Doing dynamic viscosity calculation for input to sinking scheme'
     endif
 
     if (do_check_n_conserve) then
@@ -6675,6 +6685,7 @@ module generic_WOMBATmid
         wsink2(:) = 0.0
         do k = 1,nk
         
+          if (do_viscous_sinking) then
           temp2 = Temp(i,j,k) * Temp(i,j,k)
           temp3 = temp2 * Temp(i,j,k)
           temp4 = temp3 * Temp(i,j,k)
@@ -6719,6 +6730,7 @@ module generic_WOMBATmid
           !      NOTE: the dynamic viscosity of water actually decreases with pressure at 
           !            low temperatures (Percy W. Bridgman 1925 "The Viscosity of Liquids under Pressure")
           wombat%dynvis_sw(i,j,k) = wombat%dynvis_sw(i,j,k) * mu_w_iapws / mu_w
+          endif
 
           ! 3. Apply mineral ballasting to size classes (CaCO3 --> small, BSi --> large) and determine mass
           biodet = max(epsi, wombat%f_det(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
