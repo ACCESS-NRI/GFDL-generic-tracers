@@ -653,6 +653,7 @@ module generic_WOMBATmid
         bac1_lfer, &
         bac1_mu, &
         bac1_fanaer, &
+        bac1_fnlim, &
         bac1mor1, &
         bac1mor2, &
         bac1deni, &
@@ -664,6 +665,7 @@ module generic_WOMBATmid
         bac2_lfer, &
         bac2_mu, &
         bac2_fanaer, &
+        bac2_fnlim, &
         bac2mor1, &
         bac2mor2, &
         bac2deni, &
@@ -881,6 +883,7 @@ module generic_WOMBATmid
         id_bac1_lfer = -1, &
         id_bac1_mu = -1, &
         id_bac1_fanaer = -1, &
+        id_bac1_fnlim = -1, &
         id_bac1mor1 = -1, &
         id_bac1mor2 = -1, &
         id_bac1deni = -1, &
@@ -892,6 +895,7 @@ module generic_WOMBATmid
         id_bac2_lfer = -1, &
         id_bac2_mu = -1, &
         id_bac2_fanaer = -1, &
+        id_bac2_fnlim = -1, &
         id_bac2mor1 = -1, &
         id_bac2mor2 = -1, &
         id_bac2deni = -1, &
@@ -2172,6 +2176,11 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'bac1_fnlim', 'Bacteria #1 growth limited by nitrogen?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bac1_fnlim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'bac1mor1', 'Linear mortality of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
     wombat%id_bac1mor1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -2224,6 +2233,11 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'bac2_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
     wombat%id_bac2_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'bac2_fnlim', 'Bacteria #2 growth limited by nitrogen?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bac2_fnlim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -3276,7 +3290,7 @@ module generic_WOMBATmid
     ! Nominal oxidation state of carbon of phytoplankton overflow exudation of DOC
     !-----------------------------------------------------------------------
     !  We assume very simple sugars and amino acids
-    call g_tracer_add_param('noscphyover', wombat%noscphyover, 0.0)
+    call g_tracer_add_param('noscphyover', wombat%noscphyover, 1.0 - 0.0)
 
     ! Nominal oxidation state of carbon of zooplankton excretion of DOC
     !-----------------------------------------------------------------------
@@ -3286,7 +3300,7 @@ module generic_WOMBATmid
     !  - ~50% carbohydrate (C6H12O6), with a NOSC of ~0.0 [lots of TEP: Passow et al 2001 Continental Shelf Research]
     !  - ~1% nucleic acids (C10H14O6N5P), with a NOSC of +0.85
     ! This gives an overal NOSC of  of roughly -0.20
-    call g_tracer_add_param('nosczooexcr', wombat%nosczooexcr, -0.20)
+    call g_tracer_add_param('nosczooexcr', wombat%nosczooexcr, 1.0 -0.20)
 
     ! Nominal oxidation state of carbon of phytoplankton lysis producing DOC
     !-----------------------------------------------------------------------
@@ -3297,7 +3311,7 @@ module generic_WOMBATmid
     !  - ~4% nucleic acids (C10H14O6N5P), with a NOSC of +0.85
     !  - ~1% chlorophyll (C55H72N4O5), with a NOSC of -0.91
     ! This gives an overal NOSC of lysed phytoplankton cells of roughly -0.35
-    call g_tracer_add_param('noscphylyse', wombat%noscphylyse, -0.35)
+    call g_tracer_add_param('noscphylyse', wombat%noscphylyse, 1.0 -0.35)
     
     ! Nominal oxidation state of carbon of bacterial lysis producing DOC
     !-----------------------------------------------------------------------
@@ -3307,7 +3321,7 @@ module generic_WOMBATmid
     !  - ~10% carbohydrate (C6H12O6), with a NOSC of ~0.0
     !  - ~25% nucleic acids (C10H14O6N5P), with a NOSC of +0.85
     ! This gives an overal NOSC of lysed bacterial cells of roughly -0.03
-    call g_tracer_add_param('noscbaclyse', wombat%noscbaclyse, -0.03)
+    call g_tracer_add_param('noscbaclyse', wombat%noscbaclyse, 1.0 -0.03)
 
     ! Nominal oxidation state of carbon of sinking marine detritus producing DOC
     !-----------------------------------------------------------------------
@@ -3319,7 +3333,7 @@ module generic_WOMBATmid
     !  - ~1% nucleic acids (C10H14O6N5P), with a NOSC of +0.85
     !  - ~1% chlorophyll (C55H72N4O5), with a NOSC of -0.91
     ! This gives an overal NOSC of sinking organic detritus of roughly -0.40
-    call g_tracer_add_param('noscdethydr', wombat%noscdethydr, -0.40)
+    call g_tracer_add_param('noscdethydr', wombat%noscdethydr, 1.0 -0.40)
 
     ! Offset to the in-situ nominal oxidation state of carbon targetted by bacteria
     !-----------------------------------------------------------------------
@@ -4542,6 +4556,7 @@ module generic_WOMBATmid
     wombat%bac1_lfer(:,:,:) = 1.0
     wombat%bac1_mu(:,:,:) = 0.0
     wombat%bac1_fanaer(:,:,:) = 0.0
+    wombat%bac1_fnlim(:,:,:) = 0.0
     wombat%bac1mor1(:,:,:) = 0.0
     wombat%bac1mor2(:,:,:) = 0.0
     wombat%bac1deni(:,:,:) = 0.0
@@ -4553,6 +4568,7 @@ module generic_WOMBATmid
     wombat%bac2_lfer(:,:,:) = 1.0
     wombat%bac2_mu(:,:,:) = 0.0
     wombat%bac2_fanaer(:,:,:) = 0.0
+    wombat%bac2_fnlim(:,:,:) = 0.0
     wombat%bac2mor1(:,:,:) = 0.0
     wombat%bac2mor2(:,:,:) = 0.0
     wombat%bac2deni(:,:,:) = 0.0
@@ -5507,6 +5523,8 @@ module generic_WOMBATmid
       bac_gN = (bac1_Vdon + bac1_Vnh4) * bac1_ydonC ! Growth of C biomass due to N uptake
       bac_gEA = bac_Voxy*bac1_yoxyC ! Growth of C biomass due to electron acceptor (O2) uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gN, bac_gEA ) ) * fbc
+      wombat%bac1_fnlim(i,j,k) = 0.0
+      if (bac_gN.lt.min(bac_gC,bac_gEA)) wombat%bac1_fnlim(i,j,k) = 1.0
       ! Anaerobic growth
       bac_Vno3 = wombat%bac1_Vmax_no3 * biono3 / (biono3 + wombat%bac1_kno3) ! Uptake of NO3 (i.e., NO3-limited growth)
       bac_gC = bac_Vdoc * bac1_yanaC ! Growth of C biomass due to DOC uptake
@@ -5538,6 +5556,8 @@ module generic_WOMBATmid
       bac_gN = (bac2_Vdon + bac2_Vnh4) * bac2_ydonC ! Growth of C biomass due to N uptake
       bac_gEA = bac_Voxy * bac2_yoxyC ! Growth of C biomass due to electron acceptor (O2) uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gN, bac_gEA ) ) * fbc
+      wombat%bac2_fnlim(i,j,k) = 0.0
+      if (bac_gN.lt.min(bac_gC,bac_gEA)) wombat%bac2_fnlim(i,j,k) = 1.0
       ! Anaerobic growth
       bac_gC = bac_Vdoc * bac2_yanaC ! Growth of C biomass due to DOC uptake
       bac_gN = (bac2_Vdon + bac2_Vnh4) * bac2_ydonC * wombat%bacanapen ! Growth of C biomass due to N uptake
@@ -7827,6 +7847,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_bac1_fanaer, wombat%bac1_fanaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
+    if (wombat%id_bac1_fnlim .gt. 0) &
+      used = g_send_data(wombat%id_bac1_fnlim, wombat%bac1_fnlim, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+    
     if (wombat%id_bac1mor1 > 0) &
       used = g_send_data(wombat%id_bac1mor1, wombat%bac1mor1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -7871,6 +7895,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_bac2_fanaer, wombat%bac2_fanaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
+    if (wombat%id_bac2_fnlim .gt. 0) &
+      used = g_send_data(wombat%id_bac2_fnlim, wombat%bac2_fnlim, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+    
     if (wombat%id_bac2mor1 > 0) &
       used = g_send_data(wombat%id_bac2mor1, wombat%bac2mor1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -8615,6 +8643,7 @@ module generic_WOMBATmid
     allocate(wombat%bac1_lfer(isd:ied, jsd:jed, 1:nk)); wombat%bac1_lfer(:,:,:)=0.0
     allocate(wombat%bac1_mu(isd:ied, jsd:jed, 1:nk)); wombat%bac1_mu(:,:,:)=0.0
     allocate(wombat%bac1_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bac1_fanaer(:,:,:)=0.0
+    allocate(wombat%bac1_fnlim(isd:ied, jsd:jed, 1:nk)); wombat%bac1_fnlim(:,:,:)=0.0
     allocate(wombat%bac1mor1(isd:ied, jsd:jed, 1:nk)); wombat%bac1mor1(:,:,:)=0.0
     allocate(wombat%bac1mor2(isd:ied, jsd:jed, 1:nk)); wombat%bac1mor2(:,:,:)=0.0
     allocate(wombat%bac1deni(isd:ied, jsd:jed, 1:nk)); wombat%bac1deni(:,:,:)=0.0
@@ -8626,6 +8655,7 @@ module generic_WOMBATmid
     allocate(wombat%bac2_lfer(isd:ied, jsd:jed, 1:nk)); wombat%bac2_lfer(:,:,:)=0.0
     allocate(wombat%bac2_mu(isd:ied, jsd:jed, 1:nk)); wombat%bac2_mu(:,:,:)=0.0
     allocate(wombat%bac2_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bac2_fanaer(:,:,:)=0.0
+    allocate(wombat%bac2_fnlim(isd:ied, jsd:jed, 1:nk)); wombat%bac2_fnlim(:,:,:)=0.0
     allocate(wombat%bac2mor1(isd:ied, jsd:jed, 1:nk)); wombat%bac2mor1(:,:,:)=0.0
     allocate(wombat%bac2mor2(isd:ied, jsd:jed, 1:nk)); wombat%bac2mor2(:,:,:)=0.0
     allocate(wombat%bac2deni(isd:ied, jsd:jed, 1:nk)); wombat%bac2deni(:,:,:)=0.0
@@ -8930,6 +8960,7 @@ module generic_WOMBATmid
         wombat%bac1_lfer, &
         wombat%bac1_mu, &
         wombat%bac1_fanaer, &
+        wombat%bac1_fnlim, &
         wombat%bac1mor1, &
         wombat%bac1mor2, &
         wombat%bac1deni, &
@@ -8941,6 +8972,7 @@ module generic_WOMBATmid
         wombat%bac2_lfer, &
         wombat%bac2_mu, &
         wombat%bac2_fanaer, &
+        wombat%bac2_fnlim, &
         wombat%bac2mor1, &
         wombat%bac2mor2, &
         wombat%bac2deni, &
