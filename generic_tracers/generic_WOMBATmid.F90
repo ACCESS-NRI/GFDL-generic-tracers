@@ -5454,7 +5454,7 @@ module generic_WOMBATmid
       !    to a max of 0.80 (1.25 mol DON+NH4 per mol Biomass)
       zval = wombat%bac_ydonmax - wombat%bac_ydonmin
       wombat%bac_ydon(i,j,k) = max(wombat%bac_ydonmin, min(wombat%bac_ydonmax, &
-                               wombat%bac_ydonmax + wombat%f_nosdoc(i,j,k)*(zval) ))
+                               wombat%bac_ydonmin + wombat%f_nosdoc(i,j,k)*(zval) ))
 
       ! From this base biomass yield on N, compute yields for O2 and anaerobic growth on alternative electron acceptors and DOC
       !  [ Zakem et al., 2020 ISME; Buchanan et al., 2025 Science]
@@ -5476,12 +5476,14 @@ module generic_WOMBATmid
       bac2_yn2o = (f_bac/e_bac) / ((1.0 - f_bac)/1.0) ! Yield of N biomass per mol nitrous oxide
       
       ! Convert from units N of bacterial biomass to C of bacterial biomass
-      wombat%bac1_ydoc(i,j,k) = wombat%bac_ydon(i,j,k) * wombat%bac1_C2N * dom_N2C
+      wombat%bac1_ydoc(i,j,k) = min(wombat%bac_ydonmax*0.8, &
+                                    wombat%bac_ydon(i,j,k) * wombat%bac1_C2N * dom_N2C)
       bac1_ydonC = wombat%bac_ydon(i,j,k) * wombat%bac1_C2N
       bac1_yoxyC = bac1_yoxy * wombat%bac1_C2N
       bac1_yanaC = bac1_yana * wombat%bac1_C2N * dom_N2C
       bac1_yno3C = bac1_yno3 * wombat%bac1_C2N
-      wombat%bac2_ydoc(i,j,k) = wombat%bac_ydon(i,j,k) * wombat%bac2_C2N * dom_N2C
+      wombat%bac2_ydoc(i,j,k) = min(wombat%bac_ydonmax*0.8, &
+                                    wombat%bac_ydon(i,j,k) * wombat%bac2_C2N * dom_N2C)
       bac2_ydonC = wombat%bac_ydon(i,j,k) * wombat%bac2_C2N
       bac2_yoxyC = bac2_yoxy * wombat%bac2_C2N
       bac2_yanaC = bac2_yana * wombat%bac2_C2N * dom_N2C
