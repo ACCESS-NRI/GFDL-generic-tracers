@@ -98,6 +98,10 @@
 !   If true, do benthic denitrification
 !  </DATA>
 !
+!  <DATA NAME="do_viscous_sinking" TYPE="logical">
+!   If true, do computation of dynamic viscosity
+!  </DATA>
+!
 !  <DATA NAME="do_check_n_conserve" TYPE="logical">
 !   If true, check that the ecosystem model conserves nitrogen. NOTE:
 !   not appropriate if dentirification, anammox and nitrogen fixation are on.
@@ -168,13 +172,14 @@ module generic_WOMBATmid
   logical :: do_anammox          = .true.  ! N cycle has anammox?
   logical :: do_wc_denitrification = .true.  ! N cycle has water column denitrification?
   logical :: do_benthic_denitrification = .true.  ! N cycle has N loss in sediments?
+  logical :: do_viscous_sinking  = .true.  ! Rubey's formula uses a non-constant dynamic viscosity?
   logical :: do_check_n_conserve = .false. ! check that the N fluxes balance in the ecosystem
   logical :: do_check_c_conserve = .true.  ! check that the C fluxes balance in the ecosystem
   logical :: do_check_si_conserve = .true.  ! check that the Si fluxes balance in the ecosystem
 
   namelist /generic_wombatmid_nml/ co2_calc, do_caco3_dynamics, do_burial, do_conserve_tracers, &
                                    do_nitrogen_fixation, do_anammox, do_wc_denitrification, do_benthic_denitrification, &
-                                   do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
+                                   do_viscous_sinking, do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
@@ -274,12 +279,17 @@ module generic_WOMBATmid
         detlrem, &
         bottom_thickness, &
         detlrem_sed, &
-        wdetbio, &
-        wbdetbio, &
-        wdetmax, &
+        detphi, &
+        bdetphi, &
+        phyrad0, &
+        diarad0, &
+        zoorad0, &
+        mesrad0, &
+        detrho, &
+        caco3rho, &
+        bsirho, &
         phybiot, &
         diabiot, &
-        wcaco3, &
         caco3lrem, &
         caco3lrem_sed, &
         omegamax_sed, &
@@ -362,7 +372,6 @@ module generic_WOMBATmid
         a_1_n2o, a_2_n2o, a_3_n2o, a_4_n2o, &
         b_1_n2o, b_2_n2o, b_3_n2o, &
         a1_n2o, a2_n2o, a3_n2o, a4_n2o, a5_n2o
-
 
     character(len=fm_string_len) :: ice_restart_file
     character(len=fm_string_len) :: ocean_restart_file
@@ -662,6 +671,7 @@ module generic_WOMBATmid
         caco3_prev, &
         dic_correct, &
         alk_correct, &
+        dynvis_sw, &
         zw, &
         zm
 
@@ -707,6 +717,7 @@ module generic_WOMBATmid
         id_dic_vstf = -1, &
         id_dicp_vstf = -1, &
         id_alk_vstf = -1, &
+        id_dynvis_sw = -1, &
         id_dic_correct = -1, &
         id_alk_correct = -1, &
         id_radbio = -1, &
@@ -1009,7 +1020,7 @@ module generic_WOMBATmid
 
     if (do_caco3_dynamics) then
       write (stdoutunit,*) trim(note_header), &
-          'Doing dynamic CaCO3 precipitation, dissolution and ballasting'
+          'Doing dynamic CaCO3 precipitation and dissolution'
     endif
 
     if (do_burial) then
@@ -1050,6 +1061,11 @@ module generic_WOMBATmid
     if (do_benthic_denitrification) then
       write (stdoutunit,*) trim(note_header), &
           'Doing benthic denitrification'
+    endif
+
+    if (do_viscous_sinking) then
+      write (stdoutunit,*) trim(note_header), &
+          'Doing dynamic viscosity calculation for input to sinking scheme'
     endif
 
     if (do_check_n_conserve) then
@@ -1246,6 +1262,12 @@ module generic_WOMBATmid
     !=======================================================================
     ! Tracer and source term diagnostics
     !=======================================================================
+    
+    vardesc_temp = vardesc( &
+        'dynvis_sw', 'Seawater dynamic viscosity',  'h', 'L', 's', 'kg/m/s', 'f')
+    wombat%id_dynvis_sw = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
     vardesc_temp = vardesc( &
         'dic_correct', 'Correction to DIC tracer (min limit)',  'h', 'L', 's', 'mol/kg', 'f')
     wombat%id_dic_correct = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
@@ -2493,7 +2515,6 @@ module generic_WOMBATmid
     call g_tracer_add_param('a4_n2o', wombat%a4_n2o, -0.13422)
     call g_tracer_add_param('a5_n2o', wombat%a5_n2o, 0.0011506)
 
-
     ! Initial H+ concentration [mol/kg]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('htotal_in', wombat%htotal_in, 1.e-8) ! dts: default conc from COBALT
@@ -2915,17 +2936,44 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('detlrem', wombat%detlrem, 0.5/86400.0)
     
-    ! Base detritus sinking rate coefficient [m/s]
+    ! Porosity of sinking small detritus [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wdetbio', wombat%wdetbio, 5.0/86400.0)
+    call g_tracer_add_param('detphi', wombat%detphi, 0.0)
     
-    ! Base big detritus sinking rate coefficient [m/s]
+    ! Porosity of sinking large aggregated detritus [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wbdetbio', wombat%wbdetbio, 25.0/86400.0)
+    call g_tracer_add_param('bdetphi', wombat%bdetphi, 0.97)
+
+    ! Base radius of nanophytoplankton [µm]
+    !  2–20 µm in diameter
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('phyrad0', wombat%phyrad0, 10.0)
     
-    ! Detritus maximum sinking rate coefficient [m/s]
+    ! Base radius of microphytoplankton [µm]
+    !  20–200 µm in diameter
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wdetmax', wombat%wdetmax, 50.0/86400.0)
+    call g_tracer_add_param('diarad0', wombat%diarad0, 50.0)
+
+    ! Base radius of microzooplankton [µm]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('zoorad0', wombat%zoorad0, 40.0)
+
+    ! Base radius of mesoozooplankton [µm]
+    ! Hatton et al. 2021 Sci Adv - near 1mm
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('mesrad0', wombat%mesrad0, 500.0)
+
+    ! Density of organic detritus [kg/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('detrho', wombat%detrho, 1060.0)
+    
+    ! Density of calcium carbonate [kg/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('caco3rho', wombat%caco3rho, 2710.0)
+    
+    ! Density of biogenic opal [kg/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bsirho', wombat%bsirho, 2000.0)
     
     ! Bottom thickness [m]
     !-----------------------------------------------------------------------
@@ -2943,10 +2991,6 @@ module generic_WOMBATmid
     ! Microphytoplankton biomass threshold to scale recycling [mmolC/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diabiot', wombat%diabiot, 0.5)
-
-    ! Base CaCO3 sinking rate coefficient [m/s]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('wcaco3', wombat%wcaco3, 5.0/86400.0)
 
     ! CaCO3 remineralisation rate constant [1/s]
     !-----------------------------------------------------------------------
@@ -3260,14 +3304,6 @@ module generic_WOMBATmid
     as_coeff_wombatmid = 0.31 / 3.6e5
 
     call g_tracer_start_param_list(package_name)
-
-    ! Detritus sinking velocity [m/s]
-    !-----------------------------------------------------------------------
-    ! Default value matches Ziehn et al 2020 but differs from Hayashida et
-    ! al 2020
-    call g_tracer_add_param('wdetbio', wombat%wdetbio, 5.0/86400.0)
-    call g_tracer_add_param('wbdetbio', wombat%wbdetbio, 25.0/86400.0)
-    call g_tracer_add_param('wcaco3', wombat%wcaco3, 5.0/86400.0) ! Based on 10µm average size
 
     call g_tracer_add_param('ice_restart_file', wombat%ice_restart_file, 'ice_wombatmid.res.nc')
     call g_tracer_add_param('ocean_restart_file', wombat%ocean_restart_file, 'ocean_wombatmid.res.nc')
@@ -3967,7 +4003,7 @@ module generic_WOMBATmid
     real                                    :: swpar
     real                                    :: u_npz, g_npz, m_npz, Xzoo, I_Xzoo, Xmes, I_Xmes
     real                                    :: biono3, bion2o, bionh4, biooxy, biofer, biosil, biodoc, biodon, biocaco3
-    real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobac1, biobac2, bioaoa
+    real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobdetsi, biobac1, biobac2, bioaoa
     real                                    :: biophyfe, biodiafe, biodiasi, biozoofe, biomesfe, zooprey, mesprey
     real                                    :: I_denom, wzbac1, wzbac2, wzaoa, wzphy, wzdia, wzdet, wzbdet, wzzoo, wzmes, I_wzsum
     real                                    :: fbc
@@ -3975,7 +4011,18 @@ module generic_WOMBATmid
     real                                    :: epsi = 1.0e-30
     real                                    :: pi = 3.14159265358979
     real                                    :: Rgas = 8.314462168 ! J/(K mol)
-    integer                                 :: ichl, iter, max_iter
+    real                                    :: T_star = 647.096 ! K
+    real                                    :: rho_star = 322.0 ! kg/m3
+    real                                    :: mu_star = 1e-6 ! Pa s
+    real, dimension(4)                      :: mu0_H
+    integer, dimension(21)                  :: mu1_i, mu1_j
+    real, dimension(21)                     :: mu1_H
+    real                                    :: P_MPa, rho0, rho_w, at, bt, mu_w, mu_w_iapws, T_hat, rho_hat, invT_hat, mu0, mu1, poly
+    real                                    :: invT_hat2, invT_hat3, temp2, temp3, temp4, temp5
+    integer                                 :: ichl, iter
+    real                                    :: rad_phy, rad_dia, rad_zoo, rad_mes, rad_det, rad_bdet
+    real                                    :: mass_det, mass_bdet, mass_caco3, mass_bsi, mass_small, mass_large
+    real                                    :: w1, w2, rho_small, rho_large
     real                                    :: par_phy_mldsum, par_z_mldsum
     real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, dia_chlc, phi
     real                                    :: phy_limnh4, phy_limno3, phy_limdin
@@ -4038,6 +4085,51 @@ module generic_WOMBATmid
     mmol_m3_to_mol_kg = 1.e-3 / wombat%Rho_0
     umol_m3_to_mol_kg = 1.e-3 * mmol_m3_to_mol_kg
    
+    !==========================================================================
+    ! Constants for calculating water viscosity (IAPWS 2008)
+    !==========================================================================
+    mu0_H(1) = 1.67752; mu0_H(2) = 2.20462; mu0_H(3) = 0.6366564; mu0_H(4) = -0.241605
+    mu1_i = (/ &
+      0, 1, 2, 3,       & ! j=0
+      0, 1, 2, 3,    5, & ! j=1
+      0, 1, 2, 3, 4,    & ! j=2
+      0, 1,             & ! j=3
+      0,       3,       & ! j=4
+                  4,    & ! j=5
+               3,    5 &
+            /) ! j=6
+    mu1_j = (/ &
+      0, 0, 0, 0,       & ! i=0
+      1, 1, 1, 1, 1,    & ! i=1
+      2, 2, 2, 2, 2,    & ! i=2
+      3, 3,             & ! i=3
+      4,       4,       & ! i=4
+                  5,    & ! i=5
+               6,    6  &
+            /) ! i=6
+    mu1_H = (/ &
+        0.520094,        & ! i=0, j=0
+        0.0850895,       & ! i=1, j=0
+       -1.08374,        & ! i=2, j=0
+       -0.289555,       & ! i=3, j=0
+        0.222531,       & ! i=0, j=1
+        0.999115,       & ! i=1, j=1
+        1.88797,        & ! i=2, j=1
+        1.26613,        & ! i=3, j=1
+        0.120573,       & ! i=5, j=1
+       -0.281378,       & ! i=0, j=2
+       -0.906851,       & ! i=1, j=2
+       -0.772479,       & ! i=2, j=2
+       -0.489837,       & ! i=3, j=2  
+       -0.257040,       & ! i=4, j=2
+        0.161913,       & ! i=0, j=3
+        0.257399,       & ! i=1, j=3
+       -0.0325372,      & ! i=0, j=4
+        0.0698452,      & ! i=3, j=4
+        0.00872102,     & ! i=4, j=5
+        -0.00435673,    & ! i=3, j=6
+        -0.000593264     & ! i=5, j=6
+            /)
 
     !==========================================================================
     ! Attenuation coefficients for blue, green and red light due to chlorophyll
@@ -4193,6 +4285,7 @@ module generic_WOMBATmid
     ! Calculate the source terms
     !=======================================================================
 
+    wombat%dynvis_sw(:,:,:) = 1e-3
     wombat%dic_correct(:,:,:) = 0.0
     wombat%alk_correct(:,:,:) = 0.0
     wombat%pprod_gross(:,:,:) = 0.0
@@ -4534,6 +4627,7 @@ module generic_WOMBATmid
     !    15. Sources and sinks                                              !
     !    16. Tracer tendencies                                              !
     !    17. Check for conservation by ecosystem component                  !
+    !    18. Compute sinking rates of detrital pools                        !
     !                                                                       !
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------!
@@ -4687,6 +4781,7 @@ module generic_WOMBATmid
       biomesfe = max(epsi, wombat%f_mesfe(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodet   = max(epsi, wombat%f_det(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biobdet  = max(epsi, wombat%f_bdet(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biobdetsi= max(epsi, wombat%f_bdetsi(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodoc   = max(epsi, wombat%f_doc(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodon   = max(epsi, wombat%f_don(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biobac1  = max(epsi, wombat%f_bac1(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
@@ -5168,8 +5263,8 @@ module generic_WOMBATmid
               + wombat%mesepsphy * (wombat%mesprefphy(i,j,k) * biophy)**2 &
               + wombat%mesepsdia * (wombat%mesprefdia(i,j,k) * biodia)**2 &
               + wombat%mesepsdet * (wombat%mesprefdet(i,j,k) * biodet)**2 &
-              + wombat%mesepsdet * (wombat%mesprefbdet(i,j,k) * biobdet)**2 &
-              + wombat%mesepsdet * (wombat%mesprefzoo(i,j,k) * biozoo)**2 )
+              + wombat%mesepsbdet * (wombat%mesprefbdet(i,j,k) * biobdet)**2 &
+              + wombat%mesepszoo * (wombat%mesprefzoo(i,j,k) * biozoo)**2 )
       m_npz = wombat%mesgmax * fbc * Xmes / (wombat%mesgmax * fbc + Xmes)
       ! find "apparent" community epsilon (prey capture rate coefficient)
       wombat%meseps(i,j,k) = Xmes / ( (wombat%mesprefbac1(i,j,k) * biobac1)**2 &
@@ -6531,9 +6626,13 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau)
 
 
-    !-----------------------------------------------------------------------
-    ! Assign spatially variable vertical movement of tracers
-    !-----------------------------------------------------------------------
+    !-----------------------------------------------------------------------!
+    !-----------------------------------------------------------------------!
+    !-----------------------------------------------------------------------!
+    !  [Step 18] Compute sinking rates of detrital pools                    !
+    !-----------------------------------------------------------------------!
+    !-----------------------------------------------------------------------!
+    !-----------------------------------------------------------------------!
     call g_tracer_get_pointer(tracer_list, 'det', 'vmove', wombat%p_wdet) ! [m/s]
     call g_tracer_get_pointer(tracer_list, 'detfe', 'vmove', wombat%p_wdetfe) ! [m/s]
     call g_tracer_get_pointer(tracer_list, 'bdet', 'vmove', wombat%p_wbdet) ! [m/s]
@@ -6545,29 +6644,139 @@ module generic_WOMBATmid
     
     ! Variable sinking rates of organic detritus (positive for sinking when GOLDtridiag == .true.)
     !                                            (negative for sinking when IOWtridiag ==.true.)
-    ! Note: sinking distances are limited in the vertdiff solver to prevent characteristics
-    ! crossing within a timestep
-    do j = jsc,jec; do i = isc,iec;
+    ! Note: sinking distances are limited in the vertdiff solver to prevent characteristics crossing within a timestep
+
+    do j = jsc,jec; do i = isc,iec
       if (grid_kmt(i,j).gt.0) then
+
+        ! 1. Find the average radius of particles in the community
+        !    For phytoplankton, we use Wickman et al. (2024):
+        !    - Volume = Biomass ** 0.65
+        !    - Diameter = ( (6/pi) * Volume ) ** (1/3)
+        !    - therefore, diameter = ( (6/pi) * Biomass ** 0.65 ) ** (1/3)
+        !    For microzoo (protists) we use Menden-Deuer & Lessard (2000) exponent
+        !      of 0.939 that relates carbon biomass to volume
+        !    For mesozoo we use the length-weight relationships for copepods from
+        !      Uye (1982) and Lehette & Hernandez-Leon (2009)) of 1/3
         biophy = max(epsi, wombat%f_phy(i,j,1) ) / mmol_m3_to_mol_kg  ![mmol/m3]
         biodia = max(epsi, wombat%f_dia(i,j,1) ) / mmol_m3_to_mol_kg  ![mmol/m3]
-        wsink1(:) = wombat%wdetbio * max(0.01, biophy - wombat%phybiot)**(0.21) 
-        wsink2(:) = wombat%wbdetbio * max(0.01, biodia - wombat%diabiot)**(0.21) 
-        do k=1,nk
-          wsink1(k) = wsink1(k) + 10.0/86400.0 * min(1.0, & 
-                      (wombat%f_caco3(i,j,k) / (wombat%f_det(i,j,k) + wombat%f_caco3(i,j,k) + epsi)))
-          ! Increase sinking rate with depth to achieve power law behaviour  
-          wsink1(k) = wsink1(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink1(k)))
-          wsink2(k) = wsink2(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink2(k)))
-          ! CaCO3 sinks slower than general detritus because it tends to be smaller
-          wsinkcal(k) = wsink1(k) * wombat%wcaco3/wombat%wdetbio
-        enddo
+        biozoo = max(epsi, wombat%f_zoo(i,j,1) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+        biomes = max(epsi, wombat%f_mes(i,j,1) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+        rad_phy = wombat%phyrad0 * 0.5 * (6.0/pi * biophy**0.65)**0.33 * 1e-6 ! [m]
+        rad_dia = wombat%diarad0 * 0.5 * (6.0/pi * biodia**0.65)**0.33 * 1e-6 ! [m]
+        rad_zoo = wombat%zoorad0 * 0.5 * (6.0/pi * biozoo**1.065)**0.33 * 1e-6 ! [m]
+        rad_mes = wombat%mesrad0 * 0.5 * biomes**0.33 * 1e-6 ! [m]
+        if (biophy + biozoo .gt. epsi) then
+          rad_det = min(1e-3, max(1e-6, (rad_phy*biophy + rad_zoo*biozoo) / (biophy + biozoo)))
+        else
+          rad_det = min(1e-3, max(1e-6, 0.5 * (rad_phy + rad_zoo)))
+        endif
+        if (biodia + biomes .gt. epsi) then
+          rad_bdet = min(1e-3, max(1e-6, (rad_dia*biodia + rad_mes*biomes) / (biodia + biomes)))
+        else
+          rad_bdet = min(1e-3, max(1e-6, 0.5 * (rad_dia + rad_mes)))
+        endif
+
+        ! Run through the water column and compute the sinking rates via Rubey's equation:
+        !  - radius, 
+        !  - density and 
+        !  - dynamic viscosity of seawater (that depends on T, S, and P)
+        wsink1(:) = 0.0
+        wsink2(:) = 0.0
+        do k = 1,nk
+        
+          if (do_viscous_sinking) then
+            temp2 = Temp(i,j,k) * Temp(i,j,k)
+            temp3 = temp2 * Temp(i,j,k)
+            temp4 = temp3 * Temp(i,j,k)
+            temp5 = temp4 * Temp(i,j,k)
+            ! 2. Compute seawater dynamic viscosity
+            !  2a. Compute seawater dynamic viscosity at atmospheric pressure
+            !    - Equations 22 and 23 from Sharqawy et al., 2010, https://doi.org/10.5004/dwt.2010.1079
+            !      based off Isdale et al. (1972) "Physical properties of sea water solutions: viscosity, Desalination"
+            !      that relate temperature (0 - 180 degC) and salinity (0 - 150 psu) to dynamic viscosity (kg/m/s)
+            at = 1.541 + 1.998e-2*Temp(i,j,k) - 9.52e-5*temp2
+            bt = 7.974 - 7.561e-2*Temp(i,j,k) + 4.724e-4*temp2
+            mu_w = 4.2844e-5 + 1.0/(0.157 * (Temp(i,j,k) + 64.993)**2 - 91.296)
+            wombat%dynvis_sw(i,j,k) = mu_w * (1 + at*Salt(i,j,k)*1e-3 + bt*(Salt(i,j,k)*1e-3)**2)
+            !  2b. Find the effect of T and density changes on pure water using the IAPWS formulation
+            ! ---- rho_w(z) : density estimate for pure water with pressure changes
+            !        - rho0(T) comes from UNESCO/EOS-80 Eq. 14
+            !        - rho_w(T,z) is the linearized form of the first-order compressibility correction
+            ! ---- mu0(T^) : dilute-gas term (Eq. 11 in IAPWS 2008)
+            ! ---- mu1(T^,rho^) : contribution to viscosity by finite density (Eq. 12 in IAPWS 2008)
+            P_MPa  = (101325.0 + 9.81 * 1025.0 * wombat%zm(i,j,k)) * 1e-6  ! [MPa]
+            rho0 = 999.842594 + 6.793952e-2*Temp(i,j,k) - 9.095290e-3*temp2 &
+                   + 1.001685e-4*temp3 - 1.120083e-6*temp4 + 6.536332e-9*temp5  ! kg/m^3
+            rho_w = rho0 / (1.0 - (P_MPa - 0.101325) / 2.2e3)
+            T_hat   = (Temp(i,j,k)+273.15) / T_star
+            rho_hat = rho_w / rho_star
+            invT_hat = 1.0 / T_hat
+            invT_hat2 = invT_hat * invT_hat
+            invT_hat3 = invT_hat2 * invT_hat
+            ! Find the dynamic viscosity at the dilute gas-limit (mu0)
+            mu0 = 100*sqrt(T_hat) / ( mu0_H(1) + mu0_H(2)*invT_hat + mu0_H(3)*invT_hat2 + mu0_H(4)*invT_hat3 )
+            ! Find the dynamic viscosity at the dilute gas-limit (mu1)
+            at = 1.0 / T_hat - 1.0
+            bt = rho_hat - 1.0
+            poly = 0.0
+            do iter = 1,21
+              zval = mu1_H(iter) * at**mu1_i(iter) * bt**mu1_j(iter)
+              poly = poly + zval
+            enddo
+            mu1 = exp(rho_hat * poly)
+            mu_w_iapws = (mu0 * mu1) * mu_star  ! [Pa·s = kg/m/s]
+            !  2c. Salinity corrected viscosity * pressure factor (i.e., mu_w_iapws / mu_w)
+            !      NOTE: the dynamic viscosity of water actually decreases with pressure at 
+            !            low temperatures (Percy W. Bridgman 1925 "The Viscosity of Liquids under Pressure")
+            wombat%dynvis_sw(i,j,k) = wombat%dynvis_sw(i,j,k) * mu_w_iapws / mu_w
+          endif
+
+          ! 3. Apply mineral ballasting to size classes (CaCO3 --> small, BSi --> large) and determine mass
+          biodet = max(epsi, wombat%f_det(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+          biobdet = max(epsi, wombat%f_bdet(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+          biocaco3 = max(epsi, wombat%f_caco3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+          biobdetsi = max(epsi, wombat%f_bdetsi(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+          mass_det = biodet * 1e-3 * 12.0 * 1e-3 * 2.5    ! [kg/m3] (assuming C is 40% of total mass)
+          mass_bdet = biobdet * 1e-3 * 12.0 * 1e-3 * 2.5  ! [kg/m3] (assuming C is 40% of total mass)
+          mass_caco3 = biocaco3 * 1e-3 * 100.0 * 1e-3     ! [kg/m3] (assuming CaCO3 is 100% of total mass)
+          mass_bsi = biobdetsi * 1e-3 * 60.0 * 1e-3       ! [kg/m3] (assuming SiO2 is 100% of total mass)
+          mass_small = mass_det + mass_caco3
+          mass_large = mass_bdet + mass_bsi
+          if (mass_small .gt. epsi) then
+            w1 = mass_det / mass_small 
+            w2 = mass_caco3 / mass_small
+            rho_small = 1.0 / (max( w1/wombat%detrho + w2/wombat%caco3rho, epsi)) ! [kg/m3]
+          else
+            rho_small = wombat%detrho
+          endif
+          if (mass_large .gt. epsi) then
+            w1 = mass_bdet / mass_large
+            w2 = mass_bsi / mass_large
+            rho_large = 1.0 / (max( w1/wombat%detrho + w2/wombat%bsirho, epsi)) ! [kg/m3]
+          else
+            rho_large = wombat%detrho
+          endif
+ 
+          ! 4. Compute excess density given the mass of particles and their porosity
+          rho_small = (1.0 - wombat%detphi) * rho_small + wombat%detphi * 1025.0 ! [kg/m3]
+          rho_large = (1.0 - wombat%detphi) * rho_large + wombat%detphi * 1025.0 ! [kg/m3]
+
+          ! 4. Compute the Rubey equation for sinking rates of particles (see Rubey, 1933)
+          wsink1(k) = ( sqrt( 4.0/3.0 * 9.8 * 1025.0 * (rho_small - 1025.0) * rad_det**3.0 &
+                          + 9.0*wombat%dynvis_sw(i,j,k)**2.0 ) - 3.0*wombat%dynvis_sw(i,j,k) ) &
+                      / (1025.0 * rad_det) ! [m/s]
+          wsink2(k) = ( sqrt( 4.0/3.0 * 9.8 * 1025.0 * (rho_large - 1025.0) * rad_bdet**3.0 &
+                          + 9.0*wombat%dynvis_sw(i,j,k)**2.0 ) - 3.0*wombat%dynvis_sw(i,j,k) ) &
+                      / (1025.0 * rad_bdet) ! [m/s]
+
+        enddo 
         wombat%p_wdet(i,j,:) = wsink1(:) 
         wombat%p_wdetfe(i,j,:) = wsink1(:)
         wombat%p_wbdet(i,j,:) = wsink2(:) 
         wombat%p_wbdetfe(i,j,:) = wsink2(:)
         wombat%p_wbdetsi(i,j,:) = wsink2(:)
-        wombat%p_wcaco3(i,j,:) = wsinkcal(:)
+        wombat%p_wcaco3(i,j,:) = wsink1(:)
         wombat%p_wafe(i,j,:) = wombat%wafe
         wombat%p_wbafe(i,j,:) = wombat%wbafe
       else
@@ -6811,6 +7020,10 @@ module generic_WOMBATmid
     if (wombat%id_alk_vstf .gt. 0) &
       used = g_send_data(wombat%id_alk_vstf, wombat%alk_vstf, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+
+    if (wombat%id_dynvis_sw .gt. 0) &
+      used = g_send_data(wombat%id_dynvis_sw, wombat%dynvis_sw, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_dic_correct .gt. 0) &
       used = g_send_data(wombat%id_dic_correct, wombat%dic_correct, model_time, &
@@ -8049,6 +8262,7 @@ module generic_WOMBATmid
     allocate(wombat%b_sil(isd:ied, jsd:jed)); wombat%b_sil(:,:)=0.0
     allocate(wombat%b_alk(isd:ied, jsd:jed)); wombat%b_alk(:,:)=0.0
 
+    allocate(wombat%dynvis_sw(isd:ied, jsd:jed, 1:nk)); wombat%dynvis_sw(:,:,:)=0.0
     allocate(wombat%dic_correct(isd:ied, jsd:jed, 1:nk)); wombat%dic_correct(:,:,:)=0.0
     allocate(wombat%alk_correct(isd:ied, jsd:jed, 1:nk)); wombat%alk_correct(:,:,:)=0.0
     allocate(wombat%radbio(isd:ied, jsd:jed, 1:nk)); wombat%radbio(:,:,:)=0.0
@@ -8554,6 +8768,7 @@ module generic_WOMBATmid
         wombat%caco3_btm, &
         wombat%afe_btm, &
         wombat%bafe_btm, &
+        wombat%dynvis_sw, &
         wombat%zw, &
         wombat%zm)
 
