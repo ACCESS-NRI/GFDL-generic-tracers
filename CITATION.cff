@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+title: 'GFDL Generic Tracers'
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Dougal
+    family-names: Squire
+    email: Dougie.Squire@anu.edu.au
+    affiliation: ACCESS-NRI
+    orcid: 'https://orcid.org/0000-0003-3271-6874'
+identifiers:
+  - description: "The concept DOI of all versions."
+    type: doi
+    value: 110.5281/zenodo.17180329
+  - description: "The versioned DOI"
+    type: doi
+    value: 10.5281/zenodo.17180330
+repository-code: 'https://github.com/ACCESS-NRI/GFDL-generic-tracers'
+url: 'https://docs.access-hive.org.au/'
+repository-artifact: >-
+  https://github.com/ACCESS-NRI/GFDL-generic-tracers/archive/refs/tags/2025.09.000.tar.gz
+abstract: >-
+  This is a fork of the NOAA-GFDL/ocean_BGC repo managed by NOAA-GFDL. It contains a collection of tracers and associated code for use with the MOM and GOLD ocean models.
+
+  This fork includes generic tracer implementations of the suite of WOMBAT models used in ACCESS earth-system models.
+license: CC-BY-4.0
+version: 2025.09.000
+date-released: "2025-09-19"
+keywords:
+  - keyword1
+  - keyword2
