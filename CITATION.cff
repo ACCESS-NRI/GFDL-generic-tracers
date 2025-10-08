@@ -1,0 +1,103 @@
+cff-version: 1.2.0
+title: 'ACCESS-NRI fork of GFDL generic tracers, including the WOMBAT ocean biogeochemistry models'
+message: >-
+  If you use this software, please cite it using the metadata from this file.
+type: software
+authors:
+  - given-names: Pearse James
+    family-names: Buchanan
+    email: Pearse.Buchanan@csiro.au
+    affiliation: CSIRO Environment, Hobart, 7004, Australia
+    orcid: 'https://orcid.org/0000-0001-7142-882X'
+  - given-names: Dougal
+    family-names: Squire
+    email: Dougie.Squire@anu.edu.au
+    affiliation: Australia’s Climate Simulator (ACCESS-NRI), Australian National University, Canberra, Australia
+    orcid: 'https://orcid.org/0000-0003-3271-6874'
+  - given-names: Harshula
+    family-names: Jayasuriya
+    email: harshula.jayasuriya@anu.edu.au
+    affiliation: Australia’s Climate Simulator (ACCESS-NRI), Australian National University, Canberra, Australia
+    orcid: 'https://orcid.org/0009-0009-2679-050X'
+  - given-names: Tommy
+    family-names: Gatti
+    email: tommy.gatti@anu.edu.au
+    affiliation: Australia’s Climate Simulator (ACCESS-NRI), Australian National University, Canberra, Australia
+    orcid: 'https://orcid.org/0009-0001-8679-8556'
+  - given-names: Jorge Luis
+    family-names: Gálvez Vallejo
+    email: Jorge.GalvezVallejo@anu.edu
+    affiliation: Australia’s National Computational Infrastructure (NCI), Australian National University, Canberra, Australia
+    orcid: 'https://orcid.org/0000-0003-4744-2087'
+  - given-names: Niki
+    family-names: Zadeh
+    email: Niki.Zadeh@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0002-0025-0769'
+  - given-names: John
+    family-names: Krasting
+    email: John.Krasting@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0002-4650-9844'
+  - given-names: Fabien
+    family-names: Paulot
+    email: fabien.paulot@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0001-7534-4922'
+  - given-names: Seth
+    family-names: Underwood
+    email: seth.underwood@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0002-8395-9609'
+  - given-names: Andrew
+    family-names: Ross
+    email: andrew.c.ross@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+  - given-names: Robert
+    family-names: Hallberg
+    email: robert.hallberg@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0001-5752-9034'
+  - given-names: Raymond
+    family-names: Menzel
+    email: raymond.menzel@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0002-2459-0119'
+  - given-names: Charles
+    family-names: Stock
+    email: charles.stock@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0001-9549-8013'
+  - given-names: Thomas
+    family-names: Robinson
+    email: thomas.robinson@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0001-5553-0226'
+  - given-names: Matthew
+    family-names: Harrison
+    email: matthew.harrison@noaa.gov
+    affiliation: NOAA Geophysical Fluid Dynamics Laboratory, Princeton, NJ, USA
+    orcid: 'https://orcid.org/0000-0001-7991-454X'
+identifiers:
+  - description: "The concept DOI of all versions."
+    type: doi
+    value: 110.5281/zenodo.17180329
+  - description: "Version 2025.09.000"
+    type: doi
+    value: 10.5281/zenodo.17180330
+repository-code: 'https://github.com/ACCESS-NRI/GFDL-generic-tracers'
+url: 'https://docs.access-hive.org.au/'
+repository-artifact: >-
+  https://github.com/ACCESS-NRI/GFDL-generic-tracers/archive/refs/tags/2025.09.000.tar.gz
+abstract: >-
+  This software is a fork of the repository https://github.com/NOAA-GFDL/ocean_BGC, which includes 
+  "generic tracer" modules that can be used with the MOM and GOLD ocean models. This fork has been 
+  modified to include generic tracer implementations of the World Ocean Model of Biogeochemistry And 
+  Trophic-dynamics (WOMBAT) models used in Australian Community Climate and Earth System Simulator 
+  (ACCESS) earth-system models.
+license: CC-BY-4.0
+version: 2025.09.000
+date-released: "2025-10-01"
+keywords:
+  - ocean biogeochemistry
+  - ocean modelling
