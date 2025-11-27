@@ -8,4 +8,4 @@ def on_page_markdown(markdown, *, page, config, files):
         page.file.url = page.file.url.removeprefix("pages/")
         page.file.dest_uri = page.file.dest_uri.removeprefix("pages/")
         page.file.abs_dest_path = page.file.abs_dest_path.removeprefix("pages/")
-        page._set_canonical_url(page.canonical_url.removesuffix("pages/"))
+        page.canonical_url = config.site_url + page.file.url

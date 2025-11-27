@@ -1,14 +1,14 @@
 # This file uses the following environment variables set within the build workflow:
 # - SITE_URL: the URL of the site (Falls back to the default URL)
 # For example, for PR-previews, SITE_URL is set to <default_URL>/pr-preview-NUM
-site_name: ACCESS-rAM3-configs
+site_name: 'WOMBAT configurations documentation'
 
 # Site URL
-site_url: !ENV [READTHEDOCS_CANONICAL_URL, "http://access-ram3-configs.access-hive.org.au/"]
+site_url: !ENV READTHEDOCS_CANONICAL_URL
 
 # Git repository
-repo_url: https://github.com/ACCESS-NRI/access-ram3-configs
-repo_name: access-ram3-configs
+repo_url: https://github.com/ACCESS-NRI/GFDL-generic-tracers
+repo_name: wombat-configs
 edit_uri: edit/main/documentation/docs/ # Add pencil icon to edit repository content
 
 # Theme
