@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'documentation/**'
+      - '.github/workflows/check_links.yml'
 jobs:
   pre-ci:
     name: Pre-CI
