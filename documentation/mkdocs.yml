@@ -8,7 +8,7 @@ site_url: !ENV READTHEDOCS_CANONICAL_URL
 
 # Git repository
 repo_url: https://github.com/ACCESS-NRI/GFDL-generic-tracers
-repo_name: wombat-configs
+repo_name: ACCESS-NRI/GFDL-generic-tracers
 edit_uri: edit/main/documentation/docs/ # Add pencil icon to edit repository content
 
 # Theme
