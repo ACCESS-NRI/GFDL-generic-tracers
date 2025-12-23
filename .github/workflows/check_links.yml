@@ -21,7 +21,7 @@ jobs:
     with:
       repo: '${{ github.repository }}'
       ref_name: "${{ github.event_name == 'pull_request' && format('refs/pull/{0}/head', github.event.pull_request.number) || github.ref_name }}"
-      rtd_project: wombat-configs  # MODIFY: change this to the Read the Docs project
+      rtd_project: wombat-docs  # MODIFY: change this to the Read the Docs project
       python_requirements_txt: 'documentation/requirements.txt' # MODIFY: Uncomment to add requirements.txt path. If not included, 'requirements.txt' is used.
       mkdocs_yaml: 'documentation/mkdocs.yml' # MODIFY: Uncomment to add mkdocs.yml path. If not included, 'mkdocs.yml' is used.
     #   lychee_config: '/path/to/lychee_config.toml' # MODIFY: Uncomment to add lychee config path. If not included, the Hive Docs' one gets used.
