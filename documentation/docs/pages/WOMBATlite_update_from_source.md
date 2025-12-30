@@ -253,20 +253,68 @@ Whatever soluble Fe is not present as inorganic Fe' is assigned to ligand-bound 
 
 $Fe_{lig} = Fe_{sFe} - Fe_{free}$
 
-Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe, we **solve for precipiation of nanoparticles, scavenging and coagulation** of dissolved Fe, all of which remove dFe from the water column.
+Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe, we solve for precipiation of nanoparticles, scavenging and coagulation of dissolved Fe, all of which remove dFe from the water column. These are the major sinks outside of phytoplankton uptake.
 
-Precipiation:
+**Precipiation:** \
 $Fe_{nanop}^{&rarr;} = \max\left(0.0,\ Fe_{free} - Fe_{sFe}\right)\, \gamma_{Fe}^{nano}$
 
-Scavenging:
-$Fe_{scav}^{&rarr;} = Fe_{free},\ (10^{-7} + \gamma_{Fe}^{scav} \cdot (B^{C}_{det} + B^{C}_{CaCO_3}))$ \
-$Fe_{scav}^{&rarr;Det} = Fe_{scav}^{&rarr;} \cdot \dfrac{ B_{det}^{C} }{ B_{det}^{C} + B_{CaCO_3}^{C} }$
+**Scavenging:** \
+$Fe_{scav}^{&rarr;} = Fe_{free} \left(10^{-7} + \gamma_{Fe}^{scav} \cdot (B_{det}^{C} + B_{CaCO_3}^{C}) \right)$ \
+$Fe_{scav}^{&rarr;det} = Fe_{scav}^{&rarr;} \cdot \dfrac{ B_{det}^{C} }{ B_{det}^{C} + B_{CaCO_3}^{C} }$
 
-Coagulation:
+**Coagulation:** \
+$Fe_{coag}^{&rarr;det} = Fe_{col} \Gamma_{Fe}^{coag}$
 
+When the grid cell is within the mixed layer:
+- $\Gamma_{Fe}^{coag} = \left(\ \ \ \ \ \ \ \ \  (12 \cdot F_{coag} [DOC] + 9 \cdot B_{det}^{C}) + 2.5 \cdot B_{det}^{C} + 128 \cdot F_{coag} [DOC] + 725 \cdot B_{det}^{C} \right) \gamma_{Fe}^{coag}$
+
+When the grid cell is beneath the mixed layer:
+- $\Gamma_{Fe}^{coag} = \left( 0.01 \cdot (12 \cdot F_{coag} [DOC] + 9 \cdot B_{det}^{C}) + 2.5 \cdot B_{det}^{C} + 128 \cdot F_{coag} [DOC] + 725 \cdot B_{det}^{C} \right) \gamma_{Fe}^{coag}$
+
+And where:
+- $F_{coag}$ is the phytoplankton-dependent coagulation factor <br> $F_{coag}= \max\left(\dfrac{1}{3},\ \dfrac{B_{phy}^{C}}{B_{phy}^{C} + 0.03}\right)$
+- $[DOC]$ is a proxy estimate of the concentration of dissolved organic carbon <br> $[DOC] = 10 + 40 \cdot\left(1 - \min(L_{phy}^{N},\ L_{phy}^{Fe})\right) $
+- $\gamma_{Fe}^{coag}$ is the iron coagulation rate constant
+- $B_{phy}^{C}$ is the concentration of phytoplankton carbon biomass
+- $B_{det}^{C}$ is the concentration of detrital carbon biomass
+
+Together, these terms implement a biologically mediated coagulation pathway in which iron removal from the dissolved pool is tightly coupled to ecosystem state. The formulation reflects the central conclusion of [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5): that iron cycling is not governed solely by inorganic chemistry, but is strongly regulated by biological activity, organic matter dynamics, and particle ecology across the upper ocean.
 
 ---
 ### 8. Mortality scalings and grazing
+
+We scale down **linear zooplankton mortality** when zooplankton biomass is small, such that
+
+$F_{zoo}^{\gamma} = \dfrac{B_{zoo}^{C}}{B_{zoo}^{C} + K_{zoo}^{\gamma}}$,
+
+where
+- $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass
+- $K_{zoo}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses
+
+and overall zooplankton linear mortality ($\gamma_{zoo}$) is then:
+
+$\gamma_{zoo} = \gamma_{zoo}^{0^{\circ}C} β_{hete}^{(T)} F_{zoo}^{\gamma}$
+
+**Grazing by zooplankton** is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7). This formulation suppresses grazing at very low prey biomass due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
+
+The total prey biomass available to zooplankton is defined as a preference-weighted sum of phytoplankton and detritus:
+
+$B_{prey} = \phi_{zoo}^{phy} B_{phy}^{C} + \phi_{zoo}^{det} B_{det}^{C}$
+
+where $B_{phy}^{C}$ and $B_{det}^{C}$ are phytoplankton and detrital carbon biomass, respectively, and $\phi_{zoo}$ terms define relative grazing preferences.
+
+The prey capture rate coefficient $\varepsilon$ is allowed to vary as a function of prey biomass, following the prey-dependent behaviour described by Rohr et al. (2024). This reflects a transition from microzooplankton-like feeding at low prey biomass to mesozooplankton-like feeding at high prey biomass.
+
+A prey-dependent scaling factor is defined as:
+
+$g_{prey} = e^{\left(-B_{prey} \Epsilon \right)$
+
+The effective capture rate coefficient is then:
+
+$\varepsilon = \varepsilon_{\min} + (\Epsilon_{\max} - \Epsilon_{\min}),g_{\mathrm{prey}}$
+
+At low prey biomass, $\varepsilon \rightarrow \varepsilon_{\max}$, enhancing grazing efficiency.
+At high prey biomass, $\varepsilon \rightarrow \varepsilon_{\min}$, reducing capture efficiency as handling time and feeding mode limit grazing.
 
 ---
 ### 9. CaCO3 calculations
