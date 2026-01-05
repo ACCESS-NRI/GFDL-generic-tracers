@@ -13,7 +13,7 @@
 
 The subroutine `generic_WOMBATlite_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics. 
 Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, detritus, iron and carbon pools) 
-on each NPZD time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
+at each tracer time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
 
 1. Light attenuation through the water column.
 2. Nutrient limitation of phytoplankton.
@@ -29,7 +29,7 @@ on each NPZD time‑step. The subroutine is documented internally by a list of n
 12. Check for conservation of mass.
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in grey follow the Fortran code, while 
-variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units.
+variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
 
 ### 1. Light attenuation through the water column
@@ -109,14 +109,14 @@ If the cell is Fe‑replete with a quota that exceeds the minimum quota by as mu
 **Autotrophy.**
 The maximum potential growth rate for phytoplankton (`phy_mumax(i,j,k)`, $\mu_{phy}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
 
-$\mu_{phy}^{max} = \mu_{phy}^{0^{\circ}C} \cdot β_{auto}^{(T)}$
+$\mu_{phy}^{max} = \mu_{phy}^{0^{\circ}C} \cdot (β_{auto})^{T}$
 
 In the above, both $\mu_{phy}^{0ºC}$ and $β_{auto}$ are reference values input to the model.
 
 **Heterotrophy.**
 Heterotrophic processes include mortality of phytoplankton and zooplankton, grazing rates of zooplankton and the remineralisation rate of detritus in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0^{\circ}C}$, [day<sup>-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$).
 
-$\mu_{het} = \mu_{het}^{0^{\circ}C} \cdot β_{hete}^{(T)}$
+$\mu_{het} = \mu_{het}^{0^{\circ}C} \cdot (β_{hete})^{T}$
 
 ---
 ### 4. Light limitation of phytoplankton
@@ -146,9 +146,9 @@ This step diagnoses the **rate of chlorophyll production** as a function of mixe
 
 A chlorophyll-specific initial P-I slope (`pchl_pisl`, $\alpha_{chl}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]) is constructed by scaling the photosynthetic carbon-specific P-I slope ($\alpha_{phy}$):
 
-$\alpha_{chl} = \dfrac{ \alpha_{phy} }{ \mu_{phy}^{max} (1 - \min(L_{phy}^{N}, L_{phy}^{Fe})) + \varepsilon }$
+$\alpha_{chl} = \dfrac{ \alpha_{phy} }{ \mu_{phy}^{max} (1 - \min(L_{phy}^{N}, L_{phy}^{Fe})) + \delta }$
 
-where $\varepsilon$ is a small constant preventing division by zero. Above, warm temperatures that elevate $\mu_{phy}^{max}$ and nutrient-stress decrease the chlorophyll-specific P-I slope, while nutrient-rich conditions steepen it. There is strong evidence that both nitrogen and iron limitation limit chlorophyll-to-carbon ratios of phytoplankton cells, while warm waters make enzymatic carbon fixation more efficient and lower light harvesting demand.
+where $\delta$ is a small constant preventing division by zero. Above, warm temperatures that elevate $\mu_{phy}^{max}$ and nutrient-stress decrease the chlorophyll-specific P-I slope, while nutrient-rich conditions steepen it. There is strong evidence that both nitrogen and iron limitation limit chlorophyll-to-carbon ratios of phytoplankton cells, while warm waters make enzymatic carbon fixation more efficient and lower light harvesting demand.
 
 Then, light limitation (`pchl_lpar(i,j,k)`, $L_{phy}^{PAR}$), [dimensionless]) is calculated using an exponential P–I formulation of the same form as carbon-specific light limitation.
 
@@ -293,31 +293,76 @@ where
 
 and overall zooplankton linear mortality ($\gamma_{zoo}$) is then:
 
-$\gamma_{zoo} = \gamma_{zoo}^{0^{\circ}C} β_{hete}^{(T)} F_{zoo}^{\gamma}$
+$\gamma_{zoo} = \gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} F_{zoo}^{\gamma}$
 
-**Grazing by zooplankton** is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7). This formulation suppresses grazing at very low prey biomass due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
+**Grazing by zooplankton** (`g_npz`, $\mu_{zoo}$, [day<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7), where:
+
+$\mu_{zoo} = \dfrac{\mu_{zoo}^{max} (β_{hete})^{T} \varepsilon (B_{prey})^{2}}{\mu_{zoo}^{max} (β_{hete})^{T} + \varepsilon (B_{prey})^{2}}$
+
+This formulation suppresses grazing at very low prey biomass due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
+
+The application of $\mu_{zoo}^{max} (β_{hete})^{T}$ in both the numerator and denominator makes this grazing formula unique [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w) and equivalent to a disk formulation, rather than a Michaelis–Menten formulation [(Rohr et al., 2022)](https://doi.org/10.1016/j.pocean.2022.102878). Practically, this amplifies grazing in warmer climes, but to a lesser extent than other formulations that apply the temperature amplification ($(β_{hete})^{T}$) only in the numerator [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w). This dampens the effect that variations in temperature have on grazing activity, amplifying the effect of $\varepsilon and aligning with observations that the ratio of grazing to phytoplankton growth varies little between tropical and polar climes [(Calbet and Landry, 2004)](https://doi.org/10.4319/lo.2004.49.1.0051). Theoretically, this assumes some evolutionary adaptation to account for the physiological effects of temperature across environmental niches, such that the efficiency of prey capture and handling becomes more important to grazers than metabolic constraints due to temperature.
 
 The total prey biomass available to zooplankton is defined as a preference-weighted sum of phytoplankton and detritus:
 
 $B_{prey} = \phi_{zoo}^{phy} B_{phy}^{C} + \phi_{zoo}^{det} B_{det}^{C}$
 
-where $B_{phy}^{C}$ and $B_{det}^{C}$ are phytoplankton and detrital carbon biomass, respectively, and $\phi_{zoo}$ terms define relative grazing preferences.
+where $B_{phy}^{C}$ and $B_{det}^{C}$ are phytoplankton and detrital carbon biomass, respectively, and $\phi_{zoo}$ terms define relative grazing preferences for these prey items.
 
-The prey capture rate coefficient $\varepsilon$ is allowed to vary as a function of prey biomass, following the prey-dependent behaviour described by Rohr et al. (2024). This reflects a transition from microzooplankton-like feeding at low prey biomass to mesozooplankton-like feeding at high prey biomass.
+The prey capture rate coefficient, $\varepsilon$ (`zooeps(i,j,k)`, $\varepsilon$, [(mmol C m<sup>-3</sup>)<sup>-1</sup>]),  is allowed to vary as a function of prey biomass, following the prey-dependent behaviour described by [Rohr et al. (2024)](doi.org/10.1029/2023GL107732). This reflects a transition from microzooplankton-like feeding with higher prey capture rate coefficients at low prey biomass to mesozooplankton-like feeding with lower prey capture rate coefficients at high prey biomass.
 
-A prey-dependent scaling factor is defined as:
+A prey-dependent scaling factor is defined as
 
-$g_{prey} = e^{\left(-B_{prey} \Epsilon \right)$
+$F_{prey} = e^{\left(-B_{prey} \varepsilon_{shift} \right)}$
 
-The effective capture rate coefficient is then:
+and the effective capture rate coefficient, $\varepsilon$ is then computed as
 
-$\varepsilon = \varepsilon_{\min} + (\Epsilon_{\max} - \Epsilon_{\min}),g_{\mathrm{prey}}$
+$\varepsilon = \varepsilon_{\min} + (\varepsilon_{\max} - \varepsilon_{\min}) F_{prey}$
 
 At low prey biomass, $\varepsilon \rightarrow \varepsilon_{\max}$, enhancing grazing efficiency.
-At high prey biomass, $\varepsilon \rightarrow \varepsilon_{\min}$, reducing capture efficiency as handling time and feeding mode limit grazing.
+At high prey biomass, $\varepsilon \rightarrow \varepsilon_{\min}$, reducing capture efficiency as handling time and feeding mode are more ineffective on average in a community with relatively more mesozooplankton.
 
 ---
 ### 9. CaCO3 calculations
+
+**Dynamic CaCO$_3$ production and dissolution**
+
+When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model computes both particulate inorganic carbon production (via the PIC:POC ratio) and $CaCO_3$ dissolution rates as functions of carbonate chemistry, temperature, and organic matter availability.
+
+The particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) is formulated as a function of the substrate–inhibitor ratio between bicarbonate and free hydrogen ions (`hco3 / htotal(i,j,k)`, $\dfrac{[HCO_3^-]}{[H^+]}$, [mol/µmol]), following [Lehmann & Bach (2025)](https://www.nature.com/articles/s41561-025-01644-0). This reflects the sensitivity of calcification to carbonate system speciation.
+
+Bicarbonate concentration is diagnosed as $[HCO_3^-] = DIC - [CO_3^{2-}] - [CO_2^*]$ where $DIC$ is total dissolved inorganic carbon and $CO_2^*$ is dissolved $CO_2$. The $PIC:POC$ ratio is then computed as
+
+$PIC:POC = \min \left( 0.3,  \left( f_{\text{inorg}} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)$
+
+where $f_{\text{inorg}}$ is a low background inorganic fraction and $[H^+]$ is total free hydrogen ion concentration. The exponential term captures the nonlinear enhancement of calcification with increasing $[HCO_3^-]/[H^+]$. Calcification is further modulated by a temperature-dependent suppression term,
+
+$F_T = 0.55 + 0.45 \tanh (T - 4)$
+
+which strongly reduces $CaCO_3$ production in cold waters. This formulation enforces near-zero calcification below approximately 3 °C, consistent with observations of _Emiliania huxleyi_ growth limits in polar environments [(Fielding, 2013)](https://doi.org/10.4319/lo.2013.58.2.0663). The $PIC:POC$ ratio is also capped at an upper bound of 0.3 to prevent unrealistically high inorganic carbon production and accord with the highest measured ratios in the ocean.
+
+
+Dissolution of $CaCO_3$ (`dissrat`) is computed as the sum of three contributions: undersaturation-driven dissolution of (i) calcite and (ii) aragonite, and (iii) biologically mediated dissolution associated with degredation of detrital organic matter. This formulation follows [Kwon et al. (2024)](https://www.science.org/doi/full/10.1126/sciadv.adl0779).
+
+Calcite dissolution is given by
+
+$D_{\text{cal}} = d_{\text{cal}} \max(0,  1 - \Omega_{\text{cal}})^{2.2}$
+
+and aragonite dissolution by
+
+$D_{\text{ara}} = d_{\text{ara}} \max(0,; 1 - \Omega_{\text{ara}})^{1.5}$
+
+where $\Omega_{\text{cal}}$ and $\Omega_{\text{ara}}$ are the saturation states of calcite and aragonite, respectively, and $d_{\text{cal}}$ and $d_{\text{ara}}$ are reference dissolution rate constants in units of [day<sup>-1</sup>]. Dissolution is activated only under undersaturated conditions ($\Omega < 1$) and increases nonlinearly with increasing undersaturation.
+
+An additional detritus-associated dissolution term is included (`diss_det`, $D_{\text{det}}$, [day<sup>-1</sup>]):
+
+$D_{\text{det}} = d_{\text{det}} \left( \gamma_{\text{det}}^{0^{\circ}C} (β_{hete})^{T} (B_{\text{det}})^{2} \right)$
+
+where $B_{\text{det}}$ is detrital organic carbon biomass and $\left( \gamma_{\text{det}}^{0^{\circ}C} (β_{hete})^{T} (B_{\text{det}})^{2} \right)$ is the local remineralisation rate of organic matter. This term represents shallow water $CaCO_3$ dissolution where $\Omega$ of calcite and aragonite in the water column tend to be > 1 [(Sulpis et al. (2021)](https://www.nature.com/articles/s41561-021-00743-y) but where dissolution nonetheless occurs within reducing microenvironments enriched in $CO_2^*$.
+
+The rate of $CaCO_3$ dissolution is then calculated by summing these three dissolution terms and applying them to the biomass of $CaCO_3$ in the water column ($B_{CaCO_3}$): 
+
+$D_{\text{CaCO}3} = \left( D{\text{cal}} + D_{\text{ara}} + D_{\text{det}} \right) B_{CaCO_3}$ 
 
 ---
 ### 10. Sources and Sinks
