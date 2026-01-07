@@ -32,11 +32,12 @@ jobs:
       max-parallel: 3
       matrix:
         file: ${{ fromJson(needs.pre-ci.outputs.matrix) }}
-    uses: access-nri/build-ci/.github/workflows/ci.yml@v2
+    uses: access-nri/build-ci/.github/workflows/ci.yml@v3
     with:
       spack-manifest-path: ${{ matrix.file }}
       spack-manifest-data-path: .github/build-ci/data/standard.json
       allow-ssh-into-spack-install: false  # If true, PR author must ssh into instance to complete job
-      # spack-packages-ref: main
+      # builtin-spack-packages-ref: main
+      # access-spack-packages-ref: api-v2
       # spack-config-ref: main
-      # spack-ref: releases/v0.22
+      # spack-ref: releases/v1.1
