@@ -36,15 +36,29 @@ variable names in math font are pointers to the equations; i,j,k refer to horizo
 
 Photosynthetically available radiation (PAR) is split into blue, green and red wavelengths. Surface incoming shortwave radiation is multiplied by 
 0.43 to return the photosynthetically active radiation (PAR, [W m<sup>-2</sup>) of total shortwave radiation, and is then split evenly into each 
-of blue, green and red light bands. At the top (`par_bgr_top(k,b)`, $PAR^{top}$) and mid‑point (`par_bgr_mid(k,b)`, $PAR^{mid}$) of each layer `k` 
-the subroutine calculates the downward irradiance by exponential decay of each band `b` through the layer thickness (`dzt(i,j,k)`, $\Delta z$, [m]) using 
-band‑specific attenuation coefficients (`ek_bgr(k,b)`, $ex_{bgr}$, [m<sup>-1</sup>]) obtained from a look‑up table (`zbgr`). The look-up table relates 
-chlorophyll concentration [mg m<sup>-3</sup>] to the extinction rate of blue, green and red light through the water column. For example, 
-the PAR in the blue band (`b=1`) at the top of level k is computed as
+of blue, green and red light bands. 
+
+At the top (`par_bgr_top(k,b)`, $PAR^{top}$) and mid‑point (`par_bgr_mid(k,b)`, $PAR^{mid}$) of each layer `k` we calculate the downward irradiance 
+by exponential decay of each band `b` through the layer thickness (`dzt(i,j,k)`, $\Delta z$, [m]) using band‑specific attenuation coefficients 
+(`ek_bgr(k,b)`, $ex_{bgr}$, [m<sup>-1</sup>]). These attenuation coefficients are related to the concentration of chlorophyll ([mg m<sup>-3</sup>]), 
+organic detritus ([mg N m<sup>-3</sup>]) and calcium carbonate ([kg m<sup>-3</sup>]) in the water column. For chlorophyll, attentuation coefficients 
+for each of blue, green and red light are retrieved from the look-up table of [Morel & Maritorena (2001)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2000JC000319) 
+(their Table 2) that explicitly relates chlorophyll concentration to attenutation rates and accounts for the packaging effect of chlorophyll in larger 
+cells. For organic detritus, attenutation coefficients for blue, green and red light are taken from 
+[Dutkiewicz et al. (2015)](https://bg.copernicus.org/articles/12/4447/2015/bg-12-4447-2015.html) (their Fig. 1b), while for calcium carbonate we take 
+the coefficients defined in [Soja-Wozniak et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019JC014998). For both detritus and 
+calcium carbonate, these studies provide concentration normalized attenutation coefficients, which must be multipled against concentrations to 
+retrieve the correct units of [m<sup>-1</sup>].
+
+As an example, the PAR in the blue band (`b=1`) at the top of level k is computed as
 
 $PAR^{top}(k,1) = PAR^{top}(k-1,1) * e^{(-ex_{bgr}(k-1,1) * \Delta z(k-1))}$
 
-The irradiance in the red band (`b=3`) at the mid point of layer `k`, for example, is equal to 
+where the total attenutation rate of blue light in the grid cell above `k` is the sum of attenuation due to all particulates in that grid cell:
+
+$ex_{bgr}(k-1,1) = ex_{chl}(k-1,1) + ex_{det}(k-1,1) + ex_{CaCO_3}(k-1,1) 
+
+The irradiance in the red band (`b=3`) at the mid point of layer `k`, in contrast, is equal to 
 
 $PAR^{mid}(k,3) = PAR^{mid}(k-1,3) * e^{(-0.5*(ex_{bgr}(k-1,3) * \Delta z(k-1) + ex_{bgr}(k,3) * \Delta z(k)))}$
 
