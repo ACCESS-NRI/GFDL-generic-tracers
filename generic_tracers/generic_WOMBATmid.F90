@@ -5031,7 +5031,7 @@ module generic_WOMBATmid
 
       !!!~~~ Phytoplankton ~~~!!!
       pchl_pisl = phy_pisl / ( wombat%phy_mumax(i,j,k) * 86400.0 * & 
-                  (1. - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) + epsi )
+                  max(0.1, (1. - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k)))) + epsi )
       wombat%pchl_lpar(i,j,k) = (1. - exp(-pchl_pisl * wombat%radmld(i,j,k)))
       pchl_mumin = wombat%phyminqc * wombat%phy_mu(i,j,k) * biophy * 12.0   ![mg/m3/s] 
       pchl_muopt = wombat%phyoptqc * wombat%phy_mu(i,j,k) * biophy * 12.0   ![mg/m3/s]
@@ -5045,7 +5045,7 @@ module generic_WOMBATmid
 
       !!!~~~ Microphytoplankton ~~~!!!
       dchl_pisl = dia_pisl / ( wombat%dia_mumax(i,j,k) * 86400.0 * & 
-                  (1. - min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k)) * wombat%dia_lsil(i,j,k)) + epsi )
+                  max(0.1, (1. - min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k)) * wombat%dia_lsil(i,j,k)) ) + epsi )
       wombat%dchl_lpar(i,j,k) = (1. - exp(-dchl_pisl * wombat%radmld(i,j,k)))
       dchl_mumin = wombat%diaminqc * wombat%dia_mu(i,j,k) * biodia * 12.0   ![mg/m3/s] 
       dchl_muopt = wombat%diaoptqc * wombat%dia_mu(i,j,k) * biodia * 12.0   ![mg/m3/s]
@@ -5471,7 +5471,7 @@ module generic_WOMBATmid
       !  1. Find electron potential of the bacterial biomass and DOM
       e_dom = 4.0/dom_N2C + 10.9 - 2.0*2.6 - 3.0  ! [Anderson et al., 1995]
       e_bac = 4.0*wombat%bac1_C2N + 7.0 - 2.0*2.0 - 3.0  ! [Zimmerman et al., 2014]
-      f_bac = wombat%bac_ydon(i,j,k) * e_bac/e_dom ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
+      f_bac = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
       bac1_yoxy = (f_bac/e_bac) / ((1.0 - f_bac)/4.0) ! Yield of N biomass per mol oxygen
       bac1_yana = wombat%bac_ydon(i,j,k) * wombat%bacanapen ! Yield of N biomass per mol DON during anaerobic growth
       f_bac = bac1_yana * e_bac/e_dom ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
@@ -5479,7 +5479,7 @@ module generic_WOMBATmid
       
       e_dom = 4.0/dom_N2C + 10.9 - 2.0*2.6 - 3.0  ! [Anderson et al., 1995]
       e_bac = 4.0*wombat%bac2_C2N + 7.0 - 2.0*2.0 - 3.0  ! [Zimmerman et al., 2014]
-      f_bac = wombat%bac_ydon(i,j,k) * e_bac/e_dom ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
+      f_bac = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom ) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
       bac2_yoxy = (f_bac/e_bac) / ((1.0 - f_bac)/4.0) ! Yield of N biomass per mol oxygen
       bac2_yana = wombat%bac_ydon(i,j,k) * wombat%bacanapen ! Yield of N biomass per mol DON during anaerobic growth
       f_bac = bac2_yana * e_bac/e_dom ! The fraction of electrons used for N biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
