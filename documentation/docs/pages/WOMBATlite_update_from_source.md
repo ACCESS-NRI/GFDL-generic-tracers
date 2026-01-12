@@ -636,7 +636,6 @@ $F_{bury} = 0.013 \cdot 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
 where
 - $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> day<sup>-1</sup>].
 
-As organic matter rains down at a more rapid rate, the fraction of incident organic matter that is buried increases.
-
+As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CACO_3$ that is buried increases.
 
 If `do_conserve_tracers = .true.`, then we capture the total loss of both Alk and $NO_3$ via burial or organic detritus and $CaCO_3$ and redistribute the Alk and $NO_3$ amount back at the ocean surface. This amount of each tracer is redistributed uniformly to avoid strong gradients.
