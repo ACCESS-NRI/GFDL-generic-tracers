@@ -22,14 +22,16 @@ at each tracer time‑step. The subroutine is documented internally by a list of
 5. Growth of chlorophyll.
 6. Phytoplankton uptake of iron.
 7. Iron chemistry (precipitation, scavenging and coagulation).
-8. Mortality scalings and grazing.
-9. CaCO3 calculations.
-10. Sources and sinks.
+8. Mortality and remineralisation
+9. Zooplankton grazing.
+10. CaCO3 calculations.
 11. Tracer tendencies (update tracer concentrations).
 12. Check for conservation of mass.
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in grey follow the Fortran code, while 
 variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
+
+---
 
 
 ### 1. Light attenuation through the water column
@@ -73,6 +75,8 @@ This ensures phytoplankton growth in the model responds to the mean light they e
 The euphotic depth is defined as the depth where `radbio` falls below the 1% threshold of incidient shortwave radiation and is therefore soley dependent on the concentration of chlorophyll within the water column.
 
 ---
+
+
 ### 2. Nutrient limitation of phytoplankton
 
 At the start of each vertical loop the code computes biomass of phytoplankton (`biophy`, $B_{phy}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass 
@@ -118,6 +122,8 @@ $L_{phy}^{Fe} = \max(0.0, \min(1.0, \dfrac{ Q_{phy}^{Fe:C} - Q_{phy}^{-Fe:C} }{Q
 If the cell is Fe‑replete with a quota that exceeds the minimum quota by as much as the optimal quota, then Fe does not limit growth ($L_{phy}^{Fe}$ = 1). If the cell is Fe‑deplete with a quota equal to the minimum quota, then the growth rate is reduced to zero. The optimal quota ($Q_{phy}^{*Fe:C}$) is therefore a measure of how much excess Fe is required to allow unrestricted growth.
 
 ---
+
+
 ### 3. Temperature‑dependent autotrophy and heterotrophy
 
 **Autotrophy.**
@@ -135,6 +141,8 @@ $\mu_{het} = \mu_{het}^{0^{\circ}C} \cdot (β_{hete})^{T}$
 See sections below for further details on mortality and grazing terms.
 
 ---
+
+
 ### 4. Light limitation of phytoplankton
 
 Phytoplankton growth is limited by light through a photosynthesis–irradiance (P–I) relationship that links cellular chlorophyll content and available photosynthetically active radiation ('radbio', $PAR$, [W m<sup>-2</sup>]).
@@ -155,16 +163,25 @@ Realized growth of phytoplankton is then calculated as:
 
 $\mu_{phy} = \mu_{phy}^{max} L_{phy}^{PAR} \min(L_{phy}^{N}, L_{phy}^{Fe})$
 
+and 
+
+$\mu_{phy}^{C} = \mu_{phy} B_{phy}^{C}$
+
+where $\mu_{phy}^{C}$ is in units of [mmol C m<sup>-3</sup> day<sup>-1</sup>].
+
+
 ---
+
+
 ### 5. Growth of chlorophyll
 
 This step diagnoses the **rate of chlorophyll production** as a function of mixed-layer light, the phytoplankton growth rate and nutrient availability. The structure is consistent with common **photoacclimation / variable chlorophyll-to-carbon** approaches that accelerate or decelerate chlorophyll growth relative to carbon growth.
 
 A chlorophyll-specific initial P-I slope (`pchl_pisl`, $\alpha_{chl}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]) is constructed by scaling the photosynthetic carbon-specific P-I slope ($\alpha_{phy}$) by particular environmental conditions:
 
-$\alpha_{chl} = \dfrac{ \alpha_{phy} }{ \mu_{phy}^{max} e^{\left(-\min\left(L_{phy}^{N}, L_{phy}^{Fe} \right)\right) } + \delta }$
+$\alpha_{chl} = \dfrac{ \alpha_{phy} }{ \mu_{phy}^{max} e^{\left(-\min\left(L_{phy}^{N}, L_{phy}^{Fe} \right)\right) } }$
 
-where $\delta$ is a small constant preventing division by zero. Above, warm temperatures that elevate $\mu_{phy}^{max}$ decrease the chlorophyll-specific P-I slope, and nutrient-stress also decreases this slope. Meanwhile, cold and nutrient-rich conditions steepen it. Such conditions are found in at the bottom of euphotic zones. There is strong evidence that both nitrogen and iron limitation limit chlorophyll-to-carbon ratios of phytoplankton cells [](), while warm waters make enzymatic carbon fixation more efficient and lower light harvesting demand, thereby decreasing Chl:C ratios []().
+Above, warm temperatures that elevate $\mu_{phy}^{max}$ decrease the chlorophyll-specific P-I slope, and nutrient-stress also decreases this slope. Meanwhile, cold and nutrient-rich conditions steepen it. Such conditions are found in at the bottom of euphotic zones. There is strong evidence that both nitrogen and iron limitation limit chlorophyll-to-carbon ratios of phytoplankton cells [](), while warm waters make enzymatic carbon fixation more efficient and lower light harvesting demand, thereby decreasing Chl:C ratios []().
 
 After solving for the chlorophyll-specific P-I slope, we calculate light limitation (`pchl_lpar(i,j,k)`, $L_{phy}^{PAR}$), [dimensionless]) using an exponential P–I formulation of the same form as carbon-specific light limitation,
 
@@ -174,30 +191,30 @@ but here we use $PAR_{MLD}$ rather than $PAR$. In this case, $PAR_{MLD}$ (`radml
 
 Before solving the growth rate of chlorophyll, we determine the minimum and maximum rates of chlorophyll production in mg m<sup>-3</sup> day<sup>-1</sup>, which are realised from the already known phytoplankton carbon growth rate:
 
-$\mu_{chl}^{min} = Q_{phy}^{-Chl:C} \mu_{phy} B_{phy}^{C} 12$
+$\mu_{phy}^{-chl} = Q_{phy}^{-Chl:C} \mu_{phy}^{C} \cdot 12$
 
-$\mu_{chl}^{opt} = Q_{phy}^{"Chl:C} \mu_{phy} B_{phy}^{C} 12$
+$\mu_{phy}^{+chl} = Q_{phy}^{+Chl:C} \mu_{phy}^{C} \cdot 12$
 
 where:
 
 - $Q_{phy}^{-Chl:C} =$ `phyminqc` is the minimum chlorophyll quota,
-- $Q_{phy}^{"Chl:C} =$ `phyoptqc` is the maximum chlorophyll quota,
-- $\mu_{phy} =$ `phy_mu` is the realised phytoplankton growth rate,
-- $B_{phy}^{C} 12$ is phytoplankton carbon concentration in mg m<sup>-3</sup> (implemented as `biophy * 12.0`).
+- $Q_{phy}^{+Chl:C} =$ `phymaxqc` is the maximum chlorophyll quota,
+- $\mu_{phy}^{C} =$ is the realised phytoplankton growth rate in units of [mmol C m<sup>-3</sup> day<sup>-1</sup>].
 
 These are the rates of chlorophyll growth required to support phytoplankton growth at both a minimum and maximum cellular quota. Chlorophyll-specific light limitation is then used to determine the extent to which optimal chlorophyll growth can be achieved:
 
-$\mu_{chl}^{\delta} = \phi \left(\mu_{chl}^{opt} - \mu_{chl}^{min}\right) \cdot L_{chl}^{PAR}$
+$\delta_{phy}^{chl} = \phi \left(\mu_{phy}^{+chl} - \mu_{phy}^{-chl}\right) \cdot L_{chl}^{PAR}$
 
-$\mu_{chl} = \mu_{chl}^{min} + \mu_{chl}^{\delta} $
+$\mu_{phy}^{chl} = \mu_{phy}^{-chl} + \delta_{phy}^{chl} $
 
 where:
 
 - $\phi = \dfrac{PAR_{MLD}(k=1)}{PAR_{MLD}(k=1) + K_{chl}^{PAR}}$ and reduces growth during extended periods of low light, such as the polar winter;
 - $K_{chl}^{PAR}$ is a half-saturation light scale for chlorophyll growth (`chlkWm2`, [W m<sup>-2</sup>]).
-- $\mu_{chl}^{\delta}$ is the additional growth of chlorophyll above what is required to maintain the minimum quota.
+- $\delta_{phy}^{chl}$ is the additional growth of chlorophyll above what is required to maintain the minimum quota.
 
 ---
+
 
 ### 6. Phytoplankton uptake of iron
 
@@ -220,6 +237,8 @@ $\mu_{phy}^{Fe} = \mu_{phy}^{max} B_{phy}^{"Fe} \max\left(0.2, L_{phy}^{PAR} \cd
 where the maximum dFe uptake is decreased to 20% of its maximum potential rate at night and when nitrogen is limited. The iron to carbon ratios of phytoplankton are passed to zooplankton and detritus and are also tracked in these pools.
 
 ---
+
+
 ### 7. Iron chemistry (precipitation, scavenging and coagulation)
 
 Treatment of dissolved iron (dFe, µmol m-3) follows [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5). 
@@ -294,15 +313,17 @@ And where:
 Together, these terms implement a biologically mediated coagulation pathway in which iron removal from the dissolved pool is tightly coupled to ecosystem state. The formulation reflects the central conclusion of [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5): that iron cycling is not governed solely by inorganic chemistry, but is strongly regulated by biological activity, organic matter dynamics, and particle ecology across the upper ocean.
 
 ---
-### 8. Mortality and remineralisation terms 
 
-Mortality of phytoplankton and zooplankton are affected by both linear ($\gamma$) and quadratic ($\Gamma$) terms. Linear terms are per-capita losses associated with the costs of basal metabolism. Quadratic, and thus density-dependent losses, are associated with disease, aggregation and coagulation, viruses, infection and canabalism.
+
+### 8. Mortality and remineralisation 
+
+Mortality of phytoplankton and zooplankton are affected by both linear ($\gamma$) and quadratic ($\Gamma$) terms. Linear terms are per-capita losses associated with the costs of basal metabolism. Quadratic, and thus density-dependent losses, are associated with disease, aggregation and coagulation, viruses, infection and canabalism. None of these processes are represented explicitly within the model, so we represent them implicitly.
 
 **Linear losses** for phytoplankton and zooplankton in [mmol m<sup>-3</sup> s<sup>-1</sup>] are modelled as
 
-$\gamma_{phy} = \gamma_{phy}^{0^{\circ}C} (β_{hete})^{T} B_{phy}^{C}$
+$\gamma_{phy}^{C} = \gamma_{phy}^{0^{\circ}C} (β_{hete})^{T} B_{phy}^{C}$
 
-$\gamma_{zoo} = \gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} F_{zoo}^{\gamma} B_{zoo}^{C}$
+$\gamma_{zoo}^{C} = \gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} F_{zoo}^{\gamma} B_{zoo}^{C}$
 
 In the above, we scale down **linear zooplankton mortality** when zooplankton biomass is small, such that
 
@@ -312,29 +333,40 @@ where
 - $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass
 - $K_{zoo}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses
 
+
 **Quadratic losses** of phytoplankton and zooplankton in [mmol m<sup>-3</sup> s<sup>-1</sup>] are modelled as
 
-$\Gamma_{phy} = \Gamma_{phy}^{0^{\circ}C} (β_{hete})^{T} \left(B_{phy}^{C}\right)^{2}$
+$\Gamma_{phy}^{C} = \Gamma_{phy}^{0^{\circ}C} (β_{hete})^{T} \left(B_{phy}^{C}\right)^{2}$
 
-$\Gamma_{zoo} = \Gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} \left(B_{zoo}^{C}\right)^{2}$
+$\Gamma_{zoo}^{C} = \Gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} \left(B_{zoo}^{C}\right)^{2}$
 
 where
 - $\Gamma^{0^{\circ}C}$ is the reference rate of biomass loss in units of [(mmol C m<sup>-3</sup>)<sup>-1</sup> day<sup>-1</sup>].
 
 
-### 9. Zooplankton grazing
+**Remineralisation** of detritus is only affected by a quadratic, density-dependent loss term,
 
-**Grazing by zooplankton** (`g_npz`, $\mu_{zoo}$, [day<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7), where:
+$\Gamma_{det}^{C} = \Gamma_{det}^{0^{\circ}C} (β_{hete})^{T} \left(B_{det}^{C}\right)^{2}$
 
-$\mu_{zoo} = \dfrac{\mu_{zoo}^{max} (β_{hete})^{T} \varepsilon (B_{prey})^{2}}{\mu_{zoo}^{max} (β_{hete})^{T} + \varepsilon (B_{prey})^{2}}$
+since hydrolyzation of organic detritus is performed by an heterotrophic bacterial population that is not explicitly resolved in the model.
 
-This formulation suppresses grazing at very low prey biomass due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
 
-The application of $\mu_{zoo}^{max} (β_{hete})^{T}$ in both the numerator and denominator makes this grazing formula unique [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w) and equivalent to a disk formulation, rather than a Michaelis–Menten formulation [(Rohr et al., 2022)](https://doi.org/10.1016/j.pocean.2022.102878). Practically, this amplifies grazing in warmer climes, but to a lesser extent than other formulations that apply the temperature amplification ($(β_{hete})^{T}$) only in the numerator [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w). This dampens the effect that variations in temperature have on grazing activity, amplifying the effect of $\varepsilon and aligning with observations that the ratio of grazing to phytoplankton growth varies little between tropical and polar climes [(Calbet and Landry, 2004)](https://doi.org/10.4319/lo.2004.49.1.0051). Theoretically, this assumes some evolutionary adaptation to account for the physiological effects of temperature across environmental niches, such that the efficiency of prey capture and handling becomes more important to grazers than metabolic constraints due to temperature.
+---
+
+
+### 9. Zooplankton grazing, growth, excretion and egestion
+
+**Grazing by zooplankton** (`g_npz`, $g_{zoo}$, [day<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7), where:
+
+$g_{zoo} = \dfrac{\mu_{zoo}^{max} (β_{hete})^{T} \varepsilon (B_{prey}^{C})^{2}}{\mu_{zoo}^{max} (β_{hete})^{T} + \varepsilon (B_{prey}^{C})^{2}}$
+
+This formulation suppresses grazing at very low prey biomass ($B_{prey}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
+
+The application of $g_{zoo}^{max} (β_{hete})^{T}$ in both the numerator and denominator makes this grazing formula unique [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w) and equivalent to a disk formulation, rather than a Michaelis–Menten formulation [(Rohr et al., 2022)](https://doi.org/10.1016/j.pocean.2022.102878). Practically, this amplifies grazing in warmer climes, but to a lesser extent than other formulations that apply the temperature amplification ($(β_{hete})^{T}$) only in the numerator [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w). This dampens the effect that variations in temperature have on grazing activity, amplifying the effect of $\varepsilon and aligning with observations that the ratio of grazing to phytoplankton growth varies little between tropical and polar climes [(Calbet and Landry, 2004)](https://doi.org/10.4319/lo.2004.49.1.0051). Theoretically, this assumes some evolutionary adaptation to account for the physiological effects of temperature across environmental niches, such that the efficiency of prey capture and handling becomes more important to grazers than metabolic constraints due to temperature.
 
 The total prey biomass available to zooplankton is defined as a preference-weighted sum of phytoplankton and detritus:
 
-$B_{prey} = \phi_{zoo}^{phy} B_{phy}^{C} + \phi_{zoo}^{det} B_{det}^{C}$
+$B_{prey}^{C} = \phi_{zoo}^{phy} B_{phy}^{C} + \phi_{zoo}^{det} B_{det}^{C}$
 
 where $B_{phy}^{C}$ and $B_{det}^{C}$ are phytoplankton and detrital carbon biomass, respectively, and $\phi_{zoo}$ terms define relative grazing preferences for these prey items.
 
@@ -342,17 +374,39 @@ The prey capture rate coefficient, $\varepsilon$ (`zooeps(i,j,k)`, $\varepsilon$
 
 A prey-dependent scaling factor is defined as
 
-$F_{prey} = e^{\left(-B_{prey} \varepsilon_{shift} \right)}$
+$F_{prey} = e^{\left(-B_{prey}^{C} \varepsilon_{shift} \right)}$
 
 and the effective capture rate coefficient, $\varepsilon$ is then computed as
 
 $\varepsilon = \varepsilon_{\min} + (\varepsilon_{\max} - \varepsilon_{\min}) F_{prey}$
 
-At low prey biomass, $\varepsilon \rightarrow \varepsilon_{\max}$, enhancing grazing efficiency.
-At high prey biomass, $\varepsilon \rightarrow \varepsilon_{\min}$, reducing capture efficiency as handling time and feeding mode are more ineffective on average in a community with relatively more mesozooplankton.
+At low prey biomass, $\varepsilon \rightarrow \varepsilon_{\max}$, enhancing grazing efficiency. At high prey biomass, $\varepsilon \rightarrow \varepsilon_{\min}$, reducing capture efficiency as handling time and feeding mode are more ineffective on average in a community with relatively more mesozooplankton.
+
+Zooplankton total grazing of biomass ([mmol C m<sup>-3</sup> day<sup>-1</sup>]) is therefore
+
+$g_{zoo}^{C} = g_{zoo} B_{zoo}^{C} = \left(g_{zoo}^{&rarr; phy} + g_{zoo}^{&rarr; det}\right) B_{zoo}^{C} $
+
+where:
+- $g_{zoo}^{&rarr; phy} = g_{zoo} \dfrac{\phi_{zoo}^{phy} B_{phy}^{C}}{B_{prey}^{C}}$ and is the proportion of zooplankton grazing of phytoplankton
+- $g_{zoo}^{&rarr; det} = g_{zoo} \dfrac{\phi_{zoo}^{det} B_{det}^{C}}{B_{prey}^{C}}$ and is the proportion of zooplankton grazing of detritus
+
+
+**Zooplankton growth**, or biomass accumulation ($\mu_{zoo}^{C}$), is then calculated assuming a static assimilation coefficient ($\lambda$). $\lambda$ is the fraction of ingested material that is assimilated into zooplankton biomass and thus contributes to their growth.
+
+$\mu_{zoo}^{C} = g_{zoo}^{C} \lambda$
+
+
+**Zooplankton excretion and egestion** are then calculated from the unassimilated material based on an excretion coefficient ($\eta$). $\eta$ determines the fraction of unassimilated material that is routed towards excretion ($\eta_{zoo}^{C}$), rather than egestion ($E_{zoo}^{C}$).
+
+$\eta_{zoo}^{C} = g_{zoo}^{C} \left(1 - \lambda\right)\eta$
+
+$E_{zoo}^{C} = g_{zoo}^{C} \left(1 - \lambda\right) \left(1-\eta\right)$
+
 
 ---
-### 9. CaCO3 calculations
+
+
+### 10. CaCO3 calculations
 
 **Dynamic CaCO$_3$ production and dissolution**
 
@@ -385,19 +439,83 @@ where $\Omega_{\text{cal}}$ and $\Omega_{\text{ara}}$ are the saturation states 
 
 An additional detritus-associated dissolution term is included (`diss_det`, $D_{\text{det}}$, [day<sup>-1</sup>]):
 
-$D_{\text{det}} = d_{\text{det}} \left( \gamma_{\text{det}}^{0^{\circ}C} (β_{hete})^{T} (B_{\text{det}})^{2} \right)$
+$D_{\text{det}} = d_{\text{det}} \Gamma_{det}$
 
-where $B_{\text{det}}$ is detrital organic carbon biomass and $\left( \gamma_{\text{det}}^{0^{\circ}C} (β_{hete})^{T} (B_{\text{det}})^{2} \right)$ is the local remineralisation rate of organic matter. This term represents shallow water $CaCO_3$ dissolution where $\Omega$ of calcite and aragonite in the water column tend to be > 1 [(Sulpis et al. (2021)](https://www.nature.com/articles/s41561-021-00743-y) but where dissolution nonetheless occurs within reducing microenvironments enriched in $CO_2^*$.
+where $\Gamma_{det}$ is the local remineralisation rate of organic matter ([mmol m<sup>-3</sup> day<sup>-1</sup>]. This term represents shallow water $CaCO_3$ dissolution due to reducing microenvironments. In this scenario, $\Omega$ of calcite and aragonite in the water column tend to be > 1 [(Sulpis et al. (2021)](https://www.nature.com/articles/s41561-021-00743-y) but dissolution nonetheless occurs in microenvironments enriched in $CO_2^*$.
 
 The rate of $CaCO_3$ dissolution is then calculated by summing these three dissolution terms and applying them to the biomass of $CaCO_3$ in the water column ($B_{CaCO_3}$): 
 
 $D_{\text{CaCO}3} = \left( D{\text{cal}} + D_{\text{ara}} + D_{\text{det}} \right) B_{CaCO_3}$ 
 
----
-### 10. Sources and Sinks
+
+**Static CaCO$_3$ production and dissolution**
+
+When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model uses a static PIC:POC ratio and $CaCO_3$ dissolution rate. These are set as input parameters to the model.
 
 ---
+
+
 ### 11. Tracer tendencies
 
+**Nitrate** (`f_no3(i,j,k)`, $NO_3$, [mol N kg<sup>-1</sup>])
+
+$\dfrac{\Delta NO_3}{\Delta t} = \left(\Gamma_{det}^{C} + \gamma_{zoo}^{C} + \gamma_{phy}^{C} + \eta_{zoo}^{C} - \mu_{phy}^{C} \right) \cdot R^{N:C}$
+
+**Oxygen** (`f_o2(i,j,k)`, $O_2$, [mol O<sub>2</sub> kg<sup>-1</sup>])
+
+$\dfrac{\Delta O_2}{\Delta t} = \left( \mu_{phy}^{C} - \Gamma_{det}^{C} - \gamma_{zoo}^{C} - \gamma_{phy}^{C} - \eta_{zoo}^{C} \right) \cdot R^{O_2:C}$
+
+**Dissolved iron** (`f_fe(i,j,k)`, $dFe$, [mol Fe kg<sup>-1</sup>])
+
+$\dfrac{\Delta dFe}{\Delta t} = \Gamma_{det}^{C} Q_{det}^{Fe:C} + \gamma_{phy}^{C} Q_{phy}^{Fe:C} + \gamma_{zoo}^{C} Q_{zoo}^{Fe:C} +
+\left( g_{zoo}^{&rarr; phy} \cdot Q_{phy}^{Fe:C} + g_{zoo}^{&rarr; det} \cdot Q_{det}^{Fe:C} \right) \left(1 - \lambda \right) \cdot \eta - 
+\mu_{phy}^{Fe} - Fe_{nanop}^{&rarr;} - Fe_{scav}^{&rarr;} - Fe_{coag}^{&rarr;det} $ 
+
+**Phytoplankton** (`f_phy(i,j,k)`, $phy$, [mol C kg<sup>-1</sup>])
+
+$\dfrac{\Delta phy}{\Delta t} = \mu_{phy}^{C} - \Gamma_{phy}^{C} - \gamma_{phy}^{C} - g_{zoo}^{&rarr; phy}$ 
+
+**Phytoplankton chlorophyll** (`f_pchl(i,j,k)`, $chl$, [mol Chl kg<sup>-1</sup>])
+
+$\dfrac{\Delta chl}{\Delta t} = \mu_{phy}^{chl} - \left( \Gamma_{phy}^{C} + \gamma_{phy}^{C} + g_{zoo}^{&rarr; phy} \right) \cdot Q_{phy}^{Chl:C}$ 
+
+**Phytoplankton iron** (`f_phyfe(i,j,k)`, $phy^{Fe}$, [mol Fe kg<sup>-1</sup>])
+
+$\dfrac{\Delta phy^{Fe}}{\Delta t} = \mu_{phy}^{Fe} - \left( \Gamma_{phy}^{C} + \gamma_{phy}^{C} + g_{zoo}^{&rarr; phy} \right) \cdot Q_{phy}^{Fe:C}$ 
+
+**Zoooplankton** (`f_zoo(i,j,k)`, $zoo$, [mol C kg<sup>-1</sup>])
+
+$\dfrac{\Delta zoo}{\Delta t} = \mu_{zoo}^{C} - \Gamma_{zoo}^{C} - \gamma_{zoo}^{C}$ 
+
+**Zoooplankton iron** (`f_zoofe(i,j,k)`, $zoo^{Fe}$, [mol Fe kg<sup>-1</sup>])
+
+$\dfrac{\Delta zoo^{Fe}}{\Delta t} = \left( g_{zoo}^{&rarr; phy} Q_{phy}^{Fe:C} + g_{zoo}^{&rarr; det} Q_{det}^{Fe:C} \right) \lambda - \left( \Gamma_{zoo}^{C} - \gamma_{zoo}^{C} \right) \cdot Q_{zoo}^{Fe:C}$ 
+
+**Detritus** (`f_det(i,j,k)`, $det$, [mol C kg<sup>-1</sup>])
+
+$\dfrac{\Delta det}{\Delta t} = \Gamma_{phy}^{C} + \Gamma_{zoo}^{C} + E_{zoo}^{C} - \left( \Gamma_{det}^{C} + g_{zoo}^{&rarr; det} \right)$ 
+
+**Detritus iron** (`f_detfe(i,j,k)`, $det^{Fe}$, [mol Fe kg<sup>-1</sup>])
+
+$\dfrac{\Delta det^{Fe}}{\Delta t} = \Gamma_{phy}^{C} Q_{phy}^{Fe:C} + \Gamma_{zoo}^{C} Q_{zoo}^{Fe:C} + 
+\left( g_{zoo}^{&rarr; phy} \cdot Q_{phy}^{Fe:C} + g_{zoo}^{&rarr; det} \cdot Q_{det}^{Fe:C} \right) \left(1 - \lambda \right) \left(1 - \eta \right) +
+Fe_{scav}^{&rarr;det} + Fe_{coag}^{&rarr;det} -
+\left( \Gamma_{det}^{C} + g_{zoo}^{&rarr; det} \right) \cdot Q_{det}^{Fe:C}$ 
+
+**Calcium Carbonate** (`f_caco3(i,j,k)`, $CaCO_3$, [mol C kg<sup>-1</sup>])
+
+$\dfrac{\Delta CaCO_3}{\Delta t} = \left( \Gamma_{zoo}^{C} + \Gamma_{phy}^{C} \right) PIC:POC + g_{zoo}^{&rarr; phy} \left(1 - F_{zoo}^{diss} \right) PIC:POC - D_{\text{CaCO}3}$ 
+
+**Dissolved Inorganic Carbon** (`f_dic(i,j,k)`, $DIC$, [mol C kg<sup>-1</sup>])
+
+$\dfrac{\Delta DIC}{\Delta t} = \Gamma_{det}^{C} + \gamma_{zoo}^{C} + \gamma_{phy}^{C} + \eta_{zoo}^{C} - \mu_{phy}^{C} - \dfrac{\Delta CaCO_3}{\Delta t}$ 
+
+**Alkalinity** (`f_alk(i,j,k)`, $Alk$, [mol Eq kg<sup>-1</sup>])
+
+$\dfrac{\Delta Alk}{\Delta t} = - \dfrac{\Delta NO_3}{\Delta t} - 2 \cdot \dfrac{\Delta CaCO_3}{\Delta t}$ 
+
+
 ---
+
+
 ### 12. Check for conservation of mass
