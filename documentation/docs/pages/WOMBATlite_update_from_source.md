@@ -22,11 +22,15 @@ at each tracer time‑step. The subroutine is documented internally by a list of
 5. Growth of chlorophyll.
 6. Phytoplankton uptake of iron.
 7. Iron chemistry (precipitation, scavenging and coagulation).
-8. Mortality and remineralisation
+8. Mortality and remineralisation.
 9. Zooplankton grazing.
 10. CaCO3 calculations.
 11. Tracer tendencies (update tracer concentrations).
 12. Check for conservation of mass.
+13. Additional operations on tracers.
+14. Sinking rate of particulates.
+15. Sedimentary processes
+16. 
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in grey follow the Fortran code, while 
 variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
@@ -527,7 +531,7 @@ where:
 ---
 
 
-### 14. Calculate sinking rate of particulates
+### 14. Sinking rate of particulates.
 
 WOMBAT-lite functions with a spatially variable sinking rate of both organic and inorganic (i.e., $CaCO_3$) particulate matter. 
 
@@ -582,21 +586,57 @@ The degree to which $CaCO_3$ particles sink more slowly than organic detritus is
 ---
 
 
-### 15. Sedimentary remineralisation of tracers
+### 15. Sedimentary processes.
 
-WOMBAT-lite tracks the accumulation of organic carbon, organic iron and $CaCO_3$ within a sedimentary pool. The organic carbon pool, and organic nitrogen by extension using the model's static N:C ratio, contributes to bottom fluxes of dissolved inorganic carbon (DIC), nitrate ($NO_3$), oxygen ($O_2$) and alkalinity (Alk). Remineralisation of organic carbon produces DIC and $NO_3$, but removes $O_2$ and Alk. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 172:122.
+WOMBAT-lite tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved inorganic carbon (DIC), nitrate ($NO_3$), dissolved iron (dFe), oxygen ($O_2$) and alkalinity (Alk). Remineralisation of organic carbon ($\gamma_{det,sed}^{C}$) produces DIC and $NO_3$, but removes $O_2$ and Alk. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and -172:122. Remineralisation of organic iron produces dFe.
+
+$\gamma_{det,sed}^{C} = \gamma_{det,sed}^{0^{\circ}C} (β_{hete})^{T} B_{det,sed}^{C}$
+
+$\gamma_{det,sed}^{N} = \gamma_{det,sed}^{C} R^{N:C}$
+
+$\gamma_{det,sed}^{O_2} = \gamma_{det,sed}^{C} R^{O_2:C}$
+
+$\gamma_{det,sed}^{Alk} = -\gamma_{det,sed}^{N}$
+
+$\gamma_{det,sed}^{Fe} = \gamma_{det,sed}^{0^{\circ}C} (β_{hete})^{T} B_{det,sed}^{Fe}$
 
 Alk and DIC are in turn affected by dissolution of the sedimenary $CaCO_3$ pool, which is considered as entirely calcite. Sedimentary dissolution is controlled by bottom water temperature and an estimate of the pore-water calcite saturation state ($\Omega_{cal}^{sed}$):
 
-$\D_{cal}^{sed} = d_{cal}^{sed} (β_{hete})^{T} \max(1 - \Omega_{cal}^{+sed},  1 - \Omega_{cal}^{sed})^{4.5}$
+$\D_{cal,sed} = d_{cal,sed} (β_{hete})^{T} \max(1 - \Omega_{cal,+sed},  1 - \Omega_{cal,sed})^{4.5}$
 
 where
-- $d_{cal}^{sed}$ is a base rate of dissolution in units of [day<sup>-1</sup>], and
-- $\Omega_{cal}^{+sed}$ is the maximum possible saturation state within sediment pore water.
+- $d_{cal,sed}$ is a base rate of dissolution in units of [day<sup>-1</sup>], and
+- $\Omega_{cal,+sed}$ is the maximum possible saturation state within sediment pore water.
 
-The $Omega_{cal}^{sed}$ is calculated using the `mocsy` package for solving carbonate chemistry of seawater. For the sediments, we chose to sum the water column concentration of DIC and the organic carbon content of the sediment to approximate the interstitial (i.e., porewater) DIC concentration. We assume that the organic carbon content of the sediment (p_det_sediment) in mol/m2 is relevant over one meter, and therefore can be automatically converted to mol/m3 and then subsequently converted through the mol/kg using Rho_0. With this assumption these arrays can be added together. We add these arrays together to simulate the reducing conditions of organic-rich sediments, and to calculate a lower omega for calcite, which ensures greater rates of dissolution of CaCO3 within the sediment as organic matter accumulates.
+The $\Omega_{cal,sed}$ is calculated using the `mocsy` package for solving carbonate chemistry of seawater ([Orr & Epitalon, 2015](https://doi.org/10.5194/gmd-8-485-2015)). These routines require Alk and DIC as inputs, along with nutrient concentrations and temperature and salinity of bottom waters. For DIC, we chose to sum the water column concentration of DIC and the organic carbon content of the sediment to approximate the interstitial (i.e., porewater) DIC concentration. We assume that the organic carbon content of the sediment (`p_det_sediment`), which is held in units of in [mol m<sup>-2</sup>] is relevant over one meter, and therefore can be automatically converted to [mol m<sup>-3</sup>]. With this assumption these arrays can be added together and approximates the reducing conditions of organic-rich sediments, which have lower $\Omega_{cal,sed}$. This ensures a greater rate of $CaCO_3$ dissolution within the sediment as organic matter accumulates.
+
+Overall bottom fluxes of tracers are:
+
+$\dfrac{\Delta NO_3}{\Delta t} = $\gamma_{det,sed}^{N}$
+
+$\dfrac{\Delta O_2}{\Delta t} = $\gamma_{det,sed}^{O_2}$
+
+$\dfrac{\Delta dFe}{\Delta t} = $\gamma_{det,sed}^{Fe}$
+
+$\dfrac{\Delta DIC}{\Delta t} = $\gamma_{det,sed}^{C} + \D_{cal,sed}$
+
+$\dfrac{\Delta Alk}{\Delta t} = $\gamma_{det,sed}^{Alk} + 2 \cdot \D_{cal,sed}$
 
 ---
 
-### 16. Conserve tracers following burial?
 
+### 16. Permanent burial of particulates.
+
+If `do_burial = .true.`, we compute the fraction of incident sinking organic matter and $CaCO_3$ that is permanently buried in the sediments. This permanently buried fraction is effectively removed from the model and therefore is not accumulated within the sedimentary pools.
+
+The fraction buried is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
+
+$F_{bury} = 0.013 \cdot 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}$
+
+where
+- $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> day<sup>-1</sup>].
+
+As organic matter rains down at a more rapid rate, the fraction of incident organic matter that is buried increases.
+
+
+If `do_conserve_tracers = .true.`, then we capture the total loss of both Alk and $NO_3$ via burial or organic detritus and $CaCO_3$ and redistribute the Alk and $NO_3$ amount back at the ocean surface. This amount of each tracer is redistributed uniformly to avoid strong gradients.
