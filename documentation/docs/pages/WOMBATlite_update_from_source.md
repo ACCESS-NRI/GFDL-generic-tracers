@@ -36,21 +36,9 @@ variable names in math font are pointers to the equations; i,j,k refer to horizo
 
 ### 1. Light attenuation through the water column
 
-Photosynthetically available radiation (PAR) is split into blue, green and red wavelengths. Surface incoming shortwave radiation is multiplied by 
-0.43 to return the photosynthetically active radiation (PAR, [W m<sup>-2</sup>) of total shortwave radiation, and is then split evenly into each 
-of blue, green and red light bands. 
+Photosynthetically available radiation (PAR) is split into blue, green and red wavelengths. Surface incoming shortwave radiation is multiplied by 0.43 to return the photosynthetically active radiation (PAR, [W m<sup>-2</sup>) of total shortwave radiation, and is then split evenly into each of blue, green and red light bands. 
 
-At the top (`par_bgr_top(k,b)`, $PAR^{top}$) and mid‑point (`par_bgr_mid(k,b)`, $PAR^{mid}$) of each layer `k` we calculate the downward irradiance 
-by exponential decay of each band `b` through the layer thickness (`dzt(i,j,k)`, $\Delta z$, [m]) using band‑specific attenuation coefficients 
-(`ek_bgr(k,b)`, $ex_{bgr}$, [m<sup>-1</sup>]). These attenuation coefficients are related to the concentration of chlorophyll ([mg m<sup>-3</sup>]), 
-organic detritus ([mg N m<sup>-3</sup>]) and calcium carbonate ([kg m<sup>-3</sup>]) in the water column. For chlorophyll, attentuation coefficients 
-for each of blue, green and red light are retrieved from the look-up table of [Morel & Maritorena (2001)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2000JC000319) 
-(their Table 2) that explicitly relates chlorophyll concentration to attenutation rates and accounts for the packaging effect of chlorophyll in larger 
-cells. For organic detritus, attenutation coefficients for blue, green and red light are taken from 
-[Dutkiewicz et al. (2015)](https://bg.copernicus.org/articles/12/4447/2015/bg-12-4447-2015.html) (their Fig. 1b), while for calcium carbonate we take 
-the coefficients defined in [Soja-Wozniak et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019JC014998). For both detritus and 
-calcium carbonate, these studies provide concentration normalized attenutation coefficients, which must be multipled against concentrations to 
-retrieve the correct units of [m<sup>-1</sup>].
+At the top (`par_bgr_top(k,b)`, $PAR^{top}$) and mid‑point (`par_bgr_mid(k,b)`, $PAR^{mid}$) of each layer `k` we calculate the downward irradiance by exponential decay of each band `b` through the layer thickness (`dzt(i,j,k)`, $\Delta z$, [m]) using band‑specific attenuation coefficients (`ek_bgr(k,b)`, $ex_{bgr}$, [m<sup>-1</sup>]). These attenuation coefficients are related to the concentration of chlorophyll ([mg m<sup>-3</sup>]), organic detritus ([mg N m<sup>-3</sup>]) and calcium carbonate ([kg m<sup>-3</sup>]) in the water column. For chlorophyll, attentuation coefficients for each of blue, green and red light are retrieved from the look-up table of [Morel & Maritorena (2001)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2000JC000319) (their Table 2) that explicitly relates chlorophyll concentration to attenutation rates and accounts for the packaging effect of chlorophyll in larger cells. For organic detritus, attenutation coefficients for blue, green and red light are taken from [Dutkiewicz et al. (2015)](https://bg.copernicus.org/articles/12/4447/2015/bg-12-4447-2015.html) (their Fig. 1b), while for calcium carbonate we take the coefficients defined in [Soja-Wozniak et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019JC014998). For both detritus and calcium carbonate, these studies provide concentration normalized attenutation coefficients, which must be multipled against concentrations to retrieve the correct units of [m<sup>-1</sup>].
 
 As an example, the PAR in the blue band (`b=1`) at the top of level k is computed as
 
@@ -79,8 +67,7 @@ The euphotic depth is defined as the depth where `radbio` falls below the 1% thr
 
 ### 2. Nutrient limitation of phytoplankton
 
-At the start of each vertical loop the code computes biomass of phytoplankton (`biophy`, $B_{phy}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass 
-is used to scale how both nitrate (`biono3`, $NO_{3}$, [mmol NO<sub>3</sub> m<sup>-3</sup>]) and dissolved iron (`biofer`, $dFe$, [µmol dFe m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
+At the start of each vertical loop the code computes biomass of phytoplankton (`biophy`, $B_{phy}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how both nitrate (`biono3`, $NO_{3}$, [mmol NO<sub>3</sub> m<sup>-3</sup>]) and dissolved iron (`biofer`, $dFe$, [µmol dFe m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
 
 $aff = V^{-0.57}$
 
@@ -489,7 +476,7 @@ $\dfrac{\Delta zoo}{\Delta t} = \mu_{zoo}^{C} - \Gamma_{zoo}^{C} - \gamma_{zoo}^
 
 **Zoooplankton iron** (`f_zoofe(i,j,k)`, $zoo^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta zoo^{Fe}}{\Delta t} = \left( g_{zoo}^{&rarr; phy} Q_{phy}^{Fe:C} + g_{zoo}^{&rarr; det} Q_{det}^{Fe:C} \right) \lambda - \left( \Gamma_{zoo}^{C} - \gamma_{zoo}^{C} \right) \cdot Q_{zoo}^{Fe:C}$ 
+$\dfrac{\Delta zoo^{Fe}}{\Delta t} = \left( g_{zoo}^{&rarr; phy} \cdot Q_{phy}^{Fe:C} + g_{zoo}^{&rarr; det} \cdot Q_{det}^{Fe:C} \right) \lambda - \left( \Gamma_{zoo}^{C} - \gamma_{zoo}^{C} \right) \cdot Q_{zoo}^{Fe:C}$ 
 
 **Detritus** (`f_det(i,j,k)`, $det$, [mol C kg<sup>-1</sup>])
 
@@ -519,3 +506,97 @@ $\dfrac{\Delta Alk}{\Delta t} = - \dfrac{\Delta NO_3}{\Delta t} - 2 \cdot \dfrac
 
 
 ### 12. Check for conservation of mass
+
+When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.`), the model will calculate the budget of nitrogen or carbon both before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of both nitrogen and carbon within the ocean. 
+
+---
+
+### 13. Additional operations on tracers
+
+**First**, dissolved iron concentrations are set to equal 1 nM everywhere where the depth of the water column is less than 200 metres deep. WOMBAT-lite is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we universally set the dissolved iron concentration in these waters to 1 nM.
+
+**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits, we reset these concentrations to this minimum  (`zfermin`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
+
+$[dFe]^{min} = \min\left( \max\left( 0.003 \cdot [NO_3]^{2}, 0.005 \right), 0.007 \right)$
+
+where:
+- [NO_3] is the ambient nitrate concentration in units of [mmol m<sup>-3</sup>] 
+
+**Third**, in the absence of riverine additions of tracers, we apply a correction to add tracer where substantial dilution occurs. Both alkalinity ($Alk$) and dissolved inorganic carbon ($DIC$) are reset to minimum seawater concentrations. These concentrations are set in the input parameter namelist.
+
+---
+
+
+### 14. Calculate sinking rate of particulates
+
+WOMBAT-lite functions with a spatially variable sinking rate of both organic and inorganic (i.e., $CaCO_3$) particulate matter. 
+
+**Organic detritus**
+
+We consider that base sinking rates of detritus (`wdetbio`, $\omega_{det}^{0}$, [m day<sup>-1</sup>]) are varied as a function of phytoplankton concentration (in a similar fashion to half-saturation coefficients described earlier), as well as the fraction of particulate matter that is $CaCO_3$. This approach is taken to emulate observations of varying sinking speeds [(Riley et al., 2012)](https://doi.org/10.1029/2011GB004085) and because such variations may be strongly dependent on phytoplankton community composition [(Bach et al., 2016)](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2016GB005372).
+
+In accordance with a more general Navier–Stokes drag equation and using a compilation of particle sinking speeds, [Cael et al. (2021)](https://doi.org/10.1029/2020GL091771) identified that the sinking velocity of detrital particles ($\omega_{det}$) in [m day<sup>-1</sup>]) is proportional to their diameter raised to the power of roughly 0.63, such that
+
+$\omega_{det} \propto d^{0.63}$.
+
+Knowing that 
+
+$d = 6 V \pi \dfrac{1}{3}$
+
+and given that the average volume of phytoplankton cells can be approximated by $V = (B_{phy}^{C})^{0.65}$ [(Wickman et al., 2024)](https://doi.org/10.1126/science.adk6901), we can relate $\omega_{det}$ to the biomass concentration of phytoplankton multiplied by the scaler $\omega_{det}^{0}$
+
+$\omega_{det} = \omega_{det}^{0} \cdot \left( B_{phy}^{C} \right)^{0.21}$
+
+This formula is identical to that presented by [Cael et al. (2021)](https://doi.org/10.1029/2020GL091771) in their Eq. (3), with the exception that we have related sinking rates to the biomass concentration of phytoplankton ($B_{phy}^{C}$) by assuming that $V = (B_{phy}^{C})^{0.65}$ based on marine phytoplankton data [(Wickman et al., 2024)](https://doi.org/10.1126/science.adk6901).
+
+As phytoplankton concentrations are negligible beneath the euphotic zone we use $B_{phy}^{C}$ only in the uppermost grid cell (k = 1). This assumes that the sinking velocities of marine aggregates can be related to phytoplankton community composition at the surface ([Bach et al., 2016](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2016GB005372); [Iversen and Lampitt, 2020](https://doi.org/10.1016/j.pocean.2020.102445)), which varies more horizontally across the ocean than vertically. Moreover, because we do not include dissolved/suspended organic matter as a tracer in WOMBAT-lite, we must also account for the large fraction of organics that are suspended and thus neutrally buoyant in the gyres. As such, we include a phytoplankton biomass threshold (`phybiot`, $B_{phy}^{thresh}$, [mmol C m<sup>-3</sup>]) above which sinking accelerates and beneath which any produced detritus emulates dissolved (neutrally buoyant) organic matter:
+
+$\omega_{det} = \omega_{det}^{0} \cdot \max \left( 0.0, B_{phy}^{C,k=1} - B_{phy}^{thresh} \right)^{0.21}$
+
+Sinking speeds are then accelerated depending on the fraction of $CaCO_3$ within the particulate mass by
+
+$\omega_{det} = \omega_{det} + 10 \cdot \min \left( 1, \dfrac{B_{CaCO_3}^{C}}{B_{CaCO_3}^{C} + B_{phy}^{C}} \right)$
+
+where we chose a maximum increase of 10 metres per day based on the more modest effect observed in mesocosm experiments ([Bach et al., 2016](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2016GB005372).
+
+Finally, we apply a linear increase to sinking speeds with depth to ensure that the trend in the concentration of detritus with depth exhibits a power law behavior, which is widely observed ([Berelson, 2001](https://doi.org/10.1016/S0967-0645(01)00102-3); [Martin et al., 1987](https://doi.org/10.1016/0198-0149(87)90086-0)), thought to be associated with a greater attenuation of more slowly sinking particles, and shows better performance than a constant sinking rate in models ([Tjiputra et al., 2020](https://gmd.copernicus.org/articles/13/2393/2020/)). This is applied after the previous equation as:
+
+$\omega_{det} = \omega_{det} + \max\left(0.0, \dfrac{z}{5000} \cdot \left(\omega_{det}^{max} - \omega_{det} \right)\right)$
+
+
+**Calcium carbonate**
+
+The sinking rate of $CaCO_3$ is considered to always be a fraction of the sinking rate of organic detritus, such that
+
+$\omega_{CaCO_3} = \omega_{det} \cdot \dfrac{\omega_{CaCO_3}^{0}}{\omega_{det}^{0}}$,
+
+and where
+
+$\omega_{CaCO_3}^{0} < \omega_{det}^{0}$
+
+Although more dense than organic matter, $CaCO_3$ particles tend to be smaller than organic aggregates and sink at a slower rate ([De La Rocha & Passow, 2007](https://doi.org/10.1016/j.dsr2.2007.01.004); [Zhang et al., 2018](https://doi.org/10.5194/bg-15-4759-2018)). Furthermore, the shedding of coccoliths by coccolithophores, which are near-neutrally bouyant, also contributes to a slower mean sinking speed of $CaCO_3$ ([Balch et al., 2009](https://doi.org/10.1029/2008JC004902)).
+
+The degree to which $CaCO_3$ particles sink more slowly than organic detritus is controlled by the user through altering the base sinking speed ($\omega_{CaCO_3}^{0}$) relative to the base sinking speed of organics ($\omega_{det}^{0}$).
+
+
+---
+
+
+### 15. Sedimentary remineralisation of tracers
+
+WOMBAT-lite tracks the accumulation of organic carbon, organic iron and $CaCO_3$ within a sedimentary pool. The organic carbon pool, and organic nitrogen by extension using the model's static N:C ratio, contributes to bottom fluxes of dissolved inorganic carbon (DIC), nitrate ($NO_3$), oxygen ($O_2$) and alkalinity (Alk). Remineralisation of organic carbon produces DIC and $NO_3$, but removes $O_2$ and Alk. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 172:122.
+
+Alk and DIC are in turn affected by dissolution of the sedimenary $CaCO_3$ pool, which is considered as entirely calcite. Sedimentary dissolution is controlled by bottom water temperature and an estimate of the pore-water calcite saturation state ($\Omega_{cal}^{sed}$):
+
+$\D_{cal}^{sed} = d_{cal}^{sed} (β_{hete})^{T} \max(1 - \Omega_{cal}^{+sed},  1 - \Omega_{cal}^{sed})^{4.5}$
+
+where
+- $d_{cal}^{sed}$ is a base rate of dissolution in units of [day<sup>-1</sup>], and
+- $\Omega_{cal}^{+sed}$ is the maximum possible saturation state within sediment pore water.
+
+The $Omega_{cal}^{sed}$ is calculated using the `mocsy` package for solving carbonate chemistry of seawater. For the sediments, we chose to sum the water column concentration of DIC and the organic carbon content of the sediment to approximate the interstitial (i.e., porewater) DIC concentration. We assume that the organic carbon content of the sediment (p_det_sediment) in mol/m2 is relevant over one meter, and therefore can be automatically converted to mol/m3 and then subsequently converted through the mol/kg using Rho_0. With this assumption these arrays can be added together. We add these arrays together to simulate the reducing conditions of organic-rich sediments, and to calculate a lower omega for calcite, which ensures greater rates of dissolution of CaCO3 within the sediment as organic matter accumulates.
+
+---
+
+### 16. Conserve tracers following burial?
+
