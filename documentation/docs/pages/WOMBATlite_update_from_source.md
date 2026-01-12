@@ -125,12 +125,14 @@ The maximum potential growth rate for phytoplankton (`phy_mumax(i,j,k)`, $\mu_{p
 
 $\mu_{phy}^{max} = \mu_{phy}^{0^{\circ}C} \cdot (β_{auto})^{T}$
 
-In the above, both $\mu_{phy}^{0ºC}$ and $β_{auto}$ are reference values input to the model.
+In the above, both $\mu_{phy}^{0ºC}$ and $β_{auto}$ are reference values input to the model and control how productive the ocean is.
 
 **Heterotrophy.**
 Heterotrophic processes include mortality of phytoplankton and zooplankton, grazing rates of zooplankton and the remineralisation rate of detritus in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0^{\circ}C}$, [day<sup>-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$).
 
 $\mu_{het} = \mu_{het}^{0^{\circ}C} \cdot (β_{hete})^{T}$
+
+See sections below for further details on mortality and grazing terms.
 
 ---
 ### 4. Light limitation of phytoplankton
@@ -156,53 +158,50 @@ $\mu_{phy} = \mu_{phy}^{max} L_{phy}^{PAR} \min(L_{phy}^{N}, L_{phy}^{Fe})$
 ---
 ### 5. Growth of chlorophyll
 
-This step diagnoses the **rate of chlorophyll production** as a function of mixed-layer light, the phytoplankton growth rate, and nutrient availability. The structure is consistent with common **photoacclimation / variable chlorophyll-to-carbon** approaches that accelerate or decelerate chlorophyll growth relative to carbon growth.
+This step diagnoses the **rate of chlorophyll production** as a function of mixed-layer light, the phytoplankton growth rate and nutrient availability. The structure is consistent with common **photoacclimation / variable chlorophyll-to-carbon** approaches that accelerate or decelerate chlorophyll growth relative to carbon growth.
 
-A chlorophyll-specific initial P-I slope (`pchl_pisl`, $\alpha_{chl}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]) is constructed by scaling the photosynthetic carbon-specific P-I slope ($\alpha_{phy}$):
+A chlorophyll-specific initial P-I slope (`pchl_pisl`, $\alpha_{chl}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]) is constructed by scaling the photosynthetic carbon-specific P-I slope ($\alpha_{phy}$) by particular environmental conditions:
 
-$\alpha_{chl} = \dfrac{ \alpha_{phy} }{ \mu_{phy}^{max} (1 - \min(L_{phy}^{N}, L_{phy}^{Fe})) + \delta }$
+$\alpha_{chl} = \dfrac{ \alpha_{phy} }{ \mu_{phy}^{max} e^{\left(-\min\left(L_{phy}^{N}, L_{phy}^{Fe} \right)\right) } + \delta }$
 
-where $\delta$ is a small constant preventing division by zero. Above, warm temperatures that elevate $\mu_{phy}^{max}$ and nutrient-stress decrease the chlorophyll-specific P-I slope, while nutrient-rich conditions steepen it. There is strong evidence that both nitrogen and iron limitation limit chlorophyll-to-carbon ratios of phytoplankton cells, while warm waters make enzymatic carbon fixation more efficient and lower light harvesting demand.
+where $\delta$ is a small constant preventing division by zero. Above, warm temperatures that elevate $\mu_{phy}^{max}$ decrease the chlorophyll-specific P-I slope, and nutrient-stress also decreases this slope. Meanwhile, cold and nutrient-rich conditions steepen it. Such conditions are found in at the bottom of euphotic zones. There is strong evidence that both nitrogen and iron limitation limit chlorophyll-to-carbon ratios of phytoplankton cells [](), while warm waters make enzymatic carbon fixation more efficient and lower light harvesting demand, thereby decreasing Chl:C ratios []().
 
-Then, light limitation (`pchl_lpar(i,j,k)`, $L_{phy}^{PAR}$), [dimensionless]) is calculated using an exponential P–I formulation of the same form as carbon-specific light limitation.
+After solving for the chlorophyll-specific P-I slope, we calculate light limitation (`pchl_lpar(i,j,k)`, $L_{phy}^{PAR}$), [dimensionless]) using an exponential P–I formulation of the same form as carbon-specific light limitation,
 
 $L_{chl}^{PAR} = 1 - e^{- \alpha_{chl} PAR_{MLD} }$
 
-where:
+but here we use $PAR_{MLD}$ rather than $PAR$. In this case, $PAR_{MLD}$ (`radmld`, [W m<sup>-2</sup>]) is the average downwelling irradience in the mixed layer. This ensures that chlorophyll growth is amplified relative to carbon growth in the lower part of the mixed layer, but suppressed in the upper part. As such, chlorophyll growth is able to be accelerated relative to carbon growth by both (1) scaling $\alpha_{chl}$ and (2) using $PAR_{MLD}$ rather than $PAR$. For waters beneath the mixed layer, $PAR_{MLD}$ = $PAR$, so for these waters chlorophyll to carbon ratios are only affected by scaling $\alpha_{chl}$.
 
-- $PAR_{MLD} =$ `radmld` is the average downwelling irradience in the mixed layer and ensures that chlorophyll growth is amplified relative to carbon growth in the lower part of the mixed layer, but suppressed in the upper part.
-
-Before solving the growth rate of chlorophyll, we determine the minimum and optimal rates of chlorophyll production in mg m<sup>-3</sup> day<sup>-1</sup>, which are realised from the already known phytoplankton carbon growth rate:
+Before solving the growth rate of chlorophyll, we determine the minimum and maximum rates of chlorophyll production in mg m<sup>-3</sup> day<sup>-1</sup>, which are realised from the already known phytoplankton carbon growth rate:
 
 $\mu_{chl}^{min} = Q_{phy}^{-Chl:C} \mu_{phy} B_{phy}^{C} 12$
 
-$\mu_{chl}^{opt} = Q_{phy}^{*Chl:C} \mu_{phy} B_{phy}^{C} 12$
+$\mu_{chl}^{opt} = Q_{phy}^{"Chl:C} \mu_{phy} B_{phy}^{C} 12$
 
 where:
 
 - $Q_{phy}^{-Chl:C} =$ `phyminqc` is the minimum chlorophyll quota,
-- $Q_{phy}^{*Chl:C} =$ `phyoptqc` is the optimal chlorophyll quota,
+- $Q_{phy}^{"Chl:C} =$ `phyoptqc` is the maximum chlorophyll quota,
 - $\mu_{phy} =$ `phy_mu` is the realised phytoplankton growth rate,
 - $B_{phy}^{C} 12$ is phytoplankton carbon concentration in mg m<sup>-3</sup> (implemented as `biophy * 12.0`).
 
+These are the rates of chlorophyll growth required to support phytoplankton growth at both a minimum and maximum cellular quota. Chlorophyll-specific light limitation is then used to determine the extent to which optimal chlorophyll growth can be achieved:
 
-Chlorophyll production is then computed as
+$\mu_{chl}^{\delta} = \phi \left(\mu_{chl}^{opt} - \mu_{chl}^{min}\right) \cdot L_{chl}^{PAR}$
 
-$\mu_{chl}^{\delta} = (\mu_{chl}^{opt} - \mu_{chl}^{min}) \cdot L_{chl}^{PAR} \min(L_{phy}^{N}, L_{phy}^{Fe})$
-
-$\mu_{chl} = \phi ( \mu_{chl}^{min} + \dfrac{ \mu_{chl}^{\delta} }{ \alpha_{phy} PAR_{MLD} } )$
+$\mu_{chl} = \mu_{chl}^{min} + \mu_{chl}^{\delta} $
 
 where:
 
-- $\phi = \dfrac{PAR_{MLD}}{PAR_{MLD} + K_{chl}^{PAR}}$ and reduces growth during extended periods of low light, such as the polar winter;
-- $K_{chl}^{PAR}$ is a half-saturation light scale for chlorophyll growth (`chlkWm2`, [W m<sup>-2<\sup>]).
-- $\mu_{chl}^{\delta}$ is an additional growth of chlorophyll above what is required to maintain the minimum possible quota.
+- $\phi = \dfrac{PAR_{MLD}(k=1)}{PAR_{MLD}(k=1) + K_{chl}^{PAR}}$ and reduces growth during extended periods of low light, such as the polar winter;
+- $K_{chl}^{PAR}$ is a half-saturation light scale for chlorophyll growth (`chlkWm2`, [W m<sup>-2</sup>]).
+- $\mu_{chl}^{\delta}$ is the additional growth of chlorophyll above what is required to maintain the minimum quota.
 
 ---
 
 ### 6. Phytoplankton uptake of iron
 
-Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-lite. First, a maximum quota is found dependent on the maximum quota of Fe within the phytoplankton type (`phymaxqf`, $Q_{phy}^{^Chl:C}$, mol/mol) and the phytoplankton concentration in the water column:
+Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-lite. First, a maximum quota is found dependent on the maximum quota of Fe within the phytoplankton type (`phymaxqf`, $Q_{phy}^{Chl:C}$, [mol/mol]) and the phytoplankton concentration in the water column:
 
 $B_{phy}^{"Fe} = B_{phy}^{C} Q_{phy}^{"Chl:C}$
 
@@ -295,9 +294,17 @@ And where:
 Together, these terms implement a biologically mediated coagulation pathway in which iron removal from the dissolved pool is tightly coupled to ecosystem state. The formulation reflects the central conclusion of [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5): that iron cycling is not governed solely by inorganic chemistry, but is strongly regulated by biological activity, organic matter dynamics, and particle ecology across the upper ocean.
 
 ---
-### 8. Mortality scalings and grazing
+### 8. Mortality and remineralisation terms 
 
-We scale down **linear zooplankton mortality** when zooplankton biomass is small, such that
+Mortality of phytoplankton and zooplankton are affected by both linear ($\gamma$) and quadratic ($\Gamma$) terms. Linear terms are per-capita losses associated with the costs of basal metabolism. Quadratic, and thus density-dependent losses, are associated with disease, aggregation and coagulation, viruses, infection and canabalism.
+
+**Linear losses** for phytoplankton and zooplankton in [mmol m<sup>-3</sup> s<sup>-1</sup>] are modelled as
+
+$\gamma_{phy} = \gamma_{phy}^{0^{\circ}C} (β_{hete})^{T} B_{phy}^{C}$
+
+$\gamma_{zoo} = \gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} F_{zoo}^{\gamma} B_{zoo}^{C}$
+
+In the above, we scale down **linear zooplankton mortality** when zooplankton biomass is small, such that
 
 $F_{zoo}^{\gamma} = \dfrac{B_{zoo}^{C}}{B_{zoo}^{C} + K_{zoo}^{\gamma}}$,
 
@@ -305,9 +312,17 @@ where
 - $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass
 - $K_{zoo}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses
 
-and overall zooplankton linear mortality ($\gamma_{zoo}$) is then:
+**Quadratic losses** of phytoplankton and zooplankton in [mmol m<sup>-3</sup> s<sup>-1</sup>] are modelled as
 
-$\gamma_{zoo} = \gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} F_{zoo}^{\gamma}$
+$\Gamma_{phy} = \Gamma_{phy}^{0^{\circ}C} (β_{hete})^{T} \left(B_{phy}^{C}\right)^{2}$
+
+$\Gamma_{zoo} = \Gamma_{zoo}^{0^{\circ}C} (β_{hete})^{T} \left(B_{zoo}^{C}\right)^{2}$
+
+where
+- $\Gamma^{0^{\circ}C}$ is the reference rate of biomass loss in units of [(mmol C m<sup>-3</sup>)<sup>-1</sup> day<sup>-1</sup>].
+
+
+### 9. Zooplankton grazing
 
 **Grazing by zooplankton** (`g_npz`, $\mu_{zoo}$, [day<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7), where:
 
