@@ -2104,7 +2104,7 @@ module generic_WOMBATlite
     integer                                 :: ichl
     real                                    :: par_phy_mldsum, par_z_mldsum
     real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, phi
-    real                                    :: phy_pisl, phy_pisl2 
+    real                                    :: phy_pisl 
     real                                    :: pchl_pisl, pchl_mumin, pchl_muopt
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink, wsinkcal
@@ -2668,14 +2668,12 @@ module generic_WOMBATlite
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       
-      ! 1. initial slope of Photosynthesis-Irradiance curve
-      ! 2. Alter the slope to account for respiration and daylength limitation
-      ! 3. Light limitation 
-      ! 4. Apply light and nutrient limitations to maximum growth rate
+      ! 1. Initial slope of Photosynthesis-Irradiance curve
+      ! 2. Light limitation 
+      ! 3. Apply light and nutrient limitations to maximum growth rate
 
       phy_pisl  = max(wombat%alphabio * phy_chlc, wombat%alphabio * wombat%phyminqc)
-      phy_pisl2 = phy_pisl / ( (1. + wombat%phylmor*86400.0 * fbc) ) ! add daylength estimate here
-      wombat%phy_lpar(i,j,k) = (1. - exp(-phy_pisl2 * wombat%radbio(i,j,k)))
+      wombat%phy_lpar(i,j,k) = (1. - exp(-phy_pisl * wombat%radbio(i,j,k)))
       wombat%phy_mu(i,j,k) = wombat%phy_mumax(i,j,k) * wombat%phy_lpar(i,j,k) * & 
                              min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))
 
@@ -2684,6 +2682,16 @@ module generic_WOMBATlite
       if (wombat%zw(i,j,k) .le. wombat%zeuphot(i,j)) then 
         wombat%light_limit(i,j) = wombat%light_limit(i,j) + dzt(i,j,k) &
                                   * dtsb*rdtts * wombat%phy_lpar(i,j,k)
+      endif
+
+
+      !!! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ !!! 
+      !!! Gather terms for tracer tendencies !!!
+      !!! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ !!! 
+      if (wombat%f_no3(i,j,k) .gt. epsi) then
+        wombat%phygrow(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
+      else
+        wombat%phygrow(i,j,k) = 0.0
       endif
 
 
@@ -2812,15 +2820,45 @@ module generic_WOMBATlite
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 8] Mortality scalings and grazing                              !
+      !  [Step 8] Mortality and remineralisation                              !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
+      if (biophy.gt.1e-3) then
+        wombat%phyresp(i,j,k) = wombat%phylmor * fbc * wombat%f_phy(i,j,k) ! [molC/kg/s]
+        wombat%phymort(i,j,k) = wombat%phyqmor / mmol_m3_to_mol_kg * wombat%f_phy(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
+      else
+        wombat%phyresp(i,j,k) = 0.0
+        wombat%phymort(i,j,k) = 0.0
+      endif
+      
       ! reduce linear mortality (respiration losses) of zooplankton when there is low biomass
       zoo_slmor = biozoo / (biozoo + wombat%zookz)
+
+      if (biozoo.gt.1e-3) then
+        wombat%zooresp(i,j,k) = wombat%zoolmor * fbc * wombat%f_zoo(i,j,k) * zoo_slmor ! [molC/kg/s]
+        wombat%zoomort(i,j,k) = wombat%zooqmor / mmol_m3_to_mol_kg * wombat%f_zoo(i,j,k) * wombat%f_zoo(i,j,k) ! [molC/kg/s]
+      else
+        wombat%zooresp(i,j,k) = 0.0
+        wombat%zoomort(i,j,k) = 0.0
+      endif
       
-      ! Grazing function ! [1/s]
+      if (wombat%f_det(i,j,k) .gt. epsi) then
+        wombat%detremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * wombat%f_det(i,j,k)**2.0 ! [molC/kg/s]
+      else
+        wombat%detremi(i,j,k) = 0.0
+      endif
+
+      
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !  [Step 9] Zooplankton grazing                                         !
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+
       zooprey = wombat%zprefphy * biophy + wombat%zprefdet * biodet
       ! Epsilon (prey capture rate coefficient) is made a function of phytoplankton biomass (Fig 2 of Rohr et al., 2024; GRL)
       !  - scales towards lower values (mesozooplankton) as prey biomass increases
@@ -2829,11 +2867,24 @@ module generic_WOMBATlite
       g_npz = wombat%zoogmax * fbc * (wombat%zooeps(i,j,k) * zooprey*zooprey) / &
               (wombat%zoogmax * fbc + (wombat%zooeps(i,j,k) * zooprey*zooprey))
 
+      if (zooprey.gt.1e-3) then
+        wombat%zoograzphy(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zprefphy*biophy)/zooprey ! [molC/kg/s]
+        wombat%zoograzdet(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zprefdet*biodet)/zooprey ! [molC/kg/s]
+      else
+        wombat%zoograzphy(i,j,k) = 0.0
+        wombat%zoograzdet(i,j,k) = 0.0
+      endif
+      wombat%zooexcrphy(i,j,k) = wombat%zoograzphy(i,j,k) * (1.0 - wombat%zooassi)*wombat%zooexcr
+      wombat%zooexcrdet(i,j,k) = wombat%zoograzdet(i,j,k) * (1.0 - wombat%zooassi)*wombat%zooexcr
+      wombat%zooslopphy(i,j,k) = wombat%zoograzphy(i,j,k) * (1.0 - wombat%zooassi)*(1.0-wombat%zooexcr)
+      wombat%zooslopdet(i,j,k) = wombat%zoograzdet(i,j,k) * (1.0 - wombat%zooassi)*(1.0-wombat%zooexcr)
+
+
 
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 9] CaCO3 calculations                                          !
+      !  [Step 10] CaCO3 calculations                                         !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -2865,54 +2916,6 @@ module generic_WOMBATlite
       
       endif
 
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !  [Step 10] Sources and sinks                                          !
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-
-      if (wombat%f_no3(i,j,k) .gt. epsi) then
-        wombat%phygrow(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
-      else
-        wombat%phygrow(i,j,k) = 0.0
-      endif
-
-      if (zooprey.gt.1e-3) then
-        wombat%zoograzphy(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zprefphy*biophy)/zooprey ! [molC/kg/s]
-        wombat%zoograzdet(i,j,k) = g_npz * wombat%f_zoo(i,j,k) * (wombat%zprefdet*biodet)/zooprey ! [molC/kg/s]
-      else
-        wombat%zoograzphy(i,j,k) = 0.0
-        wombat%zoograzdet(i,j,k) = 0.0
-      endif
-      wombat%zooexcrphy(i,j,k) = wombat%zoograzphy(i,j,k) * (1.0 - wombat%zooassi)*wombat%zooexcr
-      wombat%zooexcrdet(i,j,k) = wombat%zoograzdet(i,j,k) * (1.0 - wombat%zooassi)*wombat%zooexcr
-      wombat%zooslopphy(i,j,k) = wombat%zoograzphy(i,j,k) * (1.0 - wombat%zooassi)*(1.0-wombat%zooexcr)
-      wombat%zooslopdet(i,j,k) = wombat%zoograzdet(i,j,k) * (1.0 - wombat%zooassi)*(1.0-wombat%zooexcr)
-
-      if (biophy.gt.1e-3) then
-        wombat%phyresp(i,j,k) = wombat%phylmor * fbc * wombat%f_phy(i,j,k) ! [molC/kg/s]
-        wombat%phymort(i,j,k) = wombat%phyqmor / mmol_m3_to_mol_kg * wombat%f_phy(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
-      else
-        wombat%phyresp(i,j,k) = 0.0
-        wombat%phymort(i,j,k) = 0.0
-      endif
-      
-      if (biozoo.gt.1e-3) then
-        wombat%zooresp(i,j,k) = wombat%zoolmor * fbc * wombat%f_zoo(i,j,k) * zoo_slmor ! [molC/kg/s]
-        wombat%zoomort(i,j,k) = wombat%zooqmor / mmol_m3_to_mol_kg * wombat%f_zoo(i,j,k) * wombat%f_zoo(i,j,k) ! [molC/kg/s]
-      else
-        wombat%zooresp(i,j,k) = 0.0
-        wombat%zoomort(i,j,k) = 0.0
-      endif
-      
-      if (wombat%f_det(i,j,k) .gt. epsi) then
-        wombat%detremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * wombat%f_det(i,j,k)**2.0 ! [molC/kg/s]
-      else
-        wombat%detremi(i,j,k) = 0.0
-      endif
-      
       if (wombat%f_caco3(i,j,k) .gt. epsi) then
         wombat%caldiss(i,j,k) = wombat%dissratcal(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
         wombat%aradiss(i,j,k) = wombat%dissratara(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
