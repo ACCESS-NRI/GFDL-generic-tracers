@@ -160,12 +160,12 @@ module generic_WOMBATlite
         phykn, &
         phykf, &
         phyminqc, &
-        phyoptqc, &
+        phymaxqc, &
+        phytauqc, &
         phyoptqf, &
         phymaxqf, &
         phylmor, &
         phyqmor, &
-        chlkWm2, &
         zooassi, &
         zooexcr, &
         fgutdiss, &
@@ -313,7 +313,6 @@ module generic_WOMBATlite
         phy_mumax, &
         phy_mu, &
         pchl_mu, &
-        pchl_lpar, &
         phy_kni, &
         phy_kfe, &
         phy_lpar, &
@@ -404,7 +403,6 @@ module generic_WOMBATlite
         id_phy_kni = -1, &
         id_phy_kfe = -1, &
         id_phy_lpar = -1, &
-        id_pchl_lpar = -1, &
         id_phy_lnit = -1, &
         id_phy_lfer = -1, &
         id_phy_dfeupt = -1, &
@@ -891,11 +889,6 @@ module generic_WOMBATlite
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'pchl_lpar', 'Limitation of chlorophyll production by light', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_pchl_lpar = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
         'phy_lpar', 'Limitation of phytoplankton by light', 'h', 'L', 's', '[0-1]', 'f')
     wombat%id_phy_lpar = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -1367,9 +1360,18 @@ module generic_WOMBATlite
     ! internally to account for the different units carried in this generic
     ! version of WOMBATlite.
 
-    ! Initial slope of P-I curve [(mg Chl m-3)-1 (W m-2)-1]
+    ! Initial slope of P-I curve [mg C (mg Chl m-3)-1 (W m-2)-1 day-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('alphabio', wombat%alphabio, 2.25)
+    ! Values of chlorophyll-specific P-I slopes in units of mg C (mg Chl)-1 
+    !  hour-1 (µmol photons m-2 s-1)-1] typically fall within a range of:
+    !  0.006 - 0.103  [Chakraborty et al., 2017 J. Geophys Res Oceans]
+    !  0.002 - 0.182  [Bouman et al., 2020 Philos Trans A Maths Phys Eng Sci]
+    !  0.047 ± 0.004  [Valdez-Holguin et al., 1998 CalCOFI report]
+    !  0.007 - 0.087  [Fineko et al., 2002 Marine Biology; references therein] 
+    ! These values convert to: 
+    !  [0.66 - 11.39], [0.22 - 20.13], [5.20 ± 0.44], [0.77 - 9.62]
+    ! mg C (mg Chl) day-1 (W m-2)-1.
+    call g_tracer_add_param('alphabio', wombat%alphabio, 3.0)
 
     ! Autotrophy maximum growth rate parameter a [1/s]
     !-----------------------------------------------------------------------
@@ -1381,7 +1383,7 @@ module generic_WOMBATlite
 
     ! Heterotrophy maximum growth rate parameter b [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bbioh', wombat%bbioh, 1.066)
+    call g_tracer_add_param('bbioh', wombat%bbioh, 1.060)
 
     ! Phytoplankton half saturation constant for nitrogen uptake [mmolN/m3]
     !-----------------------------------------------------------------------
@@ -1389,19 +1391,19 @@ module generic_WOMBATlite
 
     ! Phytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phykf', wombat%phykf, 2.5)
-
-    ! Chlorophyll darkness growth reduction half-saturation coefficient [W/m2]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('chlkWm2', wombat%chlkWm2, 5.0)
+    call g_tracer_add_param('phykf', wombat%phykf, 1.0)
 
     ! Phytoplankton minimum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.004)
 
-    ! Phytoplankton optimal quota of chlorophyll to carbon [mg/mg]
+    ! Phytoplankton maximum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyoptqc', wombat%phyoptqc, 0.036)
+    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.060)
+
+    ! Timescale over which chlorophyll to carbon ratios are altered [s]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('phytauqc', wombat%phytauqc, 86400.0)
 
     ! Phytoplankton optimal quota of iron to carbon [mol/mol]
     !-----------------------------------------------------------------------
@@ -1419,9 +1421,13 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyqmor', wombat%phyqmor, 0.05/86400.0)
 
+    ! Phytoplankton biomass threshold to scale recycling [mmolC/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('phybiot', wombat%phybiot, 0.6)
+
     ! Zooplankton assimilation efficiency [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooassi', wombat%zooassi, 0.4)
+    call g_tracer_add_param('zooassi', wombat%zooassi, 0.3)
 
     ! Zooplankton excretion of unassimilated prey [0-1]
     !-----------------------------------------------------------------------
@@ -1429,7 +1435,7 @@ module generic_WOMBATlite
 
     ! Zooplankton dissolution efficiency of CaCO3 within guts [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('fgutdiss', wombat%fgutdiss, 1.0)
+    call g_tracer_add_param('fgutdiss', wombat%fgutdiss, 0.75)
 
     ! Zooplankton half saturation coefficient for linear mortality
     !-----------------------------------------------------------------------
@@ -1441,11 +1447,11 @@ module generic_WOMBATlite
 
     ! Zooplankton minimum prey capture rate constant [m6/mmol2/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsmin', wombat%zooepsmin, 0.025/86400.0)
+    call g_tracer_add_param('zooepsmin', wombat%zooepsmin, 0.002/86400.0)
 
     ! Zooplankton maximum prey capture rate constant [m6/mmol2/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsmax', wombat%zooepsmax, 0.25/86400.0)
+    call g_tracer_add_param('zooepsmax', wombat%zooepsmax, 0.22/86400.0)
 
     ! Rate of transition of epsilon from micro to mesozoo [per mmolC/m3]
     !-----------------------------------------------------------------------
@@ -1461,25 +1467,27 @@ module generic_WOMBATlite
 
     ! Zooplankton respiration rate constant [1/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoolmor', wombat%zoolmor, 0.01/86400.0)
+    call g_tracer_add_param('zoolmor', wombat%zoolmor, 0.0025/86400.0)
 
     ! Zooplankton quadratic mortality rate constant [m3/mmolN/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooqmor', wombat%zooqmor, 0.9/86400.0)
+    call g_tracer_add_param('zooqmor', wombat%zooqmor, 0.8/86400.0)
 
-    ! Detritus remineralisation rate constant for <180 m; value for >=180m is half of this [1/s]
+    ! Detritus remineralisation rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    ! Detritus remineralisation rate for (>=180 m) is hard-coded to be
-    ! detlrem/2
-    call g_tracer_add_param('detlrem', wombat%detlrem, 0.1/86400.0)
+    call g_tracer_add_param('detlrem', wombat%detlrem, 0.5/86400.0)
     
     ! Base detritus sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wdetbio', wombat%wdetbio, 18.0/86400.0)
+    call g_tracer_add_param('wdetbio', wombat%wdetbio, 25.0/86400.0)
     
     ! Detritus maximum sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wdetmax', wombat%wdetmax, 36.0/86400.0)
+    call g_tracer_add_param('wdetmax', wombat%wdetmax, 42.0/86400.0)
+
+    ! Base CaCO3 sinking rate coefficient [m/s]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('wcaco3', wombat%wcaco3, 12.5/86400.0)
 
     ! Bottom thickness [m]
     !-----------------------------------------------------------------------
@@ -1491,20 +1499,10 @@ module generic_WOMBATlite
     ! This would normally equal detlrem, but we set the default value to be
     ! consistent with what is in ACCESS-ESM1.5 (undocumented in Ziehn et al
     ! 2020)
-    call g_tracer_add_param('detlrem_sed', wombat%detlrem_sed, 0.005/86400.0)
+    call g_tracer_add_param('detlrem_sed', wombat%detlrem_sed, 0.01/86400.0)
     
-    ! Phytoplankton biomass threshold to scale recycling [mmolC/m3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('phybiot', wombat%phybiot, 0.6)
-
-    ! Base CaCO3 sinking rate coefficient [m/s]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('wcaco3', wombat%wcaco3, 4.0/86400.0)
-
     ! CaCO3 remineralisation rate constant [1/s]
     !-----------------------------------------------------------------------
-    ! Default value matches 0.001714 day-1 in Ziehn et al 2020; differs from
-    ! Hayashida et al 2020
     call g_tracer_add_param('caco3lrem', wombat%caco3lrem, 0.01/86400.0)
 
     ! CaCO3 remineralization rate constant in sediments [1/s]
@@ -1513,13 +1511,13 @@ module generic_WOMBATlite
 
     ! Ceiling of omega in the sediments (controls rate of CaCO3 dissolution) [0-1]
     ! - if == 1.0, then there may be at minimum no dissolution of CaCO3
-    ! - if < 1.0, then there is always some dissolution of CaCO3 when when supersaturated
+    ! - if < 1.0, then there is always some dissolution of CaCO3 
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('omegamax_sed', wombat%omegamax_sed, 0.7)
+    call g_tracer_add_param('omegamax_sed', wombat%omegamax_sed, 0.8)
 
     ! CaCO3 inorganic fraction [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.04)
+    call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.045)
 
     ! CaCO3 dissolution factor due to calcite undersaturation
     !-----------------------------------------------------------------------
@@ -1547,7 +1545,7 @@ module generic_WOMBATlite
 
     ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 d-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 5e-2)
+    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.005)
 
     ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 d-1]
     !-----------------------------------------------------------------------
@@ -2103,9 +2101,9 @@ module generic_WOMBATlite
     real                                    :: pi = 3.14159265358979
     integer                                 :: ichl
     real                                    :: par_phy_mldsum, par_z_mldsum
-    real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, phi
+    real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc
     real                                    :: phy_pisl 
-    real                                    :: pchl_pisl, pchl_mumin, pchl_muopt
+    real                                    :: theta_opt
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink, wsinkcal
     real, dimension(4,61)                   :: zbgr
@@ -2317,7 +2315,6 @@ module generic_WOMBATlite
     wombat%phy_kni(:,:,:) = 0.0
     wombat%phy_kfe(:,:,:) = 0.0
     wombat%phy_lpar(:,:,:) = 0.0
-    wombat%pchl_lpar(:,:,:) = 0.0
     wombat%phy_lnit(:,:,:) = 0.0
     wombat%phy_lfer(:,:,:) = 0.0
     wombat%phy_dfeupt(:,:,:) = 0.0
@@ -2685,9 +2682,6 @@ module generic_WOMBATlite
       endif
 
 
-      !!! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ !!! 
-      !!! Gather terms for tracer tendencies !!!
-      !!! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ !!! 
       if (wombat%f_no3(i,j,k) .gt. epsi) then
         wombat%phygrow(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
       else
@@ -2703,25 +2697,23 @@ module generic_WOMBATlite
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      ! 1. Light limitation of chlorophyll production
-      ! 2. minimum and optimal rates of chlorophyll growth
-      ! 3. Calculate mg Chl m-3 s-1
+      ! 1. Estimate the target Chl:C ratio required to support maximum growth
+      !    This is a direct approximation of Geider, MacIntyre & Kana (1998): 
+      !     - Chl increased in response to low light (we use the mean of the MLD)
+      !     - Chl decreased in response to nutrient limitation
+      theta_opt = wombat%phymaxqc / (1.0 + &
+                  ( wombat%alphabio * wombat%radmld(i,j,k) * wombat%phymaxqc ) &
+                 /( epsi + 2.0 * wombat%phy_mumax(i,j,k) * 86400.0 &
+                    * max(0.01, min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) ) ) 
 
-      ! Reduced chlorophyll growth during extended periods of darkness
-      phi = wombat%radmld(i,j,1) / (wombat%radmld(i,j,1) + wombat%chlkWm2)
+      ! 2. Ensure that a minimum chl:c ratio must be maintained by the cell
+      theta_opt = max(wombat%phyminqc, theta_opt)
 
-      pchl_pisl = phy_pisl / ( wombat%phy_mumax(i,j,k) * 86400.0 * & 
-                  max(0.1, (1. - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) ) + epsi )
-      wombat%pchl_lpar(i,j,k) = (1. - exp(-pchl_pisl * wombat%radmld(i,j,k)))
-      pchl_mumin = wombat%phyminqc * wombat%phy_mu(i,j,k) * biophy * 12.0   ![mg/m3/s] 
-      pchl_muopt = wombat%phyoptqc * wombat%phy_mu(i,j,k) * biophy * 12.0   ![mg/m3/s]
-      wombat%pchl_mu(i,j,k) = (pchl_muopt - pchl_mumin) * wombat%pchl_lpar(i,j,k) * &
-                               min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))
-      if ( (phy_pisl * wombat%radmld(i,j,k)) .gt. 0.0 ) then
-        wombat%pchl_mu(i,j,k) = phi * ( pchl_mumin + wombat%pchl_mu(i,j,k) / &
-                                (phy_pisl * wombat%radmld(i,j,k)) )
-      endif
-      wombat%pchl_mu(i,j,k) = wombat%pchl_mu(i,j,k) / 12.0 * mmol_m3_to_mol_kg  ![mol/kg/s]
+      ! 3. Estimate the rate that chlorophyll is synthesized towards this optimal
+      !    Rates of chlorophyll synthesis are not instantaneous, and take hours to days
+      !    Here, we make chlorophyll synthesis respond on a timescale of phytauqc
+      wombat%pchl_mu(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_pchl(i,j,k) &
+                            + (theta_opt - phy_chlc) / wombat%phytauqc * wombat%f_phy(i,j,k)
 
 
       !-----------------------------------------------------------------------!
@@ -3419,10 +3411,14 @@ module generic_WOMBATlite
       call g_tracer_get_pointer(tracer_list, 'alk', 'stf', wombat%p_alk_stf)
       ! Spread the addition around to all grid cells
       if (sum(grid_tmask(:,:,1)).gt.0.0) then
-        avedetbury = sum(wombat%p_detbury(:,:,1) * grid_dat(:,:)) / sum(grid_dat(:,:) * grid_tmask(:,:,1))  ! [mol/m2/s]
-        avecaco3bury = sum(wombat%p_caco3bury(:,:,1) * grid_dat(:,:)) / sum(grid_dat(:,:) * grid_tmask(:,:,1))  ! [mol/m2/s]
-        wombat%p_no3_stf(:,:) = wombat%p_no3_stf(:,:) + avedetbury*16.0/122.0   ! [mol/m2/s]
-        wombat%p_alk_stf(:,:) = wombat%p_alk_stf(:,:) - avedetbury*16.0/122.0 + avecaco3bury*2.0  ! [mol/m2/s]
+        avedetbury   = sum(wombat%p_detbury(:,:,1) * grid_dat(:,:) * grid_tmask(:,:,1)) &
+                     / sum(grid_dat(:,:) * grid_tmask(:,:,1))  ! [mol/m2/s]
+        avecaco3bury = sum(wombat%p_caco3bury(:,:,1) * grid_dat(:,:) * grid_tmask(:,:,1) ) &
+                     / sum(grid_dat(:,:) * grid_tmask(:,:,1))  ! [mol/m2/s]
+        wombat%p_no3_stf(:,:) = wombat%p_no3_stf(:,:) + avedetbury*16.0/122.0                      ! [mol/m2/s]
+        wombat%p_alk_stf(:,:) = wombat%p_alk_stf(:,:) - avedetbury*16.0/122.0 + avecaco3bury*2.0   ! [mol/m2/s]
+        wombat%p_no3_stf(:,:) = wombat%p_no3_stf(:,:) * grid_tmask(:,:,1) 
+        wombat%p_alk_stf(:,:) = wombat%p_alk_stf(:,:) * grid_tmask(:,:,1)
       endif
     endif
 
@@ -3512,10 +3508,6 @@ module generic_WOMBATlite
 
     if (wombat%id_pchl_mu .gt. 0) &
       used = g_send_data(wombat%id_pchl_mu, wombat%pchl_mu, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
-    if (wombat%id_pchl_lpar .gt. 0) &
-      used = g_send_data(wombat%id_pchl_lpar, wombat%pchl_lpar, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_phy_kni .gt. 0) &
@@ -4135,7 +4127,6 @@ module generic_WOMBATlite
     allocate(wombat%phy_mumax(isd:ied, jsd:jed, 1:nk)); wombat%phy_mumax(:,:,:)=0.0
     allocate(wombat%phy_mu(isd:ied, jsd:jed, 1:nk)); wombat%phy_mu(:,:,:)=0.0
     allocate(wombat%pchl_mu(isd:ied, jsd:jed, 1:nk)); wombat%pchl_mu(:,:,:)=0.0
-    allocate(wombat%pchl_lpar(isd:ied, jsd:jed, 1:nk)); wombat%pchl_lpar(:,:,:)=0.0
     allocate(wombat%phy_kni(isd:ied, jsd:jed, 1:nk)); wombat%phy_kni(:,:,:)=0.0
     allocate(wombat%phy_kfe(isd:ied, jsd:jed, 1:nk)); wombat%phy_kfe(:,:,:)=0.0
     allocate(wombat%phy_lpar(isd:ied, jsd:jed, 1:nk)); wombat%phy_lpar(:,:,:)=0.0
@@ -4284,7 +4275,6 @@ module generic_WOMBATlite
         wombat%phy_mumax, &
         wombat%phy_mu, &
         wombat%pchl_mu, &
-        wombat%pchl_lpar, &
         wombat%phy_kni, &
         wombat%phy_kfe, &
         wombat%phy_lpar, &
