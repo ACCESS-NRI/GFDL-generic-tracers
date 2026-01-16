@@ -1,13 +1,13 @@
 # Description of the WOMBATlite ocean biogeochemical model
 ## Subroutine - "update_from_source"
 
-`!         (\___/)  .-.   .-. .--. .-..-..---.  .--. .-----.            !`\
-`!         / o o \  : :.-.: :: ,. :: '' :: .; :: .; :'-. .-'            !`\
-`!        (   "   ) : :: :: :: :: :: .. ::   .':    :  : :              !`\
-`!         \__ __/  : '' '' ;: :; :: :; :: .; :: :: :  : :              !`\
-`!                   '.,'.,' '.__.':_;:_;:___.':_;:_;  :_;              !`\
-`!                                                                      !`\
-`!  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT)  !`
+`!         (\___/)  .-.   .-. .--. .-..-..---.  .--. .-----.            !`\ \\
+`!         / o o \  : :.-.: :: ,. :: '' :: .; :: .; :'-. .-'            !`\ \\
+`!        (   "   ) : :: :: :: :: :: .. ::   .':    :  : :              !`\ \\
+`!         \__ __/  : '' '' ;: :; :: :; :: .; :: :: :  : :              !`\ \\
+`!                   '.,'.,' '.__.':_;:_;:___.':_;:_;  :_;              !`\ \\
+`!                                                                      !`\ \\
+`!  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT)  !` \\
 
 ---
 
@@ -29,8 +29,8 @@ at each tracer time‑step. The subroutine is documented internally by a list of
 12. Check for conservation of mass.
 13. Additional operations on tracers.
 14. Sinking rate of particulates.
-15. Sedimentary processes
-16. 
+15. Sedimentary processes.
+16. Permanent burial of particulates.
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in grey follow the Fortran code, while 
 variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
@@ -166,52 +166,47 @@ where $\mu_{phy}^{C}$ is in units of [mmol C m<sup>-3</sup> day<sup>-1</sup>].
 
 ### 5. Growth of chlorophyll
 
-This step diagnoses the **rate of chlorophyll production** as a function of mixed-layer light, the phytoplankton growth rate and nutrient availability. The structure is consistent with common **photoacclimation / variable chlorophyll-to-carbon** approaches that accelerate or decelerate chlorophyll growth relative to carbon growth.
+This step diagnoses the **rate of chlorophyll production** as a function of mixed-layer light, the phytoplankton growth rate and nutrient availability. The structure is consistent with the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation that relaxes the chlorophyll-to-carbon ratio towards an optimal value that supports photosynthetic growth under prevailing light and nutrient conditions.
 
-A chlorophyll-specific initial P-I slope (`pchl_pisl`, $\alpha_{chl}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]) is constructed by scaling the photosynthetic carbon-specific P-I slope ($\alpha_{phy}$) by particular environmental conditions:
+We first solve for the optimal chlorophyll-to-carbon ratio, $Q_{phy}^{*Chl:C}$ (g Chl g C$^{-1}$), which is diagnosed as the ratio required to support maximal photosynthetic carbon fixation under the ambient mean light level in the mixed layer, while accounting for nutrient limitation:
 
-$\alpha_{chl} = \dfrac{ \alpha_{phy} }{ \mu_{phy}^{max} e^{\left(-\min\left(L_{phy}^{N}, L_{phy}^{Fe} \right)\right) } }$
-
-Above, warm temperatures that elevate $\mu_{phy}^{max}$ decrease the chlorophyll-specific P-I slope, and nutrient-stress also decreases this slope. Meanwhile, cold and nutrient-rich conditions steepen it. Such conditions are found in at the bottom of euphotic zones. There is strong evidence that both nitrogen and iron limitation limit chlorophyll-to-carbon ratios of phytoplankton cells [](), while warm waters make enzymatic carbon fixation more efficient and lower light harvesting demand, thereby decreasing Chl:C ratios []().
-
-After solving for the chlorophyll-specific P-I slope, we calculate light limitation (`pchl_lpar(i,j,k)`, $L_{phy}^{PAR}$), [dimensionless]) using an exponential P–I formulation of the same form as carbon-specific light limitation,
-
-$L_{chl}^{PAR} = 1 - e^{- \alpha_{chl} PAR_{MLD} }$
-
-but here we use $PAR_{MLD}$ rather than $PAR$. In this case, $PAR_{MLD}$ (`radmld`, [W m<sup>-2</sup>]) is the average downwelling irradience in the mixed layer. This ensures that chlorophyll growth is amplified relative to carbon growth in the lower part of the mixed layer, but suppressed in the upper part. As such, chlorophyll growth is able to be accelerated relative to carbon growth by both (1) scaling $\alpha_{chl}$ and (2) using $PAR_{MLD}$ rather than $PAR$. For waters beneath the mixed layer, $PAR_{MLD}$ = $PAR$, so for these waters chlorophyll to carbon ratios are only affected by scaling $\alpha_{chl}$.
-
-Before solving the growth rate of chlorophyll, we determine the minimum and maximum rates of chlorophyll production in mg m<sup>-3</sup> day<sup>-1</sup>, which are realised from the already known phytoplankton carbon growth rate:
-
-$\mu_{phy}^{-chl} = Q_{phy}^{-Chl:C} \mu_{phy}^{C} \cdot 12$
-
-$\mu_{phy}^{+chl} = Q_{phy}^{+Chl:C} \mu_{phy}^{C} \cdot 12$
+$Q_{phy}^{*Chl:C} = \dfrac{Q_{phy}^{+Chl:C}}{1 + \dfrac{\alpha_{phy} PAR_{MLD} Q_{phy}^{+Chl:C}}{2 \mu_{phy}^{max} \min \left(L_{phy}^{N}, L_{phy}^{Fe} \right) }}$
 
 where:
+- $Q_{phy}^{+Chl:C}$ is the maximum allowable chlorophyll-to-carbon ratio (`phymaxqc`)
+- $\alpha_{phy}$ is the chlorophyll-specific initial slope of the P–I curve (`alphabio`)
+- $PAR_{MLD}$ is mean photosynthetically available radiation over the mixed layer (`radmld`)
+- $\mu_{phy}^{max}$ is the temperature-dependent maximum phytoplankton growth rate in [day<sup>-1</sup>] (`phy_mumax`)
+- $L_{phy}^{N}$ and $L_{phy}^{Fe}$ are the nutrient limitation factors for growth on N and Fe
 
-- $Q_{phy}^{-Chl:C} =$ `phyminqc` is the minimum chlorophyll quota,
-- $Q_{phy}^{+Chl:C} =$ `phymaxqc` is the maximum chlorophyll quota,
-- $\mu_{phy}^{C} =$ is the realised phytoplankton growth rate in units of [mmol C m<sup>-3</sup> day<sup>-1</sup>].
+We set a floor for the minimum chlorophyll-to-carbon ratio of phytoplankton via:
 
-These are the rates of chlorophyll growth required to support phytoplankton growth at both a minimum and maximum cellular quota. Chlorophyll-specific light limitation is then used to determine the extent to which optimal chlorophyll growth can be achieved:
-
-$\delta_{phy}^{chl} = \phi \left(\mu_{phy}^{+chl} - \mu_{phy}^{-chl}\right) \cdot L_{chl}^{PAR}$
-
-$\mu_{phy}^{chl} = \mu_{phy}^{-chl} + \delta_{phy}^{chl} $
+$Q_{phy}^{*Chl:C} = \min \left( Q_{phy}^{*Chl:C}, Q_{phy}^{-Chl:C} \right)$
 
 where:
+- $Q_{phy}^{-Chl:C}$ is the minimum allowable chlorophyll-to-carbon ratio (`phyminqc`)
 
-- $\phi = \dfrac{PAR_{MLD}(k=1)}{PAR_{MLD}(k=1) + K_{chl}^{PAR}}$ and reduces growth during extended periods of low light, such as the polar winter;
-- $K_{chl}^{PAR}$ is a half-saturation light scale for chlorophyll growth (`chlkWm2`, [W m<sup>-2</sup>]).
-- $\delta_{phy}^{chl}$ is the additional growth of chlorophyll above what is required to maintain the minimum quota.
+Growth of chlorophyll is then calculated as:
+
+$\dfrac{\delta Chl}{\delta t} = \mu_{phy} B_{phy}^{Chl} + \dfrac{ Q_{phy}^{*Chl:C} - Q_{phy}^{Chl:C} }{\tau_{phy}^{Chl}} \cdot B_{phy}^{C}$
+
+where:
+- $Q_{phy}^{Chl:C}$ is the in-situ chlorophyll-to-carbon ratio
+- $B_{phy}^{Chl}$ is the in-situ concentation of phytoplankton chlorophyll in units of [mol/kg]
+- $\mu_{phy}$ is the realized growth rate of phytoplankton in units of [day<sup>-1</sup>]
+- $\tau_{phy}^{Chl}$ is the rate of chlorophyll synthesis in units of [day<sup>-1</sup>]
+- $B_{phy}^{Chl}$ is the in-situ concentation of phytoplankton carbon in units of [mol/kg]
+
+This formulation elevates chlorophyll-to-carbon ratios in low light and supresses synthesis when nutrients are low.
 
 ---
 
 
 ### 6. Phytoplankton uptake of iron
 
-Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-lite. First, a maximum quota is found dependent on the maximum quota of Fe within the phytoplankton type (`phymaxqf`, $Q_{phy}^{Chl:C}$, [mol/mol]) and the phytoplankton concentration in the water column:
+Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-lite. First, a maximum quota is found dependent on the maximum quota of Fe within the phytoplankton type (`phymaxqf`, $Q_{phy}^{+Fe:C}$, [mol/mol]) and the phytoplankton concentration in the water column:
 
-$B_{phy}^{"Fe} = B_{phy}^{C} Q_{phy}^{"Chl:C}$
+$B_{phy}^{+Fe} = B_{phy}^{C} Q_{phy}^{+Fe:C}$
 
 Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/), this rate is scaled by three terms relating to (i) michaelis-menten type affinity for dFe, (ii) up-regulation of dFe uptake representing investment in transporters when cell quotas are limiting to growth, and (iii) down regulation of dFe uptake associated with enriched cellular quotas:
 
@@ -219,11 +214,11 @@ Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015
 
 (ii) $4 - \dfrac{4.5 L_{phy}^{Fe}}{0.5 + L_{phy}^{Fe}}$
 
-(iii) $\max\left(0, 1 - \dfrac{B_{phy}^{Fe} / B_{phy}^{"Fe}}{|1.05 - B_{phy}^{Fe} / B_{phy}^{"Fe}|} \right)$
+(iii) $\max\left(0, 1 - \dfrac{B_{phy}^{Fe} / B_{phy}^{+Fe}}{|1.05 - B_{phy}^{Fe} / B_{phy}^{+Fe}|} \right)$
 
 dFe uptake by phytoplankton is then calculated as
 
-$\mu_{phy}^{Fe} = \mu_{phy}^{max} B_{phy}^{"Fe} \max\left(0.2, L_{phy}^{PAR} \cdot L_{phy}^{N}\right) \cdot (i) \cdot (ii) \cdot (iii)$
+$\mu_{phy}^{Fe} = \mu_{phy}^{max} B_{phy}^{+Fe} \max\left(0.2, L_{phy}^{PAR} \cdot L_{phy}^{N}\right) \cdot (i) \cdot (ii) \cdot (iii)$
 
 where the maximum dFe uptake is decreased to 20% of its maximum potential rate at night and when nitrogen is limited. The iron to carbon ratios of phytoplankton are passed to zooplankton and detritus and are also tracked in these pools.
 
@@ -511,7 +506,7 @@ $\dfrac{\Delta Alk}{\Delta t} = - \dfrac{\Delta NO_3}{\Delta t} - 2 \cdot \dfrac
 
 ### 12. Check for conservation of mass
 
-When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.`), the model will calculate the budget of nitrogen or carbon both before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of both nitrogen and carbon within the ocean. 
+When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.`), the model will calculate the budget of nitrogen or carbon both before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of both nitrogen and carbon within the ocean. In WOMBATlite, both $NO_3$ and DIC should be perfectly conserved during ecosystem cycling.
 
 ---
 
