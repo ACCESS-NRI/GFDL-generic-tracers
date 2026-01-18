@@ -1612,6 +1612,8 @@ module generic_WOMBATlite
         longname = 'Nitrate', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
+        flux_param  = (/ 1.0 /), & ! dts: trunoff supplied in mol/kg
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -1680,6 +1682,8 @@ module generic_WOMBATlite
         longname = 'Detritus', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
+        flux_param  = (/ 1.0 /), & ! dts: trunoff supplied in mol/kg
         move_vertical = .true., &
         btm_reservoir = .true.)
 
@@ -1711,12 +1715,14 @@ module generic_WOMBATlite
         units = 'mol/kg', &
         prog = .true., &
         flux_gas = .true., &
-        flux_bottom = .true., &
         flux_gas_name = 'co2_flux', &
         flux_gas_type = 'air_sea_gas_flux_generic', &
         flux_gas_molwt = WTMCO2, &
         flux_gas_param = (/ as_coeff_wombatlite, 9.7561e-06 /), & ! dts: param(2) converts Pa -> atm
         flux_gas_restart_file = 'ocean_wombatlite_airsea_flux.res.nc', &
+        flux_runoff = .true., &
+        flux_param  = (/ 1.0 /), & ! dts: trunoff supplied in mol/kg
+        flux_bottom = .true., &
         flux_virtual = .true.)
 
     ! DICp (preformed Dissolved inorganic carbon)
@@ -1746,6 +1752,8 @@ module generic_WOMBATlite
         longname = 'Alkalinity', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
+        flux_param  = (/ 1.0 /), & ! dts: trunoff supplied in mol/kg
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -1757,7 +1765,7 @@ module generic_WOMBATlite
         units = 'mol/kg', &
         prog = .true., &
         flux_drydep = .true., &
-        flux_param  = (/ 1.0 /), & ! dts: conversion to mol/m2/s done in data_table
+        flux_param  = (/ 1.0 /), & ! dts: fe flux supplied in mol/m2/s
         flux_bottom = .true.)
 
     !=======================================================================
