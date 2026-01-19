@@ -2698,7 +2698,7 @@ module generic_WOMBATlite
       !-----------------------------------------------------------------------!
 
       ! 1. Estimate the target Chl:C ratio required to support maximum growth
-      !    This is a direct approximation of Geider, MacIntyre & Kana (1998): 
+      !    This is a direct approximation of Geider, MacIntyre & Kana (1997): 
       !     - Chl increased in response to low light (we use the mean of the MLD)
       !     - Chl decreased in response to nutrient limitation
       theta_opt = wombat%phymaxqc / (1.0 + &
@@ -3221,13 +3221,13 @@ module generic_WOMBATlite
         zno3 = wombat%f_no3(i,j,k) / mmol_m3_to_mol_kg
         zfermin = min( max( 3e-2 * zno3 * zno3, 5e-2), 7e-2) * umol_m3_to_mol_kg
         wombat%f_fe(i,j,k) = max(zfermin, wombat%f_fe(i,j,k)) * grid_tmask(i,j,k)
-        ! pjb: set limits of some tracers and save corrections to output for budgets
-        wombat%alk_correct(i,j,k) = (max(wombat%alk_min * mmol_m3_to_mol_kg, wombat%f_alk(i,j,k) ) &
-                                    - wombat%f_alk(i,j,k) ) * grid_tmask(i,j,k)
-        wombat%dic_correct(i,j,k) = (max(wombat%dic_min * mmol_m3_to_mol_kg, wombat%f_dic(i,j,k) ) &
-                                    - wombat%f_dic(i,j,k) ) * grid_tmask(i,j,k)
-        wombat%f_alk(i,j,k) = wombat%f_alk(i,j,k) + wombat%alk_correct(i,j,k)
-        wombat%f_dic(i,j,k) = wombat%f_dic(i,j,k) + wombat%dic_correct(i,j,k)
+        !! pjb: set limits of some tracers and save corrections to output for budgets
+        !wombat%alk_correct(i,j,k) = (max(wombat%alk_min * mmol_m3_to_mol_kg, wombat%f_alk(i,j,k) ) &
+        !                            - wombat%f_alk(i,j,k) ) * grid_tmask(i,j,k)
+        !wombat%dic_correct(i,j,k) = (max(wombat%dic_min * mmol_m3_to_mol_kg, wombat%f_dic(i,j,k) ) &
+        !                            - wombat%f_dic(i,j,k) ) * grid_tmask(i,j,k)
+        !wombat%f_alk(i,j,k) = wombat%f_alk(i,j,k) + wombat%alk_correct(i,j,k)
+        !wombat%f_dic(i,j,k) = wombat%f_dic(i,j,k) + wombat%dic_correct(i,j,k)
       enddo
     enddo; enddo
 
