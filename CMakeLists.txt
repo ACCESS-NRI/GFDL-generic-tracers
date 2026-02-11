@@ -66,6 +66,12 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
   set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g3 -O2 -xCORE-AVX2 -debug all -check none")
   set(CMAKE_Fortran_FLAGS_DEBUG "-g3 -O0 -debug all -check -check noarg_temp_created -check nopointer -warn -warn noerrors -ftrapuv")
 
+elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O2 -Mr8")  
+  set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -W -fbounds-check")
+
 else()
   message(WARNING "Fortran compiler with ID ${CMAKE_Fortran_COMPILER_ID} will be used with CMake default options")
 endif()
