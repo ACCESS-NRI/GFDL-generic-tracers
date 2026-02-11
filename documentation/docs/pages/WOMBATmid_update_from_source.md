@@ -1,13 +1,13 @@
 # Description of the WOMBATmid ocean biogeochemical model
 ## Subroutine - "update_from_source"
 
-`!         (\___/)  .-.   .-. .--. .-..-..---.  .--. .-----.            !`\ \\
-`!         / o o \  : :.-.: :: ,. :: '' :: .; :: .; :'-. .-'            !`\ \\
-`!        (   "   ) : :: :: :: :: :: .. ::   .':    :  : :              !`\ \\
-`!         \__ __/  : '' '' ;: :; :: :; :: .; :: :: :  : :              !`\ \\
-`!                   '.,'.,' '.__.':_;:_;:___.':_;:_;  :_;              !`\ \\
-`!                                                                      !`\ \\
-`!  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT)  !` \\
+`!         (\___/)  .-.   .-. .--. .-..-..---.  .--. .-----.            !`\
+`!         / o o \  : :.-.: :: ,. :: '' :: .; :: .; :'-. .-'            !`\
+`!        (   "   ) : :: :: :: :: :: .. ::   .':    :  : :              !`\
+`!         \__ __/  : '' '' ;: :; :: :; :: .; :: :: :  : :              !`\
+`!                   '.,'.,' '.__.':_;:_;:___.':_;:_;  :_;              !`\
+`!                                                                      !`\
+`!  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT)  !` 
 
 ---
 
@@ -136,7 +136,7 @@ where $NH_4$ is the ambient ammonium concentration (`bionh4`, $NH_4$, [mmol N m<
 
 Note that although phytoplankton prefer $NH_4$ over $NO_3$, as $NO_3$ becomes more abundant than $NH_4$ the $L_{mp}^{NO_3}$ term begins to exceed the $L_{mp}^{NH_4}$ term such that phytoplankton switch from regenerated production ($NH_4$-based) to new production ($NO_3$-based). This reproduces the known switch of phytoplankton from regenerated to new production that is observed in the real ocean ([Dugdale & Goering, 1967](https://doi.org/10.4319/lo.1967.12.2.0196), [Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/)). Furthermore, if $K_{mp}^{N}$ > $K_{np}^{N}$, this ensures that (i) micro-phytoplankton are less competitive for $NH_4$ than nano-phytoplankton at any concentration and (ii) micro-phytoplankton growth is greater than nano-phytoplankton under abundant $NO_3$, which is consistent with theory and observations ([Fawcett et al., 2011](https://doi.org/10.1038/ngeo1265), [Glibert et al., 2016](https://doi.org/10.1002/lno.10203))
 
-**Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{np}^{-Fe:C}$, [mol/mol]; `dia_minqfe`, $Q_{mp}^{-Fe:C}$, [mol/mol]) and an optimal quota for growth (`phy_optqfe`, $Q_{np}^{*Fe:C}$, [mol/mol]; `dia_optqfe`, $Q_{mp}^{*Fe:C}$, [mol/mol]). The minimum iron quota, $Q_{np}^{-Fe:C}$ and $Q_{mp}^{-Fe:C}$, is dependent on the chlorophyll content of the cell, the degree of total nitrogen limitation and the degree of nitrate limitation (due to Fe requirements of nitrate reduction within the cell ([]())) according to
+**Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{np}^{-Fe:C}$, [mol/mol]; `dia_minqfe`, $Q_{mp}^{-Fe:C}$, [mol/mol]) and an optimal quota for growth (`phy_optqfe`, $Q_{np}^{*Fe:C}$, [mol/mol]; `dia_optqfe`, $Q_{mp}^{*Fe:C}$, [mol/mol]). The minimum iron quota, $Q_{np}^{-Fe:C}$ and $Q_{mp}^{-Fe:C}$, is dependent on three terms that each correspond to the iron required by photosystems, respiration and nitrate reduction ([Flynn & Hipkin, 1999](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x)):
 
 $$
 \begin{align}
@@ -154,19 +154,21 @@ Q_{mp}^{-Fe:C} = & 0.00167 / 55.85 * Q_{mp}^{Chl:C} * 12 \\
 \end{align}
 $$
 
-The minimum iron requirements of the cell for growth increases as a function of three terms. First, the ratio of chlorophyll to carbon (`phy_chlc`, $Q_{np}^{Chl:C}$, [mol/mol]; `dia_chlc`, $Q_{mp}^{Chl:C}$, [mol/mol]). Second, the amount of Fe required in respiration, tracked via an estimate of internal nitrogen stores. Third, as the cell performs more nitrate reduction for growth. This formulation and the coefficients applied to chlorophyll content and nitrate use derive from [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x).
+The first term reflects the amount of iron required for photosystems I and II. `0.00167/55.85` is equivalent to the grams of Fe per gram of chlorophyll divided by the grams of Fe per mol Fe, giving mol Fe per gram chlorophyll. This term is multipled by the chlorophyll to carbon ratio of the phytoplantkon cell (`phy_chlc`, $Q_{np}^{Chl:C}$, [mol/mol]; `dia_chlc`, $Q_{mp}^{Chl:C}$, [mol/mol]) and grams of C per mol C, returning mol Fe per mol C. At a healthy chlorophyll:C ratio of 0.03, this term returns an Fe:C ratio of roughly 10 $\mu$mol:mol, which reproduces well known requirements of phytoplankton cells ([Morel, Rueter & Price, 1991](https://www.jstor.org/stable/43924569)). The second term, representing the respiratory iron requirement, is derived from [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) who estimated 1.21 $\times 10^{-5}$ grams Fe per gram N assimilated into the cell, which is converted to mol Fe per mol C with 14 g N per mol N divided by 55.85 g Fe per mol Fe $\times$ 7.625 mol C per mol N. This second term assumes that respiration is reduced as growth becomes more limited by available nitrogen (`phy_lnit(i,j,k)`, $L_{np}^{N}$, [dimensionless]; `dia_lnit(i,j,k)`, $L_{mp}^{N}$, [dimensionless]). Finally, the third term represents the iron required by nitrate/nitrite reduction. Nitrate assimilation requires roughly 1.8$\times$ more iron than ammonia assimilation ([Raven, 1988](https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1988.tb04196.x)). [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) estimated a demand of 1.15 $\times 10^{-4}$ g Fe per mol NO$_3$ reduced, which is accounted for by the nitrate limitation term (`phy_lno3(i,j,k)`, $L_{np}^{NO_3}$, [dimensionless]; `dia_lno3(i,j,k)`, $L_{mp}^{NO_3}$, [dimensionless])). Note that the `1.5` is designed to account for dark respiration (i.e., respiration when the cells are not growing) and the `0.5` refers to the fact that during cell division the cell must reinstate half of its Fe reserves. 
 
-The Fe limitation factor (`phy_lfer(i,j,k)`, $L_{np}^{Fe}$; `dia_lfer(i,j,k)`, $L_{mp}^{Fe}$), [dimensionless]) is computed from the present Fe:C quota of the phytoplankton cells (`phy_Fe2C`, $Q_{np}^{Fe:C}$, [mol/mol]; `dia_Fe2C`, $Q_{mp}^{Fe:C}$, [mol/mol]) relative to these quotas.
+The Fe limitation factor (`phy_lfer(i,j,k)`, $L_{np}^{Fe}$; `dia_lfer(i,j,k)`, $L_{mp}^{Fe}$), [dimensionless]) is then computed from the present Fe:C quota of the phytoplankton cells (`phy_Fe2C`, $Q_{np}^{Fe:C}$, [mol/mol]; `dia_Fe2C`, $Q_{mp}^{Fe:C}$, [mol/mol]) relative to the minimum and optimal quotas.
 
 $L_{np}^{Fe} = \max\left(0.0, \min\left(1.0, \dfrac{ Q_{np}^{Fe:C} - Q_{np}^{-Fe:C} }{Q_{np}^{*Fe:C}} \right)\right)$
 
 $L_{mp}^{Fe} = \max\left(0.0, \min\left(1.0, \dfrac{ Q_{mp}^{Fe:C} - Q_{mp}^{-Fe:C} }{Q_{mp}^{*Fe:C}} \right)\right)$
 
-If the cell is Fe‑replete with a quota that exceeds the minimum quota by as much as the optimal quota, then Fe does not limit growth ($L_{np}^{Fe}$ = 1; $L_{mp}^{Fe}$ = 1). If the cell is Fe‑deplete with a quota equal to the minimum quota, then the growth rate is reduced to zero. The optimal quota ($Q_{np}^{*Fe:C}$; $Q_{mp}^{*Fe:C}$) is therefore a measure of how much excess Fe is required to allow unrestricted growth.
+If the cell is Fe‑replete with a quota that exceeds the minimum quota by as much as the optimal quota, then Fe does not limit growth ($L_{np}^{Fe}$ = 1; $L_{mp}^{Fe}$ = 1). If the cell is Fe‑deplete with a quota equal to or less than the minimum quota, then the growth rate is reduced to zero. The optimal quota ($Q_{np}^{*Fe:C}$; $Q_{mp}^{*Fe:C}$) is therefore a measure of how much excess Fe is required to allow unrestricted growth.
 
 **Limitation of micro-phytoplankton growth by silicic acid** is computed as a gating constraint on division via:
 
 $L_{mp}^{Si} = \min\left( 1.0, \max\left( 0.0, \dfrac{ Q_{mp}^{Si:C} - Q_{mp}^{-Si:C} }{ Q_{mp}^{*Si:C} - Q_{mp}^{-Si:C} }  \right) \right)$
+
+where the minimum quota (`diaminqs`, $Q_{mp}^{-Si:C}$, [mol/mol]) and optimal quota (`diaoptqs`, $Q_{mp}^{*Si:C}$, [mol/mol]) are set as input parameters to the model at run time. This formulation treats silicification as linearly limiting to growth between the minimum and optimal quotas. Above the optimal quota silica limitation does not exist. This reflects evidence that diatoms division is structurally constrained by silica until a threshold reserve is reached, at which point division can proceed ([Martin-Jézéquel, Hildebrand & Brzezinski, 2003](https://onlinelibrary.wiley.com/doi/full/10.1046/j.1529-8817.2000.00019.x)). This treatment is also supported by weak or even negative relationships between Si:C quotas and growth rates of marine diatoms ([María Mejía et al., 2013](https://www.sciencedirect.com/science/article/pii/S001670371300344X?via%3Dihub)) and is consistent with the apparent increase in Si:C quotas under Fe-limited growth ([Hutchins & Bruland, 1998](https://www.nature.com/articles/31203), [Takeda, 1998](https://www.nature.com/articles/31674)), which suggests that Si:C quotas can be decoupled from growth. 
 
 ---
 
@@ -266,15 +268,15 @@ $B_{phy}^{+Fe} = B_{phy}^{C} Q_{phy}^{+Fe:C}$
 
 Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/), this rate is scaled by three terms relating to (i) michaelis-menten type affinity for dFe, (ii) up-regulation of dFe uptake representing investment in transporters when cell quotas are limiting to growth, and (iii) down regulation of dFe uptake associated with enriched cellular quotas:
 
-(i) $\dfrac{dFe}{dFe + K_{phy}^{Fe}}$
+(i) $\dfrac{dFe}{dFe + K_{np}^{Fe}}$
 
-(ii) $4 - \dfrac{4.5 L_{phy}^{Fe}}{0.5 + L_{phy}^{Fe}}$
+(ii) $4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}}$
 
-(iii) $\max\left(0, 1 - \dfrac{B_{phy}^{Fe} / B_{phy}^{+Fe}}{|1.05 - B_{phy}^{Fe} / B_{phy}^{+Fe}|} \right)$
+(iii) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}|} \right)$
 
 dFe uptake by phytoplankton is then calculated as
 
-$\mu_{phy}^{Fe} = \mu_{phy}^{max} B_{phy}^{+Fe} \max\left(0.2, L_{phy}^{PAR} \cdot L_{phy}^{N}\right) \cdot (i) \cdot (ii) \cdot (iii)$
+$\mu_{np}^{Fe} = \mu_{np}^{max} B_{np}^{+Fe} \max\left(0.2, L_{np}^{PAR} \cdot L_{np}^{N}\right) \cdot (i) \cdot (ii) \cdot (iii)$
 
 where the maximum dFe uptake is decreased to 20% of its maximum potential rate at night and when nitrogen is limited. The iron to carbon ratios of phytoplankton are passed to zooplankton and detritus and are also tracked in these pools.
 
