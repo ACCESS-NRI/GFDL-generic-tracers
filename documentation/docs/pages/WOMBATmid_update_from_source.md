@@ -18,29 +18,31 @@ The subroutine is documented internally by a list of numbered steps (see code co
 
 1. Light attenuation through the water column.
 2. Nutrient limitation of phytoplankton.
-3. Temperature‑dependent autotrophy and heterotrophy.
+3. Maximum potential growth rate of phytoplankton.
 4. Light limitation of phytoplankton.
-5. Growth of chlorophyll.
-6. Phytoplankton uptake of iron.
-7. Phytoplankton uptake of silicic acid.
-8. Iron chemistry (precipitation, scavenging and coagulation).
-9. Silicic acid chemistry and dissolution.
-10. Mortality and remineralisation.
-11. Zooplankton grazing.
-12. CaCO3 calculations.
-13. Implicit nitrogen fixation.
-14. Facultative heterotrophy calculations.
-15. Chemotrophy calculations.
-16. Nominal oxidation state of DOC.
-17. Sources and sinks.
-18. Check for conservation of mass.
-19. Additional operations on tracers.
-20. Sinking rate of particulates.
-21. Sedimentary processes.
-22. Permanent burial of particulates.
+5. Realized growth rate of phytoplankton.
+6. Growth of chlorophyll.
+7. Phytoplankton uptake of iron.
+8. Phytoplankton uptake of silicic acid.
+9. Iron chemistry (precipitation, scavenging and coagulation).
+10. Silicic acid chemistry and dissolution.
+11. Mortality and remineralisation.
+12. Zooplankton grazing.
+13. CaCO3 calculations.
+14. Implicit nitrogen fixation.
+15. Facultative heterotrophy calculations.
+16. Chemotrophy calculations.
+17. Nominal oxidation state of DOC.
+18. Sources and sinks.
+19. Check for conservation of mass.
+20. Additional operations on tracers.
+21. Sinking rate of particulates.
+22. Sedimentary processes.
+23. Permanent burial of particulates.
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in grey follow the Fortran code, while 
-variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
+variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units. 
+If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
 ---
 
@@ -76,7 +78,6 @@ This ensures phytoplankton growth in the model responds to the mean light they e
 The euphotic depth is defined as the depth where `radbio` falls below the 1% threshold of incidient shortwave radiation and is therefore soley dependent on the concentration of chlorophyll within the water column.
 
 ---
-
 
 ### 2. Nutrient limitation of phytoplankton
 
@@ -173,21 +174,15 @@ where the minimum quota (`diaminqs`, $Q_{mp}^{-Si:C}$, [mol/mol]) and optimal qu
 ---
 
 
-### 3. Temperature‑dependent autotrophy and heterotrophy
+### 3. Maximum potential growth rates of phytoplankton
 
-**Autotrophy.**
-The maximum potential growth rate for phytoplankton (`phy_mumax(i,j,k)`, $\mu_{phy}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
+The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\mu_{np}^{max}$, [day<sup>-1</sup>]) and micro-phytoplankton (`dia_mumax(i,j,k)`, $\mu_{mp}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
 
-$\mu_{phy}^{max} = \mu_{phy}^{0^{\circ}C} \cdot (β_{auto})^{T}$
+$\mu_{np}^{max} = \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T}$
 
-In the above, both $\mu_{phy}^{0ºC}$ and $β_{auto}$ are reference values input to the model and control how productive the ocean is.
+$\mu_{mp}^{max} = \mu_{mp}^{0^{\circ}C} \cdot (β_{mp})^{T}$
 
-**Heterotrophy.**
-Heterotrophic processes include mortality of phytoplankton and zooplankton, grazing rates of zooplankton and the remineralisation rate of detritus in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0^{\circ}C}$, [day<sup>-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$).
-
-$\mu_{het} = \mu_{het}^{0^{\circ}C} \cdot (β_{hete})^{T}$
-
-See sections below for further details on mortality and grazing terms.
+In the above, $\mu_{np}^{0ºC}$, $\mu_{mp}^{0ºC}$, $β_{np}$ and $β_{mp}$ are reference values input to the model at run time. This allows the user to configure nano-phytoplankton and micro-phytoplankton with different maximum potential growth rates and different sensitivities to temperature ([Anderson et al., 2021](https://www.nature.com/articles/s41467-021-26651-8)).
 
 ---
 
@@ -196,64 +191,85 @@ See sections below for further details on mortality and grazing terms.
 
 Phytoplankton growth is limited by light through a photosynthesis–irradiance (P–I) relationship that links cellular chlorophyll content and available photosynthetically active radiation ('radbio', $PAR$, [W m<sup>-2</sup>]).
 
-First, The initial slope of the P–I curve, (`phy_pisl`, $\alpha_{phy}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]), determines how efficiently phytoplankton convert light into carbon fixation. It is scaled by the cellular chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{phy}^{Chl:C}$, [mg/mg]).
+First, The initial slope of the P–I curve, (`phy_pisl`, $\alpha_{np}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]; `dia_pisl`, $\alpha_{mp}$, [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>]), determines how efficiently phytoplankton convert light into carbon fixation. It is scaled by the cellular chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^{Chl:C}$, [mg/mg]; `dia_chlc`, $Q_{mp}^{Chl:C}$, [mg/mg]).
 
-$\alpha_{phy} = \max(\alpha_{phy}^{Chl} \cdot Q_{phy}^{Chl:C} \ , \ \alpha_{phy}^{Chl} \cdot Q_{phy}^{-Chl:C}$ )
+$\alpha_{np} = \max(\alpha_{np}^{Chl} \cdot Q_{np}^{Chl:C} \ , \ \alpha_{np}^{Chl} \cdot Q_{np}^{-Chl:C}$ )
 
-where $\alpha_{phy}^{Chl}$ is the photosynthetic efficiency per unit chlorophyll in units of [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup> (mg/mg)<sup>-1</sup>] and $Q_{phy}^{-Chl:C}$ is the minimum chlorophyll to carbon ratio of the cell. This constraint prevents photosynthesis from collapsing unrealistically at low chlorophyll concentrations.
+$\alpha_{mp} = \max(\alpha_{mp}^{Chl} \cdot Q_{mp}^{Chl:C} \ , \ \alpha_{mp}^{Chl} \cdot Q_{mp}^{-Chl:C}$ )
 
-Second, light limitation (`phy_lpar(i,j,k)`, $L_{phy}^{PAR}$), [dimensionless]) is calculated using an exponential P–I formulation.
+where $\alpha_{np}^{Chl}$ and $\alpha_{mp}^{Chl}$ are the photosynthetic efficiency per unit chlorophyll in units of [day<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup> (mg/mg)<sup>-1</sup>], while $Q_{np}^{-Chl:C}$ and $Q_{mp}^{-Chl:C}$ are the minimum chlorophyll to carbon ratio of the cell. This constraint prevents photosynthesis from collapsing unrealistically at low chlorophyll concentrations. These values are parameter inputs at run time and can differ between nano-phytoplankton and micro-phytoplankton ([Edwards et al., 2015](https://doi.org/10.1002/lno.10033), [Litchman 2022](https://link.springer.com/chapter/10.1007/978-3-030-92499-7_1)).
 
-$L_{phy}^{PAR} = 1 - e^{- \alpha_{phy} PAR }$
+Second, light limitation (`phy_lpar(i,j,k)`, $L_{np}^{PAR}$), [dimensionless]; `dia_lpar(i,j,k)`, $L_{mp}^{PAR}$), [dimensionless]) is calculated using an exponential P–I formulation.
+
+$L_{np}^{PAR} = 1 - e^{- \alpha_{np} PAR }$
+
+$L_{mp}^{PAR} = 1 - e^{- \alpha_{mp} PAR }$
 
 At low irradiance (PAR), growth increases approximately linearly with light, while at high irradiance photosynthesis asymptotically saturates. Photoinhibition is not included in this formulation.
 
-Realized growth of phytoplankton is then calculated as:
+---
 
-$\mu_{phy} = \mu_{phy}^{max} L_{phy}^{PAR} \min(L_{phy}^{N}, L_{phy}^{Fe})$
+### 5. Realized growth rate of phytoplankton.
 
-and 
+Realized growth of phytoplankton is calculated as:
 
-$\mu_{phy}^{C} = \mu_{phy} B_{phy}^{C}$
+$\mu_{np} = \mu_{np}^{max} L_{np}^{PAR} \min(L_{np}^{N}, L_{np}^{Fe})$
 
-where $\mu_{phy}^{C}$ is in units of [mmol C m<sup>-3</sup> day<sup>-1</sup>].
+$\mu_{mp} = \mu_{mp}^{max} L_{mp}^{PAR} \min(L_{mp}^{N}, L_{mp}^{Fe}) L_{mp}^{Si}$
+
+where Liebig's law of the minimum ([Liebig, 1840](https://archive.org/details/organicchemistry00liebrich/mode/2up), [Blackman, 1905](https://doi.org/10.1093/oxfordjournals.aob.a089000)) is applied to resources that are required for biomass synthesis (N and Fe). For micro-phytoplankton, their growth is additionally restricted by silica limitation applied outside of Liebig's law because we treat silica limitation (`dia_lsil(i,j,k)`, $L_{mp}^{Si}$, [dimensionless]) as a structural threshold, rather than as a metabolic throttle.
+
+Carbon fixation by phytoplankton is calculated as:
+
+$\mu_{np}^{C} = \mu_{np} B_{np}^{C}$
+
+$\mu_{mp}^{C} = \mu_{mp} B_{mp}^{C}$
+
+where $\mu_{np}^{C}$ and $\mu_{mp}^{C}$ are in units of [mmol C m<sup>-3</sup> day<sup>-1</sup>].
 
 
 ---
 
 
-### 5. Growth of chlorophyll
+### 6. Growth of chlorophyll
 
 This step diagnoses the **rate of chlorophyll production** as a function of mixed-layer light, the phytoplankton growth rate and nutrient availability. The structure is consistent with the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation that relaxes the chlorophyll-to-carbon ratio towards an optimal value that supports photosynthetic growth under prevailing light and nutrient conditions.
 
-We first solve for the optimal chlorophyll-to-carbon ratio, $Q_{phy}^{*Chl:C}$ (g Chl g C$^{-1}$), which is diagnosed as the ratio required to support maximal photosynthetic carbon fixation under the ambient mean light level in the mixed layer, while accounting for nutrient limitation:
+We first solve for the optimal chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^{*Chl:C}$, [mol/mol]; `dia_chlc`, $Q_{mp}^{*Chl:C}$, [mol/mol]), which is diagnosed as the ratio required to support maximal photosynthetic carbon fixation under the ambient mean light level in the mixed layer, while accounting for nutrient limitation of biosynthesis:
 
-$Q_{phy}^{*Chl:C} = \dfrac{Q_{phy}^{+Chl:C}}{1 + \dfrac{\alpha_{phy} PAR_{MLD} Q_{phy}^{+Chl:C}}{2 \mu_{phy}^{max} \min \left(L_{phy}^{N}, L_{phy}^{Fe} \right) }}$
+$Q_{np}^{*Chl:C} = \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }}$
+
+$Q_{mp}^{*Chl:C} = \dfrac{Q_{mp}^{+Chl:C}}{1 + \dfrac{\alpha_{mp} PAR_{MLD} Q_{mp}^{+Chl:C}}{2 \mu_{mp}^{max} \min \left(L_{mp}^{N}, L_{mp}^{Fe} \right) }}$
 
 where:
-- $Q_{phy}^{+Chl:C}$ is the maximum allowable chlorophyll-to-carbon ratio (`phymaxqc`)
-- $\alpha_{phy}$ is the chlorophyll-specific initial slope of the P–I curve (`alphabio`)
+- $Q_{np}^{+Chl:C}$ and $Q_{mp}^{+Chl:C}$ are the maximum allowable chlorophyll-to-carbon ratios (`phymaxqc`; `diamaxqc`)
+- $\alpha_{np}$ and $\alpha_{mp}$ are the chlorophyll-specific initial slopes of the P–I curve (`alphabio_phy`; `alphabio_dia`)
 - $PAR_{MLD}$ is mean photosynthetically available radiation over the mixed layer (`radmld`)
-- $\mu_{phy}^{max}$ is the temperature-dependent maximum phytoplankton growth rate in [day<sup>-1</sup>] (`phy_mumax`)
-- $L_{phy}^{N}$ and $L_{phy}^{Fe}$ are the nutrient limitation factors for growth on N and Fe
+- $\mu_{np}^{max}$ and $\mu_{mp}^{max}$ are the temperature-dependent maximum phytoplankton growth rates in [day<sup>-1</sup>] (`phy_mumax`; `dia_mumax`)
+- $L_{np}^{N}$ and $L_{np}^{Fe}$ are the nano-phytoplankton limitation factors for growth on N and Fe (`phy_lnit` and `phy_lfer`)
+- $L_{mp}^{N}$ and $L_{mp}^{Fe}$ are the micro-phytoplankton limitation factors for growth on N and Fe (`dia_lnit` and `dia_lfer`)
 
 We set a floor for the minimum chlorophyll-to-carbon ratio of phytoplankton via:
 
-$Q_{phy}^{*Chl:C} = \min \left( Q_{phy}^{*Chl:C}, Q_{phy}^{-Chl:C} \right)$
+$Q_{np}^{*Chl:C} = \min \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right)$
+
+$Q_{mp}^{*Chl:C} = \min \left( Q_{mp}^{*Chl:C}, Q_{mp}^{-Chl:C} \right)$
 
 where:
-- $Q_{phy}^{-Chl:C}$ is the minimum allowable chlorophyll-to-carbon ratio (`phyminqc`)
+- $Q_{np}^{-Chl:C}$ and $Q_{mp}^{-Chl:C}$ are the minimum allowable chlorophyll-to-carbon ratios (`phyminqc`; `diaminqc`)
 
 Growth of chlorophyll is then calculated as:
 
-$\dfrac{\delta Chl}{\delta t} = \mu_{phy} B_{phy}^{Chl} + \dfrac{ Q_{phy}^{*Chl:C} - Q_{phy}^{Chl:C} }{\tau_{phy}^{Chl}} \cdot B_{phy}^{C}$
+$\dfrac{\delta Chl}{\delta t} = \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau_{np}^{Chl}} \cdot B_{np}^{C}$
+
+$\dfrac{\delta Chl}{\delta t} = \mu_{mp} B_{mp}^{Chl} + \dfrac{ Q_{mp}^{*Chl:C} - Q_{mp}^{Chl:C} }{\tau_{mp}^{Chl}} \cdot B_{mp}^{C}$
 
 where:
-- $Q_{phy}^{Chl:C}$ is the in-situ chlorophyll-to-carbon ratio
-- $B_{phy}^{Chl}$ is the in-situ concentation of phytoplankton chlorophyll in units of [mol/kg]
-- $\mu_{phy}$ is the realized growth rate of phytoplankton in units of [day<sup>-1</sup>]
-- $\tau_{phy}^{Chl}$ is the rate of chlorophyll synthesis in units of [day<sup>-1</sup>]
-- $B_{phy}^{Chl}$ is the in-situ concentation of phytoplankton carbon in units of [mol/kg]
+- $Q_{np}^{Chl:C}$ and $Q_{mp}^{Chl:C}$ are the in-situ chlorophyll-to-carbon ratios (`phy_chlc`; `dia_chlc`)
+- $B_{np}^{Chl}$ and $B_{mp}^{Chl}$ are the in-situ concentations of phytoplankton chlorophyll in units of [mol/kg] (`biophy`; `biodia`)
+- $\mu_{np}$ and $\mu_{mp}$ are the realized growth rates of phytoplankton in units of [day<sup>-1</sup>] (`phy_mu(i,j,k)`; `dia_mu(i,j,k)`)
+- $\tau_{np}^{Chl}$ and $\tau_{mp}^{Chl}$ are the rates of chlorophyll synthesis in units of [day<sup>-1</sup>] (`phytauqc`; `diatauqc`)
+- $B_{np}^{Chl}$ and $B_{mp}^{Chl}$ are the in-situ concentations of phytoplankton carbon in units of [mol/kg] (`biopchl`; `biodchl`)
 
 This formulation elevates chlorophyll-to-carbon ratios in low light and supresses synthesis when nutrients are low.
 
