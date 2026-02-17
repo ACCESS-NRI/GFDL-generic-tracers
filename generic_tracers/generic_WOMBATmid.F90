@@ -3312,11 +3312,11 @@ module generic_WOMBATmid
     !  - ~1% chlorophyll (C55H72N4O5), with a NOSC of -0.91
     ! This gives an overal NOSC of lysed phytoplankton cells of roughly -0.35
     call g_tracer_add_param('noscphylyse', wombat%noscphylyse, 1.0 -0.35)
-    
+
     ! Nominal oxidation state of carbon of bacterial lysis producing DOC
     !-----------------------------------------------------------------------
     ! Composition of E. coli cells by dry weight [Schonheit et al., 2016 Trends in Microbiology; their Table 1]
-    !  - ~55% protein, with a NOSC of -0.15  [Fig. 5 of Dick 2024 J. Royal Society] 
+    !  - ~55% protein, with a NOSC of -0.15  [Fig. 5 of Dick 2024 J. Royal Society]
     !  - ~10% lipid (C16H32O2), with a NOSC of -1.6
     !  - ~10% carbohydrate (C6H12O6), with a NOSC of ~0.0
     !  - ~25% nucleic acids (C10H14O6N5P), with a NOSC of +0.85
@@ -3325,7 +3325,7 @@ module generic_WOMBATmid
 
     ! Nominal oxidation state of carbon of sinking marine detritus producing DOC
     !-----------------------------------------------------------------------
-    ! Composition of marine organic detritus by dry weight 
+    ! Composition of marine organic detritus by dry weight
     !  [Minor et al. 2003 Geochim. et Cosmochim. Acta; Lopez-Fernandez et al., 2013 Progress in Oceanography]
     !  - ~30% protein, with a NOSC of -0.15  [Fig. 5 of Dick 2024 J. Royal Society]
     !  - ~23% lipids (C16H32O2), with a NOSC of -1.6
@@ -4160,10 +4160,13 @@ module generic_WOMBATmid
     real                                    :: hco3, diss_cal, diss_ara, diss_det
     real                                    :: avedetbury, avecaco3bury
     real                                    :: dzt_bot, dzt_bot_os
-    real                                    :: e_dom, e_bac, f_bac, bac1_yoxy, bac1_yana, bac1_yno3, bac2_yoxy, bac2_yana, bac2_yn2o
-    real                                    :: bac1_ydonC, bac2_ydonC, bac1_yoxyC, bac1_yanaC, bac1_yno3C, bac2_yoxyC, bac2_yanaC, bac2_yn2oC
+    real                                    :: e_dom, e_bac, f_bac
+    real                                    :: bac1_yoxy, bac1_yana, bac1_yno3, bac2_yoxy, bac2_yana, bac2_yn2o
+    real                                    :: bac1_ydonC, bac1_yoxyC, bac1_yanaC, bac1_yno3C
+    real                                    :: bac2_ydonC, bac2_yoxyC, bac2_yanaC, bac2_yn2oC
     real                                    :: bac_Vdoc, bac1_Vdon, bac1_Vnh4, bac2_Vdon, bac2_Vnh4, bac_Voxy, bac_Vno3, bac_Vn2o
-    real                                    :: bac_gC, bac_gN, bac_gEA, bac_limnh4, bac_limdon, bac_lnh4, bac_ldon, bac_muana, bac_muaer
+    real                                    :: bac_gC, bac_gN, bac_gEA, bac_limnh4, bac_limdon, bac_lnh4, bac_ldon
+    real                                    :: bac_muana, bac_muaer
     real                                    :: aoa_Vnh4, aoa_Voxy
     real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect
     real                                    :: disssi_temp, disssi_usat, disssi_bact
@@ -5467,7 +5470,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
 
       ! Compute variation in yield due to NOSC (Wang & Kuzyakov 2023 Global Change Biology)
-      !  - We chose to vary the yield (here in terms of N) from a minimum of 0.1 (10 mol DON+NH4 per mol Biomass) 
+      !  - We chose to vary the yield (here in terms of N) from a minimum of 0.1 (10 mol DON+NH4 per mol Biomass)
       !    to a max of 0.80 (1.25 mol DON+NH4 per mol Biomass)
       zval = wombat%bac_ydonmax - wombat%bac_ydonmin
       wombat%bac_ydon(i,j,k) = max(wombat%bac_ydonmin, min(wombat%bac_ydonmax, &
@@ -5483,7 +5486,7 @@ module generic_WOMBATmid
       bac1_yana = wombat%bac_ydon(i,j,k) * wombat%bacanapen ! Yield of N biomass per mol DON during anaerobic growth
       f_bac = bac1_yana * e_bac/e_dom ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
       bac1_yno3 = (f_bac/e_bac) / ((1.0 - f_bac)/4.0) ! Yield of N biomass per mol nitrate
-      
+
       e_dom = 4.0/dom_N2C + 10.9 - 2.0*2.6 - 3.0  ! [Anderson et al., 1995]
       e_bac = 4.0*wombat%bac2_C2N + 7.0 - 2.0*2.0 - 3.0  ! [Zimmerman et al., 2014]
       f_bac = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom ) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
@@ -5491,7 +5494,7 @@ module generic_WOMBATmid
       bac2_yana = wombat%bac_ydon(i,j,k) * wombat%bacanapen ! Yield of N biomass per mol DON during anaerobic growth
       f_bac = bac2_yana * e_bac/e_dom ! The fraction of electrons used for N biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
       bac2_yn2o = (f_bac/e_bac) / ((1.0 - f_bac)/1.0) ! Yield of N biomass per mol nitrous oxide
-      
+
       ! Convert from units N of bacterial biomass to C of bacterial biomass
       wombat%bac1_ydoc(i,j,k) = min(wombat%bac_ydonmax*0.8, &
                                     wombat%bac_ydon(i,j,k) * wombat%bac1_C2N * dom_N2C)
@@ -5513,7 +5516,7 @@ module generic_WOMBATmid
       ! Bacteria prefer uptake of N from DON than NH4, but will nonetheless supplement growth with NH4
       bac_limdon = biodon / (biodon + wombat%bac1_kdom)
       bac_limnh4 = bionh4 / (bionh4 + wombat%bac1_knh4)
-      bac1_Vdon = wombat%bac1_Vmax_don * bac_limdon 
+      bac1_Vdon = wombat%bac1_Vmax_don * bac_limdon
       bac1_Vnh4 = wombat%bac1_Vmax_nh4 * bac_limnh4
       wombat%bac1_lnit(i,j,k) = (bac1_Vdon + bac1_Vnh4) / (wombat%bac1_Vmax_don + wombat%bac1_Vmax_nh4)
       bac_ldon = 5.0 * wombat%bac1_lnit(i,j,k) * bac_limdon / (5.0 * bac_limdon + bac_limnh4)
@@ -5526,7 +5529,7 @@ module generic_WOMBATmid
       bac_gEA = bac_Voxy*bac1_yoxyC ! Growth of C biomass due to electron acceptor (O2) uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gN, bac_gEA ) ) * fbc
       wombat%bac1_fnlim(i,j,k) = 0.0
-      if (bac_gN.lt.min(bac_gC,bac_gEA)) wombat%bac1_fnlim(i,j,k) = 1.0
+      if (bac_gN<min(bac_gC,bac_gEA)) wombat%bac1_fnlim(i,j,k) = 1.0
       ! Anaerobic growth
       bac_Vno3 = wombat%bac1_Vmax_no3 * biono3 / (biono3 + wombat%bac1_kno3) ! Uptake of NO3 (i.e., NO3-limited growth)
       bac_gC = bac_Vdoc * bac1_yanaC ! Growth of C biomass due to DOC uptake
@@ -5546,7 +5549,7 @@ module generic_WOMBATmid
       ! Bacteria prefer uptake of N from DON than NH4, but will nonetheless supplement growth with NH4
       bac_limdon = biodon / (biodon + wombat%bac2_kdom)
       bac_limnh4 = bionh4 / (bionh4 + wombat%bac2_knh4)
-      bac2_Vdon = wombat%bac2_Vmax_don * bac_limdon 
+      bac2_Vdon = wombat%bac2_Vmax_don * bac_limdon
       bac2_Vnh4 = wombat%bac2_Vmax_nh4 * bac_limnh4
       wombat%bac2_lnit(i,j,k) = (bac2_Vdon + bac2_Vnh4) / (wombat%bac2_Vmax_don + wombat%bac2_Vmax_nh4)
       bac_ldon = 5.0 * wombat%bac2_lnit(i,j,k) * bac_limdon / (5.0 * bac_limdon + bac_limnh4)
@@ -5559,7 +5562,7 @@ module generic_WOMBATmid
       bac_gEA = bac_Voxy * bac2_yoxyC ! Growth of C biomass due to electron acceptor (O2) uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gN, bac_gEA ) ) * fbc
       wombat%bac2_fnlim(i,j,k) = 0.0
-      if (bac_gN.lt.min(bac_gC,bac_gEA)) wombat%bac2_fnlim(i,j,k) = 1.0
+      if (bac_gN<min(bac_gC,bac_gEA)) wombat%bac2_fnlim(i,j,k) = 1.0
       ! Anaerobic growth
       bac_gC = bac_Vdoc * bac2_yanaC ! Growth of C biomass due to DOC uptake
       bac_gN = (bac2_Vdon + bac2_Vnh4) * bac2_ydonC * wombat%bacanapen ! Growth of C biomass due to N uptake
@@ -5573,17 +5576,17 @@ module generic_WOMBATmid
       wombat%bac2_mu(i,j,k) = max(bac_muaer, bac_muana)
 
       ! Determine if bacteria are limited by Fe
-      if (biofer.gt.1e-3) then
+      if (biofer>1e-3) then
           ! Initial estimate of the C biomass growth, DOC and DON assimilation rate by bacteria
           wombat%bac1ufer(i,j,k) = wombat%bac1_mu(i,j,k) * wombat%f_bac1(i,j,k) / wombat%bac1_C2Fe ! [molFe/kg/s]
           wombat%bac2ufer(i,j,k) = wombat%bac2_mu(i,j,k) * wombat%f_bac2(i,j,k) / wombat%bac2_C2Fe ! [molFe/kg/s]
-          if (wombat%bac1ufer(i,j,k).gt.0.0) then
+          if (wombat%bac1ufer(i,j,k)>0.0) then
             ! Apply uptake kinetics constraint on bacterial dFe uptake
             wombat%bac1_lfer(i,j,k) = biofer / (biofer + wombat%bac1_kfer + epsi)
             zval = wombat%f_fe(i,j,k)*0.25/dt
             wombat%bac1_lfer(i,j,k) = max(0.0, min(1.0, min( wombat%bac1_lfer(i,j,k), zval / wombat%bac1ufer(i,j,k) )))
           endif
-          if (wombat%bac2ufer(i,j,k).gt.0.0) then
+          if (wombat%bac2ufer(i,j,k)>0.0) then
             ! Apply uptake kinetics constraint on bacterial dFe uptake
             wombat%bac2_lfer(i,j,k) = biofer / (biofer + wombat%bac2_kfer + epsi)
             zval = wombat%f_fe(i,j,k)*0.25/dt
@@ -5597,24 +5600,24 @@ module generic_WOMBATmid
       ! Adjust the growth rate to be affected by dFe-limitation
       wombat%bac1_mu(i,j,k) = wombat%bac1_mu(i,j,k) * wombat%bac1_lfer(i,j,k)
       wombat%bac2_mu(i,j,k) = wombat%bac2_mu(i,j,k) * wombat%bac2_lfer(i,j,k)
-      
+
       ! Final calculation after growth rate adjustment due to possible Fe limitation
       wombat%bac1grow(i,j,k) = wombat%bac1_mu(i,j,k) * wombat%f_bac1(i,j,k) ! [molC/kg/s]
-      wombat%doc1remi(i,j,k) = wombat%bac1grow(i,j,k) / wombat%bac1_ydoc(i,j,k) * (1. - wombat%bac1_fanaer(i,j,k)) & 
+      wombat%doc1remi(i,j,k) = wombat%bac1grow(i,j,k) / wombat%bac1_ydoc(i,j,k) * (1. - wombat%bac1_fanaer(i,j,k)) &
                                + wombat%bac1grow(i,j,k) / bac1_yanaC * wombat%bac1_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%bac1nupt(i,j,k) = wombat%bac1grow(i,j,k) / bac1_ydonC * (1. - wombat%bac1_fanaer(i,j,k)) & 
+      wombat%bac1nupt(i,j,k) = wombat%bac1grow(i,j,k) / bac1_ydonC * (1. - wombat%bac1_fanaer(i,j,k)) &
                                + wombat%bac1grow(i,j,k) / (bac1_ydonC * wombat%bacanapen) * wombat%bac1_fanaer(i,j,k) ! [molN/kg/s]
       wombat%don1remi(i,j,k) = wombat%bac1nupt(i,j,k) * bac1_Vdon / (bac1_Vdon + bac1_Vnh4 + epsi) ! [molN/kg/s]
       wombat%bac1unh4(i,j,k) = wombat%bac1nupt(i,j,k) - wombat%don1remi(i,j,k) ! [molN/kg/s]
       wombat%bac1ufer(i,j,k) = wombat%bac1grow(i,j,k) / wombat%bac1_C2Fe ! [molFe/kg/s]
       wombat%bac1resp(i,j,k) = wombat%bac1grow(i,j,k) / bac1_yoxyC * (1. - wombat%bac1_fanaer(i,j,k)) ! [molO2/kg/s]
       wombat%bac1deni(i,j,k) = wombat%bac1grow(i,j,k) / bac1_yno3C * wombat%bac1_fanaer(i,j,k) ! [molNO3/kg/s]
-      
+
       ! Final calculation after growth rate adjustment due to possible Fe limitation
       wombat%bac2grow(i,j,k) = wombat%bac2_mu(i,j,k) * wombat%f_bac2(i,j,k) ! [molC/kg/s]
-      wombat%doc2remi(i,j,k) = wombat%bac2grow(i,j,k) / wombat%bac2_ydoc(i,j,k) * (1. - wombat%bac2_fanaer(i,j,k)) & 
+      wombat%doc2remi(i,j,k) = wombat%bac2grow(i,j,k) / wombat%bac2_ydoc(i,j,k) * (1. - wombat%bac2_fanaer(i,j,k)) &
                                + wombat%bac2grow(i,j,k) / bac2_yanaC * wombat%bac2_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%bac2nupt(i,j,k) = wombat%bac2grow(i,j,k) / bac2_ydonC * (1. - wombat%bac2_fanaer(i,j,k)) & 
+      wombat%bac2nupt(i,j,k) = wombat%bac2grow(i,j,k) / bac2_ydonC * (1. - wombat%bac2_fanaer(i,j,k)) &
                                + wombat%bac2grow(i,j,k) / (bac2_ydonC * wombat%bacanapen) * wombat%bac2_fanaer(i,j,k) ! [molN/kg/s]
       wombat%don2remi(i,j,k) = wombat%bac2nupt(i,j,k) * bac2_Vdon / (bac2_Vdon + bac2_Vnh4 + epsi) ! [molN/kg/s]
       wombat%bac2unh4(i,j,k) = wombat%bac2nupt(i,j,k) - wombat%don2remi(i,j,k) ! [molN/kg/s]
@@ -5934,15 +5937,15 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      ! NOSC = 4 - (4C + H - 3N - 2O + 5P - 2S) / C  
+      ! NOSC = 4 - (4C + H - 3N - 2O + 5P - 2S) / C
       !  [La Rowe & Van Cappellen, 2011 Geochim. et Cosmochim. Acta]
-      ! Here, we change the NOS of DOC according to our best guesses of the NOSC 
+      ! Here, we change the NOS of DOC according to our best guesses of the NOSC
       ! of the sources of DOC. These, and their references, are listed in the
       ! parameter definitions section near the top of the code.
       ! The change in NOSC occurs via:
       !  dNOSC/dt = dDOC(source)/dt * ( NOSC(source) - NOSC(in situ)) / [DOC]
 
-      if (wombat%f_doc(i,j,k) .gt. epsi) then
+      if (wombat%f_doc(i,j,k) > epsi) then
         zval = 1.0 / wombat%f_doc(i,j,k)
         wombat%nosdoc_overflow(i,j,k) = ( wombat%phydoc(i,j,k) &
                                         + wombat%diadoc(i,j,k) ) &
@@ -5986,7 +5989,7 @@ module generic_WOMBATmid
         wombat%nosdoc_dethydro(i,j,k) = 0.0
         wombat%nosdoc_docconsu(i,j,k) = 0.0
       endif
-        
+
 
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -6339,7 +6342,7 @@ module generic_WOMBATmid
                              + wombat%nosdoc_baclysis(i,j,k) &
                              + wombat%nosdoc_dethydro(i,j,k) &
                              + wombat%nosdoc_docconsu(i,j,k) )
-      
+
       ! Heterotrophic bacteria #1 ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_bac1(i,j,k) = wombat%f_bac1(i,j,k) + dtsb * ( &
@@ -7237,7 +7240,7 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_radbio1, wombat%radbio(:,:,1), model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
-    if (wombat%id_regpp3d .gt. 0) &
+    if (wombat%id_regpp3d > 0) &
       used = g_send_data(wombat%id_regpp3d, wombat%regpp3d, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
@@ -7741,11 +7744,11 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_don2remi, wombat%don2remi, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1nupt .gt. 0) &
+    if (wombat%id_bac1nupt > 0) &
       used = g_send_data(wombat%id_bac1nupt, wombat%bac1nupt, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2nupt .gt. 0) &
+    if (wombat%id_bac2nupt > 0) &
       used = g_send_data(wombat%id_bac2nupt, wombat%bac2nupt, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
@@ -7804,16 +7807,16 @@ module generic_WOMBATmid
     if (wombat%id_aoamor2 > 0) &
       used = g_send_data(wombat%id_aoamor2, wombat%aoamor2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-    
-    if (wombat%id_bac_ydon .gt. 0) &
+
+    if (wombat%id_bac_ydon > 0) &
       used = g_send_data(wombat%id_bac_ydon, wombat%bac_ydon, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1_ydoc .gt. 0) &
+    if (wombat%id_bac1_ydoc > 0) &
       used = g_send_data(wombat%id_bac1_ydoc, wombat%bac1_ydoc, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2_ydoc .gt. 0) &
+    if (wombat%id_bac2_ydoc > 0) &
       used = g_send_data(wombat%id_bac2_ydoc, wombat%bac2_ydoc, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
@@ -7849,10 +7852,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_bac1_fanaer, wombat%bac1_fanaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1_fnlim .gt. 0) &
+    if (wombat%id_bac1_fnlim > 0) &
       used = g_send_data(wombat%id_bac1_fnlim, wombat%bac1_fnlim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-    
+
     if (wombat%id_bac1mor1 > 0) &
       used = g_send_data(wombat%id_bac1mor1, wombat%bac1mor1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -7897,10 +7900,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_bac2_fanaer, wombat%bac2_fanaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2_fnlim .gt. 0) &
+    if (wombat%id_bac2_fnlim > 0) &
       used = g_send_data(wombat%id_bac2_fnlim, wombat%bac2_fnlim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-    
+
     if (wombat%id_bac2mor1 > 0) &
       used = g_send_data(wombat%id_bac2mor1, wombat%bac2mor1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -7933,27 +7936,27 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_anammox, wombat%anammox, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_nosdoc_overflow .gt. 0) &
+    if (wombat%id_nosdoc_overflow > 0) &
       used = g_send_data(wombat%id_nosdoc_overflow, wombat%nosdoc_overflow, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-    
-    if (wombat%id_nosdoc_excretion .gt. 0) &
+
+    if (wombat%id_nosdoc_excretion > 0) &
       used = g_send_data(wombat%id_nosdoc_excretion, wombat%nosdoc_excretion, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_nosdoc_phylysis .gt. 0) &
+    if (wombat%id_nosdoc_phylysis > 0) &
       used = g_send_data(wombat%id_nosdoc_phylysis, wombat%nosdoc_phylysis, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-    
-    if (wombat%id_nosdoc_baclysis .gt. 0) &
+
+    if (wombat%id_nosdoc_baclysis > 0) &
       used = g_send_data(wombat%id_nosdoc_baclysis, wombat%nosdoc_baclysis, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_nosdoc_dethydro .gt. 0) &
+    if (wombat%id_nosdoc_dethydro > 0) &
       used = g_send_data(wombat%id_nosdoc_dethydro, wombat%nosdoc_dethydro, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_nosdoc_docconsu .gt. 0) &
+    if (wombat%id_nosdoc_docconsu > 0) &
       used = g_send_data(wombat%id_nosdoc_docconsu, wombat%nosdoc_docconsu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
