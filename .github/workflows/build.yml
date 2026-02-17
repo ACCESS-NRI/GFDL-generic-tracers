@@ -37,7 +37,5 @@ jobs:
       spack-manifest-path: ${{ matrix.file }}
       spack-manifest-data-path: .github/build-ci/data/standard.json
       allow-ssh-into-spack-install: false  # If true, PR author must ssh into instance to complete job
-      # builtin-spack-packages-ref: main
-      # access-spack-packages-ref: api-v2
-      # spack-config-ref: main
-      # spack-ref: releases/v1.1
+      # Default args (including explicit spack/spack-packages/spack-config versions) 
+      # are specified in https://github.com/ACCESS-NRI/build-ci/tree/v3/.github/workflows#inputs
