@@ -206,7 +206,7 @@ module generic_WOMBATmid
         phykn, &
         phykf, &
         phyminqc, &
-        phyoptqc, &
+        phymaxqc, &
         phyoptqf, &
         phymaxqf, &
         phylmor, &
@@ -215,7 +215,7 @@ module generic_WOMBATmid
         diakf, &
         diaks, &
         diaminqc, &
-        diaoptqc, &
+        diamaxqc, &
         diaoptqf, &
         diamaxqf, &
         diaminqs, &
@@ -224,7 +224,7 @@ module generic_WOMBATmid
         diaVmaxs, &
         dialmor, &
         diaqmor, &
-        chlkWm2, &
+        chltau, &
         overflow, &
         trikf, &
         trichlc, &
@@ -504,7 +504,6 @@ module generic_WOMBATmid
         phy_mumax, &
         phy_mu, &
         pchl_mu, &
-        pchl_lpar, &
         phy_kni, &
         phy_kfe, &
         phy_lpar, &
@@ -516,7 +515,6 @@ module generic_WOMBATmid
         dia_mumax, &
         dia_mu, &
         dchl_mu, &
-        dchl_lpar, &
         dia_kni, &
         dia_kfe, &
         dia_ksi, &
@@ -740,7 +738,6 @@ module generic_WOMBATmid
         id_phy_kni = -1, &
         id_phy_kfe = -1, &
         id_phy_lpar = -1, &
-        id_pchl_lpar = -1, &
         id_phy_lnit = -1, &
         id_phy_lnh4 = -1, &
         id_phy_lno3 = -1, &
@@ -750,7 +747,6 @@ module generic_WOMBATmid
         id_dia_kfe = -1, &
         id_dia_ksi = -1, &
         id_dia_lpar = -1, &
-        id_dchl_lpar = -1, &
         id_dia_lnit = -1, &
         id_dia_lnh4 = -1, &
         id_dia_lno3 = -1, &
@@ -1430,11 +1426,6 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'pchl_lpar', 'Limitation of phytoplankton chlorophyll production by light', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_pchl_lpar = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
         'phy_lpar', 'Limitation of phytoplankton by light', 'h', 'L', 's', '[0-1]', 'f')
     wombat%id_phy_lpar = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -1487,11 +1478,6 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'dchl_mu', 'Realised growth rate of microphytoplankton chlorophyll', 'h', 'L', 's', 'mol/kg/s', 'f')
     wombat%id_dchl_mu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
-        'dchl_lpar', 'Limitation of microphytoplankton chlorophyll production by light', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_dchl_lpar = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2652,9 +2638,9 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.008)
 
-    ! Phytoplankton optimal quota of chlorophyll to carbon [mg/mg]
+    ! Phytoplankton maximum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyoptqc', wombat%phyoptqc, 0.040)
+    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.065)
 
     ! Phytoplankton optimal quota of iron to carbon [mol/mol]
     !-----------------------------------------------------------------------
@@ -2691,9 +2677,9 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaminqc', wombat%diaminqc, 0.004)
 
-    ! microphytoplankton optimal quota of chlorophyll to carbon [mg/mg]
+    ! microphytoplankton maximum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diaoptqc', wombat%diaoptqc, 0.036)
+    call g_tracer_add_param('diamaxqc', wombat%diamaxqc, 0.060)
 
     ! microphytoplankton optimal quota of iron to carbon [mol/mol]
     !-----------------------------------------------------------------------
@@ -2734,9 +2720,9 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaqmor', wombat%diaqmor, 0.05/86400.0)
 
-    ! Chlorophyll darkness growth reduction half-saturation coefficient [W/m2]
+    ! Timescale of chlorophyll synthesis by phytoplankton [s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('chlkWm2', wombat%chlkWm2, 5.0)
+    call g_tracer_add_param('chltau', wombat%chltau, 86400.0)
 
     ! Maximum fraction of NPP that can be routed to DOC exudation by phytoplankton [0-1]
     !-----------------------------------------------------------------------
@@ -4126,13 +4112,10 @@ module generic_WOMBATmid
     real                                    :: mass_det, mass_bdet, mass_caco3, mass_bsi, mass_small, mass_large
     real                                    :: w1, w2, rho_small, rho_large
     real                                    :: par_phy_mldsum, par_z_mldsum
-    real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, dia_chlc, phi
+    real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, dia_chlc 
     real                                    :: phy_limnh4, phy_limno3, phy_limdin
     real                                    :: dia_limnh4, dia_limno3, dia_limdin
-    real                                    :: phy_pisl, phy_pisl2
-    real                                    :: pchl_pisl, pchl_mumin, pchl_muopt
-    real                                    :: dia_pisl, dia_pisl2
-    real                                    :: dchl_pisl, dchl_mumin, dchl_muopt
+    real                                    :: phy_pisl, dia_pisl
     real                                    :: zooegesbac1fe, zooegesbac2fe, zooegesaoafe, zooegesphyfe, zooegesdiafe, zooegesdetfe
     real                                    :: zooassibac1fe, zooassibac2fe, zooassiaoafe, zooassiphyfe, zooassidiafe, zooassidetfe
     real                                    :: zooexcrbac1fe, zooexcrbac2fe, zooexcraoafe, zooexcrphyfe, zooexcrdiafe, zooexcrdetfe
@@ -4413,7 +4396,6 @@ module generic_WOMBATmid
     wombat%phy_kni(:,:,:) = 0.0
     wombat%phy_kfe(:,:,:) = 0.0
     wombat%phy_lpar(:,:,:) = 0.0
-    wombat%pchl_lpar(:,:,:) = 0.0
     wombat%phy_lnit(:,:,:) = 0.0
     wombat%phy_lnh4(:,:,:) = 0.0
     wombat%phy_lno3(:,:,:) = 0.0
@@ -4426,7 +4408,6 @@ module generic_WOMBATmid
     wombat%dia_kfe(:,:,:) = 0.0
     wombat%dia_ksi(:,:,:) = 0.0
     wombat%dia_lpar(:,:,:) = 0.0
-    wombat%dchl_lpar(:,:,:) = 0.0
     wombat%dia_lnit(:,:,:) = 0.0
     wombat%dia_lnh4(:,:,:) = 0.0
     wombat%dia_lno3(:,:,:) = 0.0
@@ -4738,18 +4719,18 @@ module generic_WOMBATmid
     !    2.  Nutrient limitation of phytoplankton                           !
     !    3.  Temperature-dependence of heterotrophy                         !
     !    4.  Light limitation of phytoplankton                              !
-    !    5.  Growth of chlorophyll                                          !
-    !    6.  Phytoplankton uptake of iron                                   !
-    !    7.  Phytoplankton uptake of silicic acid                           !
-    !    8.  Iron chemistry                                                 !
-    !    9.  Silicic acid chemistry and dissolution                         !
-    !    10. Mortality scalings and grazing                                 !
-    !    11. CaCO3 calculations                                             !
-    !    12. Implicit nitrogen fixation                                     !
-    !    13. Facultative heterotrophy calculations                          !
-    !    14. Chemoautotroph calculations                                    !
-    !    15. Sources and sinks                                              !
-    !    16. Nominal oxidation state of DOC                                 !
+    !    5.  Realized growth rate of phytoplankton                          !
+    !    6.  Growth of chlorophyll                                          !
+    !    7.  Phytoplankton uptake of iron                                   !
+    !    8.  Phytoplankton uptake of silicic acid                           !
+    !    9.  Iron chemistry (scavenging, coagulation, dissolution)          !
+    !    10. Silicic acid chemistry and dissolution                         !
+    !    11. Mortality scalings and grazing                                 !
+    !    12. CaCO3 calculations                                             !
+    !    13. Implicit nitrogen fixation                                     !
+    !    14. Facultative heterotrophy calculations                          !
+    !    15. Chemoautotroph calculations                                    !
+    !    16. Sources and sinks                                              !
     !    17. Tracer tendencies                                              !
     !    18. Check for conservation by ecosystem component                  !
     !    19. Compute sinking rates of detrital pools                        !
@@ -5006,91 +4987,100 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
 
       ! 1. initial slope of Photosynthesis-Irradiance curve
-      ! 2. Alter the slope to account for respiration and daylength limitation
-      ! 3. Light limitation
-      ! 4. Apply light and nutrient limitations to maximum growth rate
-      ! 5. Determine difference in light-limited and realized growth to get DOC exudation
+      ! 2. Light limitation
 
       !!!~~~ Phytoplankton ~~~!!!
       phy_pisl  = max(wombat%alphabio_phy * phy_chlc, wombat%alphabio_phy * wombat%phyminqc)
-      phy_pisl2 = phy_pisl / ( (1. + wombat%phylmor*86400.0 * fbc) ) ! add daylength estimate here
-      wombat%phy_lpar(i,j,k) = (1. - exp(-phy_pisl2 * wombat%radbio(i,j,k)))
-      wombat%phy_mu(i,j,k) = wombat%phy_mumax(i,j,k) * wombat%phy_lpar(i,j,k) * &
-                             min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))
+      wombat%phy_lpar(i,j,k) = (1. - exp(-phy_pisl * wombat%radbio(i,j,k)))
+
       !!!~~~ Microphytoplankton ~~~!!!
       dia_pisl  = max(wombat%alphabio_dia * dia_chlc, wombat%alphabio_dia * wombat%diaminqc)
-      dia_pisl2 = dia_pisl / ( (1. + wombat%dialmor*86400.0 * fbc) ) ! add daylength estimate here
-      wombat%dia_lpar(i,j,k) = (1. - exp(-dia_pisl2 * wombat%radbio(i,j,k)))
+      wombat%dia_lpar(i,j,k) = (1. - exp(-dia_pisl * wombat%radbio(i,j,k)))
+
+
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !  [Step 5] Realized growth rate of phytoplankton                       !
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+
+      ! 1. Apply light and nutrient limitations to maximum growth rate
+      wombat%phy_mu(i,j,k) = wombat%phy_mumax(i,j,k) * wombat%phy_lpar(i,j,k) * &
+                             min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))
       wombat%dia_mu(i,j,k) = wombat%dia_mumax(i,j,k) * wombat%dia_lpar(i,j,k) * &
-                             min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k)) * wombat%dia_lsil(i,j,k)
+                             min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k)) * &
+                             wombat%dia_lsil(i,j,k)
 
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !  [Step 5] Growth of chlorophyll                                       !
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-
-      ! 1. Light limitation of chlorophyll production
-      ! 2. minimum and optimal rates of chlorophyll growth
-      ! 3. Calculate mg Chl m-3 s-1
-
-      ! Reduced chlorophyll growth during extended periods of darkness
-      phi = wombat%radmld(i,j,1) / (wombat%radmld(i,j,1) + wombat%chlkWm2)
-
-      !!!~~~ Phytoplankton ~~~!!!
-      pchl_pisl = phy_pisl / ( wombat%phy_mumax(i,j,k) * 86400.0 * &
-                  max(0.1, (1. - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k)))) + epsi )
-      wombat%pchl_lpar(i,j,k) = (1. - exp(-pchl_pisl * wombat%radmld(i,j,k)))
-      pchl_mumin = wombat%phyminqc * wombat%phy_mu(i,j,k) * biophy * 12.0   ![mg/m3/s]
-      pchl_muopt = wombat%phyoptqc * wombat%phy_mu(i,j,k) * biophy * 12.0   ![mg/m3/s]
-      wombat%pchl_mu(i,j,k) = (pchl_muopt - pchl_mumin) * wombat%pchl_lpar(i,j,k) * &
-                               min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))
-      if ( (phy_pisl * wombat%radmld(i,j,k)) > 0.0 ) then
-        wombat%pchl_mu(i,j,k) = phi * ( pchl_mumin + wombat%pchl_mu(i,j,k) / &
-                                (phy_pisl * wombat%radmld(i,j,k)) )
+      if ((wombat%f_nh4(i,j,k) + wombat%f_no3(i,j,k)) > epsi) then
+        wombat%phygrow(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_phy(i,j,k) ! [molC/kg/s]
+        wombat%diagrow(i,j,k) = wombat%dia_mu(i,j,k) * wombat%f_dia(i,j,k) ! [molC/kg/s]
+      else
+        wombat%phygrow(i,j,k) = 0.0
+        wombat%diagrow(i,j,k) = 0.0
       endif
-      wombat%pchl_mu(i,j,k) = wombat%pchl_mu(i,j,k) / 12.0 * mmol_m3_to_mol_kg  ![mol/kg/s]
+
+
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !  [Step 6] Growth of chlorophyll                                       !
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+
+      ! 1. Estimate the target Chl:C ratio required to support maximum growth
+      !    This is a direct approximation of Geider, MacIntyre & Kana (1997):
+      !     - Chl increased in response to low light (we use the mean of the MLD)
+      !     - Chl decreased in response to N and Fe limitation
+      ! 2. Ensure that a minimum chl:c ratio must be maintained by the cell
+      ! 3. Estimate the rate that chlorophyll is synthesized towards this optimal
+      !    Rates of chlorophyll synthesis are not instantaneous, and take hours to days
+      !    Here, we make chlorophyll synthesis respond on a timescale of chltau
+
+      !!!~~~ Nanophytoplankton ~~~!!!
+      theta_opt = wombat%phymaxqc / (1.0 + &
+                  ( wombat%alphabio_phy * wombat%radmld(i,j,k) * wombat%phymaxqc ) &
+                 /( epsi + 2.0 * wombat%phy_mumax(i,j,k) * 86400.0 &
+                    * max(0.01, min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) ) )
+      theta_opt = max(wombat%phyminqc, theta_opt)
+      wombat%pchl_mu(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_pchl(i,j,k) &
+                            + (theta_opt - phy_chlc) / wombat%chltau * wombat%f_phy(i,j,k)
 
       !!!~~~ Microphytoplankton ~~~!!!
-      dchl_pisl = dia_pisl / ( wombat%dia_mumax(i,j,k) * 86400.0 * &
-                  max(0.1, (1. - min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k)) * wombat%dia_lsil(i,j,k)) ) + epsi )
-      wombat%dchl_lpar(i,j,k) = (1. - exp(-dchl_pisl * wombat%radmld(i,j,k)))
-      dchl_mumin = wombat%diaminqc * wombat%dia_mu(i,j,k) * biodia * 12.0   ![mg/m3/s]
-      dchl_muopt = wombat%diaoptqc * wombat%dia_mu(i,j,k) * biodia * 12.0   ![mg/m3/s]
-      wombat%dchl_mu(i,j,k) = (dchl_muopt - dchl_mumin) * wombat%dchl_lpar(i,j,k) * &
-                               min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k)) * wombat%dia_lsil(i,j,k)
-      if ( (dia_pisl * wombat%radmld(i,j,k)) > 0.0 ) then
-        wombat%dchl_mu(i,j,k) = phi * ( dchl_mumin + wombat%dchl_mu(i,j,k) / &
-                                (dia_pisl * wombat%radmld(i,j,k)) )
-      endif
-      wombat%dchl_mu(i,j,k) = wombat%dchl_mu(i,j,k) / 12.0 * mmol_m3_to_mol_kg  ![mol/kg/s]
+      theta_opt = wombat%diamaxqc / (1.0 + &
+                  ( wombat%alphabio_dia * wombat%radmld(i,j,k) * wombat%diamaxqc ) &
+                 /( epsi + 2.0 * wombat%dia_mumax(i,j,k) * 86400.0 &
+                    * max(0.01, min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k))) ) )
+      theta_opt = max(wombat%diaminqc, theta_opt)
+      wombat%dchl_mu(i,j,k) = wombat%dia_mu(i,j,k) * wombat%f_dchl(i,j,k) &
+                            + (theta_opt - dia_chlc) / wombat%chltau * wombat%f_dia(i,j,k)
 
 
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 6] Phytoplankton uptake of iron                                !
+      !  [Step 7] Phytoplankton uptake of iron                                !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
       ! 1. Maximum iron content of phytoplankton cell
       ! 2. Ensure that dFe uptake increases or decreases in response to cell quota
-      ! 3. Iron uptake of phytoplankton (reduced to 20% at night and when N is limiting)
+      ! 3. Iron uptake of phytoplankton (reduced 10-fold in darkness)
 
-      !!!~~~ Phytoplankton ~~~!!!
+      !!!~~~ Nano-phytoplankton ~~~!!!
       phy_maxqfe = biophy * wombat%phymaxqf  !mmol Fe / m3
       wombat%phy_feupreg(i,j,k) = (4.0 - 4.5 * wombat%phy_lfer(i,j,k) / &
                                   (wombat%phy_lfer(i,j,k) + 0.5) )
       wombat%phy_fedoreg(i,j,k) = max(0.0, (1.0 - biophyfe/phy_maxqfe) / &
                                   abs(1.05 - biophyfe/phy_maxqfe) )
-      wombat%phy_dfeupt(i,j,k) = (wombat%phy_mumax(i,j,k) * wombat%phymaxqf * &
-                                  max(0.2, wombat%phy_lpar(i,j,k) * wombat%phy_lnit(i,j,k)) * &
+      wombat%phy_dfeupt(i,j,k) = (wombat%phy_mumax(i,j,k) * phy_maxqfe * &
+                                  max(0.01, wombat%phy_lpar(i,j,k))**0.5 * &
                                   biofer / (biofer + wombat%phy_kfe(i,j,k)) * &
                                   wombat%phy_feupreg(i,j,k) * &
-                                  wombat%phy_fedoreg(i,j,k) * biophy) * mmol_m3_to_mol_kg
+                                  wombat%phy_fedoreg(i,j,k) ) * mmol_m3_to_mol_kg
 
       !!!~~~ Microphytoplankton ~~~!!!
       dia_maxqfe = biodia * wombat%diamaxqf  !mmol Fe / m3
@@ -5098,8 +5088,8 @@ module generic_WOMBATmid
                                   (wombat%dia_lfer(i,j,k) + 0.5) )
       wombat%dia_fedoreg(i,j,k) = max(0.0, (1.0 - biodiafe/dia_maxqfe) / &
                                   abs(1.05 - biodiafe/dia_maxqfe) )
-      wombat%dia_dfeupt(i,j,k) = max(0.0, ( wombat%dia_mumax(i,j,k) * wombat%diamaxqf * biodia &
-                                     * max(0.2, wombat%dia_lpar(i,j,k) * wombat%dia_lnit(i,j,k)) &
+      wombat%dia_dfeupt(i,j,k) = max(0.0, ( wombat%dia_mumax(i,j,k) * dia_maxqfe &
+                                     * max(0.01, wombat%dia_lpar(i,j,k))**0.5 &
                                      * biofer / (biofer + wombat%dia_kfe(i,j,k)) &
                                      * wombat%dia_feupreg(i,j,k) &
                                      * wombat%dia_fedoreg(i,j,k))) * mmol_m3_to_mol_kg
@@ -5108,7 +5098,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 7] Phytoplankton uptake of silicic acid                        !
+      !  [Step 8] Phytoplankton uptake of silicic acid                        !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5133,15 +5123,16 @@ module generic_WOMBATmid
                                      * wombat%dia_sidoreg(i,j,k) )) * mmol_m3_to_mol_kg ! [molSi/kg/s]
 
 
-      !-------------------------------------------------------------------------------------!
-      !-------------------------------------------------------------------------------------!
-      !-------------------------------------------------------------------------------------!
-      !  [Step 8] Iron chemistry (Aumont et al., 2015 GMD & Tagliabue et al., 2023 Nature)  !
-      !-------------------------------------------------------------------------------------!
-      !-------------------------------------------------------------------------------------!
-      !-------------------------------------------------------------------------------------!
+      !------------------------------------------------------------------------!
+      !------------------------------------------------------------------------!
+      !------------------------------------------------------------------------!
+      !  [Step 9] Iron chemistry (scavenging, coagulation, dissolution)        !
+      !------------------------------------------------------------------------!
+      !------------------------------------------------------------------------!
+      !------------------------------------------------------------------------!
 
-      ! Estimate solubility of Fe3+ (free Fe) in solution using temperature, pH and salinity
+      ! Estimate solubility of Fe3+ (free Fe) in solution using temperature, 
+      ! pH and salinity using the equations of Liu & Millero (2002)
       ztemk = max(5.0, Temp(i,j,k)) + 273.15    ! temperature in kelvin
       I_ztemk = 1.0 / ztemk
       zval = 19.924 * Salt(i,j,k) / ( 1000. - 1.005 * Salt(i,j,k))
@@ -5158,12 +5149,19 @@ module generic_WOMBATmid
       endif
       fe3sol = fesol1 * ( hp*hp*hp + fesol2*hp*hp + fesol3*hp + fesol4 + fesol5/hp ) *1e9
 
-      ! Estimate total colloidal iron (variable, with a 10% of total dissolved Fe floor)
+      ! Estimate total colloidal iron following Tagliabue et al. (2023).
+      ! Colloidal dFe is considered to be whatever exceeds the inorganic solubility 
+      ! ceiling, although there is always a hard lower limit of 10% of total dFe.
       wombat%fecol(i,j,k) = max(0.1*biofer, biofer - fe3sol)
 
-      ! Determine equilibriuim fractionation of the remaining dFe (non-colloidal fraction) into Fe' and L-Fe
-      fe_keq = 10.0**( 17.27 - 1565.7 * I_ztemk ) * 1e-9 ! Temperature reduces solubility
-      !  - Resolve for soluble Fe after accounting for colloidal fraction above
+      ! Determine equilibriuim fractionation of the remaining dFe (non-colloidal)
+      ! between Fe' and ligand-bound iron (L-Fe). Below, temperature increases the
+      ! solubility constant (reducing free Fe) and light decreases the solubility
+      ! constant (increasing free Fe). The temperature-dependency comes from Volker
+      ! & Tagliabue (2015), while the light dependency is informed by Barbeau et al.
+      ! (2001) who saw a 0.7 log10 unit decrease in K in high light.
+      fe_keq = 1e-9 * 10.0**( (17.27 - 1565.7 * I_ztemk ) - 0.7 * &
+                              wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) )
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
       zval = 1.0 + wombat%ligand * fe_keq - fe_sfe * fe_keq
       wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*fe_keq*fe_sfe ) ) &
@@ -5172,10 +5170,10 @@ module generic_WOMBATmid
       wombat%felig(i,j,k) = fe_sfe - wombat%feIII(i,j,k)
 
       ! Scavenging of Fe` onto biogenic particles
-      partic = (biodet + biobdet*(1.0+bdet_Si2C) + biocaco3) ! total particle concentration [mmol/m3]
+      partic = (biodet*2 + biobdet*2 + biobdetsi*2 + biocaco3*8.3) ! total particle concentration [mmol/m3]
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
-      wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet + biocaco3) / (partic+epsi)
-      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * biobdet * (1.0+bdet_Si2C) / (partic+epsi)
+      wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet*2 + biocaco3*8.3) / (partic+epsi)
+      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 * biobdetsi*2) / (partic+epsi)
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
@@ -7256,10 +7254,6 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_pchl_mu, wombat%pchl_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_pchl_lpar > 0) &
-      used = g_send_data(wombat%id_pchl_lpar, wombat%pchl_lpar, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
     if (wombat%id_phy_kni > 0) &
       used = g_send_data(wombat%id_phy_kni, wombat%phy_kni, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -7302,10 +7296,6 @@ module generic_WOMBATmid
 
     if (wombat%id_dchl_mu > 0) &
       used = g_send_data(wombat%id_dchl_mu, wombat%dchl_mu, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
-    if (wombat%id_dchl_lpar > 0) &
-      used = g_send_data(wombat%id_dchl_lpar, wombat%dchl_lpar, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_dia_kni > 0) &
@@ -8499,7 +8489,6 @@ module generic_WOMBATmid
     allocate(wombat%phy_mumax(isd:ied, jsd:jed, 1:nk)); wombat%phy_mumax(:,:,:)=0.0
     allocate(wombat%phy_mu(isd:ied, jsd:jed, 1:nk)); wombat%phy_mu(:,:,:)=0.0
     allocate(wombat%pchl_mu(isd:ied, jsd:jed, 1:nk)); wombat%pchl_mu(:,:,:)=0.0
-    allocate(wombat%pchl_lpar(isd:ied, jsd:jed, 1:nk)); wombat%pchl_lpar(:,:,:)=0.0
     allocate(wombat%phy_kni(isd:ied, jsd:jed, 1:nk)); wombat%phy_kni(:,:,:)=0.0
     allocate(wombat%phy_kfe(isd:ied, jsd:jed, 1:nk)); wombat%phy_kfe(:,:,:)=0.0
     allocate(wombat%phy_lpar(isd:ied, jsd:jed, 1:nk)); wombat%phy_lpar(:,:,:)=0.0
@@ -8511,7 +8500,6 @@ module generic_WOMBATmid
     allocate(wombat%dia_mumax(isd:ied, jsd:jed, 1:nk)); wombat%dia_mumax(:,:,:)=0.0
     allocate(wombat%dia_mu(isd:ied, jsd:jed, 1:nk)); wombat%dia_mu(:,:,:)=0.0
     allocate(wombat%dchl_mu(isd:ied, jsd:jed, 1:nk)); wombat%dchl_mu(:,:,:)=0.0
-    allocate(wombat%dchl_lpar(isd:ied, jsd:jed, 1:nk)); wombat%dchl_lpar(:,:,:)=0.0
     allocate(wombat%dia_kni(isd:ied, jsd:jed, 1:nk)); wombat%dia_kni(:,:,:)=0.0
     allocate(wombat%dia_kfe(isd:ied, jsd:jed, 1:nk)); wombat%dia_kfe(:,:,:)=0.0
     allocate(wombat%dia_ksi(isd:ied, jsd:jed, 1:nk)); wombat%dia_ksi(:,:,:)=0.0
@@ -8818,7 +8806,6 @@ module generic_WOMBATmid
         wombat%phy_mumax, &
         wombat%phy_mu, &
         wombat%pchl_mu, &
-        wombat%pchl_lpar, &
         wombat%phy_kni, &
         wombat%phy_kfe, &
         wombat%phy_lpar, &
@@ -8830,7 +8817,6 @@ module generic_WOMBATmid
         wombat%dia_mumax, &
         wombat%dia_mu, &
         wombat%dchl_mu, &
-        wombat%dchl_lpar, &
         wombat%dia_kni, &
         wombat%dia_kfe, &
         wombat%dia_ksi, &
