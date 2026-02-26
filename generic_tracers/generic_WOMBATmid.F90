@@ -4137,6 +4137,7 @@ module generic_WOMBATmid
     real                                    :: biof, zno3, zfermin, shear
     real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, mes_Fe2C, det_Fe2C, bdet_Fe2C
     real                                    :: dom_N2C, dia_Si2C, bdet_Si2C
+    real                                    :: theta_opt
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe, dia_maxqsi
     real                                    :: zoo_slmor, mes_slmor
