@@ -1346,9 +1346,15 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('knano_dfe', wombat%knano_dfe, 0.1)
 
-    ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 d-1]
+    ! Scavenging of Fe` onto biogenic particles [(mmol/m3)-1 d-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.05)
+    ! Ye et al., 2011 (Biogeosciences) find scavenging rates of 30 - 750
+    ! (kg/m3)-1 day-1 in mesocosm experiments. Assuming that there are 
+    ! 40,000 mmol C kg-1 (1 kg of pure carbon contains 83 mol and assuming
+    ! that half of marine organic particles are pure carbon by mass means 
+    ! that roughly 40,000 mmol C kg-1), this translates to scavenging rates 
+    ! of 0.001 to 0.02 (mmol mass particles / m3)-1 day-1.
+    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.01)
 
     ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 d-1]
     !-----------------------------------------------------------------------
@@ -2502,11 +2508,11 @@ module generic_WOMBATlite
                                   (wombat%phy_lfer(i,j,k) + 0.5) )
       wombat%phy_fedoreg(i,j,k) = max(0.0, (1.0 - biophyfe/phy_maxqfe) / &
                                   abs(1.05 - biophyfe/phy_maxqfe) )
-      wombat%phy_dfeupt(i,j,k) = (wombat%phy_mumax(i,j,k) * wombat%phymaxqf * &
+      wombat%phy_dfeupt(i,j,k) = (wombat%phy_mumax(i,j,k) * phy_maxqfe * &
                                   max(0.01, wombat%phy_lpar(i,j,k))**0.5 * &
                                   biofer / (biofer + wombat%phy_kfe(i,j,k)) * &
                                   wombat%phy_feupreg(i,j,k) * &
-                                  wombat%phy_fedoreg(i,j,k) * biophy) * mmol_m3_to_mol_kg
+                                  wombat%phy_fedoreg(i,j,k)) * mmol_m3_to_mol_kg
 
 
       !-----------------------------------------------------------------------!
@@ -2560,9 +2566,9 @@ module generic_WOMBATlite
       wombat%feprecip(i,j,k) = max(0.0, ( wombat%feIII(i,j,k) - fe3sol ) ) * wombat%knano_dfe/86400.0
 
       ! Scavenging of Fe` onto biogenic particles
-      partic = (biodet + biocaco3)
+      partic = (biodet*2 + biocaco3*8.3)
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
-      wombat%fescadet(i,j,k) = wombat%fescaven(i,j,k) * biodet / (partic+epsi)
+      wombat%fescadet(i,j,k) = wombat%fescaven(i,j,k) * biodet*2 / (partic+epsi)
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
