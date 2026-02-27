@@ -8,10 +8,14 @@ spack:
         - '@git.2025.02=2025.02 ~openmp precision=64'
     gcc-runtime:
       require:
-        - '%gcc'
+        - '%access_gcc'
+    intel-oneapi-compilers:
+      require:
+      - '@{{ oneapi_compiler_version }}'
     all:
       require:
-      - '%{{ oneapi_compiler }} target=x86_64'
+      - '%access_oneapi'
+      - target=x86_64
   concretizer:
     unify: false
   view: false

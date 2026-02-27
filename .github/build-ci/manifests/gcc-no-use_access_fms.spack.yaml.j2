@@ -6,9 +6,13 @@ spack:
     fms:
       require:
         - '@git.2025.02=2025.02 ~openmp precision=64'
+    gcc:
+      require:
+        - '@{{ gcc_compiler_version }}'
     all:
       require:
-      - '%{{ gcc_compiler }} target=x86_64'
+      - '%access_gcc'
+      - target=x86_64
   concretizer:
     unify: false
   view: false
