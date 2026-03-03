@@ -5963,17 +5963,6 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-
-
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-<<<<<<< HEAD
-      !  [Step 16] Nominal oxidation state of DOC                             !
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-
       ! NOSC = 4 - (4C + H - 3N - 2O + 5P - 2S) / C
       !  [La Rowe & Van Cappellen, 2011 Geochim. et Cosmochim. Acta]
       ! Here, we change the NOS of DOC according to our best guesses of the NOSC
@@ -6002,15 +5991,15 @@ module generic_WOMBATmid
                                          + wombat%mesexcrbdet(i,j,k)*wombat%mesexcrdom &
                                          + wombat%mesexcrzoo(i,j,k)*wombat%mesexcrdom ) &
                                          * ( wombat%nosczooexcr - wombat%f_nosdoc(i,j,k) ) * zval
-        wombat%nosdoc_phylysis(i,j,k) = ( wombat%phylyse(i,j,k) &
-                                        + wombat%dialyse(i,j,k) ) &
+        wombat%nosdoc_phylysis(i,j,k) = ( wombat%phymorl(i,j,k) &
+                                        + wombat%diamorl(i,j,k) ) &
                                         * ( wombat%noscphylyse - wombat%f_nosdoc(i,j,k) ) * zval
-        wombat%nosdoc_baclysis(i,j,k) = ( wombat%bac1mor1(i,j,k) &
-                                        + wombat%bac1mor2(i,j,k) &
-                                        + wombat%bac2mor1(i,j,k) &
-                                        + wombat%bac2mor2(i,j,k) &
-                                        + wombat%aoamor1(i,j,k) &
-                                        + wombat%aoamor2(i,j,k) ) &
+        wombat%nosdoc_baclysis(i,j,k) = ( wombat%bac1morl(i,j,k) &
+                                        + wombat%bac1morq(i,j,k) &
+                                        + wombat%bac2morl(i,j,k) &
+                                        + wombat%bac2morq(i,j,k) &
+                                        + wombat%aoamorl(i,j,k) &
+                                        + wombat%aoamorq(i,j,k) ) &
                                         * ( wombat%noscbaclyse - wombat%f_nosdoc(i,j,k) ) * zval
         wombat%nosdoc_dethydro(i,j,k) = ( wombat%detremi(i,j,k) &
                                         + wombat%bdetremi(i,j,k) ) &
