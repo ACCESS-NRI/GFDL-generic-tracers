@@ -1,5 +1,6 @@
 {
   "intel_compiler_version": "2021.10.0",
   "gcc_compiler_version": "13.2.0",
-  "oneapi_compiler_version": "2025.2.0"
+  "oneapi_compiler_version": "2025.2.0",
+  "fms_version": "2025.03"
 }
