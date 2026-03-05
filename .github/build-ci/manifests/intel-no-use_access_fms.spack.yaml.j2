@@ -5,10 +5,14 @@ spack:
   packages:
     fms:
       require:
-        - '@git.2025.02=2025.02 ~openmp precision=64'
+        - '@{{ fms_version }} ~openmp precision=64'
+    intel-oneapi-compilers-classic:
+      require:
+      - '@{{ intel_compiler_version }}'
     all:
       require:
-      - '%{{ intel_compiler }} target=x86_64'
+      - '%access_intel'
+      - target=x86_64
   concretizer:
     unify: false
   view: false

@@ -3,9 +3,13 @@ spack:
   # *_compiler is defined in the .github/build-ci/data/standard.json file
   - access-generic-tracers@git.{{ ref }} +use_access_fms
   packages:
+    gcc:
+      require:
+        - '@{{ gcc_compiler_version }}'
     all:
       require:
-      - '%{{ gcc_compiler }} target=x86_64'
+      - '%access_gcc'
+      - target=x86_64
   concretizer:
     unify: false
   view: false
