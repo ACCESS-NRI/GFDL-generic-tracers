@@ -1280,6 +1280,10 @@ module generic_WOMBATlite
 
     ! Detritus remineralisation rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
+    ! Given a quadratic density-dependency of remineralisation of organic
+    ! matter concentration, with a detlrem equal to 10-5 per second,
+    ! a 50% fraction (f) would be remineralised in 11 days.
+    ! -ln(f) / k, where k = reminr*[det]**2
     call g_tracer_add_param('detlrem', wombat%detlrem, 0.5/86400.0)
 
     ! Base detritus sinking rate coefficient [m/s]
@@ -2855,7 +2859,7 @@ module generic_WOMBATlite
                               wombat%zooexcrdet(i,j,k) - &
                               wombat%phymorl(i,j,k) ) + dtsb * 2.0 * ( &
                               wombat%zoodiss(i,j,k) + wombat%caldiss(i,j,k) + &
-                              wombat%aradiss(i,j,k) + wombat%pocdiss(i,j,k) + &
+                              wombat%aradiss(i,j,k) + wombat%pocdiss(i,j,k) - &
                               wombat%zoograzphy(i,j,k) * (1.0-wombat%fgutdiss) * wombat%pic2poc(i,j,k) - &
                               wombat%phymorq(i,j,k) * wombat%pic2poc(i,j,k) - &
                               wombat%zoomorq(i,j,k) * wombat%pic2poc(i,j,k) )
