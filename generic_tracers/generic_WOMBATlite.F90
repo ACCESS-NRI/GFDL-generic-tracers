@@ -2864,7 +2864,7 @@ module generic_WOMBATlite
                               wombat%zooexcrdet(i,j,k) - &
                               wombat%phymorl(i,j,k) ) + dtsb * 2.0 * ( &
                               wombat%zoodiss(i,j,k) + wombat%caldiss(i,j,k) + &
-                              wombat%aradiss(i,j,k) + wombat%pocdiss(i,j,k) + &
+                              wombat%aradiss(i,j,k) + wombat%pocdiss(i,j,k) - &
                               wombat%zoograzphy(i,j,k) * (1.0-wombat%fgutdiss) * wombat%pic2poc(i,j,k) - &
                               wombat%phymorq(i,j,k) * wombat%pic2poc(i,j,k) - &
                               wombat%zoomorq(i,j,k) * wombat%pic2poc(i,j,k) )
