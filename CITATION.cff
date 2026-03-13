@@ -29,6 +29,11 @@ authors:
     email: Jorge.GalvezVallejo@anu.edu
     affiliation: Australia’s National Computational Infrastructure (NCI), Australian National University, Canberra, Australia
     orcid: 'https://orcid.org/0000-0003-4744-2087'
+  - given-names: Rama
+    family-names: Aslekar
+    email: rama.aslekar@utas.edu.au
+    affiliation: Institute for Marine and Antarctic Studies, University of Tasmania, Hobart, Australia
+    orcid: 'https://orcid.org/0009-0009-6199-1403'
   - given-names: Niki
     family-names: Zadeh
     email: Niki.Zadeh@noaa.gov
@@ -82,13 +87,13 @@ identifiers:
   - description: "The concept DOI of all versions."
     type: doi
     value: 110.5281/zenodo.17180329
-  - description: "Version 2026.02.000"
+  - description: "Version 2026.02.001"
     type: doi
-    value: 10.5281/zenodo.18792886
+    value: 10.5281/zenodo.18995674
 repository-code: 'https://github.com/ACCESS-NRI/GFDL-generic-tracers'
 url: 'https://docs.access-hive.org.au/'
 repository-artifact: >-
-  https://github.com/ACCESS-NRI/GFDL-generic-tracers/archive/refs/tags/2026.02.000.tar.gz
+  https://github.com/ACCESS-NRI/GFDL-generic-tracers/archive/refs/tags/2026.02.001.tar.gz
 abstract: >-
   This software is a fork of the repository https://github.com/NOAA-GFDL/ocean_BGC, which includes 
   "generic tracer" modules that can be used with the MOM and GOLD ocean models. This fork has been 
@@ -96,10 +101,11 @@ abstract: >-
   Trophic-dynamics (WOMBAT) models used in Australian Community Climate and Earth System Simulator 
   (ACCESS) earth-system models.
 license: CC-BY-4.0
-version: 2026.02.000
-date-released: "2026-02-27"
+version: 2026.02.001
+date-released: "2026-03-13"
 keywords:
   - ocean biogeochemistry
   - ocean modelling
+
 
 
