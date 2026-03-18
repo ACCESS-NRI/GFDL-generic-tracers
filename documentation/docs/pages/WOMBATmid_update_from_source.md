@@ -260,6 +260,7 @@ where
 WOMBAT-mid also carries a distinct dissolved organic nitrogen tracer (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>]) that receives material during the hydrolysation of particulate organics:
 
 $\Gamma_{sd}^{&rarr; N} = \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}$\ 
+
 $\Gamma_{ld}^{&rarr; N} = \Gamma_{ld}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}$
 
 where
@@ -351,9 +352,9 @@ where
 - $\mu_{mp}^{&larr; C}$ is the realized biomass growth rate of micro-phytoplankton (`diagrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $f_{overflow}$ is the maximum fraction total carbon fixation that goes to DOC exudation (`overflow`, [dimenionless])
 
-The total carbon fixation rate is of a phytoplankton type $p$ is 
+The total carbon fixation rate of phytoplankton type $p$ is 
 
-$\mu_{p}^{totalC} = \mu_{p}^{&rarr; DOC} + \mu_{p}^{&larr; C} = \mu_{p}^{max} L_{p}^{PAR}$\
+$\mu_{p}^{totalC} = \mu_{p}^{&rarr; DOC} + \mu_{p}^{&larr; C} = \mu_{p}^{max} L_{p}^{PAR}$
 
 This formulation is derived from the idea that DOC exudation occurs as a result of the difference between carbon fixation capacity, which is bounded by light, and biosynthesis, which is bounded by light and nutrient resources. Since [Thornton (2014)](https://doi.org/10.1080/09670262.2013.875596) identified that as much as 50% of total phytoplankton carbon fixation can be routed to DOC exudation, we cap DOC exudation at $f_{overflow}$ of total carbon fixation, which is set as to a default of 0.5. We also set a hard bound that 2% of total carbon fixation must at minimum go to DOC production based on the findings of [Bjørnsen (1988)](https://doi.org/10.4319/lo.1988.33.1.0151) who identified that even the healthiest cells lose a small fraction of their assimilated carbon as DOC via passive diffusion across the cell membrane.
 
@@ -422,8 +423,8 @@ Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015
 ($ii_{np}$) $4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}}$ \
 ($ii_{mp}$) $4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}}$
 
-($iii_{np}$) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}|} \right)$\ 
-($iii_{mp}$) $\max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}|} \right)$
+($iii_{np}$) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)$ \ 
+($iii_{mp}$) $\max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{\left|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}\right|} \right)$
 
 where
 - $dFe$ is the in situ dissolved iron concentration (`biofer`, [µmol Fe m<sup>-3</sup>])
@@ -443,7 +444,7 @@ where
 Under very low light, this fourth term reduces maximum potential Fe uptake by 10-fold than what it otherwise would be. All four terms are dimensionless and are designed to scale dissolved iron uptake either up or down. Dissolved iron uptake by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
 $\mu_{np}^{&larr; dFe} = \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np})$ \
-$\mu_{mp}^{&larr; dFe} = \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})$ \
+$\mu_{mp}^{&larr; dFe} = \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})$
 
 where 
 - $\mu_{np}^{&larr; dFe}$ and $\mu_{mp}^{&larr; dFe}$ are the realized uptake rate of dissolved iron by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>])
@@ -662,7 +663,7 @@ where
 - $d_{B_{ld}^{Si}}$ is the rate of biogenic silica dissolution (`disssi(i,j,k)`, [s<sup>-1</sup>])
 - $B_{ld}^{Si}$ is the in situ concentration of biogenic silica (`f_bdetsi(i,j,k)`, [mol Si kg<sup>-1</sup>])
 
-We treat the dissolution rate of biogenic silica ($d_{Si}$) as dependent on three conditions: the degree of undersaturation ([Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf); [Van Cappellen & Qiu, 1997](https://doi.org/10.1016/S0967-0645(96)00112-9); [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431)), in situ temperature ([Kamatani, 1982](https://doi.org/10.1007/BF00393146); [Greenwood et al., 2005](https://doi.org/10.1007/s10498-004-9515-y)) and the activity of heterotrophic microbes ([Bidle & Azam, 1999](https://doi.org/10.1038/17351); [Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). To account for these conditions, we formulate the rate of dissolution of biogenic silica (`disssi(i,j,k)`, $d_{Si}$, [s<sup>-1</sup]) as the product of three terms:
+We treat the dissolution rate of biogenic silica ($d_{B_{ld}^{Si}}$) as dependent on three conditions: the degree of undersaturation ([Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf); [Van Cappellen & Qiu, 1997](https://doi.org/10.1016/S0967-0645(96)00112-9); [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431)), in situ temperature ([Kamatani, 1982](https://doi.org/10.1007/BF00393146); [Greenwood et al., 2005](https://doi.org/10.1007/s10498-004-9515-y)) and the activity of heterotrophic microbes ([Bidle & Azam, 1999](https://doi.org/10.1038/17351); [Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). To account for these conditions, we formulate the rate of dissolution of biogenic silica (`disssi(i,j,k)`, $d_{Si}$, [s<sup>-1</sup>]) as the product of three terms:
 
 $d_{B_{ld}^{Si}} = d_{B_{ld}^{Si}}^{T} \cdot S_{B_{ld}^{Si}}^{Sat} \cdot S_{B_{ld}^{Si}}^{bio}$
 
@@ -673,15 +674,15 @@ where
 
 First, we solve for $d_{B_{ld}^{Si}}^{T}$. [Kamatani, 1982](https://doi.org/10.1007/BF00393146) measured dissolution rates of biogenic silica collected in Tokyo Bay between 8ºC and 30ºC and identified that these roughly obeyed the equation:
 
-$d_{B_{ld}^{Si}}^{T} = \dfrac{e^{\alpha + \Beta T}}{3600}$
+$d_{B_{ld}^{Si}}^{T} = \dfrac{e^{\alpha + β T}}{3600}$
 
 where 
 - $\alpha$ is a species-dependent dissolution intercept that ranges between -7.35 and -10.38. We set $\alpha$ = -8.0
-- $\Beta$ is the slope common to all species and is equal to 0.0833
+- $β$ is the slope common to all species and is equal to 0.0833
 - $T$ is the in situ temperature of seawater ([`Temp(i,j,k)`, [ºC]])
 - $3600$ converts the rate from [hour<sup>-1</sup>] to [s<sup>-1</sup>]
 
-Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of $Si(OH)_{4}$ vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, $Si(OH)_{4}$ is always undersaturated. We therefore assume that $Si(OH)_{4}$ is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
+Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of Si(OH)<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, $Si(OH)_{4}$ is always undersaturated. We therefore assume that $Si(OH)_{4}$ is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
 
 $S_{B_{ld}^{Si}}^{Sat} = 1 - \left(\dfrac{[Si(OH)_{4}]}{[Si(OH)_{4}]^{eq}}\right)^{2}$
  
