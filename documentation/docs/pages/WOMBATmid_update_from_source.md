@@ -456,7 +456,7 @@ where
 
 ### 9. Phytoplankton uptake of silicic acid.
 
-Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for $Si(OH)_{4}$ and (ii) down regulation of $Si(OH)_{4}$ uptake associated with enriched cellular quotas. 
+Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{\leftarrow Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for $Si(OH)_{4}$ and (ii) down regulation of $Si(OH)_{4}$ uptake associated with enriched cellular quotas. 
 
 (i) $\dfrac{Si(OH)_{4}}{Si(OH)_{4} + K_{mp}^{Si}}$
 
