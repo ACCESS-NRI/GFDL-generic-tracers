@@ -423,7 +423,8 @@ Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015
 ($ii_{np}$) $4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}}$ \
 ($ii_{mp}$) $4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}}$
 
-($iii_{np}$) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)$ \ 
+($iii_{np}$) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)$\ 
+
 ($iii_{mp}$) $\max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{\left|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}\right|} \right)$
 
 where
@@ -456,7 +457,7 @@ where
 
 ### 9. Phytoplankton uptake of silicic acid.
 
-Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for $\mathrm{Si(OH)_{4}}$ and (ii) down regulation of $\mathrm{Si(OH)_{4}}$ uptake associated with enriched cellular quotas. 
+Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for Si(OH)<sub>4</sub> and (ii) down regulation of Si(OH)<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 (i) $\dfrac{Si(OH)_{4}}{Si(OH)_{4} + K_{mp}^{Si}}$
 
