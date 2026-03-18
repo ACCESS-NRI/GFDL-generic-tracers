@@ -222,7 +222,8 @@ This formulation treats silicification as linearly limiting to growth between th
 **Autotrophy**\
 The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\mu_{np}^{max}$, [day<sup>-1</sup>]) and micro-phytoplankton (`dia_mumax(i,j,k)`, $\mu_{mp}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
 
-$\mu_{np}^{max} = \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T}$\
+$\mu_{np}^{max} = \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T}$
+
 $\mu_{mp}^{max} = \mu_{mp}^{0^{\circ}C} \cdot (β_{mp})^{T}$
 
 where
@@ -249,7 +250,8 @@ In the code, the combined term $\left(β_{hete}\right)^{T}$ is saved as `fbc`. S
 **POM --> DOM**
 WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM), which occurs before the remineralisation of the DOM by heterotrophic bacteria. The hydrolysation rate of small sinking organic detritus (`detremi(i,j,k)`, $\Gamma_{sd}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`bdetremi(i,j,k)`, $\Gamma_{ld}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
 
-$\Gamma_{sd}^{&rarr; C} = \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2}$\
+$\Gamma_{sd}^{&rarr; C} = \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2}$
+
 $\Gamma_{ld}^{&rarr; C} = \Gamma_{ld}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{ld}^{C}\right)^{2}$
 
 where
@@ -259,7 +261,7 @@ where
 
 WOMBAT-mid also carries a distinct dissolved organic nitrogen tracer (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>]) that receives material during the hydrolysation of particulate organics:
 
-$\Gamma_{sd}^{&rarr; N} = \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}$\ 
+$\Gamma_{sd}^{&rarr; N} = \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}$
 
 $\Gamma_{ld}^{&rarr; N} = \Gamma_{ld}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}$
 
@@ -291,7 +293,7 @@ This constraint prevents photosynthesis from collapsing unrealistically at low c
 
 Second, light limitation (`phy_lpar(i,j,k)`, $L_{np}^{PAR}$), [dimensionless]; `dia_lpar(i,j,k)`, $L_{mp}^{PAR}$), [dimensionless]) is calculated using an exponential P–I formulation.
 
-$L_{np}^{PAR} = 1 - e^{- \alpha_{np} PAR }$\
+$L_{np}^{PAR} = 1 - e^{- \alpha_{np} PAR }$ \
 $L_{mp}^{PAR} = 1 - e^{- \alpha_{mp} PAR }$
 
 where
@@ -423,7 +425,7 @@ Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015
 ($ii_{np}$) $4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}}$ \
 ($ii_{mp}$) $4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}}$
 
-($iii_{np}$) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)$\ 
+($iii_{np}$) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)$
 
 ($iii_{mp}$) $\max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{\left|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}\right|} \right)$
 
@@ -459,7 +461,7 @@ where
 
 Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for Si(OH)<sub>4</sub> and (ii) down regulation of Si(OH)<sub>4</sub> uptake associated with enriched cellular quotas. 
 
-(i) $\dfrac{Si(OH)_{4}}{Si(OH)_{4} + K_{mp}^{Si}}$
+(i) $\dfrac{\mathrm{Si(OH)<sub>4</sub>}}{\mathrm{Si(OH)<sub>4</sub>} + K_{mp}^{Si}}$
 
 (ii) $\left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}$
 
