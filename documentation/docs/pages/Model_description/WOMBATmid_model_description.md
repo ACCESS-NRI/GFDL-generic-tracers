@@ -150,10 +150,10 @@ With this information, we allow the half-saturation terms for nitrogen (`phy_kni
 
 $$
 \begin{align}
-K_{np}^{N} &= K_{np}^{N,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )
-K_{np}^{Fe} &= K_{np}^{Fe,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )
-K_{mp}^{N} &= K_{mp}^{N,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )
-K_{mp}^{Fe} &= K_{mp}^{Fe,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )
+K_{np}^{N} &= K_{np}^{N,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} ) \\
+K_{np}^{Fe} &= K_{np}^{Fe,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} ) \\
+K_{mp}^{N} &= K_{mp}^{N,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} ) \\
+K_{mp}^{Fe} &= K_{mp}^{Fe,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} ) \\
 K_{mp}^{Si} &= K_{mp}^{Si,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )
 \end{align}
 $$
@@ -168,11 +168,11 @@ where
 
 $$
 \begin{align}
-l_{np}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{np}^{N}}
-l_{np}^{NO_3} &= \dfrac{NO_3}{NO_3 + K_{np}^{N}}
-l_{np}^{N} &= \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{np}^{N}}
-L_{np}^{NH_4} &= \dfrac{5 \cdot l_{np}^{N} l_{np}^{NH_4}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}
-L_{np}^{NO_3} &= \dfrac{l_{np}^{N} l_{np}^{NO_3}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}
+l_{np}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{np}^{N}} \\
+l_{np}^{NO_3} &= \dfrac{NO_3}{NO_3 + K_{np}^{N}} \\
+l_{np}^{N} &= \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{np}^{N}} \\
+L_{np}^{NH_4} &= \dfrac{5 \cdot l_{np}^{N} l_{np}^{NH_4}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}} \\
+L_{np}^{NO_3} &= \dfrac{l_{np}^{N} l_{np}^{NO_3}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}} \\
 L_{np}^{N} &= L_{np}^{NH_4} + L_{np}^{NO_3}
 \end{align}
 $$
@@ -192,11 +192,11 @@ The same set of equations are applied to micro-phytoplankton:
 
 $$
 \begin{align}
-l_{mp}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{mp}^{N}}
-l_{mp}^{NO_3} &= \dfrac{NO_3}{NO_3 + K_{mp}^{N}}
-l_{mp}^{N} &= \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{mp}^{N}}
-L_{mp}^{NH_4} &= \dfrac{5 \cdot l_{mp}^{N} l_{mp}^{NH_4}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}}
-L_{mp}^{NO_3} &= \dfrac{l_{mp}^{N} l_{mp}^{NO_3}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}}
+l_{mp}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{mp}^{N}} \\
+l_{mp}^{NO_3} &= \dfrac{NO_3}{NO_3 + K_{mp}^{N}} \\
+l_{mp}^{N} &= \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{mp}^{N}} \\
+L_{mp}^{NH_4} &= \dfrac{5 \cdot l_{mp}^{N} l_{mp}^{NH_4}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}} \\
+L_{mp}^{NO_3} &= \dfrac{l_{mp}^{N} l_{mp}^{NO_3}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}} \\
 L_{mp}^{N} &= L_{mp}^{NH_4} + L_{mp}^{NO_3}
 \end{align}
 $$
@@ -285,7 +285,7 @@ The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\
 
 $$
 \begin{align}
-\mu_{np}^{max} &= \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T}
+\mu_{np}^{max} &= \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T} \\
 \mu_{mp}^{max} &= \mu_{mp}^{0^{\circ}C} \cdot (β_{mp})^{T}
 \end{align}
 $$
@@ -322,7 +322,7 @@ WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (PO
 
 $$
 \begin{align}
-\Gamma_{sd}^{&rarr; C} &= \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2}
+\Gamma_{sd}^{&rarr; C} &= \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2} \\
 \Gamma_{ld}^{&rarr; C} &= \Gamma_{ld}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{ld}^{C}\right)^{2}
 \end{align}
 $$
@@ -336,7 +336,7 @@ WOMBAT-mid also carries a distinct dissolved organic nitrogen tracer (`f_don(i,j
 
 $$
 \begin{align}
-\Gamma_{sd}^{&rarr; N} &= \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}
+\Gamma_{sd}^{&rarr; N} &= \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122} \\
 \Gamma_{ld}^{&rarr; N} &= \Gamma_{ld}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}
 \end{align}
 $$
@@ -356,7 +356,7 @@ First, The initial slope of the P–I curve, (`phy_pisl`, $\alpha_{np}$, [(W m<s
 
 $$
 \begin{align}
-\alpha_{np} &= \max(\alpha_{np}^{Chl} \cdot Q_{np}^{Chl:C} \ , \ \alpha_{np}^{Chl} \cdot Q_{np}^{-Chl:C})
+\alpha_{np} &= \max(\alpha_{np}^{Chl} \cdot Q_{np}^{Chl:C} \ , \ \alpha_{np}^{Chl} \cdot Q_{np}^{-Chl:C}) \\
 \alpha_{mp} &= \max(\alpha_{mp}^{Chl} \cdot Q_{mp}^{Chl:C} \ , \ \alpha_{mp}^{Chl} \cdot Q_{mp}^{-Chl:C})
 \end{align}
 $$
@@ -375,7 +375,7 @@ Second, light limitation (`phy_lpar(i,j,k)`, $L_{np}^{PAR}$), [dimensionless]; `
 
 $$
 \begin{align}
-L_{np}^{PAR} &= 1 - e^{- \alpha_{np} PAR }
+L_{np}^{PAR} &= 1 - e^{- \alpha_{np} PAR } \\
 L_{mp}^{PAR} &= 1 - e^{- \alpha_{mp} PAR }
 \end{align}
 $$
@@ -394,7 +394,7 @@ Realized growth of nano-phytoplankton (`phy_mu(i,j,k)`, $\mu_{np}$, [s<sup>-1</s
 
 $$
 \begin{align}
-\mu_{np} &= \mu_{np}^{max} L_{np}^{PAR} \min(L_{np}^{N}, L_{np}^{Fe})
+\mu_{np} &= \mu_{np}^{max} L_{np}^{PAR} \min(L_{np}^{N}, L_{np}^{Fe}) \\
 \mu_{mp} &= \mu_{mp}^{max} L_{mp}^{PAR} \min(L_{mp}^{N}, L_{mp}^{Fe}) L_{mp}^{Si}
 \end{align}
 $$
@@ -417,7 +417,7 @@ Carbon fixation by phytoplankton is then calculated as:
 
 $$
 \begin{align}
-\mu_{np}^{&larr; C} &= \mu_{np} B_{np}^{C}
+\mu_{np}^{&larr; C} &= \mu_{np} B_{np}^{C} \\
 \mu_{mp}^{&larr; C} &= \mu_{mp} B_{mp}^{C}
 \end{align}
 $$
@@ -437,7 +437,7 @@ We implement the overflow hypothesis ([Fogg, 1983](https://doi.org/10.1515/botm.
 
 $$
 \begin{align}
-\mu_{np}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{&larr; C}\right) \right)
+\mu_{np}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{&larr; C}\right) \right) \\
 \mu_{mp}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{&larr; C}\right) \right)
 \end{align}
 $$
@@ -472,7 +472,7 @@ We first solve for the optimal chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^
 
 $$
 \begin{align}
-Q_{np}^{*Chl:C} &= \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }}
+Q_{np}^{*Chl:C} &= \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }} \\
 Q_{mp}^{*Chl:C} &= \dfrac{Q_{mp}^{+Chl:C}}{1 + \dfrac{\alpha_{mp} PAR_{MLD} Q_{mp}^{+Chl:C}}{2 \mu_{mp}^{max} \min \left(L_{mp}^{N}, L_{mp}^{Fe} \right) }}
 \end{align}
 $$
@@ -489,7 +489,7 @@ We set a floor for the minimum chlorophyll-to-carbon ratio of phytoplankton via:
 
 $$
 \begin{align}
-Q_{np}^{*Chl:C} &= \min \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right)
+Q_{np}^{*Chl:C} &= \min \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right) \\
 Q_{mp}^{*Chl:C} &= \min \left( Q_{mp}^{*Chl:C}, Q_{mp}^{-Chl:C} \right)
 \end{align}
 $$
@@ -501,7 +501,7 @@ Growth of chlorophyll by nano-phytoplankton and micro-phytoplankton (`pchl_mu(i,
 
 $$
 \begin{align}
-\mu_{np}^{&larr; Chl} &= \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau^{Chl}} \cdot B_{np}^{C}
+\mu_{np}^{&larr; Chl} &= \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau^{Chl}} \cdot B_{np}^{C} \\
 \mu_{mp}^{&larr; Chl} &= \mu_{mp} B_{mp}^{Chl} + \dfrac{ Q_{mp}^{*Chl:C} - Q_{mp}^{Chl:C} }{\tau^{Chl}} \cdot B_{mp}^{C}
 \end{align}
 $$
@@ -524,7 +524,7 @@ Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a t
 
 $$
 \begin{align}
-B_{np}^{+Fe} &= B_{np}^{C} Q_{np}^{+Fe:C}
+B_{np}^{+Fe} &= B_{np}^{C} Q_{np}^{+Fe:C} \\
 B_{mp}^{+Fe} &= B_{mp}^{C} Q_{mp}^{+Fe:C}
 \end{align}
 $$
@@ -538,11 +538,11 @@ Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015
 
 $$
 \begin{align}
-i_{np} &= \dfrac{dFe}{dFe + K_{np}^{Fe}}
-i_{mp} &= \dfrac{dFe}{dFe + K_{mp}^{Fe}}
-ii_{np} &= 4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}}
-ii_{mp} &= 4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}}
-iii_{np} &= \max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)
+i_{np} &= \dfrac{dFe}{dFe + K_{np}^{Fe}} \\
+i_{mp} &= \dfrac{dFe}{dFe + K_{mp}^{Fe}} \\
+ii_{np} &= 4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}} \\
+ii_{mp} &= 4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}} \\
+iii_{np} &= \max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right) \\
 iii_{mp} &= \max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{\left|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}\right|} \right)
 \end{align}
 $$
@@ -558,7 +558,7 @@ Note that we additionally include a fourth term that decreases the maximum dFe u
 
 $$
 \begin{align}
-iv_{np} &= \max\left(0.01, L_{np}^{PAR}\right)^{0.5}
+iv_{np} &= \max\left(0.01, L_{np}^{PAR}\right)^{0.5} \\
 iv_{mp} &= \max\left(0.01, L_{mp}^{PAR}\right)^{0.5}
 \end{align}
 $$
@@ -570,7 +570,7 @@ Under very low light, this fourth term reduces maximum potential Fe uptake by 10
 
 $$
 \begin{align}
-\mu_{np}^{&larr; dFe} &= \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np})
+\mu_{np}^{&larr; dFe} &= \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np}) \\
 \mu_{mp}^{&larr; dFe} &= \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})
 \end{align}
 $$
@@ -589,7 +589,7 @@ Like chlorophyll and iron, the silicon content of micro-phytoplankton is explici
 
 $$
 \begin{align}
-(i) & \dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}}
+(i) & \dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}} \\
 (ii) & \left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}
 \end{align}
 $$
@@ -630,8 +630,8 @@ We first estimate the **solubility of free Fe from Fe<sup>3+</sup>** in solution
 
 $$
 \begin{align}
-T_K &= \max(5.0, T) + 273.15
-\left(T_K\right)^{-1} &= \dfrac{1}{T_K}
+T_K &= \max(5.0, T) + 273.15 \\
+\left(T_K\right)^{-1} &= \dfrac{1}{T_K} \\
 I_{S} &= \dfrac{19.924,S}{1000 - 1.005,S}
 \end{align}
 $$
@@ -640,11 +640,11 @@ Solubility constants:
 
 $$
 \begin{align}
-Fe_{sol1} &= 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\left(T_K\right)^{-1}\right)}
-Fe_{sol2} &= 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\left(T_K\right)^{-1}\right)}
-Fe_{sol3} &= 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\left(T_K\right)^{-1}\right)}
-Fe_{sol4} &= 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\left(T_K\right)^{-1}\right)}
-Fe_{sol5} &= 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\left(T_K\right)^{-1}\right)}
+Fe_{sol1} &= 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\left(T_K\right)^{-1}\right)} \\
+Fe_{sol2} &= 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\left(T_K\right)^{-1}\right)} \\
+Fe_{sol3} &= 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\left(T_K\right)^{-1}\right)} \\
+Fe_{sol4} &= 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\left(T_K\right)^{-1}\right)} \\
+Fe_{sol5} &= 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\left(T_K\right)^{-1}\right)} \\
 \end{align}
 $$
 
@@ -690,8 +690,8 @@ After finding $Fe_{Keq}$ we solve for the free dissolved Fe concentration (`feII
 
 $$
 \begin{align}
-z &= 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq}
-Fe_{free} &= \dfrac{-z + \sqrt{z^2 + 4.0 Fe_{Keq} dFe_{sFe}}}{2 Fe_{Keq} + \varepsilon}
+z &= 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq} \\
+Fe_{free} &= \dfrac{-z + \sqrt{z^2 + 4.0 Fe_{Keq} dFe_{sFe}}}{2 Fe_{Keq} + \varepsilon} \\
 Fe_{free} &= \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)
 \end{align}
 $$
@@ -742,7 +742,7 @@ Total scavenging ($Sc_{dFe}^{&rarr;}$) of free iron is then broken into two part
 
 $$
 \begin{align}
-Sc_{dFe}^{&rarr; Fe_{sA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{sd}^{C} + 8.3 \cdot B_{CaCO_3}^{C} }{ B_{particles}^{M} }
+Sc_{dFe}^{&rarr; Fe_{sA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{sd}^{C} + 8.3 \cdot B_{CaCO_3}^{C} }{ B_{particles}^{M} } \\
 Sc_{dFe}^{&rarr; Fe_{lA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} }{ B_{particles}^{M} }
 \end{align}
 $$
@@ -754,7 +754,7 @@ Similarly to scavenging of free iron, coagulation routes dissolved iron to two s
 
 $$
 \begin{align}
-Co_{dFe}^{&rarr; Fe_{sA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{sA}
+Co_{dFe}^{&rarr; Fe_{sA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{sA} \\
 Co_{dFe}^{&rarr; Fe_{lA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{lA}
 \end{align}
 $$
@@ -768,7 +768,7 @@ The coagulation scaling coefficients are themselves dependent on the concentrati
 
 $$
 \begin{align}
-S_{coag}^{sA} &= H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9 \cdot B_{sd}^{C}\right) + 2.5 \cdot B_{sd}^{C} + 128 \cdot F_{coag} B_{DOC}^{C} + 725 \cdot B_{sd}^{C}
+S_{coag}^{sA} &= H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9 \cdot B_{sd}^{C}\right) + 2.5 \cdot B_{sd}^{C} + 128 \cdot F_{coag} B_{DOC}^{C} + 725 \cdot B_{sd}^{C} \\
 F_{coag} &= \dfrac{B_{np}^{C} + B_{mp}^{C}}{B_{np}^{C} + B_{mp}^{C} + 0.03}
 \end{align}
 $$
@@ -801,7 +801,7 @@ Small, slow sinking authigenic (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</su
 
 $$
 \begin{align}
-D_{sA}^{&rarr; dFe} &= Fe_{sA} \gamma_{sA}^{diss}
+D_{sA}^{&rarr; dFe} &= Fe_{sA} \gamma_{sA}^{diss} \\
 D_{lA}^{&rarr; dFe} &= Fe_{lA} \gamma_{lA}^{diss}
 \end{align}
 $$
@@ -952,12 +952,12 @@ Mortality of ecological functional types are affected by both linear ($\gamma$) 
 
 $$
 \begin{align}
-\gamma_{np}^{&rarr; C} &= \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}
-\gamma_{mp}^{&rarr; C} &= \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}
-\gamma_{mz}^{&rarr; C} &= \gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C}
-\gamma_{Mz}^{&rarr; C} &= \gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C}
-\gamma_{b1}^{&rarr; C} &= \gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C}
-\gamma_{b2}^{&rarr; C} &= \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C}
+\gamma_{np}^{&rarr; C} &= \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
+\gamma_{mp}^{&rarr; C} &= \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
+\gamma_{mz}^{&rarr; C} &= \gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
+\gamma_{Mz}^{&rarr; C} &= \gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C} \\
+\gamma_{b1}^{&rarr; C} &= \gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C} \\
+\gamma_{b2}^{&rarr; C} &= \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
 \gamma_{aoa}^{&rarr; C} &= \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
 \end{align}
 $$
@@ -986,7 +986,7 @@ In the above, we scale down **linear mortality** of micro- and meso-zooplannkton
 
 $$
 \begin{align}
-S_{mz}^{\gamma} &= \dfrac{B_{mz}^{C}}{B_{mz}^{C} + K_{mz}^{\gamma}}
+S_{mz}^{\gamma} &= \dfrac{B_{mz}^{C}}{B_{mz}^{C} + K_{mz}^{\gamma}} \\
 S_{Mz}^{\gamma} &= \dfrac{B_{Mz}^{C}}{B_{Mz}^{C} + K_{Mz}^{\gamma}}
 \end{align}
 $$
@@ -1002,12 +1002,12 @@ where
 
 $$
 \begin{align}
-\Gamma_{np}^{&rarr; C} &= \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}
-\Gamma_{mp}^{&rarr; C} &= \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}
-\Gamma_{mz}^{&rarr; C} &= \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C}
-\Gamma_{Mz}^{&rarr; C} &= \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C}
-\Gamma_{b1}^{&rarr; C} &= \Gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C}
-\Gamma_{b2}^{&rarr; C} &= \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C}
+\Gamma_{np}^{&rarr; C} &= \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
+\Gamma_{mp}^{&rarr; C} &= \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
+\Gamma_{mz}^{&rarr; C} &= \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
+\Gamma_{Mz}^{&rarr; C} &= \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C} \\
+\Gamma_{b1}^{&rarr; C} &= \Gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C} \\
+\Gamma_{b2}^{&rarr; C} &= \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
 \Gamma_{aoa}^{&rarr; C} &= \Gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
 \end{align}
 $$
@@ -1039,7 +1039,7 @@ where
 
 $$
 \begin{align}
-g_{mz} &= \dfrac{\mu_{mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{mz}^{i} \phi_{mz}^{i} (B_{i}^{C})^{2}\right)}
+g_{mz} &= \dfrac{\mu_{mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{mz}^{i} \phi_{mz}^{i} (B_{i}^{C})^{2}\right)} \\
 g_{Mz} &= \dfrac{\mu_{Mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{Mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}
 \end{align}
 $$
@@ -1098,7 +1098,7 @@ Total grazing of biomass by micro-zooplankton ([mol C kg<sup>-1</sup> day<sup>-1
 
 $$
 \begin{align}
-g_{mz}^{&larr; C} &= g_{mz} B_{mz}^{C}
+g_{mz}^{&larr; C} &= g_{mz} B_{mz}^{C} \\
 g_{Mz}^{&larr; C} &= g_{Mz} B_{Mz}^{C}
 \end{align}
 $$
@@ -1113,7 +1113,7 @@ Total grazing of prey can also be expressed as the sum of individual prey type c
 
 $$
 \begin{align}
-g_{mz}^{&larr; C} &= g_{mz}^{&larr; B_{np}^{C}} + g_{mz}^{&larr; B_{mp}^{C}} + g_{mz}^{&larr; B_{sd}^{C}} + g_{mz}^{&larr; B_{b1}^{C}} + g_{mz}^{&larr; B_{b2}^{C}} + g_{mz}^{&larr; B_{aoa}^{C}}
+g_{mz}^{&larr; C} &= g_{mz}^{&larr; B_{np}^{C}} + g_{mz}^{&larr; B_{mp}^{C}} + g_{mz}^{&larr; B_{sd}^{C}} + g_{mz}^{&larr; B_{b1}^{C}} + g_{mz}^{&larr; B_{b2}^{C}} + g_{mz}^{&larr; B_{aoa}^{C}} \\
 g_{Mz}^{&larr; C} &= g_{Mz}^{&larr; B_{np}^{C}} + g_{Mz}^{&larr; B_{mp}^{C}} + g_{Mz}^{&larr; B_{sd}^{C}} + g_{Mz}^{&larr; B_{ld}^{C}} + g_{Mz}^{&larr; B_{b1}^{C}} + g_{Mz}^{&larr; B_{b2}^{C}} + g_{Mz}^{&larr; B_{aoa}^{C}} + g_{Mz}^{&larr; B_{mz}^{C}}
 \end{align}
 $$
@@ -1147,8 +1147,8 @@ Thus:
 
 $$
 \begin{align}
-E_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \left(1 - \lambda_{z}^{C} \right)
-X_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right)
+E_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \left(1 - \lambda_{z}^{C} \right) \\
+X_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
 A_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \eta_{z}^{C}
 \end{align}
 $$
@@ -1165,8 +1165,8 @@ Total egestion, excretion and assimilation or carbon are therefore:
 
 $$
 \begin{align}
-E_{z}^{&larr; C} &= g_{z}^{&larr; C} \left(1 - \lambda_{z}^{C} \right)
-X_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right)
+E_{z}^{&larr; C} &= g_{z}^{&larr; C} \left(1 - \lambda_{z}^{C} \right) \\
+X_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
 A_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \eta_{z}^{C}
 \end{align}
 $$
@@ -1175,8 +1175,8 @@ Because we track both carbon and iron through the ecosystem components, we assig
 
 $$
 \begin{align}
-E_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \left(1 - \lambda_{z}^{Fe} \right)
-X_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right)
+E_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \left(1 - \lambda_{z}^{Fe} \right) \\
+X_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
 A_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \eta_{z}^{Fe}
 \end{align}
 $$
@@ -1194,8 +1194,8 @@ Total egestion, excretion and assimilation or iron are therefore:
 
 $$
 \begin{align}
-E_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \left(1 - \lambda_{z}^{Fe} \right)
-X_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right)
+E_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \left(1 - \lambda_{z}^{Fe} \right) \\
+X_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
 A_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \eta_{z}^{Fe}
 \end{align}
 $$
@@ -1231,10 +1231,10 @@ When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model com
 
 $$
 \begin{align}
-(1) & P_{CaCO_3}^{\Gamma_{np}^{C}} = \Gamma_{np}^{&rarr; C} \cdot PIC:POC
-(2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \Gamma_{mp}^{&rarr; C} \cdot PIC:POC
-(3) & P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}} = g_{mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
-(4) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}} = g_{Mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
+(1) & P_{CaCO_3}^{\Gamma_{np}^{C}} = \Gamma_{np}^{&rarr; C} \cdot PIC:POC \\
+(2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \Gamma_{mp}^{&rarr; C} \cdot PIC:POC \\
+(3) & P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}} = g_{mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
+(4) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}} = g_{Mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
 (5) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}} = g_{Mz}^{&larr; B_{mz}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
 \end{align}
 $$
@@ -1283,8 +1283,8 @@ This formulation, at leas the first three terms, follows [Kwon et al. (2024)](ht
 
 $$
 \begin{align}
-(1) & D_{CaCO_3}^{\Omega_{cal}} = d_{CaCO_3}^{\Omega_{cal}} \max\left(0,  1 - \Omega_{cal}\right)^{2.2} B_{CaCO_3}^{C} 
-(2) & D_{CaCO_3}^{\Omega_{ara}} = d_{CaCO_3}^{\Omega_{ara}} \max\left(0,  1 - \Omega_{ara}\right)^{1.5} B_{CaCO_3}^{C}
+(1) & D_{CaCO_3}^{\Omega_{cal}} = d_{CaCO_3}^{\Omega_{cal}} \max\left(0,  1 - \Omega_{cal}\right)^{2.2} B_{CaCO_3}^{C} \\ 
+(2) & D_{CaCO_3}^{\Omega_{ara}} = d_{CaCO_3}^{\Omega_{ara}} \max\left(0,  1 - \Omega_{ara}\right)^{1.5} B_{CaCO_3}^{C} \\
 (3) & D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} = d_{CaCO_3}^{\Gamma_{sd}} \Gamma_{sd}^{&rarr; C} B_{CaCO_3}^{C}
 \end{align}
 $$
@@ -1304,7 +1304,7 @@ The fourth and fifth terms (`zoodiss(i,j,k)`; `mesdiss(i,j,k)`, [mol C kg<sup>-1
 
 $$
 \begin{align}
-(4) & D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{&larr; C}}} = g_{mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}
+(4) & D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{&larr; C}}} = g_{mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}} \\
 (5) & D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{&larr; C}}} = g_{Mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}
 \end{align}
 $$
@@ -1358,7 +1358,7 @@ The iron and light limitation terms are as follows:
 
 $$
 \begin{align}
-L_{diazo}^{Fe} &= \dfrac{dFe}{dFe + K_{diazo}^{Fe}}
+L_{diazo}^{Fe} &= \dfrac{dFe}{dFe + K_{diazo}^{Fe}} \\
 L_{diazo}^{PAR} &= 1 - e^{- \alpha_{diazo} PAR}
 \end{align}
 $$
@@ -1394,7 +1394,7 @@ Thus, whichever of aerobic and anaerobic metabolism offers the greatest growth r
 
 $$
 \begin{align}
-\mu_{b}^{aer} &= \min \left(\mu_{b}^{aer(DOC)}, \mu_{b}^{aer(N)}, \mu_{b}^{aer(dFe)}, \mu_{b}^{aer(EA)} \right)
+\mu_{b}^{aer} &= \min \left(\mu_{b}^{aer(DOC)}, \mu_{b}^{aer(N)}, \mu_{b}^{aer(dFe)}, \mu_{b}^{aer(EA)} \right) \\
 \mu_{b}^{ana} &= \min \left(\mu_{b}^{ana(DOC)}, \mu_{b}^{ana(N)}, \mu_{b}^{ana(dFe)}, \mu_{b}^{ana(EA)} \right)
 \end{align}
 $$
@@ -1403,9 +1403,9 @@ For aerobic growth, these resource-specific growth rates are calculated as:
 
 $$
 \begin{align}
-\mu_{b}^{aer(DOC)} &= V_{b}^{DOC} y_{b}^{aer(DOC)}
-\mu_{b}^{aer(N)} &= \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{aer(N)}
-\mu_{b}^{aer(dFe)} &= V_{b}^{dFe} y_{b}^{aer(Fe)}
+\mu_{b}^{aer(DOC)} &= V_{b}^{DOC} y_{b}^{aer(DOC)} \\
+\mu_{b}^{aer(N)} &= \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{aer(N)} \\
+\mu_{b}^{aer(dFe)} &= V_{b}^{dFe} y_{b}^{aer(Fe)} \\
 \mu_{b}^{aer(EA)} &= V_{b}^{O_{2}} y_{b}^{O_{2}}
 \end{align}
 $$
@@ -1425,10 +1425,10 @@ For anaerobic growth, these resource-specific growth rates are calculated in the
 
 $$
 \begin{align}
-\mu_{b}^{ana(DOC)} = V_{b}^{DOC} y_{b}^{ana(DOC)}
-\mu_{b}^{ana(N)} = \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{ana(N)}
-\mu_{b}^{ana(dFe)} = V_{b}^{dFe} y_{b}^{ana(Fe)}
-\mu_{b1}^{NO_{3}} = V_{b}^{NO_{3}} y_{b}^{NO_{3}}
+\mu_{b}^{ana(DOC)} = V_{b}^{DOC} y_{b}^{ana(DOC)} \\
+\mu_{b}^{ana(N)} = \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{ana(N)} \\
+\mu_{b}^{ana(dFe)} = V_{b}^{dFe} y_{b}^{ana(Fe)} \\
+\mu_{b1}^{NO_{3}} = V_{b}^{NO_{3}} y_{b}^{NO_{3}} \\
 \mu_{b2}^{N_{2}O} = V_{b}^{N_{2}O} y_{b}^{N_{2}O}
 \end{align}
 $$
@@ -1450,12 +1450,12 @@ Uptake rates of reductant ($DOC$), addition resources ($DON$, NH<sub>4</sub> and
 
 $$
 \begin{align}
-V_{b}^{DOC} &= V_{b}^{max,DOC} \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{C} + K_{b}^{DOC}}
-V_{b}^{DON} &= V_{b}^{max,DON} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{N} + K_{b}^{DON}}
-V_{b}^{NH_4} &= V_{b}^{max,NH_4} \cdot \dfrac{NH_4}{NH_4 + K_{b}^{NH_4}}
-V_{b}^{dFe} &= V_{b}^{max,dFe} \cdot \dfrac{dFe}{dFe + K_{b}^{dFe}}
-V_{b}^{O_{2}} &= \rho_{b}^{O_2} \cdot O_{2}
-V_{b}^{NO_{3}} &= V_{b}^{max,NO_{3}} \cdot \dfrac{NO_{3}}{NO_{3} + K_{b}^{NO_{3}}}
+V_{b}^{DOC} &= V_{b}^{max,DOC} \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{C} + K_{b}^{DOC}} \\
+V_{b}^{DON} &= V_{b}^{max,DON} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{N} + K_{b}^{DON}} \\
+V_{b}^{NH_4} &= V_{b}^{max,NH_4} \cdot \dfrac{NH_4}{NH_4 + K_{b}^{NH_4}} \\
+V_{b}^{dFe} &= V_{b}^{max,dFe} \cdot \dfrac{dFe}{dFe + K_{b}^{dFe}} \\
+V_{b}^{O_{2}} &= \rho_{b}^{O_2} \cdot O_{2} \\
+V_{b}^{NO_{3}} &= V_{b}^{max,NO_{3}} \cdot \dfrac{NO_{3}}{NO_{3} + K_{b}^{NO_{3}}} \\
 V_{b}^{N_{2}O} &= \rho_{b}^{N_{2}O} \cdot N_{2}O
 \end{align}
 $$
@@ -1501,7 +1501,7 @@ From this base biomass yield on N, we can compute growth yields on DOC (`bac1_yd
 
 $$
 \begin{align}
-\kappa_{b} &= 4 \cdot R_{b}^{C:N} + 1 \cdot R_{b}^{H:N} - 2 \cdot R_{b}^{O:N} - 3
+\kappa_{b} &= 4 \cdot R_{b}^{C:N} + 1 \cdot R_{b}^{H:N} - 2 \cdot R_{b}^{O:N} - 3 \\
 \kappa_{DOM} &= 4 \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{N}} + 1 \cdot R_{DOM}^{H:N} - 2 \cdot R_{DOM}^{O:N} - 3
 \end{align}
 $$
@@ -1515,7 +1515,7 @@ These ratios associated with the stoichimometry of bacterial biomass and dissolv
 
 $$
 \begin{align}
-\kappa_{b} &= 20.0
+\kappa_{b} &= 20.0 \\
 \kappa_{DOM} &= 4 \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{N}} + 2.7
 \end{align}
 $$
@@ -1524,7 +1524,7 @@ Using these electron potentials ($\kappa$) we can solve for the fraction of elec
 
 $$
 \begin{align}
-f_{b}^{aer(\kappa)} &= \min\left(0.8, y_{b}^{DON} \dfrac{\kappa_{b}}{\kappa_{DOM}} \right)
+f_{b}^{aer(\kappa)} &= \min\left(0.8, y_{b}^{DON} \dfrac{\kappa_{b}}{\kappa_{DOM}} \right) \\
 f_{b}^{ana(\kappa)} &= f_{b}^{aer(\kappa)} P_{ana}
 \end{align}
 $$
@@ -1536,11 +1536,11 @@ Now that we have the fraction of electrons that are partitioned towards biomass 
 
 $$
 \begin{align}
-y_{b}^{aer(DON)} &= y_{b}^{DON} \cdot R_{b}^{C:N}
-y_{b}^{aer(DOC)} &= y_{b}^{DON} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}}
-y_{b}^{O_2} &= \dfrac{\dfrac{f_{b}^{aer(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{aer(\kappa)}}{4}} \cdot R_{b}^{C:N}
-y_{b}^{ana(DOC)} &= y_{b}^{DON} P_{ana} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}}
-y_{b}^{NO_{3} &rarr; N_{2}O} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{4}} \cdot R_{b}^{C:N}
+y_{b}^{aer(DON)} &= y_{b}^{DON} \cdot R_{b}^{C:N} \\
+y_{b}^{aer(DOC)} &= y_{b}^{DON} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}} \\
+y_{b}^{O_2} &= \dfrac{\dfrac{f_{b}^{aer(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{aer(\kappa)}}{4}} \cdot R_{b}^{C:N} \\
+y_{b}^{ana(DOC)} &= y_{b}^{DON} P_{ana} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}} \\
+y_{b}^{NO_{3} &rarr; N_{2}O} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{4}} \cdot R_{b}^{C:N} \\
 y_{b}^{N_{2}O &rarr; N_{2}} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{1}} \cdot R_{b}^{C:N}
 \end{align}
 $$
@@ -1593,7 +1593,7 @@ However, both $B_{DOM}^{N}$ (`don1remi(i,j,k)`; `don2remi(i,j,k)`, [mol N kg<sup
 
 $$
 \begin{align}
-\mu_{b}^{&larr; B_{DOM}^{N}} &= \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{DON}}{V_{b}^{DON} + V_{b}^{NH_4}}
+\mu_{b}^{&larr; B_{DOM}^{N}} &= \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{DON}}{V_{b}^{DON} + V_{b}^{NH_4}} \\
 \mu_{b}^{&larr; NH_4} &= \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{NH_4}}{V_{b}^{DON} + V_{b}^{NH_4}}
 \end{align}
 $$
@@ -1604,8 +1604,8 @@ Consumption of the electron acceptors O<sub>2</sub> (`bac1resp(i,j,k)`; `bac2res
 
 $$
 \begin{align}
-\mu_{b}^{&larr; O_2} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{O_2}} \left(1 - f_{ana} \right) 
-\mu_{b1}^{&larr; NO_3} &= \dfrac{\mu_{b1}^{&larr; C}}{y_{b1}^{NO_3}} f_{ana}
+\mu_{b}^{&larr; O_2} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{O_2}} \left(1 - f_{ana} \right)  \\
+\mu_{b1}^{&larr; NO_3} &= \dfrac{\mu_{b1}^{&larr; C}}{y_{b1}^{NO_3}} f_{ana} \\
 \mu_{b2}^{&larr; N_{2}O} &= \dfrac{\mu_{b2}^{&larr; C}}{y_{b2}^{N_{2}O}} f_{ana}
 \end{align}
 $$
@@ -1683,8 +1683,8 @@ The realized growth rate, $\mu_{aoa}$, is the minimum growth achievable on oxyge
 
 $$
 \begin{align}
-\mu_{aoa} &= \min\left(\mu_{aoa}^{NH_4}, \mu_{aoa}^{O_2}\right)
-\mu_{aoa}^{NH_4} &= \mu_{aoa}^{max} \dfrac{NH_4}{NH_4 + K_{aoa}^{NH_4}}
+\mu_{aoa} &= \min\left(\mu_{aoa}^{NH_4}, \mu_{aoa}^{O_2}\right) \\
+\mu_{aoa}^{NH_4} &= \mu_{aoa}^{max} \dfrac{NH_4}{NH_4 + K_{aoa}^{NH_4}} \\
 \mu_{aoa}^{O_2} &= \dfrac{\rho_{aoa}^{O_2} O_2}{y_{aoa}^{O_2}}
 \end{align}
 $$
@@ -1712,7 +1712,7 @@ In reality, ammonia oxidizing archaea perform the first step of the nitrificatio
 
 $$
 \begin{align}
-\mu_{aoa}^{&larr; NH_4} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}}
+\mu_{aoa}^{&larr; NH_4} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}} \\
 \mu_{aoa}^{&larr; O_2} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}
 \end{align}
 $$
@@ -1725,7 +1725,7 @@ Ammonia ozidizing archaea produce both NO<sub>3</sub> and a small amount of N<su
 
 $$
 \begin{align}
-\mu_{aoa}^{&rarr; NO_3} &= \mu_{aoa}^{&larr; NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O}
+\mu_{aoa}^{&rarr; NO_3} &= \mu_{aoa}^{&larr; NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O} \\
 \mu_{aoa}^{&rarr; N_{2}O} &= \mu_{aoa}^{C} p_{aoa}^{N_{2}O}
 \end{align}
 $$
@@ -1752,8 +1752,10 @@ $$
 
 since
 
-$a\cdot NH_4 + b \cdot O_2 &rarr; c \cdot B_{aoa}^{C} + d \cdot N_{2}O + e \cdot NO_{3}$\
-$Y = \% N_{2}O produced per NO_{3} produced$\
+$a\cdot NH_4 + b \cdot O_2 &rarr; c \cdot B_{aoa}^{C} + d \cdot N_{2}O + e \cdot NO_{3}$
+
+$Y = \% N_{2}O produced per NO_{3} produced$
+
 $d = \dfrac{\left(a - c\right) \cdot Y}{2 \cdot Y + 1}$
 
 
@@ -1816,10 +1818,10 @@ Sources of $B_{DOM}^{C}$ include (1) phytoplankton overflow production (`nosdoc_
 
 $$
 \begin{align}
-(1) & \Delta DOM_{overflow}^{NOSC} = \left(\sum_{p} \mu_{p}^{&rarr; DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}}
-(2) & \Delta DOM_{excretion}^{NOSC} = \left(\sum_{z,i} \left( X_{z}^{&rarr; i^{C}} \cdot f_{z}^{X &rarr; DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}}
-(3) & \Delta DOM_{photolyse}^{NOSC} = \left(\sum_{p} \gamma_{p}^{&rarr; C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}}
-(4) & \Delta DOM_{bacterlyse}^{NOSC} = \left(\sum_{b} \gamma_{b}^{&rarr; C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}}
+(1) & \Delta DOM_{overflow}^{NOSC} = \left(\sum_{p} \mu_{p}^{&rarr; DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(2) & \Delta DOM_{excretion}^{NOSC} = \left(\sum_{z,i} \left( X_{z}^{&rarr; i^{C}} \cdot f_{z}^{X &rarr; DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(3) & \Delta DOM_{photolyse}^{NOSC} = \left(\sum_{p} \gamma_{p}^{&rarr; C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(4) & \Delta DOM_{bacterlyse}^{NOSC} = \left(\sum_{b} \gamma_{b}^{&rarr; C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
 (5) & \Delta DOM_{dethydro}^{NOSC} = \left(\sum_{d} \Gamma_{d}^{&rarr; C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
 \end{align}
 $$
