@@ -98,7 +98,7 @@ The euphotic depth (`zeuphot(i,j)`, [m]) is defined as the depth where `radbio` 
 
 ### 2. Nutrient limitation of phytoplankton.
 
-At the start of each vertical loop `k=1` through `k=kmax` the code computes the biomass of nano-phytoplankton (`biophy`, $B_{np}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton (`biodia`, $B_{mp}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how nitrogen in the form of nitrate (`biono3`, $NO_{3}$, [mmol N m<sup>-3</sup>]) and ammonium (`bionh4`, $NH_{4}$, [mmol N m<sup>-3</sup>]), dissolved iron (`biofer`, $dFe$, [µmol dFe m<sup>-3</sup>]) and silicic acid in the case of micro-phytoplankton (`biosil`, $Si(OH)_{4}$, [mmol S m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
+At the start of each vertical loop `k=1` through `k=kmax` the code computes the biomass of nano-phytoplankton (`biophy`, $B_{np}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton (`biodia`, $B_{mp}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how nitrogen in the form of nitrate (`biono3`, NO<sub>3</sub>, [mmol N m<sup>-3</sup>]) and ammonium (`bionh4`, NH<sub>4</sub>, [mmol N m<sup>-3</sup>]), dissolved iron (`biofer`, $dFe$, [µmol dFe m<sup>-3</sup>]) and silicic acid in the case of micro-phytoplankton (`biosil`, Si(OH)<sub>4</sub>, [mmol S m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
 
 $aff = V^{-0.57}$
 
@@ -462,7 +462,7 @@ where
 Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for Si(OH)<sub>4</sub> and (ii) down regulation of Si(OH)<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 (i) 
-$\dfrac{Si(OH)<sub>4</sub>}{Si(OH)<sub>4</sub> + K_{mp}^{Si}}$
+$\dfrac{Si\left(OH\right)_{4}}{Si\left(OH\right)_{4} + K_{mp}^{Si}}$
 
 (ii) 
 $\left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}$
@@ -622,26 +622,26 @@ $D_{lA}^{&rarr; dFe} = Fe_{lA} \gamma_{lA}^{diss}$
 **Silicic acid equilibrium concentration**\
 To determine the rate of biogenic silica dissolution we must first determine the equilibrium concentration of silicic acid (Si(OH)<sub>4</sub>) in seawater. To do so, we solve for this equilibrium concentration via thermodynamic first-principles:
 
-$K_{Si(OH)<sub>4</sub>}(T,P) = \dfrac{\gamma_{Si(OH)<sub>4</sub>^{0}} \cdot [Si(OH)<sub>4</sub>]^{eq}}{(a_{H_{2}O})^{2}}$
+$K_{Si(OH)_{4}}(T,P) = \dfrac{\gamma_{Si(OH)_{4}^{0}} \cdot [Si(OH)_{4}]^{eq}}{(a_{H_{2}O})^{2}}$
 
 where
-- $K_{Si(OH)<sub>4</sub>}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
-- $\gamma_{<sub>4</sub>^{0}}$ is the activity ratio of Si(OH)<sub>4</sub> in seawater (`gamma0`, [dimensionless])
-- $[Si(OH)<sub>4</sub>]^{eq}$ is the equilibrium concentration of Si(OH)<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
+- $K_{Si(OH)_{4}}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
+- $\gamma_{Si(OH)_{4}^{0}}$ is the activity ratio of Si(OH)<sub>4</sub> in seawater (`gamma0`, [dimensionless])
+- $[Si(OH)_{4}]^{eq}$ is the equilibrium concentration of Si(OH)<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
 - $a_{H_{2}O}$ is the activity of seawater (`alphaH2O`, [dimensionless])
 
 The equation is rearranged such that:
 
 $[Si(OH)_{4}]^{eq} = \dfrac{K_{Si(OH)_{4}}(T,P) \cdot (a_{H_{2}O})^{2}}{\gamma_{Si(OH)_{4}^{0}}}$
 
-The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{Si(OH)_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the solubility of $Si(OH)_{4}$ decreases predictably with salinity according to
+The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{Si(OH)_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the solubility of Si(OH)<sub>4</sub> decreases predictably with salinity according to
 
 $\gamma_{Si(OH)_{4}^{0}} = 1 + 0.0053 \cdot S - 0.000034 \cdot S^{2}$
 
 where
 - $S$ is the in situ salinity of seawater (`Salt(i,j,k)`, [psu])
 
-For $K_{Si(OH)_{4}}(T,P)$ we follow the derivation of [Gunnarsson & Arnórsson (2000)](https://doi.org/10.1016/S0016-7037(99)00426-3) who relate the thermodynamic equilibrium constant of $Si(OH)_{4}$ to variations in temperature at a constant pressure of 1 bar ($P^{1}$):
+For $K_{Si(OH)_{4}}(T,P)$ we follow the derivation of [Gunnarsson & Arnórsson (2000)](https://doi.org/10.1016/S0016-7037(99)00426-3) who relate the thermodynamic equilibrium constant of Si(OH)<sub>4</sub> to variations in temperature at a constant pressure of 1 bar ($P^{1}$):
 
 $K(T,P^{1}) = 10^{ -8.476 - \dfrac{485.24}{T_{K}} - 2.268 \times 10^{-6} \cdot (T_{K})^{2} + 3.068 log_{10}(T_{K})}$
 
@@ -681,7 +681,7 @@ where
 
 First, we solve for $d_{B_{ld}^{Si}}^{T}$. [Kamatani, 1982](https://doi.org/10.1007/BF00393146) measured dissolution rates of biogenic silica collected in Tokyo Bay between 8ºC and 30ºC and identified that these roughly obeyed the equation:
 
-$d_{B_{ld}^{Si}}^{T} = \dfrac{e^{\alpha + β T}}{3600}$
+$d_{B_{ld}^{Si}}^{T} = \dfrac{e^{\left(\alpha + β T\right)}}{3600}$
 
 where 
 - $\alpha$ is a species-dependent dissolution intercept that ranges between -7.35 and -10.38. We set $\alpha$ = -8.0
@@ -689,13 +689,13 @@ where
 - $T$ is the in situ temperature of seawater ([`Temp(i,j,k)`, [ºC]])
 - $3600$ converts the rate from [hour<sup>-1</sup>] to [s<sup>-1</sup>]
 
-Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of Si(OH)<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, $Si(OH)_{4}$ is always undersaturated. We therefore assume that $Si(OH)_{4}$ is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
+Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of Si(OH)<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, Si(OH)<sub>4</sub> is always undersaturated. We therefore assume that Si(OH)<sub>4</sub> is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
 
 $S_{B_{ld}^{Si}}^{Sat} = 1 - \left(\dfrac{[Si(OH)_{4}]}{[Si(OH)_{4}]^{eq}}\right)^{2}$
  
 where
-- $[Si(OH)_{4}]$ is the in situ concentration of $Si(OH)_{4}$ (`f_sil(i,j,k)`, [mol Si kg<sup>-1</sup>])
-- $[Si(OH)_{4}]^{eq}$ is the equilibrium concentration of $Si(OH)_{4}$ (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
+- $[Si(OH)_{4}]$ is the in situ concentration of Si(OH)<sub>4</sub> (`f_sil(i,j,k)`, [mol Si kg<sup>-1</sup>])
+- $[Si(OH)_{4}]^{eq}$ is the equilibrium concentration of Si(OH)<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
 - we use an exponent of $2$ informed by the organic carbon-rich biogenic silica dissolution kinetics reported in Table 3.4 of [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf)
 
 The scaling term associated with activity of heterotrophic bacteria is informed by substantial evidence. According to [Rickert et al., 2002](https://doi.org/10.1016/S0016-7037(01)00757-8) "The removal of organic or inorganic coatings enhance the reactivity by at least an order of magnitude". Order of magnitude increases in silica dissolution have been reported for diatom frustules in contact with bacteria ([Bidle & Azam, 1999](https://doi.org/10.1038/17351)), while anti-biotic treatments to mesocosms off Monterey Bay caused silica dissolution to reduced by 50% ([Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). We represent this bacterially-induced stimulation of dissolution with
@@ -714,7 +714,7 @@ where
 
 Mortality of ecological functional types are affected by both linear ($\gamma$) and quadratic ($\Gamma$) terms. Linear terms are per-capita losses associated with the costs of basal metabolism. Quadratic, and thus density-dependent losses, are associated with disease, aggregation and coagulation, viruses, infection and canabalism. None of these processes are represented explicitly within the model, so we represent them implicitly.
 
-**Linear losses** of nano-phytoplankton ($_{np}$), micro-phytoplankton ($_{mp}$), micro-zooplankton ($_{mz}$), meso-zooplankton ($_{Mz}$), facultative nitrate-reducing bacteria ($_{b1}$), facultative nitrous oxide-reducing bacteria ($_{b2}$) and ammonia oxidizing archaea ($_{aoa}$) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
+**Linear losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
 $\gamma_{np}^{&rarr; C} = \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}$\
 $\gamma_{mp}^{&rarr; C} = \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}$\
@@ -1989,7 +1989,7 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 
 ### 23. Sedimentary processes.
 
-WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), dissolved organic nitrogen (DON), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid ($Si(OH)_{4}$), oxygen ($O_2$) and alkalinity (Alk). 
+WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), dissolved organic nitrogen (DON), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (Si(OH)<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
 
 **Organics**\
