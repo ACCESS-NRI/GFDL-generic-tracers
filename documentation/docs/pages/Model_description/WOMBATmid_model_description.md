@@ -172,7 +172,6 @@ where
 
 The same set of equations are applied to micro-phytoplankton:
 
-$
 \begin{align}
 l_{mp}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{mp}^{N}} \\
 l_{mp}^{NO_3} &= \dfrac{NO_3}{NO_3 + K_{mp}^{N}} \\
@@ -181,7 +180,6 @@ L_{mp}^{NH_4} &= \dfrac{5 \cdot l_{mp}^{N} l_{mp}^{NH_4}}{l_{mp}^{NO_3} + 5 \cdo
 L_{mp}^{NO_3} &= \dfrac{l_{mp}^{N} l_{mp}^{NO_3}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}} \\
 L_{mp}^{N} &= L_{mp}^{NH_4} + L_{mp}^{NO_3}
 \end{align}
-$
 
 where
 - NH<sub>4</sub> is the in situ concentration of ammonium (`bionh4`, [mmol N m<sup>-3</sup>]) 
@@ -198,21 +196,17 @@ Note that although phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, as N
 
 **Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{np}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_minqfe`, $Q_{mp}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phy_optqfe`, $Q_{np}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_optqfe`, $Q_{mp}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{np}^{-Fe:C}$ and $Q_{mp}^{-Fe:C}$, is dependent on three terms that each correspond to the iron required by photosystems, respiration and nitrate reduction ([Flynn & Hipkin, 1999](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x)):
 
-$
 \begin{align}
 Q_{np}^{-Fe:C} = & 0.00167 / 55.85 * Q_{np}^{Chl:C} * 12 \\
 &  + 1.21 \times 10^{-5} * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * L_{np}^{N} \\
 &  + 1.15 \times 10^{-4} * 14.0 / 55.85 / 7.625 * 0.5 * L_{np}^{NO_3}
 \end{align}
-$
 
-$
 \begin{align}
 Q_{mp}^{-Fe:C} &= 0.00167 / 55.85 * Q_{mp}^{Chl:C} * 12 \\
 &\qquad  + 1.21 \times 10^{-5} * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * L_{mp}^{N} \\
 &\qquad  + 1.15 \times 10^{-4} * 14.0 / 55.85 / 7.625 * 0.5 * L_{mp}^{NO_3}
 \end{align}
-$
 
 The first term reflects the amount of iron required for photosystems I and II. `0.00167/55.85` is equivalent to the grams of Fe per gram of chlorophyll divided by the grams of Fe per mol Fe, giving mol Fe per gram chlorophyll. This term is multipled by the chlorophyll to carbon ratio of the phytoplantkon cell (`phy_chlc`, $Q_{np}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]; `dia_chlc`, $Q_{mp}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]) and grams of C per mol C, returning mol Fe per mol C. At a healthy chlorophyll:C ratio of 0.03, this term returns an Fe:C ratio of roughly 10 µmol:mol, which reproduces well known requirements of phytoplankton cells ([Morel, Rueter & Price, 1991](https://www.jstor.org/stable/43924569)). The second term, representing the respiratory iron requirement, is derived from [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) who estimated 1.21 $\times 10^{-5}$ grams Fe per gram N assimilated into the cell, which is converted to mol Fe per mol C with 14 g N per mol N divided by 55.85 g Fe per mol Fe $\times$ 7.625 mol C per mol N. This second term assumes that respiration is reduced as growth becomes more limited by available nitrogen (`phy_lnit(i,j,k)`, $L_{np}^{N}$, [dimensionless]; `dia_lnit(i,j,k)`, $L_{mp}^{N}$, [dimensionless]). Finally, the third term represents the iron required by nitrate/nitrite reduction. Nitrate assimilation requires roughly 1.8-fold more iron than ammonia assimilation ([Raven, 1988](https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1988.tb04196.x)). [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) estimated a demand of 1.15 $\times 10^{-4}$ g Fe per mol NO$_3$ reduced, which is accounted for by the nitrate limitation term (`phy_lno3(i,j,k)`, $L_{np}^{NO_3}$, [dimensionless]; `dia_lno3(i,j,k)`, $L_{mp}^{NO_3}$, [dimensionless])). Note that the `1.5` is designed to account for dark respiration (i.e., respiration when the cells are not growing) and the `0.5` refers to the fact that during cell division the cell must reinstate half of its Fe reserves. 
 
@@ -240,11 +234,9 @@ If the cell is Fe‑replete with a quota that exceeds the minimum quota by as mu
 
 **Limitation of micro-phytoplankton growth by silicic acid** is computed as a gating constraint on division via:
 
-$
 \begin{align}
 L_{mp}^{Si} &= \min\left( 1.0, \max\left( 0.0, \dfrac{ Q_{mp}^{Si:C} - Q_{mp}^{-Si:C} }{ Q_{mp}^{*Si:C} - Q_{mp}^{-Si:C} }  \right) \right)
 \end{align}
-$
 
 where
 - $Q_{mp}^{-Si:C}$ is the minimum Si:C quota of the micro-phytoplankton cell (`diaminqs`, [mol Si (mol C)<sup>-1</sup>])
@@ -261,12 +253,10 @@ This formulation treats silicification as linearly limiting to growth between th
 
 The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\mu_{np}^{max}$, [day<sup>-1</sup>]) and micro-phytoplankton (`dia_mumax(i,j,k)`, $\mu_{mp}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
 
-$
 \begin{align}
 \mu_{np}^{max} &= \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T} \\
 \mu_{mp}^{max} &= \mu_{mp}^{0^{\circ}C} \cdot (β_{mp})^{T}
 \end{align}
-$
 
 where
 - $\mu_{np}^{0^{\circ}}C$ is the rate of nano-phytoplankton growth at 0ºC (`abioa_phy`, [s<sup>-1</sup>])
@@ -281,11 +271,9 @@ In the above, $\mu_{np}^{0ºC}$, $\mu_{mp}^{0ºC}$, $β_{np}$ and $β_{mp}$ are 
 
 Heterotrophic processes include mortality of ecosystem functional types, grazing rates of zooplankton, growth rates of heterotrophic bacteria consuming dissovled organic matter (DOC and DON) and the hydrolysation rate of particulate detritus in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0ºC}$, [<sup>s-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$). Each heterotrophic process has a different $\mu_{het}^{0ºC}$ value and we expand on this later under the mortality, grazing and bacterial heterotrophy sections. However, the basic formulation for scaling heterotrophic metabolisms with temperature takes the form:
 
-$$
 \begin{align}
 \mu_{het} &= \mu_{het}^{0ºC} \left(β_{hete}\right)^{T}
 \end{align}
-$$
 
 where
 - $\mu_{het}^{0ºC}$ is the rate of some heterotrophic metabolism at 0ºC ([s<sup>-1</sup>])
@@ -298,12 +286,10 @@ In the code, the combined term $\left(β_{hete}\right)^{T}$ is saved as `fbc`. S
 
 WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM), which occurs before the remineralisation of the DOM by heterotrophic bacteria. The hydrolysation rate of small sinking organic detritus (`detremi(i,j,k)`, $\Gamma_{sd}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`bdetremi(i,j,k)`, $\Gamma_{ld}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
 
-$$
 \begin{align}
 \Gamma_{sd}^{&rarr; C} &= \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2} \\
 \Gamma_{ld}^{&rarr; C} &= \Gamma_{ld}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{ld}^{C}\right)^{2}
 \end{align}
-$$
 
 where
 - $\Gamma_{sd}^{0ºC} = \Gamma_{ld}^{0ºC}$ is the base hydrolysation rate of sinking detritus at 0ºC (`detlrem`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
@@ -312,12 +298,10 @@ where
 
 WOMBAT-mid also carries a distinct dissolved organic nitrogen tracer (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>]) that receives material during the hydrolysation of particulate organics:
 
-$$
 \begin{align}
 \Gamma_{sd}^{&rarr; N} &= \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122} \\
 \Gamma_{ld}^{&rarr; N} &= \Gamma_{ld}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}
 \end{align}
-$$
 
 where
 - $\dfrac{16}{122}$ is the ratio of nitrogen to carbon in organic material ([mol N (mol C)<sup>-1</sup>])
@@ -332,12 +316,10 @@ Phytoplankton growth is limited by light through a photosynthesis–irradiance (
 
 First, The initial slope of the P–I curve, (`phy_pisl`, $\alpha_{np}$, [(W m<sup>-2</sup>)<sup>-1</sup>]; `dia_pisl`, $\alpha_{mp}$, [(W m<sup>-2</sup>)<sup>-1</sup>]), determines how efficiently phytoplankton convert light into carbon fixation. It is scaled by the cellular chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]; `dia_chlc`, $Q_{mp}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]).
 
-$$
 \begin{align}
 \alpha_{np} &= \max(\alpha_{np}^{Chl} \cdot Q_{np}^{Chl:C} \ , \ \alpha_{np}^{Chl} \cdot Q_{np}^{-Chl:C}) \\
 \alpha_{mp} &= \max(\alpha_{mp}^{Chl} \cdot Q_{mp}^{Chl:C} \ , \ \alpha_{mp}^{Chl} \cdot Q_{mp}^{-Chl:C})
 \end{align}
-$$
 
 where 
 - $\alpha_{np}^{Chl}$ is the photosynthetic efficiency per unit chlorophyll in nano-phytoplankton (`alphabio_phy`, [(W m<sup>-2</sup>)<sup>-1</sup> (mol C (mol C)<sup>-1</sup>)<sup>-1</sup>])
@@ -351,12 +333,10 @@ This constraint prevents photosynthesis from collapsing unrealistically at low c
 
 Second, light limitation (`phy_lpar(i,j,k)`, $L_{np}^{PAR}$), [dimensionless]; `dia_lpar(i,j,k)`, $L_{mp}^{PAR}$), [dimensionless]) is calculated using an exponential P–I formulation.
 
-$$
 \begin{align}
 L_{np}^{PAR} &= 1 - e^{- \alpha_{np} PAR } \\
 L_{mp}^{PAR} &= 1 - e^{- \alpha_{mp} PAR }
 \end{align}
-$$
 
 where
 - $PAR$ is the downwelling photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>])
@@ -370,13 +350,10 @@ At low irradiance ($PAR$), growth increases approximately linearly with light, w
 
 Realized growth of nano-phytoplankton (`phy_mu(i,j,k)`, $\mu_{np}$, [s<sup>-1</sup>]) and micro-phytoplankton (`dia_mu(i,j,k)`, $\mu_{mp}$, [s<sup>-1</sup>]) is calculated as:
 
-$$
 \begin{align}
 \mu_{np} &= \mu_{np}^{max} L_{np}^{PAR} \min(L_{np}^{N}, L_{np}^{Fe}) \\
 \mu_{mp} &= \mu_{mp}^{max} L_{mp}^{PAR} \min(L_{mp}^{N}, L_{mp}^{Fe}) L_{mp}^{Si}
 \end{align}
-$$
-
 
 where
 - $\mu_{np}^{max}$ is the maximum potential rate of carbon fixation by nano-phytoplankton (`phy_mumax`, [s<sup>-1</sup>])
@@ -393,12 +370,10 @@ Liebig's law of the minimum ([Liebig, 1840](https://archive.org/details/organicc
 
 Carbon fixation by phytoplankton is then calculated as:
 
-$$
 \begin{align}
 \mu_{np}^{&larr; C} &= \mu_{np} B_{np}^{C} \\
 \mu_{mp}^{&larr; C} &= \mu_{mp} B_{mp}^{C}
 \end{align}
-$$
 
 where 
 - $\mu_{np}^{&larr; C}$ is the realized rate of carbon biomass growth by nano-phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -413,12 +388,10 @@ where
 
 We implement the overflow hypothesis ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)), which posits that phytoplankton can exude their assimilated carbon as dissolved organic carbon (DOC) in high light, low nutrient conditions. We thus account for a phytoplankton-mediated creation of DOC from dissolved inorganic carbon (DIC) via:
 
-$$
 \begin{align}
 \mu_{np}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{&larr; C}\right) \right) \\
 \mu_{mp}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{&larr; C}\right) \right)
 \end{align}
-$$
 
 where 
 - $\mu_{np}^{&rarr; DOC}$ is the overflow production of DOC by nano-phytoplankton (`phydoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -431,11 +404,9 @@ where
 
 The total carbon fixation rate of phytoplankton type $p$ is 
 
-$$
 \begin{align}
 \mu_{p}^{totalC} &= \mu_{p}^{&rarr; DOC} + \mu_{p}^{&larr; C} = \mu_{p}^{max} L_{p}^{PAR}
 \end{align}
-$$
 
 This formulation is derived from the idea that DOC exudation occurs as a result of the difference between carbon fixation capacity, which is bounded by light, and biosynthesis, which is bounded by light and nutrient resources. Since [Thornton (2014)](https://doi.org/10.1080/09670262.2013.875596) identified that as much as 50% of total phytoplankton carbon fixation can be routed to DOC exudation, we cap DOC exudation at $f_{overflow}$ of total carbon fixation, which is set as to a default of 0.5. We also set a hard bound that 2% of total carbon fixation must at minimum go to DOC production based on the findings of [Bjørnsen (1988)](https://doi.org/10.4319/lo.1988.33.1.0151) who identified that even the healthiest cells lose a small fraction of their assimilated carbon as DOC via passive diffusion across the cell membrane.
 
@@ -448,12 +419,10 @@ This step diagnoses the **rate of chlorophyll production** as a function of mixe
 
 We first solve for the optimal chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^{*Chl:C}$, [mol C (mol C)<sup>-1</sup>]; `dia_chlc`, $Q_{mp}^{*Chl:C}$, [mol C (mol C)<sup>-1</sup>]), which is diagnosed as the ratio required to support maximal photosynthetic carbon fixation under the ambient mean light level in the mixed layer, while accounting for nutrient limitation of biosynthesis:
 
-$$
 \begin{align}
 Q_{np}^{*Chl:C} &= \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }} \\
 Q_{mp}^{*Chl:C} &= \dfrac{Q_{mp}^{+Chl:C}}{1 + \dfrac{\alpha_{mp} PAR_{MLD} Q_{mp}^{+Chl:C}}{2 \mu_{mp}^{max} \min \left(L_{mp}^{N}, L_{mp}^{Fe} \right) }}
 \end{align}
-$$
 
 where
 - $Q_{np}^{+Chl:C}$ and $Q_{mp}^{+Chl:C}$ are the maximum allowable chlorophyll-to-carbon ratios (`phymaxqc`; `diamaxqc`, [mol C (mol C)<sup>-1</sup>])
@@ -465,24 +434,20 @@ where
 
 We set a floor for the minimum chlorophyll-to-carbon ratio of phytoplankton via:
 
-$$
 \begin{align}
 Q_{np}^{*Chl:C} &= \min \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right) \\
 Q_{mp}^{*Chl:C} &= \min \left( Q_{mp}^{*Chl:C}, Q_{mp}^{-Chl:C} \right)
 \end{align}
-$$
 
 where
 - $Q_{np}^{-Chl:C}$ and $Q_{mp}^{-Chl:C}$ are the minimum allowable chlorophyll-to-carbon ratios (`phyminqc`; `diaminqc`, [mol C (mol C)<sup>-1</sup>])
 
 Growth of chlorophyll by nano-phytoplankton and micro-phytoplankton (`pchl_mu(i,j,k)`; `dchl_mu(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
-$$
 \begin{align}
 \mu_{np}^{&larr; Chl} &= \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau^{Chl}} \cdot B_{np}^{C} \\
 \mu_{mp}^{&larr; Chl} &= \mu_{mp} B_{mp}^{Chl} + \dfrac{ Q_{mp}^{*Chl:C} - Q_{mp}^{Chl:C} }{\tau^{Chl}} \cdot B_{mp}^{C}
 \end{align}
-$$
 
 where
 - $Q_{np}^{Chl:C}$ and $Q_{mp}^{Chl:C}$ are the in-situ chlorophyll-to-carbon ratios (`phy_chlc`; `dia_chlc`, [mol C (mol C)<sup>-1</sup>])
@@ -500,12 +465,10 @@ This formulation elevates chlorophyll-to-carbon ratios in low light and supresse
 
 Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. First, a maximum quota is found based on the maximum Fe:C ratio of the phytoplankton type:
 
-$$
 \begin{align}
 B_{np}^{+Fe} &= B_{np}^{C} Q_{np}^{+Fe:C} \\
 B_{mp}^{+Fe} &= B_{mp}^{C} Q_{mp}^{+Fe:C}
 \end{align}
-$$
 
 where
 - $B_{np}^{+Fe}$ and $B_{mp}^{+Fe}$ are the maximum Fe quotas of the nano-phytoplankton and micro-phytoplankton cells (`phy_maxqfe`; `dia_maxqfe`, [mmol Fe m-3])
@@ -514,7 +477,6 @@ where
 
 Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/), this rate is scaled by three terms relating to (i) michaelis-menten type affinity for dFe, (ii) up-regulation of dFe uptake representing investment in transporters when cell quotas are limiting to growth, and (iii) down regulation of dFe uptake associated with enriched cellular quotas.
 
-$$
 \begin{align}
 i_{np} &= \dfrac{dFe}{dFe + K_{np}^{Fe}} \\
 i_{mp} &= \dfrac{dFe}{dFe + K_{mp}^{Fe}} \\
@@ -523,7 +485,6 @@ ii_{mp} &= 4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}} \\
 iii_{np} &= \max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right) \\
 iii_{mp} &= \max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{\left|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}\right|} \right)
 \end{align}
-$$
 
 where
 - $dFe$ is the in situ dissolved iron concentration (`biofer`, [µmol Fe m<sup>-3</sup>])
@@ -534,24 +495,20 @@ where
 
 Note that we additionally include a fourth term that decreases the maximum dFe uptake of a cell under light limitation. This is informed by slower uptake of Fe by cells grown in darkness compared to those grown in light by roughly 10-fold ([Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)), which may be due to physiological stimulation of Fe uptake machinery or photoreduction of ligand-bound iron complexes ([Kong et al., 2023](https://doi.org/10.1002/lno.12331); [Maldonado et al., 2005](https://doi.org/10.1029/2005GB002481)), or possibly a combination of both. To obtain a 10-fold relative increase in Fe uptake rates under light, we applied the following term:
 
-$$
 \begin{align}
 iv_{np} &= \max\left(0.01, L_{np}^{PAR}\right)^{0.5} \\
 iv_{mp} &= \max\left(0.01, L_{mp}^{PAR}\right)^{0.5}
 \end{align}
-$$
 
 where
 - $L_{np}^{PAR}$ and $L_{mp}^{PAR}$ are the growth limiters of nano-phytoplankton and micro-phytoplankton by light (`phy_lpar(i,j,k)`; `dia_lpar(i,j,k)`, [dimensionless])
 
 Under very low light, this fourth term reduces maximum potential Fe uptake by 10-fold than what it otherwise would be. All four terms are dimensionless and are designed to scale dissolved iron uptake either up or down. Dissolved iron uptake by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
-$$
 \begin{align}
 \mu_{np}^{&larr; dFe} &= \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np}) \\
 \mu_{mp}^{&larr; dFe} &= \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})
 \end{align}
-$$
 
 where 
 - $\mu_{np}^{&larr; dFe}$ and $\mu_{mp}^{&larr; dFe}$ are the realized uptake rate of dissolved iron by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>])
@@ -565,12 +522,10 @@ where
 
 Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
 
-$$
 \begin{align}
 (i) & \dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}} \\
 (ii) & \left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}
 \end{align}
-$$
 
 where 
 - H<sub>4</sub>SiO<sub>4</sub> is the in situ silicic acid concentration (`biosil`, [mmol Si m<sup>-3</sup>])
@@ -581,11 +536,9 @@ where
 
 Uptake is then calculated as
 
-$$
 \begin{align}
 \mu_{mp}^{&larr; Si} &= \max \left(0, V_{mp}^{Si} \cdot B_{mp}^{C} \cdot (i) \cdot (ii) \right)
 \end{align}
-$$
 
 where
 - $V_{mp}^{Si}$ is the maximum uptake rate of silicon to carbon by a micro-phytoplankton cell (`diaVmaxs`, [mol Si (mol C)<sup>-1</sup> s<sup>-1</sup>])
@@ -606,17 +559,14 @@ Treatment of dissolved iron (`f_fe(i,j,k)`, $dFe$, mol kg<sup>-1</sup>) follows 
 
 We first estimate the **solubility of free Fe from Fe<sup>3+</sup>** in solution using temperature, pH and salinity using the thermodynamic equilibrium equations of [Liu & Millero (2002)](https://www.sciencedirect.com/science/article/abs/pii/S0304420301000743). 
 
-$$
 \begin{align}
 T_K &= \max(5.0, T) + 273.15 \\
 \left(T_K\right)^{-1} &= \dfrac{1}{T_K} \\
 I_{S} &= \dfrac{19.924,S}{1000 - 1.005,S}
 \end{align}
-$$
 
 Solubility constants:
 
-$$
 \begin{align}
 Fe_{sol1} &= 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\left(T_K\right)^{-1}\right)} \\
 Fe_{sol2} &= 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\left(T_K\right)^{-1}\right)} \\
@@ -624,15 +574,12 @@ Fe_{sol3} &= 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\left(T_K\right)^{-1}\ri
 Fe_{sol4} &= 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\left(T_K\right)^{-1}\right)} \\
 Fe_{sol5} &= 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\left(T_K\right)^{-1}\right)} \\
 \end{align}
-$$
 
 Final Fe(III) solubility:
 
-$$
 \begin{align}
 Fe_{sol} &= Fe_{sol1}\left([H^+]^3 + Fe_{sol2}[H^+]^2 + Fe_{sol3}[H^+] + Fe_{sol4} + \dfrac{Fe_{sol5}}{[H^+]}\right)\times10^{9}
 \end{align}
-$$
 
 where 
 - $T_{K}$ is in situ water temperature (`ztemk`, [ºK])
@@ -642,48 +589,38 @@ where
 
 Next we **estimate the concentration of colloidal iron** in solution following [Tagliabue et al. 2023](https://www.nature.com/articles/s41586-023-06210-5). Colloidal dissolved Fe (`fecol(i,j,k)`, $dFe_{col}$, [mmol Fe m<sup>-3</sup>]) is whatever exceeds the inorganic solubility ceiling (`fe3sol`, $dFe_{sol}$, [mmol Fe m<sup>-3</sup>]), but we enforce a hard minimum that colloids are at least 10% of total dissolved Fe (`biofer`, $dFe$, [mmol Fe m<sup>-3</sup>]).
 
-$$
 \begin{align}
 dFe_{col} &= \max\left(0.1 dFe\, \ dFe - dFe_{sol} \right)
 \end{align}
-$$
 
 Following solving for colloidal Fe, we **partition the remaining dissolved Fe into ligand-bound and free iron**. To do so, we find the remaining dissolved iron not in colloidal form (`fe_sfe`, $dFe_{sFe}$, [mmol Fe m<sup>-3</sup>]), 
 
-$$
 \begin{align}
 dFe_{sFe} &= \max\left(0.0,\ dFe - dFe_{col} \right)
 \end{align}
-$$
 
 Partitioning is done using a standard quadratic form that drops out of mass balance + equilibrium for 1:1 complexation with a single ligand class. To do so, we need the temperature- and light-dependent conditional stability constant for Fe–ligand complexation (`fe_keq`, $Fe_{Keq}$, [nmol Fe kg<sup>-1</sup>]). The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008). The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log10 units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)):
 
-$$
 \begin{align}
 Fe_{Keq} &= 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) }\times 10^{-9}
 \end{align}
-$$
 
 After finding $Fe_{Keq}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]):
 
-$$
 \begin{align}
 z &= 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq} \\
 Fe_{free} &= \dfrac{-z + \sqrt{z^2 + 4.0 Fe_{Keq} dFe_{sFe}}}{2 Fe_{Keq} + \varepsilon} \\
 Fe_{free} &= \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)
 \end{align}
-$$
 
 where
 - $[Ligand]$ is the in situ concentration of iron-binding ligands (`ligand`, [nmol kg<sup>-1</sup>]).
 
 Whatever soluble dissolved iron is not present as inorganic free iron is assigned to ligand-bound dissolved iron:
 
-$$
 \begin{align}
 dFe_{lig} &= dFe_{sFe} - dFe_{free}
 \end{align}
-$$
 
 Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe, we solve for scavenging of free iron and coagulation of colloidal, both of which remove dissolved iron and transfer these to two sinking authigenic particles. These authigenic sinking particles included a small, slowly sinking type (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>]) and a large, fast sinking type (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>]). Both scavenging and colloidal coagulation are the major sinks of dissolved iron outside of phytoplankton uptake and this dissolved iron is transferred to the authigenics.
 
@@ -691,22 +628,18 @@ Now that we have separated the dissolved Fe pool into its subcomponents of free,
 
 Scavenging of dissolved iron specifically affects free iron, is accelerated by the presence of particles in the water column and routes this iron to two sinking authigenic phases. Total scavenging of dissolved iron (`fescaven(i,j,k)`, $Sc_{dFe}^{&rarr;}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is calculated as
 
-$$
 \begin{align}
 Sc_{dFe}^{&rarr;} &= dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)
 \end{align}
-$$
 
 where
 - $dFe_{free}$ is the in situ concentration of dissolved free iron (`feIII(i,j,k)`, [nmol Fe kg<sup>-1</sup>])
 - $\gamma_{dFe}^{scav}$ is the rate constant of scavenging (`kscav_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $B_{particles}^{M}$ is the in situ concentration of detrital particles in the water column (`partic`, [mmol m<sup>-3</sup>])
 
-$$
 \begin{align}
 B_{particles}^{M} &= 2 \cdot B_{sd}^{C} + 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} + 8.3 \cdot B_{CaCO_3}^{C}
 \end{align}
-$$
 
 where
 - $B_{sd}^{C}$ is the in situ concentration of small organic carbon detritus (`biodet`, [mmol C m<sup>-3</sup>])
@@ -718,24 +651,20 @@ Organic carbon-based particle types $B_{sd}^{C}$ and $B_{ld}^{C}$ are multipled 
 
 Total scavenging ($Sc_{dFe}^{&rarr;}$) of free iron is then broken into two parts: scavenging to small authigenic particles (`fescaafe(i,j,k)`, $Sc_{dFe}^{&rarr; Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and scavenging to large authigenic particles (`fescabafe(i,j,k)`, $Sc_{dFe}^{&rarr; Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]). 
 
-$$
 \begin{align}
 Sc_{dFe}^{&rarr; Fe_{sA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{sd}^{C} + 8.3 \cdot B_{CaCO_3}^{C} }{ B_{particles}^{M} } \\
 Sc_{dFe}^{&rarr; Fe_{lA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} }{ B_{particles}^{M} }
 \end{align}
-$$
 
 
 **Coagulation:**
 
 Similarly to scavenging of free iron, coagulation routes dissolved iron to two sinking authigenic phases. However, coagulation acts on the colloidal fraction of dissolved iron ([Tagliabue et al., 2023](https://www.nature.com/articles/s41586-023-06210-5)). Rates of coagulation of colloidal iron to small, slowly sinking authigenic iron (`fecoag2afe(i,j,k)`, $Co_{dFe}^{&rarr; Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and large, fast sinking authigenic iron (`fecoag2bafe(i,j,k)`, $Co_{dFe}^{&rarr; Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) follow the form:
 
-$$
 \begin{align}
 Co_{dFe}^{&rarr; Fe_{sA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{sA} \\
 Co_{dFe}^{&rarr; Fe_{lA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{lA}
 \end{align}
-$$
 
 where
 - $dFe_{col}$ is the in situ concentration of dissolved colloidal iron (`fecol(i,j,k)`, [mol Fe kg<sup>-1</sup>])
@@ -744,12 +673,10 @@ where
 
 The coagulation scaling coefficients are themselves dependent on the concentrations of dissolved organic carbon, particulate organic carbon, phytoplankton biomass and the rate of mixing. For small particle coagulation:
 
-$$
 \begin{align}
 S_{coag}^{sA} &= H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9 \cdot B_{sd}^{C}\right) + 2.5 \cdot B_{sd}^{C} + 128 \cdot F_{coag} B_{DOC}^{C} + 725 \cdot B_{sd}^{C} \\
 F_{coag} &= \dfrac{B_{np}^{C} + B_{mp}^{C}}{B_{np}^{C} + B_{mp}^{C} + 0.03}
 \end{align}
-$$
 
 where
 - $H_{mix}$ is a heavyside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless])
@@ -760,11 +687,9 @@ where
 
 For large particle coagulation:
 
-$$
 \begin{align}
 S_{coag}^{lA} &= \left(2 \cdot H_{mix} + 1.37 \right) B_{ld}^{C} + 1.94 \cdot B_{ld}^{C}
 \end{align}
-$$
 
 where
 - $H_{mix}$ is a heavyside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless])
@@ -777,12 +702,10 @@ Together, these terms implement a biologically mediated coagulation pathway in w
 
 Small, slow sinking authigenic (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>]) and a large, fast sinking authigenic iron (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>]) are returned back to the dissolved iron phase through reductive processes or complexation with ligands ([Tagliabue et al., 2023](https://www.nature.com/articles/s41586-023-06210-5)). We represent this process simply via dissolution rate cofficients:
 
-$$
 \begin{align}
 D_{sA}^{&rarr; dFe} &= Fe_{sA} \gamma_{sA}^{diss} \\
 D_{lA}^{&rarr; dFe} &= Fe_{lA} \gamma_{lA}^{diss}
 \end{align}
-$$
 
 ---
 
