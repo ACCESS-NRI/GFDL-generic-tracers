@@ -66,11 +66,21 @@ Because WOMBAT-mid has two forms of phytoplankton (nanophytoplankton and microph
 
 As an example, the PAR in the blue band (`b=1`) at the top of level k is computed as
 
-$PAR^{top}(k,1) = PAR^{top}(k-1,1) * e^{(-ex_{bgr}(k-1,1) * \Delta z(k-1))}$
+$$
+\begin{align}
+PAR^{top}(k,1) = PAR^{top}(k-1,1) * e^{(-ex_{bgr}(k-1,1) * \Delta z(k-1))}
+\end{align}
+$$
+
 
 where the total attenutation rate of blue light in the grid cell above `k` is the sum of attenuation due to all particulates in that grid cell, which includes chlorophyll, detritus and calcium carbonate:
 
-$ex_{bgr}(k-1,1) = ex_{chl}(k-1,1) + ex_{det}(k-1,1) + ex_{CaCO_3}(k-1,1)$
+$$
+\begin{align}
+ex_{bgr}(k-1,1) = ex_{chl}(k-1,1) + ex_{det}(k-1,1) + ex_{CaCO_3}(k-1,1)
+\end{align}
+$$
+
 
 where
 - $ex_{chl}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to chlorophyll (`zbgr(2,ichl)`, [m<sup>-1</sup>])
@@ -79,7 +89,11 @@ where
 
 The irradiance in the red band (`b=3`) at the mid point of layer `k`, in contrast, is equal to 
 
-$PAR^{mid}(k,3) = PAR^{mid}(k-1,3) * e^{(-0.5*(ex_{bgr}(k-1,3) * \Delta z(k-1) + ex_{bgr}(k,3) * \Delta z(k)))}$
+$$
+\begin{align}
+PAR^{mid}(k,3) = PAR^{mid}(k-1,3) * e^{(-0.5*(ex_{bgr}(k-1,3) * \Delta z(k-1) + ex_{bgr}(k,3) * \Delta z(k)))}
+\end{align}
+$$
 
 where
 - $PAR^{mid}(k-1,3)$ is the red light (`b=3`) at the mid-point of the overlying grid cell (`par_bgr_mid(k-1,3)`, [W m<sup>-2</sup>])
@@ -91,7 +105,11 @@ The total PAR available to phytoplantkon is assumed to be the sum of the blue, g
 homogenously distributed within a layer `k`, but we do not assume that light is homogenously distributed within that layer, we solve for the 
 PAR that is seen by the average phytoplankton within that cell (`radbio`, $PAR$, [W m<sup>-2</sup>])
 
-$PAR(k) = \sum_{b=1}^3 \dfrac{(PAR^{top}(k,b) - PAR^{top}(k+1,b))}{ex_{bgr}(k,b) * \Delta z(k)}$
+$$
+\begin{align}
+PAR(k) = \sum_{b=1}^3 \dfrac{(PAR^{top}(k,b) - PAR^{top}(k+1,b))}{ex_{bgr}(k,b) * \Delta z(k)}
+\end{align}
+$$
 
 where
 - $PAR^{top}(k,b)$ is the incoming photosynthetically active radiation at the top of grid cell `k` and light band `b` (`par_bgr_top(k,b)`, [W m<sup>-2</sup>])
@@ -120,10 +138,14 @@ $aff = (B_{phy})^{-0.37}$
 
 With this information, we allow the half-saturation terms for nitrogen (`phy_kni(i,j,k)`, $K_{np}^{N}$, [mmol N m<sup>-3</sup>]; `dia_kni(i,j,k)`, $K_{mp}^{N}$, [mmol N m<sup>-3</sup>]), dissolved iron  (`phy_kfe(i,j,k)`, $K_{np}^{Fe}$, [µmol dFe m<sup>-3</sup>]; `dia_kfe(i,j,k)`, $K_{mp}^{Fe}$, [µmol dFe m<sup>-3</sup>]) and silic acid (`dia_ksi(i,j,k)`, $K_{mp}^{Si}$, [µmol Si m<sup>-3</sup>]) uptake to vary as a function of phytoplankton biomass concentration. We set reference values for the half-saturation coefficient of nitrogen (`phykn`, $K_{np}^{N,0}$, [mmol N m<sup>-3</sup>]; `diakn`, $K_{mp}^{N,0}$, [mmol N m<sup>-3</sup>]), dissolved iron (`phykf`, $K_{np}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]; `diakf`, $K_{mp}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]) and silicic acid (`diaks`, $K_{mp}^{Si,0}$, [µmol Si m<sup>-3</sup>]) as input parameters to the model, and also set thresholds of nano-phytoplankton concentration (`phybiot`, $B_{np}^{thresh}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton concentration (`diabiot`, $B_{mp}^{thresh}$, [mmol C m<sup>-3</sup>]) beneath which cell size cannot decrease and affinity can no longer increase. At this minimum, where affinity is maximised, the half-saturation coefficients are bounded to be 10% of their reference values.
 
-$K_{np}^{N} = K_{np}^{N,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )$\
-$K_{np}^{Fe} = K_{np}^{Fe,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )$\
-$K_{mp}^{N} = K_{mp}^{N,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$\
-$K_{mp}^{Fe} = K_{mp}^{Fe,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$\
+$K_{np}^{N} = K_{np}^{N,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )$ 
+
+$K_{np}^{Fe} = K_{np}^{Fe,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )$
+
+$K_{mp}^{N} = K_{mp}^{N,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$
+
+$K_{mp}^{Fe} = K_{mp}^{Fe,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$
+
 $K_{mp}^{Si} = K_{mp}^{Si,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$
 
 where
@@ -134,11 +156,16 @@ where
 
 **Limitation of phytoplankton growth by nitrogen** (`phy_lnit(i,j,k)`, $L_{np}^{N}$), [dimensionless]; `dia_lnit(i,j,k)`, $L_{mp}^{N}$), [dimensionless]) is split between ammonium (`phy_lnh4(i,j,k)`, $L_{np}^{NH_4}$), [dimensionless]; `dia_lnh4(i,j,k)`, $L_{mp}^{NH_4}$), [dimensionless]) and nitrate (`phy_lno3(i,j,k)`, $L_{np}^{NO_3}$), [dimensionless]; `dia_lno3(i,j,k)`, $L_{mp}^{NO_3}$), [dimensionless]). Phytoplankton preferentially consume and grow on ammonium because it is most efficiently converted to glutamate for biomass synthesis, while nitrate must be first reduced within the cell ([Dortch, 1990](https://www.jstor.org/stable/24842258)). To represent this preference, we follow [Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/) who assert a 5-fold preference of phytoplankton for ammonium over nitrate and show that this reproduces preferences of ammonium-fueled growth in ocean field data.
 
-$l_{np}^{NH_4} = \dfrac{NH_4}{NH_4 + K_{np}^{N}}$\
-$l_{np}^{NO_3} = \dfrac{NO_3}{NO_3 + K_{np}^{N}}$\
-$l_{np}^{N} = \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{np}^{N}}$\
-$L_{np}^{NH_4} = \dfrac{5 \cdot l_{np}^{N} l_{np}^{NH_4}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}$\
-$L_{np}^{NO_3} = \dfrac{l_{np}^{N} l_{np}^{NO_3}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}$\
+$l_{np}^{NH_4} = \dfrac{NH_4}{NH_4 + K_{np}^{N}}$
+
+$l_{np}^{NO_3} = \dfrac{NO_3}{NO_3 + K_{np}^{N}}$
+
+$l_{np}^{N} = \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{np}^{N}}$
+
+$L_{np}^{NH_4} = \dfrac{5 \cdot l_{np}^{N} l_{np}^{NH_4}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}$
+
+$L_{np}^{NO_3} = \dfrac{l_{np}^{N} l_{np}^{NO_3}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}$
+
 $L_{np}^{N} = L_{np}^{NH_4} + L_{np}^{NO_3}$
 
 where
@@ -227,7 +254,8 @@ This formulation treats silicification as linearly limiting to growth between th
 
 ### 3. Temperature-dependent metabolism and POM-->DOM.
 
-**Autotrophy**\
+**Autotrophy**
+
 The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\mu_{np}^{max}$, [day<sup>-1</sup>]) and micro-phytoplankton (`dia_mumax(i,j,k)`, $\mu_{mp}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
 
 $\mu_{np}^{max} = \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T}$
@@ -243,7 +271,8 @@ where
 
 In the above, $\mu_{np}^{0ºC}$, $\mu_{mp}^{0ºC}$, $β_{np}$ and $β_{mp}$ are reference values input to the model at run time. This allows the user to configure nano-phytoplankton and micro-phytoplankton with different maximum potential growth rates and different sensitivities to temperature ([Anderson et al., 2021](https://www.nature.com/articles/s41467-021-26651-8)).
 
-**Heterotrophy**\
+**Heterotrophy**
+
 Heterotrophic processes include mortality of ecosystem functional types, grazing rates of zooplankton, growth rates of heterotrophic bacteria consuming dissovled organic matter (DOC and DON) and the hydrolysation rate of particulate detritus in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0ºC}$, [<sup>s-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$). Each heterotrophic process has a different $\mu_{het}^{0ºC}$ value and we expand on this later under the mortality, grazing and bacterial heterotrophy sections. However, the basic formulation for scaling heterotrophic metabolisms with temperature takes the form:
 
 $\mu_{het} = \mu_{het}^{0ºC} \left(β_{hete}\right)^{T}$
@@ -256,6 +285,7 @@ where
 In the code, the combined term $\left(β_{hete}\right)^{T}$ is saved as `fbc`. See sections below for further details on heterotrophic metabolisms.
 
 **POM --> DOM**
+
 WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM), which occurs before the remineralisation of the DOM by heterotrophic bacteria. The hydrolysation rate of small sinking organic detritus (`detremi(i,j,k)`, $\Gamma_{sd}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`bdetremi(i,j,k)`, $\Gamma_{ld}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
 
 $\Gamma_{sd}^{&rarr; C} = \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2}$
@@ -792,7 +822,6 @@ where
 - $B_{b2}^{C}$ is the concentration of facultative N<sub>2</sub>O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{aoa}^{C}$ is the concentration of ammonia oxidizing archaea carbon biomass (`f_aoa(i,j,k)`, [mol kg<sup>-1</sup>])
 
-
 ---
 
 
@@ -847,8 +876,8 @@ $g_{mz}^{&larr; C} = g_{mz} B_{mz}^{C}$\
 $g_{Mz}^{&larr; C} = g_{Mz} B_{Mz}^{C}$
 
 where
-- $g_{mz}$ is the total specific rate of grazing of micro-zooplankton (`g_zoo`, [s<sup>-1</sup])
-- $g_{Mz}$ is the total specific rate of grazing of meso-zooplankton (`g_mes`, [s<sup>-1</sup])
+- $g_{mz}$ is the total specific rate of grazing of micro-zooplankton (`g_zoo`, [s<sup>-1</sup>])
+- $g_{Mz}$ is the total specific rate of grazing of meso-zooplankton (`g_mes`, [s<sup>-1</sup>])
 - $B_{mz}^{C}$ is the in situ concentration of micro-zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol C kg<sup>-1</sup>])
 - $B_{Mz}^{C}$ is the in situ concentration of meso-zooplankton carbon biomass (`f_mes(i,j,k)`, [mol C kg<sup>-1</sup>])
 
@@ -1268,7 +1297,7 @@ Growth of ammonia oxidizing archaea (`aoagrow(i,j,k)`, $\mu_{aoa}^{C}$, [mol C k
 $\mu_{aoa}^{C} = \mu_{aoa} B_{aoa}^{C}$
 
 where
-- $\mu_{aoa}$ is the realized growth rate of ammonia oxidizing archaea (`aoa_mu(i,j,k)`, [s<sup>-1</sup])
+- $\mu_{aoa}$ is the realized growth rate of ammonia oxidizing archaea (`aoa_mu(i,j,k)`, [s<sup>-1</sup>])
 - $B_{aoa}^{C}$ is the in situ concentration of carbon biomass of ammonia oxidizing archaea (`f_aoa(i,j,k)`, [mol C kg<sup>-1</sup>])
 
 The realized growth rate, $\mu_{aoa}$, is the minimum growth achievable on oxygen and ammonium:
@@ -1278,7 +1307,7 @@ $\mu_{aoa}^{NH_4} = \mu_{aoa}^{max} \dfrac{NH_4}{NH_4 + K_{aoa}^{NH_4}}$\
 $\mu_{aoa}^{O_2} = \dfrac{\rho_{aoa}^{O_2} O_2}{y_{aoa}^{O_2}}$
 
 where
-- $\mu_{aoa}^{max}$ is a temperature-dependent maximum growh rate of ammonia oxidizing archaea (`aoa_mumax(i,j,k)`, [s<sup>-1</sup])
+- $\mu_{aoa}^{max}$ is a temperature-dependent maximum growh rate of ammonia oxidizing archaea (`aoa_mumax(i,j,k)`, [s<sup>-1</sup>])
 - $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of NH<sub>4</sub> by ammonia oxidizing archaea (`aoa_knh4`, [mmol N m<sup>-3</sup>])
 - $\rho_{aoa}^{O_2}$ is the diffusive uptake limit of O<sub>2</sub> by ammonia oxidizing archaea (`aoa_poxy`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on O<sub>2</sub> (`aoa_yoxy`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>])
