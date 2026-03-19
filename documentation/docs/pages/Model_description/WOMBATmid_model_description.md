@@ -149,13 +149,13 @@ $$
 With this information, we allow the half-saturation terms for nitrogen (`phy_kni(i,j,k)`, $K_{np}^{N}$, [mmol N m<sup>-3</sup>]; `dia_kni(i,j,k)`, $K_{mp}^{N}$, [mmol N m<sup>-3</sup>]), dissolved iron  (`phy_kfe(i,j,k)`, $K_{np}^{Fe}$, [µmol dFe m<sup>-3</sup>]; `dia_kfe(i,j,k)`, $K_{mp}^{Fe}$, [µmol dFe m<sup>-3</sup>]) and silic acid (`dia_ksi(i,j,k)`, $K_{mp}^{Si}$, [µmol Si m<sup>-3</sup>]) uptake to vary as a function of phytoplankton biomass concentration. We set reference values for the half-saturation coefficient of nitrogen (`phykn`, $K_{np}^{N,0}$, [mmol N m<sup>-3</sup>]; `diakn`, $K_{mp}^{N,0}$, [mmol N m<sup>-3</sup>]), dissolved iron (`phykf`, $K_{np}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]; `diakf`, $K_{mp}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]) and silicic acid (`diaks`, $K_{mp}^{Si,0}$, [µmol Si m<sup>-3</sup>]) as input parameters to the model, and also set thresholds of nano-phytoplankton concentration (`phybiot`, $B_{np}^{thresh}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton concentration (`diabiot`, $B_{mp}^{thresh}$, [mmol C m<sup>-3</sup>]) beneath which cell size cannot decrease and affinity can no longer increase. At this minimum, where affinity is maximised, the half-saturation coefficients are bounded to be 10% of their reference values.
 
 $$
-\begin{align}
+\begin{aligned}
 K_{np}^{N} &= K_{np}^{N,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} ) \\
 K_{np}^{Fe} &= K_{np}^{Fe,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} ) \\
 K_{mp}^{N} &= K_{mp}^{N,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} ) \\
 K_{mp}^{Fe} &= K_{mp}^{Fe,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} ) \\
 K_{mp}^{Si} &= K_{mp}^{Si,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )
-\end{align}
+\end{aligned}
 $$
 
 where
@@ -1865,10 +1865,10 @@ where
 
 $$
 \begin{align}
-\dfrac{\Delta NO_3}{\Delta t} = \mu_{aoa}^{&rarr; NO_3} \\
-                              - \mu_{b1}^{&larr; NO_3} \\
-                              - \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
-                                     + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+\dfrac{\Delta NO_3}{\Delta t} &= \mu_{aoa}^{&rarr; NO_3} \\
+                              &- \mu_{b1}^{&larr; NO_3} \\
+                              &- \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
+                              &\quad  + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
 \end{align}
 $$
 
