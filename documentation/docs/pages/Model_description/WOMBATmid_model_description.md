@@ -142,7 +142,7 @@ when combining panels c and f of their Figure 1. This then relates the affinity 
 
 $$
 \begin{align}
-aff &= (B_{phy})^{-0.37}$
+aff &= (B_{phy})^{-0.37}
 \end{align}
 $$
 
@@ -283,9 +283,12 @@ This formulation treats silicification as linearly limiting to growth between th
 
 The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\mu_{np}^{max}$, [day<sup>-1</sup>]) and micro-phytoplankton (`dia_mumax(i,j,k)`, $\mu_{mp}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
 
-$\mu_{np}^{max} = \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T}$
-
-$\mu_{mp}^{max} = \mu_{mp}^{0^{\circ}C} \cdot (β_{mp})^{T}$
+$$
+\begin{align}
+\mu_{np}^{max} &= \mu_{np}^{0^{\circ}C} \cdot (β_{np})^{T}
+\mu_{mp}^{max} &= \mu_{mp}^{0^{\circ}C} \cdot (β_{mp})^{T}
+\end{align}
+$$
 
 where
 - $\mu_{np}^{0^{\circ}}C$ is the rate of nano-phytoplankton growth at 0ºC (`abioa_phy`, [s<sup>-1</sup>])
@@ -300,7 +303,11 @@ In the above, $\mu_{np}^{0ºC}$, $\mu_{mp}^{0ºC}$, $β_{np}$ and $β_{mp}$ are 
 
 Heterotrophic processes include mortality of ecosystem functional types, grazing rates of zooplankton, growth rates of heterotrophic bacteria consuming dissovled organic matter (DOC and DON) and the hydrolysation rate of particulate detritus in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0ºC}$, [<sup>s-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$). Each heterotrophic process has a different $\mu_{het}^{0ºC}$ value and we expand on this later under the mortality, grazing and bacterial heterotrophy sections. However, the basic formulation for scaling heterotrophic metabolisms with temperature takes the form:
 
-$\mu_{het} = \mu_{het}^{0ºC} \left(β_{hete}\right)^{T}$
+$$
+\begin{align}
+\mu_{het} &= \mu_{het}^{0ºC} \left(β_{hete}\right)^{T}
+\end{align}
+$$
 
 where
 - $\mu_{het}^{0ºC}$ is the rate of some heterotrophic metabolism at 0ºC ([s<sup>-1</sup>])
@@ -313,9 +320,12 @@ In the code, the combined term $\left(β_{hete}\right)^{T}$ is saved as `fbc`. S
 
 WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM), which occurs before the remineralisation of the DOM by heterotrophic bacteria. The hydrolysation rate of small sinking organic detritus (`detremi(i,j,k)`, $\Gamma_{sd}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`bdetremi(i,j,k)`, $\Gamma_{ld}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
 
-$\Gamma_{sd}^{&rarr; C} = \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2}$
-
-$\Gamma_{ld}^{&rarr; C} = \Gamma_{ld}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{ld}^{C}\right)^{2}$
+$$
+\begin{align}
+\Gamma_{sd}^{&rarr; C} &= \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2}
+\Gamma_{ld}^{&rarr; C} &= \Gamma_{ld}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{ld}^{C}\right)^{2}
+\end{align}
+$$
 
 where
 - $\Gamma_{sd}^{0ºC} = \Gamma_{ld}^{0ºC}$ is the base hydrolysation rate of sinking detritus at 0ºC (`detlrem`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
@@ -324,9 +334,12 @@ where
 
 WOMBAT-mid also carries a distinct dissolved organic nitrogen tracer (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>]) that receives material during the hydrolysation of particulate organics:
 
-$\Gamma_{sd}^{&rarr; N} = \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}$
-
-$\Gamma_{ld}^{&rarr; N} = \Gamma_{ld}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}$
+$$
+\begin{align}
+\Gamma_{sd}^{&rarr; N} &= \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}
+\Gamma_{ld}^{&rarr; N} &= \Gamma_{ld}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}
+\end{align}
+$$
 
 where
 - $\dfrac{16}{122}$ is the ratio of nitrogen to carbon in organic material ([mol N (mol C)<sup>-1</sup>])
@@ -341,8 +354,12 @@ Phytoplankton growth is limited by light through a photosynthesis–irradiance (
 
 First, The initial slope of the P–I curve, (`phy_pisl`, $\alpha_{np}$, [(W m<sup>-2</sup>)<sup>-1</sup>]; `dia_pisl`, $\alpha_{mp}$, [(W m<sup>-2</sup>)<sup>-1</sup>]), determines how efficiently phytoplankton convert light into carbon fixation. It is scaled by the cellular chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]; `dia_chlc`, $Q_{mp}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]).
 
-$\alpha_{np} = \max(\alpha_{np}^{Chl} \cdot Q_{np}^{Chl:C} \ , \ \alpha_{np}^{Chl} \cdot Q_{np}^{-Chl:C})$\
-$\alpha_{mp} = \max(\alpha_{mp}^{Chl} \cdot Q_{mp}^{Chl:C} \ , \ \alpha_{mp}^{Chl} \cdot Q_{mp}^{-Chl:C})$ 
+$$
+\begin{align}
+\alpha_{np} &= \max(\alpha_{np}^{Chl} \cdot Q_{np}^{Chl:C} \ , \ \alpha_{np}^{Chl} \cdot Q_{np}^{-Chl:C})
+\alpha_{mp} &= \max(\alpha_{mp}^{Chl} \cdot Q_{mp}^{Chl:C} \ , \ \alpha_{mp}^{Chl} \cdot Q_{mp}^{-Chl:C})
+\end{align}
+$$
 
 where 
 - $\alpha_{np}^{Chl}$ is the photosynthetic efficiency per unit chlorophyll in nano-phytoplankton (`alphabio_phy`, [(W m<sup>-2</sup>)<sup>-1</sup> (mol C (mol C)<sup>-1</sup>)<sup>-1</sup>])
@@ -356,8 +373,12 @@ This constraint prevents photosynthesis from collapsing unrealistically at low c
 
 Second, light limitation (`phy_lpar(i,j,k)`, $L_{np}^{PAR}$), [dimensionless]; `dia_lpar(i,j,k)`, $L_{mp}^{PAR}$), [dimensionless]) is calculated using an exponential P–I formulation.
 
-$L_{np}^{PAR} = 1 - e^{- \alpha_{np} PAR }$ \
-$L_{mp}^{PAR} = 1 - e^{- \alpha_{mp} PAR }$
+$$
+\begin{align}
+L_{np}^{PAR} &= 1 - e^{- \alpha_{np} PAR }
+L_{mp}^{PAR} &= 1 - e^{- \alpha_{mp} PAR }
+\end{align}
+$$
 
 where
 - $PAR$ is the downwelling photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>])
@@ -371,8 +392,13 @@ At low irradiance ($PAR$), growth increases approximately linearly with light, w
 
 Realized growth of nano-phytoplankton (`phy_mu(i,j,k)`, $\mu_{np}$, [s<sup>-1</sup>]) and micro-phytoplankton (`dia_mu(i,j,k)`, $\mu_{mp}$, [s<sup>-1</sup>]) is calculated as:
 
-$\mu_{np} = \mu_{np}^{max} L_{np}^{PAR} \min(L_{np}^{N}, L_{np}^{Fe})$\
-$\mu_{mp} = \mu_{mp}^{max} L_{mp}^{PAR} \min(L_{mp}^{N}, L_{mp}^{Fe}) L_{mp}^{Si}$
+$$
+\begin{align}
+\mu_{np} &= \mu_{np}^{max} L_{np}^{PAR} \min(L_{np}^{N}, L_{np}^{Fe})
+\mu_{mp} &= \mu_{mp}^{max} L_{mp}^{PAR} \min(L_{mp}^{N}, L_{mp}^{Fe}) L_{mp}^{Si}
+\end{align}
+$$
+
 
 where
 - $\mu_{np}^{max}$ is the maximum potential rate of carbon fixation by nano-phytoplankton (`phy_mumax`, [s<sup>-1</sup>])
@@ -389,8 +415,12 @@ Liebig's law of the minimum ([Liebig, 1840](https://archive.org/details/organicc
 
 Carbon fixation by phytoplankton is then calculated as:
 
-$\mu_{np}^{&larr; C} = \mu_{np} B_{np}^{C}$\
-$\mu_{mp}^{&larr; C} = \mu_{mp} B_{mp}^{C}$
+$$
+\begin{align}
+\mu_{np}^{&larr; C} &= \mu_{np} B_{np}^{C}
+\mu_{mp}^{&larr; C} &= \mu_{mp} B_{mp}^{C}
+\end{align}
+$$
 
 where 
 - $\mu_{np}^{&larr; C}$ is the realized rate of carbon biomass growth by nano-phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -405,8 +435,12 @@ where
 
 We implement the overflow hypothesis ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)), which posits that phytoplankton can exude their assimilated carbon as dissolved organic carbon (DOC) in high light, low nutrient conditions. We thus account for a phytoplankton-mediated creation of DOC from dissolved inorganic carbon (DIC) via:
 
-$\mu_{np}^{&rarr; DOC} = \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{&larr; C}\right) \right)$\
-$\mu_{mp}^{&rarr; DOC} = \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{&larr; C}\right) \right)$
+$$
+\begin{align}
+\mu_{np}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{&larr; C}\right) \right)
+\mu_{mp}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{&larr; C}\right) \right)
+\end{align}
+$$
 
 where 
 - $\mu_{np}^{&rarr; DOC}$ is the overflow production of DOC by nano-phytoplankton (`phydoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -419,7 +453,11 @@ where
 
 The total carbon fixation rate of phytoplankton type $p$ is 
 
-$\mu_{p}^{totalC} = \mu_{p}^{&rarr; DOC} + \mu_{p}^{&larr; C} = \mu_{p}^{max} L_{p}^{PAR}$
+$$
+\begin{align}
+\mu_{p}^{totalC} &= \mu_{p}^{&rarr; DOC} + \mu_{p}^{&larr; C} = \mu_{p}^{max} L_{p}^{PAR}
+\end{align}
+$$
 
 This formulation is derived from the idea that DOC exudation occurs as a result of the difference between carbon fixation capacity, which is bounded by light, and biosynthesis, which is bounded by light and nutrient resources. Since [Thornton (2014)](https://doi.org/10.1080/09670262.2013.875596) identified that as much as 50% of total phytoplankton carbon fixation can be routed to DOC exudation, we cap DOC exudation at $f_{overflow}$ of total carbon fixation, which is set as to a default of 0.5. We also set a hard bound that 2% of total carbon fixation must at minimum go to DOC production based on the findings of [Bjørnsen (1988)](https://doi.org/10.4319/lo.1988.33.1.0151) who identified that even the healthiest cells lose a small fraction of their assimilated carbon as DOC via passive diffusion across the cell membrane.
 
@@ -432,8 +470,12 @@ This step diagnoses the **rate of chlorophyll production** as a function of mixe
 
 We first solve for the optimal chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^{*Chl:C}$, [mol C (mol C)<sup>-1</sup>]; `dia_chlc`, $Q_{mp}^{*Chl:C}$, [mol C (mol C)<sup>-1</sup>]), which is diagnosed as the ratio required to support maximal photosynthetic carbon fixation under the ambient mean light level in the mixed layer, while accounting for nutrient limitation of biosynthesis:
 
-$Q_{np}^{*Chl:C} = \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }}$\
-$Q_{mp}^{*Chl:C} = \dfrac{Q_{mp}^{+Chl:C}}{1 + \dfrac{\alpha_{mp} PAR_{MLD} Q_{mp}^{+Chl:C}}{2 \mu_{mp}^{max} \min \left(L_{mp}^{N}, L_{mp}^{Fe} \right) }}$
+$$
+\begin{align}
+Q_{np}^{*Chl:C} &= \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }}
+Q_{mp}^{*Chl:C} &= \dfrac{Q_{mp}^{+Chl:C}}{1 + \dfrac{\alpha_{mp} PAR_{MLD} Q_{mp}^{+Chl:C}}{2 \mu_{mp}^{max} \min \left(L_{mp}^{N}, L_{mp}^{Fe} \right) }}
+\end{align}
+$$
 
 where
 - $Q_{np}^{+Chl:C}$ and $Q_{mp}^{+Chl:C}$ are the maximum allowable chlorophyll-to-carbon ratios (`phymaxqc`; `diamaxqc`, [mol C (mol C)<sup>-1</sup>])
@@ -445,16 +487,24 @@ where
 
 We set a floor for the minimum chlorophyll-to-carbon ratio of phytoplankton via:
 
-$Q_{np}^{*Chl:C} = \min \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right)$\
-$Q_{mp}^{*Chl:C} = \min \left( Q_{mp}^{*Chl:C}, Q_{mp}^{-Chl:C} \right)$
+$$
+\begin{align}
+Q_{np}^{*Chl:C} &= \min \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right)
+Q_{mp}^{*Chl:C} &= \min \left( Q_{mp}^{*Chl:C}, Q_{mp}^{-Chl:C} \right)
+\end{align}
+$$
 
 where
 - $Q_{np}^{-Chl:C}$ and $Q_{mp}^{-Chl:C}$ are the minimum allowable chlorophyll-to-carbon ratios (`phyminqc`; `diaminqc`, [mol C (mol C)<sup>-1</sup>])
 
 Growth of chlorophyll by nano-phytoplankton and micro-phytoplankton (`pchl_mu(i,j,k)`; `dchl_mu(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
-$\mu_{np}^{&larr; Chl} = \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau^{Chl}} \cdot B_{np}^{C}$\
-$\mu_{mp}^{&larr; Chl} = \mu_{mp} B_{mp}^{Chl} + \dfrac{ Q_{mp}^{*Chl:C} - Q_{mp}^{Chl:C} }{\tau^{Chl}} \cdot B_{mp}^{C}$
+$$
+\begin{align}
+\mu_{np}^{&larr; Chl} &= \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau^{Chl}} \cdot B_{np}^{C}
+\mu_{mp}^{&larr; Chl} &= \mu_{mp} B_{mp}^{Chl} + \dfrac{ Q_{mp}^{*Chl:C} - Q_{mp}^{Chl:C} }{\tau^{Chl}} \cdot B_{mp}^{C}
+\end{align}
+$$
 
 where
 - $Q_{np}^{Chl:C}$ and $Q_{mp}^{Chl:C}$ are the in-situ chlorophyll-to-carbon ratios (`phy_chlc`; `dia_chlc`, [mol C (mol C)<sup>-1</sup>])
@@ -472,8 +522,12 @@ This formulation elevates chlorophyll-to-carbon ratios in low light and supresse
 
 Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. First, a maximum quota is found based on the maximum Fe:C ratio of the phytoplankton type:
 
-$B_{np}^{+Fe} = B_{np}^{C} Q_{np}^{+Fe:C}$\
-$B_{mp}^{+Fe} = B_{mp}^{C} Q_{mp}^{+Fe:C}$
+$$
+\begin{align}
+B_{np}^{+Fe} &= B_{np}^{C} Q_{np}^{+Fe:C}
+B_{mp}^{+Fe} &= B_{mp}^{C} Q_{mp}^{+Fe:C}
+\end{align}
+$$
 
 where
 - $B_{np}^{+Fe}$ and $B_{mp}^{+Fe}$ are the maximum Fe quotas of the nano-phytoplankton and micro-phytoplankton cells (`phy_maxqfe`; `dia_maxqfe`, [mmol Fe m-3])
@@ -482,15 +536,16 @@ where
 
 Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/), this rate is scaled by three terms relating to (i) michaelis-menten type affinity for dFe, (ii) up-regulation of dFe uptake representing investment in transporters when cell quotas are limiting to growth, and (iii) down regulation of dFe uptake associated with enriched cellular quotas.
 
-($i_{np}$) $\dfrac{dFe}{dFe + K_{np}^{Fe}}$ \
-($i_{mp}$) $\dfrac{dFe}{dFe + K_{mp}^{Fe}}$
-
-($ii_{np}$) $4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}}$ \
-($ii_{mp}$) $4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}}$
-
-($iii_{np}$) $\max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)$
-
-($iii_{mp}$) $\max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{\left|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}\right|} \right)$
+$$
+\begin{align}
+i_{np} &= \dfrac{dFe}{dFe + K_{np}^{Fe}}
+i_{mp} &= \dfrac{dFe}{dFe + K_{mp}^{Fe}}
+ii_{np} &= 4 - \dfrac{4.5 L_{np}^{Fe}}{0.5 + L_{np}^{Fe}}
+ii_{mp} &= 4 - \dfrac{4.5 L_{mp}^{Fe}}{0.5 + L_{mp}^{Fe}}
+iii_{np} &= \max\left(0, 1 - \dfrac{B_{np}^{Fe} / B_{np}^{+Fe}}{\left|1.05 - B_{np}^{Fe} / B_{np}^{+Fe}\right|} \right)
+iii_{mp} &= \max\left(0, 1 - \dfrac{B_{mp}^{Fe} / B_{mp}^{+Fe}}{\left|1.05 - B_{mp}^{Fe} / B_{mp}^{+Fe}\right|} \right)
+\end{align}
+$$
 
 where
 - $dFe$ is the in situ dissolved iron concentration (`biofer`, [µmol Fe m<sup>-3</sup>])
@@ -501,16 +556,24 @@ where
 
 Note that we additionally include a fourth term that decreases the maximum dFe uptake of a cell under light limitation. This is informed by slower uptake of Fe by cells grown in darkness compared to those grown in light by roughly 10-fold ([Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)), which may be due to physiological stimulation of Fe uptake machinery or photoreduction of ligand-bound iron complexes ([Kong et al., 2023](https://doi.org/10.1002/lno.12331); [Maldonado et al., 2005](https://doi.org/10.1029/2005GB002481)), or possibly a combination of both. To obtain a 10-fold relative increase in Fe uptake rates under light, we applied the following term:
 
-($iv_{np}$) $\max\left(0.01, L_{np}^{PAR}\right)^{0.5}$ \
-($iv_{mp}$) $\max\left(0.01, L_{mp}^{PAR}\right)^{0.5}$
+$$
+\begin{align}
+iv_{np} &= \max\left(0.01, L_{np}^{PAR}\right)^{0.5}
+iv_{mp} &= \max\left(0.01, L_{mp}^{PAR}\right)^{0.5}
+\end{align}
+$$
 
 where
 - $L_{np}^{PAR}$ and $L_{mp}^{PAR}$ are the growth limiters of nano-phytoplankton and micro-phytoplankton by light (`phy_lpar(i,j,k)`; `dia_lpar(i,j,k)`, [dimensionless])
 
 Under very low light, this fourth term reduces maximum potential Fe uptake by 10-fold than what it otherwise would be. All four terms are dimensionless and are designed to scale dissolved iron uptake either up or down. Dissolved iron uptake by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
-$\mu_{np}^{&larr; dFe} = \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np})$ \
-$\mu_{mp}^{&larr; dFe} = \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})$
+$$
+\begin{align}
+\mu_{np}^{&larr; dFe} &= \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np})
+\mu_{mp}^{&larr; dFe} &= \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})
+\end{align}
+$$
 
 where 
 - $\mu_{np}^{&larr; dFe}$ and $\mu_{mp}^{&larr; dFe}$ are the realized uptake rate of dissolved iron by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>])
@@ -524,11 +587,12 @@ where
 
 Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
 
-(i) 
-$\dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}}$
-
-(ii) 
-$\left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}$
+$$
+\begin{align}
+(i) & \dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}}
+(ii) & \left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}
+\end{align}
+$$
 
 where 
 - H<sub>4</sub>SiO<sub>4</sub> is the in situ silicic acid concentration (`biosil`, [mmol Si m<sup>-3</sup>])
@@ -539,7 +603,11 @@ where
 
 Uptake is then calculated as
 
-$\mu_{mp}^{&larr; Si} = \max \left(0, V_{mp}^{Si} \cdot B_{mp}^{C} \cdot (i) \cdot (ii) \right)$
+$$
+\begin{align}
+\mu_{mp}^{&larr; Si} &= \max \left(0, V_{mp}^{Si} \cdot B_{mp}^{C} \cdot (i) \cdot (ii) \right)
+\end{align}
+$$
 
 where
 - $V_{mp}^{Si}$ is the maximum uptake rate of silicon to carbon by a micro-phytoplankton cell (`diaVmaxs`, [mol Si (mol C)<sup>-1</sup> s<sup>-1</sup>])
@@ -560,21 +628,33 @@ Treatment of dissolved iron (`f_fe(i,j,k)`, $dFe$, mol kg<sup>-1</sup>) follows 
 
 We first estimate the **solubility of free Fe from Fe<sup>3+</sup>** in solution using temperature, pH and salinity using the thermodynamic equilibrium equations of [Liu & Millero (2002)](https://www.sciencedirect.com/science/article/abs/pii/S0304420301000743). 
 
-$T_K = \max(5.0, T) + 273.15$ \
-$\left(T_K\right)^{-1} = \dfrac{1}{T_K}$ \
-$I_{S} = \dfrac{19.924,S}{1000 - 1.005,S}$
+$$
+\begin{align}
+T_K &= \max(5.0, T) + 273.15
+\left(T_K\right)^{-1} &= \dfrac{1}{T_K}
+I_{S} &= \dfrac{19.924,S}{1000 - 1.005,S}
+\end{align}
+$$
 
 Solubility constants:
 
-$Fe_{sol1} = 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\left(T_K\right)^{-1}\right)}$ \
-$Fe_{sol2} = 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\left(T_K\right)^{-1}\right)}$ \
-$Fe_{sol3} = 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\left(T_K\right)^{-1}\right)}$ \
-$Fe_{sol4} = 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\left(T_K\right)^{-1}\right)}$ \
-$Fe_{sol5} = 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\left(T_K\right)^{-1}\right)}$
+$$
+\begin{align}
+Fe_{sol1} &= 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\left(T_K\right)^{-1}\right)}
+Fe_{sol2} &= 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\left(T_K\right)^{-1}\right)}
+Fe_{sol3} &= 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\left(T_K\right)^{-1}\right)}
+Fe_{sol4} &= 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\left(T_K\right)^{-1}\right)}
+Fe_{sol5} &= 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\left(T_K\right)^{-1}\right)}
+\end{align}
+$$
 
 Final Fe(III) solubility:
 
-$Fe_{sol} = Fe_{sol1}\left([H^+]^3 + Fe_{sol2}[H^+]^2 + Fe_{sol3}[H^+] + Fe_{sol4} + \dfrac{Fe_{sol5}}{[H^+]}\right)\times10^{9}$
+$$
+\begin{align}
+Fe_{sol} &= Fe_{sol1}\left([H^+]^3 + Fe_{sol2}[H^+]^2 + Fe_{sol3}[H^+] + Fe_{sol4} + \dfrac{Fe_{sol5}}{[H^+]}\right)\times10^{9}
+\end{align}
+$$
 
 where 
 - $T_{K}$ is in situ water temperature (`ztemk`, [ºK])
@@ -584,44 +664,71 @@ where
 
 Next we **estimate the concentration of colloidal iron** in solution following [Tagliabue et al. 2023](https://www.nature.com/articles/s41586-023-06210-5). Colloidal dissolved Fe (`fecol(i,j,k)`, $dFe_{col}$, [mmol Fe m<sup>-3</sup>]) is whatever exceeds the inorganic solubility ceiling (`fe3sol`, $dFe_{sol}$, [mmol Fe m<sup>-3</sup>]), but we enforce a hard minimum that colloids are at least 10% of total dissolved Fe (`biofer`, $dFe$, [mmol Fe m<sup>-3</sup>]).
 
-$dFe_{col} = \max\left(0.1 dFe\, \ dFe - dFe_{sol} \right)$
+$$
+\begin{align}
+dFe_{col} &= \max\left(0.1 dFe\, \ dFe - dFe_{sol} \right)
+\end{align}
+$$
 
 Following solving for colloidal Fe, we **partition the remaining dissolved Fe into ligand-bound and free iron**. To do so, we find the remaining dissolved iron not in colloidal form (`fe_sfe`, $dFe_{sFe}$, [mmol Fe m<sup>-3</sup>]), 
 
-$dFe_{sFe} = \max\left(0.0,\ dFe - dFe_{col} \right)$
+$$
+\begin{align}
+dFe_{sFe} &= \max\left(0.0,\ dFe - dFe_{col} \right)
+\end{align}
+$$
 
 Partitioning is done using a standard quadratic form that drops out of mass balance + equilibrium for 1:1 complexation with a single ligand class. To do so, we need the temperature- and light-dependent conditional stability constant for Fe–ligand complexation (`fe_keq`, $Fe_{Keq}$, [nmol Fe kg<sup>-1</sup>]). The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008). The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log10 units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)):
 
-$Fe_{Keq} = 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) }\times 10^{-9}$, 
+$$
+\begin{align}
+Fe_{Keq} &= 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) }\times 10^{-9}
+\end{align}
+$$
 
 After finding $Fe_{Keq}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]):
 
-$z = 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq}$
-
-$Fe_{free} = \dfrac{-z + \sqrt{z^2 + 4.0 Fe_{Keq} dFe_{sFe}}}{2 Fe_{Keq} + \varepsilon}$
-
-$Fe_{free} = \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)$
+$$
+\begin{align}
+z &= 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq}
+Fe_{free} &= \dfrac{-z + \sqrt{z^2 + 4.0 Fe_{Keq} dFe_{sFe}}}{2 Fe_{Keq} + \varepsilon}
+Fe_{free} &= \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)
+\end{align}
+$$
 
 where
 - $[Ligand]$ is the in situ concentration of iron-binding ligands (`ligand`, [nmol kg<sup>-1</sup>]).
 
 Whatever soluble dissolved iron is not present as inorganic free iron is assigned to ligand-bound dissolved iron:
 
-$dFe_{lig} = dFe_{sFe} - dFe_{free}$
+$$
+\begin{align}
+dFe_{lig} &= dFe_{sFe} - dFe_{free}
+\end{align}
+$$
 
 Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe, we solve for scavenging of free iron and coagulation of colloidal, both of which remove dissolved iron and transfer these to two sinking authigenic particles. These authigenic sinking particles included a small, slowly sinking type (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>]) and a large, fast sinking type (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>]). Both scavenging and colloidal coagulation are the major sinks of dissolved iron outside of phytoplankton uptake and this dissolved iron is transferred to the authigenics.
 
-**Scavenging:** \
+**Scavenging:**
+
 Scavenging of dissolved iron specifically affects free iron, is accelerated by the presence of particles in the water column and routes this iron to two sinking authigenic phases. Total scavenging of dissolved iron (`fescaven(i,j,k)`, $Sc_{dFe}^{&rarr;}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is calculated as
 
-$Sc_{dFe}^{&rarr;} = dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)$ 
+$$
+\begin{align}
+Sc_{dFe}^{&rarr;} &= dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)
+\end{align}
+$$
 
 where
 - $dFe_{free}$ is the in situ concentration of dissolved free iron (`feIII(i,j,k)`, [nmol Fe kg<sup>-1</sup>])
 - $\gamma_{dFe}^{scav}$ is the rate constant of scavenging (`kscav_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $B_{particles}^{M}$ is the in situ concentration of detrital particles in the water column (`partic`, [mmol m<sup>-3</sup>])
 
-$B_{particles}^{M} = 2 \cdot B_{sd}^{C} + 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} + 8.3 \cdot B_{CaCO_3}^{C}$
+$$
+\begin{align}
+B_{particles}^{M} &= 2 \cdot B_{sd}^{C} + 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} + 8.3 \cdot B_{CaCO_3}^{C}
+\end{align}
+$$
 
 where
 - $B_{sd}^{C}$ is the in situ concentration of small organic carbon detritus (`biodet`, [mmol C m<sup>-3</sup>])
@@ -633,15 +740,24 @@ Organic carbon-based particle types $B_{sd}^{C}$ and $B_{ld}^{C}$ are multipled 
 
 Total scavenging ($Sc_{dFe}^{&rarr;}$) of free iron is then broken into two parts: scavenging to small authigenic particles (`fescaafe(i,j,k)`, $Sc_{dFe}^{&rarr; Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and scavenging to large authigenic particles (`fescabafe(i,j,k)`, $Sc_{dFe}^{&rarr; Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]). 
 
-$Sc_{dFe}^{&rarr; Fe_{sA}} = Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{sd}^{C} + 8.3 \cdot B_{CaCO_3}^{C} }{ B_{particles}^{M} }$\
-$Sc_{dFe}^{&rarr; Fe_{lA}} = Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} }{ B_{particles}^{M} }$
+$$
+\begin{align}
+Sc_{dFe}^{&rarr; Fe_{sA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{sd}^{C} + 8.3 \cdot B_{CaCO_3}^{C} }{ B_{particles}^{M} }
+Sc_{dFe}^{&rarr; Fe_{lA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} }{ B_{particles}^{M} }
+\end{align}
+$$
 
 
-**Coagulation:** \
+**Coagulation:**
+
 Similarly to scavenging of free iron, coagulation routes dissolved iron to two sinking authigenic phases. However, coagulation acts on the colloidal fraction of dissolved iron ([Tagliabue et al., 2023](https://www.nature.com/articles/s41586-023-06210-5)). Rates of coagulation of colloidal iron to small, slowly sinking authigenic iron (`fecoag2afe(i,j,k)`, $Co_{dFe}^{&rarr; Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and large, fast sinking authigenic iron (`fecoag2bafe(i,j,k)`, $Co_{dFe}^{&rarr; Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) follow the form:
 
-$Co_{dFe}^{&rarr; Fe_{sA}} = dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{sA} $\
-$Co_{dFe}^{&rarr; Fe_{lA}} = dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{lA} $
+$$
+\begin{align}
+Co_{dFe}^{&rarr; Fe_{sA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{sA}
+Co_{dFe}^{&rarr; Fe_{lA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{lA}
+\end{align}
+$$
 
 where
 - $dFe_{col}$ is the in situ concentration of dissolved colloidal iron (`fecol(i,j,k)`, [mol Fe kg<sup>-1</sup>])
@@ -650,8 +766,12 @@ where
 
 The coagulation scaling coefficients are themselves dependent on the concentrations of dissolved organic carbon, particulate organic carbon, phytoplankton biomass and the rate of mixing. For small particle coagulation:
 
-$S_{coag}^{sA} = H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9 \cdot B_{sd}^{C}\right) + 2.5 \cdot B_{sd}^{C} + 128 \cdot F_{coag} B_{DOC}^{C} + 725 \cdot B_{sd}^{C}$ \
-$F_{coag} = \dfrac{B_{np}^{C} + B_{mp}^{C}}{B_{np}^{C} + B_{mp}^{C} + 0.03}$ 
+$$
+\begin{align}
+S_{coag}^{sA} &= H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9 \cdot B_{sd}^{C}\right) + 2.5 \cdot B_{sd}^{C} + 128 \cdot F_{coag} B_{DOC}^{C} + 725 \cdot B_{sd}^{C}
+F_{coag} &= \dfrac{B_{np}^{C} + B_{mp}^{C}}{B_{np}^{C} + B_{mp}^{C} + 0.03}
+\end{align}
+$$
 
 where
 - $H_{mix}$ is a heavyside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless])
@@ -662,7 +782,11 @@ where
 
 For large particle coagulation:
 
-$S_{coag}^{lA} = \left(2 \cdot H_{mix} + 1.37 \right) B_{ld}^{C} + 1.94 \cdot B_{ld}^{C}$
+$$
+\begin{align}
+S_{coag}^{lA} &= \left(2 \cdot H_{mix} + 1.37 \right) B_{ld}^{C} + 1.94 \cdot B_{ld}^{C}
+\end{align}
+$$
 
 where
 - $H_{mix}$ is a heavyside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless])
@@ -671,21 +795,31 @@ where
 Together, these terms implement a biologically mediated coagulation pathway in which iron removal from the dissolved pool is tightly coupled to ecosystem state. The formulation reflects the central conclusion of [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5): that iron cycling is not governed solely by inorganic chemistry, but is strongly regulated by biological activity, organic matter dynamics, and particle ecology across the upper ocean. 
 
 
-**Dissolution:** \
+**Dissolution:**
+
 Small, slow sinking authigenic (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>]) and a large, fast sinking authigenic iron (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>]) are returned back to the dissolved iron phase through reductive processes or complexation with ligands ([Tagliabue et al., 2023](https://www.nature.com/articles/s41586-023-06210-5)). We represent this process simply via dissolution rate cofficients:
 
-$D_{sA}^{&rarr; dFe} = Fe_{sA} \gamma_{sA}^{diss}$\
-$D_{lA}^{&rarr; dFe} = Fe_{lA} \gamma_{lA}^{diss}$
+$$
+\begin{align}
+D_{sA}^{&rarr; dFe} &= Fe_{sA} \gamma_{sA}^{diss}
+D_{lA}^{&rarr; dFe} &= Fe_{lA} \gamma_{lA}^{diss}
+\end{align}
+$$
 
 ---
 
 
 ### 11. Biogenic silica dissolution. 
 
-**Silicic acid equilibrium concentration**\
+**Silicic acid equilibrium concentration**
+
 To determine the rate of biogenic silica dissolution we must first determine the equilibrium concentration of silicic acid (H<sub>4</sub>SiO<sub>4</sub>) in seawater. To do so, we solve for this equilibrium concentration via thermodynamic first-principles:
 
-$K_{H_{4}SiO_{4}}(T,P) = \dfrac{\gamma_{H_{4}SiO_{4}^{0}} \cdot [H_{4}SiO_{4}]^{eq}}{(a_{H_{2}O})^{2}}$
+$$
+\begin{align}
+K_{H_{4}SiO_{4}}(T,P) &= \dfrac{\gamma_{H_{4}SiO_{4}^{0}} \cdot [H_{4}SiO_{4}]^{eq}}{(a_{H_{2}O})^{2}}
+\end{align}
+$$
 
 where
 - $K_{H_{4}SiO_{4}}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
@@ -695,25 +829,41 @@ where
 
 The equation is rearranged such that:
 
-$[H_{4}SiO_{4}]^{eq} = \dfrac{K_{H_{4}SiO_{4}}(T,P) \cdot (a_{H_{2}O})^{2}}{\gamma_{H_{4}SiO_{4}^{0}}}$
+$$
+\begin{align}
+[H_{4}SiO_{4}]^{eq} &= \dfrac{K_{H_{4}SiO_{4}}(T,P) \cdot (a_{H_{2}O})^{2}}{\gamma_{H_{4}SiO_{4}^{0}}}
+\end{align}
+$$
 
 The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{H_{4}SiO_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the solubility of H<sub>4</sub>SiO<sub>4</sub> decreases predictably with salinity according to
 
-$\gamma_{H_{4}SiO_{4}^{0}} = 1 + 0.0053 \cdot S - 0.000034 \cdot S^{2}$
+$$
+\begin{align}
+\gamma_{H_{4}SiO_{4}^{0}} &= 1 + 0.0053 \cdot S - 0.000034 \cdot S^{2}
+\end{align}
+$$
 
 where
 - $S$ is the in situ salinity of seawater (`Salt(i,j,k)`, [psu])
 
 For $K_{H_{4}SiO_{4}}(T,P)$ we follow the derivation of [Gunnarsson & Arnórsson (2000)](https://doi.org/10.1016/S0016-7037(99)00426-3) who relate the thermodynamic equilibrium constant of H<sub>4</sub>SiO<sub>4</sub> to variations in temperature at a constant pressure of 1 bar ($P^{1}$):
 
-$K(T,P^{1}) = 10^{ -8.476 - \dfrac{485.24}{T_{K}} - 2.268 \times 10^{-6} \cdot (T_{K})^{2} + 3.068 log_{10}(T_{K})}$
+$$
+\begin{align}
+K(T,P^{1}) &= 10^{ -8.476 - \dfrac{485.24}{T_{K}} - 2.268 \times 10^{-6} \cdot (T_{K})^{2} + 3.068 log_{10}(T_{K})}
+\end{align}
+$$
 
 where
 - $T_{K}$ is the in situ temperature of seawater ([`zval`, [ºK]])
 
 We add a classic pressure correction to $K(T,P^{1})$ to retrieve $K(T,P)$ of the form:
 
-$K(T,P) = K(T,P^{1}) \cdot e^{- \dfrac{\Delta V^{0}}{RT_{K}}P}$
+$$
+\begin{align}
+K(T,P) &= K(T,P^{1}) \cdot e^{- \dfrac{\Delta V^{0}}{RT_{K}}P}
+\end{align}
+$$
 
 where
 - $\Delta V^{0}$ is the partial molal volume change (`deltaV0`, [m<sup>3</sup> mol<sup>-1</sup>])
@@ -724,10 +874,15 @@ where
 We obtain $\Delta V^{0}$ from [Willey, 1982](https://doi.org/10.1016/0016-7037(82)90015-1) and [Loucaides et al., 2012](https://doi.org/10.1016/j.marchem.2012.04.003) of roughly -9.0 [cm<sup>3</sup> mol<sup>-1</sup>], which we convert to [m<sup>3</sup> mol<sup>-1</sup>] by multiplying by $10^{6}$. The negative value of $\Delta V^{0}$ implies an increase in dissolution of silica at higher pressures. These value return equilibrium concentrations of silicic acid on the order of 1000 to 1800 mmol m<sup>-3</sup>. Temperature increases are the largest control, while pressure increases from the surface to the ocean bottom increase solubility by 15-20%. 
 
 
-**Biogenic silica dissolution**\
+**Biogenic silica dissolution**
+
 Biogenic silica is only considered associated with the large type of sinking particulate organic matter and dissolution (`bsidiss(i,j,k)`, $D_{B_{ld}^{Si}}^{&rarr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) occurs via
 
-$D_{B_{ld}^{Si}}^{&rarr; Si} = d_{B_{ld}^{Si}} \cdot B_{ld}^{Si}$
+$$
+\begin{align}
+D_{B_{ld}^{Si}}^{&rarr; Si} &= d_{B_{ld}^{Si}} \cdot B_{ld}^{Si}
+\end{align}
+$$
 
 where
 - $d_{B_{ld}^{Si}}$ is the rate of biogenic silica dissolution (`disssi(i,j,k)`, [s<sup>-1</sup>])
@@ -735,7 +890,11 @@ where
 
 We treat the dissolution rate of biogenic silica ($d_{B_{ld}^{Si}}$) as dependent on three conditions: the degree of undersaturation ([Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf); [Van Cappellen & Qiu, 1997](https://doi.org/10.1016/S0967-0645(96)00112-9); [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431)), in situ temperature ([Kamatani, 1982](https://doi.org/10.1007/BF00393146); [Greenwood et al., 2005](https://doi.org/10.1007/s10498-004-9515-y)) and the activity of heterotrophic microbes ([Bidle & Azam, 1999](https://doi.org/10.1038/17351); [Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). To account for these conditions, we formulate the rate of dissolution of biogenic silica (`disssi(i,j,k)`, $d_{Si}$, [s<sup>-1</sup>]) as the product of three terms:
 
-$d_{B_{ld}^{Si}} = d_{B_{ld}^{Si}}^{T} \cdot S_{B_{ld}^{Si}}^{Sat} \cdot S_{B_{ld}^{Si}}^{bio}$
+$$
+\begin{align}
+d_{B_{ld}^{Si}} &= d_{B_{ld}^{Si}}^{T} \cdot S_{B_{ld}^{Si}}^{Sat} \cdot S_{B_{ld}^{Si}}^{bio}
+\end{align}
+$$
 
 where
 - $d_{B_{ld}^{Si}}^{T}$ is the temperature-dependent rate of dissolution (`disssi_temp`, [s<sup>-1</sup>])
@@ -744,7 +903,11 @@ where
 
 First, we solve for $d_{B_{ld}^{Si}}^{T}$. [Kamatani, 1982](https://doi.org/10.1007/BF00393146) measured dissolution rates of biogenic silica collected in Tokyo Bay between 8ºC and 30ºC and identified that these roughly obeyed the equation:
 
-$d_{B_{ld}^{Si}}^{T} = \dfrac{e^{\left(\alpha + β T\right)}}{3600}$
+$$
+\begin{align}
+d_{B_{ld}^{Si}}^{T} &= \dfrac{e^{\left(\alpha + β T\right)}}{3600}
+\end{align}
+$$
 
 where 
 - $\alpha$ is a species-dependent dissolution intercept that ranges between -7.35 and -10.38. We set $\alpha$ = -8.0
@@ -754,8 +917,12 @@ where
 
 Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of H<sub>4</sub>SiO<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, H<sub>4</sub>SiO<sub>4</sub> is always undersaturated. We therefore assume that H<sub>4</sub>SiO<sub>4</sub> is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
 
-$S_{B_{ld}^{Si}}^{Sat} = 1 - \left(\dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{2}$
- 
+$$
+\begin{align}
+S_{B_{ld}^{Si}}^{Sat} &= 1 - \left(\dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{2}
+\end{align}
+$$
+
 where
 - $[H_{4}SiO_{4}]$ is the in situ concentration of H<sub>4</sub>SiO<sub>4</sub> (`f_sil(i,j,k)`, [mol Si kg<sup>-1</sup>])
 - $[H_{4}SiO_{4}]^{eq}$ is the equilibrium concentration of H<sub>4</sub>SiO<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
@@ -763,15 +930,19 @@ where
 
 The scaling term associated with activity of heterotrophic bacteria is informed by substantial evidence. According to [Rickert et al., 2002](https://doi.org/10.1016/S0016-7037(01)00757-8) "The removal of organic or inorganic coatings enhance the reactivity by at least an order of magnitude". Order of magnitude increases in silica dissolution have been reported for diatom frustules in contact with bacteria ([Bidle & Azam, 1999](https://doi.org/10.1038/17351)), while anti-biotic treatments to mesocosms off Monterey Bay caused silica dissolution to reduced by 50% ([Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). We represent this bacterially-induced stimulation of dissolution with
 
-$S_{B_{ld}^{Si}}^{bio} = 1 + F_{B_{ld}^{Si}}^{bac} \cdot \dfrac{B_{bac}^{C}}{B_{bac}^{C} + K_{B_{ld}^{Si}}^{bac}} $
+$$
+\begin{align}
+S_{B_{ld}^{Si}}^{bio} &= 1 + F_{B_{ld}^{Si}}^{bac} \cdot \dfrac{B_{bac}^{C}}{B_{bac}^{C} + K_{B_{ld}^{Si}}^{bac}}
+\end{align}
+$$
 
 where
 - $F_{B_{ld}^{Si}}^{bac}$ is the factor increase in dissolution caused by peak bacterial biomass (`bsi_fbac`, [dimenionless])
 - $K_{B_{ld}^{Si}}^{bac}$ is the half-saturation coefficient for stimulation of silica dissolution in the presence of bacterial biomass (`bsi_kbac`, [mmol C m<sup>-1</sup>])
 - $B_{bac}^{C}$ is the in situ concentration of bacterial biomass (`biobac1` + `biobac2`, [mmol C m<sup>-1</sup>])
 
-
 ---
+
 
 ### 12. Mortality terms
 
@@ -779,13 +950,17 @@ Mortality of ecological functional types are affected by both linear ($\gamma$) 
 
 **Linear losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
-$\gamma_{np}^{&rarr; C} = \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}$\
-$\gamma_{mp}^{&rarr; C} = \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}$\
-$\gamma_{mz}^{&rarr; C} = \gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C}$\
-$\gamma_{Mz}^{&rarr; C} = \gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C}$\
-$\gamma_{b1}^{&rarr; C} = \gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C}$\
-$\gamma_{b2}^{&rarr; C} = \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C}$\
-$\gamma_{aoa}^{&rarr; C} = \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}$
+$$
+\begin{align}
+\gamma_{np}^{&rarr; C} &= \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}
+\gamma_{mp}^{&rarr; C} &= \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}
+\gamma_{mz}^{&rarr; C} &= \gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C}
+\gamma_{Mz}^{&rarr; C} &= \gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C}
+\gamma_{b1}^{&rarr; C} &= \gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C}
+\gamma_{b2}^{&rarr; C} &= \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C}
+\gamma_{aoa}^{&rarr; C} &= \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
+\end{align}
+$$
 
 where
 - $\gamma_{np}^{0ºC}$ is the rate of linear mortality of nano-phytoplankton at 0ºC (`phylmor`, [s<sup>-1</sup>])
@@ -809,8 +984,12 @@ where
 
 In the above, we scale down **linear mortality** of micro- and meso-zooplannkton when their populations are very small small with
 
-$S_{mz}^{\gamma} = \dfrac{B_{mz}^{C}}{B_{mz}^{C} + K_{mz}^{\gamma}}$\
-$S_{Mz}^{\gamma} = \dfrac{B_{Mz}^{C}}{B_{Mz}^{C} + K_{Mz}^{\gamma}}$
+$$
+\begin{align}
+S_{mz}^{\gamma} &= \dfrac{B_{mz}^{C}}{B_{mz}^{C} + K_{mz}^{\gamma}}
+S_{Mz}^{\gamma} &= \dfrac{B_{Mz}^{C}}{B_{Mz}^{C} + K_{Mz}^{\gamma}}
+\end{align}
+$$
 
 where
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`biozoo`, [mmol C m<sup>-1</sup>])
@@ -821,13 +1000,17 @@ where
 
 **Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
-$\Gamma_{np}^{&rarr; C} = \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}$\
-$\Gamma_{mp}^{&rarr; C} = \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}$\
-$\Gamma_{mz}^{&rarr; C} = \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C}$\
-$\Gamma_{Mz}^{&rarr; C} = \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C}$\
-$\Gamma_{b1}^{&rarr; C} = \Gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C}$\
-$\Gamma_{b2}^{&rarr; C} = \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C}$\
-$\Gamma_{aoa}^{&rarr; C} = \Gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}$
+$$
+\begin{align}
+\Gamma_{np}^{&rarr; C} &= \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}
+\Gamma_{mp}^{&rarr; C} &= \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}
+\Gamma_{mz}^{&rarr; C} &= \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C}
+\Gamma_{Mz}^{&rarr; C} &= \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C}
+\Gamma_{b1}^{&rarr; C} &= \Gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C}
+\Gamma_{b2}^{&rarr; C} &= \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C}
+\Gamma_{aoa}^{&rarr; C} &= \Gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
+\end{align}
+$$
 
 where
 - $\Gamma_{np}^{0ºC}$ is the rate of quadratic mortality of nano-phytoplankton at 0ºC (`phyqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
@@ -854,8 +1037,12 @@ where
 
 **Grazing** by micro-zooplankton (`g_zoo`, $g_{mz}$, [s<sup>-1</sup>]) and meso-zooplankton (`g_mes`, $g_{Mz}$, [s<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7), where:
 
-$g_{mz} = \dfrac{\mu_{mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{mz}^{i} \phi_{mz}^{i} (B_{i}^{C})^{2}\right)}$\
-$g_{Mz} = \dfrac{\mu_{Mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{Mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}$
+$$
+\begin{align}
+g_{mz} &= \dfrac{\mu_{mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{mz}^{i} \phi_{mz}^{i} (B_{i}^{C})^{2}\right)}
+g_{Mz} &= \dfrac{\mu_{Mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{Mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}
+\end{align}
+$$
 
 where 
 - $\mu_{mz}^{max}$ is the maximum rate of micro-zooplankton grazing at 0ºC (`zoogmax`, [s<sup>-1</sup>])
@@ -870,7 +1057,11 @@ where
 
 and where
 
-$\sum_{i} \phi_{mz}^{i} = \sum_{i} \phi_{Mz}^{i} = 1.0$
+$$
+\begin{align}
+\sum_{i} \phi_{mz}^{i} &= \sum_{i} \phi_{Mz}^{i} = 1.0
+\end{align}
+$$
 
 This formulation suppresses grazing at low prey biomass ($B_{i}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
 
@@ -878,7 +1069,11 @@ The application of the temperature-dependent maximum growth rate in both the num
 
 The normalized prey preferences (i.e., dietary fractions) are further modified by prey switching prior to computation of total prey biomass ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)) such that
 
-$\phi_{z}^{i} = \left( \phi_{z}^{i} B_{i}^{C} \right)^{s_{z}}$ \
+$$
+\begin{align}
+\phi_{z}^{i} &= \left( \phi_{z}^{i} B_{i}^{C} \right)^{s_{z}}
+\end{align}
+$$
 
 where
 - $\phi_{z}^{i}$ is the relative prey preference of zooplankton type $z$ for prey type $i$
@@ -891,14 +1086,22 @@ When $s_{z} > 1$, zooplankton exhibit prey-switching and feed disproportionately
 
 Again, prey preferences are normalized to ensure 
 
-$\sum_{i} \phi_{mz}^{i} = \sum_{i} \phi_{Mz}^{i} = 1.0$
+$$
+\begin{align}
+\sum_{i} \phi_{mz}^{i} &= \sum_{i} \phi_{Mz}^{i} = 1.0
+\end{align}
+$$
 
 The community average prey capture rate coefficients of micro-zooplankton (`zooeps(i,j,k)`, $\varepsilon_{mz}$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) and meso-zooplankton (`meseps(i,j,k)`, $\varepsilon_{Mz}$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) vary as a function of the prey biomasses and the consequential variations in prey preferences associated with prey-switching, which is consistent with the prey-dependent behaviour described by [Rohr et al. (2024)](doi.org/10.1029/2023GL107732). 
 
 Total grazing of biomass by micro-zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
-$g_{mz}^{&larr; C} = g_{mz} B_{mz}^{C}$\
-$g_{Mz}^{&larr; C} = g_{Mz} B_{Mz}^{C}$
+$$
+\begin{align}
+g_{mz}^{&larr; C} &= g_{mz} B_{mz}^{C}
+g_{Mz}^{&larr; C} &= g_{Mz} B_{Mz}^{C}
+\end{align}
+$$
 
 where
 - $g_{mz}$ is the total specific rate of grazing of micro-zooplankton (`g_zoo`, [s<sup>-1</sup>])
@@ -908,12 +1111,20 @@ where
 
 Total grazing of prey can also be expressed as the sum of individual prey type consumption:
 
-$g_{mz}^{&larr; C} = g_{mz}^{&larr; B_{np}^{C}} + g_{mz}^{&larr; B_{mp}^{C}} + g_{mz}^{&larr; B_{sd}^{C}} + g_{mz}^{&larr; B_{b1}^{C}} + g_{mz}^{&larr; B_{b2}^{C}} + g_{mz}^{&larr; B_{aoa}^{C}}$\
-$g_{Mz}^{&larr; C} = g_{Mz}^{&larr; B_{np}^{C}} + g_{Mz}^{&larr; B_{mp}^{C}} + g_{Mz}^{&larr; B_{sd}^{C}} + g_{Mz}^{&larr; B_{ld}^{C}} + g_{Mz}^{&larr; B_{b1}^{C}} + g_{Mz}^{&larr; B_{b2}^{C}} + g_{Mz}^{&larr; B_{aoa}^{C}} + g_{Mz}^{&larr; B_{mz}^{C}}$
+$$
+\begin{align}
+g_{mz}^{&larr; C} &= g_{mz}^{&larr; B_{np}^{C}} + g_{mz}^{&larr; B_{mp}^{C}} + g_{mz}^{&larr; B_{sd}^{C}} + g_{mz}^{&larr; B_{b1}^{C}} + g_{mz}^{&larr; B_{b2}^{C}} + g_{mz}^{&larr; B_{aoa}^{C}}
+g_{Mz}^{&larr; C} &= g_{Mz}^{&larr; B_{np}^{C}} + g_{Mz}^{&larr; B_{mp}^{C}} + g_{Mz}^{&larr; B_{sd}^{C}} + g_{Mz}^{&larr; B_{ld}^{C}} + g_{Mz}^{&larr; B_{b1}^{C}} + g_{Mz}^{&larr; B_{b2}^{C}} + g_{Mz}^{&larr; B_{aoa}^{C}} + g_{Mz}^{&larr; B_{mz}^{C}}
+\end{align}
+$$
 
 In this formulation, consumption of each prey item $i$ in [mol C kg<sup>-1</sup>] is equal to:
 
-$g_{z}^{&larr; B_{i}^{C}} = g_{z} B_{z}^{C} \cdot \dfrac{\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}{\sum_{i} \varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}$
+$$
+\begin{align}
+g_{z}^{&larr; B_{i}^{C}} &= g_{z} B_{z}^{C} \cdot \dfrac{\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}{\sum_{i} \varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}
+\end{align}
+$$
 
 Thus:
 - $g_{mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -934,9 +1145,13 @@ Thus:
 
 **Zooplankton egestion, excretion and assimilation** are then calculated assuming static assimilation coefficients. Grazed biomass is routed to either egestion or ingestion via an ingestion coefficient ($\lambda^{C}$, [mol C (mol C)<sup>-1</sup>]), with the egested fraction being equal to $1.0 - \lambda^{C}$. The biomass that is ingested is then split between assimilation and excretion based on an assimilation coefficient ($\eta^{C}$, [mol C (mol C)<sup>-1</sup>]) with the excreted fraction being equal to $1.0 - \eta^{C}$. Egestion ($E$), excretion ($X$) and assimilation ($A$) of organic carbon due to grazing of prey type $i$ by zooplankton type $z$ are:
 
-$E_{z}^{&larr; B_{i}^{C}} = g_{z}^{&larr; B_{i}^{C}} \left(1 - \lambda_{z}^{C} \right)$\
-$X_{z}^{&larr; B_{i}^{C}} = g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right)$\
-$A_{z}^{&larr; B_{i}^{C}} = g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \eta_{z}^{C}$
+$$
+\begin{align}
+E_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \left(1 - \lambda_{z}^{C} \right)
+X_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right)
+A_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \eta_{z}^{C}
+\end{align}
+$$
 
 where 
 - $E_{z}^{&larr; B_{i}^{C}}$ is the rate of egestion of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>])
@@ -948,16 +1163,23 @@ where
 
 Total egestion, excretion and assimilation or carbon are therefore:
 
-$E_{z}^{&larr; C} = g_{z}^{&larr; C} \left(1 - \lambda_{z}^{C} \right)$\
-$X_{z}^{&larr; C} = g_{z}^{&larr; C} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right)$\
-$A_{z}^{&larr; C} = g_{z}^{&larr; C} \lambda_{z}^{C} \eta_{z}^{C}$
-
+$$
+\begin{align}
+E_{z}^{&larr; C} &= g_{z}^{&larr; C} \left(1 - \lambda_{z}^{C} \right)
+X_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right)
+A_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \eta_{z}^{C}
+\end{align}
+$$
 
 Because we track both carbon and iron through the ecosystem components, we assign unique ingestion and assimilation coefficients to carbon and iron. This separation of ingestion and assimilation coefficients for iron and carbon follows [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597). For iron, we apply unique ingestion ($\lambda^{Fe}$, [mol Fe (mol Fe)<sup>-1</sup>]) and assimilation coefficients ($\eta^{Fe}$, [mol Fe (mol Fe)<sup>-1</sup>]). [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597) show that if $\lambda^{Fe} << \lambda^{C}$ then egestion is enriched in Fe:C, and it follows that $\eta^{Fe} >> \eta^{C}$ so that zooplankton can absorb sufficient iron from their prey. Consequently:
 
-$E_{z}^{&larr; B_{i}^{Fe}} = g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \left(1 - \lambda_{z}^{Fe} \right)$\
-$X_{z}^{&larr; B_{i}^{Fe}} = g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right)$\
-$A_{z}^{&larr; B_{i}^{Fe}} = g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \eta_{z}^{Fe}$
+$$
+\begin{align}
+E_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \left(1 - \lambda_{z}^{Fe} \right)
+X_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right)
+A_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \eta_{z}^{Fe}
+\end{align}
+$$
 
 where 
 - $E_{z}^{&larr; B_{i}^{Fe}}$ is the rate of egestion of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>])
@@ -970,20 +1192,31 @@ where
 
 Total egestion, excretion and assimilation or iron are therefore:
 
-$E_{z}^{&larr; Fe} = \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \left(1 - \lambda_{z}^{Fe} \right)$\
-$X_{z}^{&larr; Fe} = \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right)$\
-$A_{z}^{&larr; Fe} = \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \eta_{z}^{Fe}$
+$$
+\begin{align}
+E_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \left(1 - \lambda_{z}^{Fe} \right)
+X_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right)
+A_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \eta_{z}^{Fe}
+\end{align}
+$$
 
+**Excretion of nitrogen**
 
-**Excretion of nitrogen**\
 For zooplankton preying on phytoplankton, other zooplankton and detritus, their excretion of nitrogen will be equal to:
 
-$X_{z}^{&larr; B_{i}^{N}} = X_{z}^{&larr; B_{i}^{C}} \dfrac{16}{122}$
+$$
+\begin{align}
+X_{z}^{&larr; B_{i}^{N}} &= X_{z}^{&larr; B_{i}^{C}} \dfrac{16}{122}
+\end{align}
+$$
 
 However, since both micro-zooplankton and meso-zooplankton consume heterotrophic bacteria and ammonia oxidizing arcaheal types, which have different C:N ratios to other ecosystem biomass components, we must also compute the specific excretion of NH<sub>4</sub> and $B_{DOM}^{N}$ by zooplankton when feeding on these types. Since these types are richer in N than the other prey types, zooplankton excrete more NH<sub>4</sub> and $B_{DOM}^{N}$ when bacteria and archaea represent a greater proportion of their diet ([Sterner & Elser, 2002](https://press.princeton.edu/books/ebook/9781400885695/ecological-stoichiometry-pdf)). Total excretion of nitrogen from bacterial/archaeal type $i$ by zooplankton type $z$ is as follows:
 
-$X_{z}^{&larr; B_{i}^{N}} = g_{z}^{&larr; B_{i}^{C}} \dfrac{1}{R_{i}^{C:N}} - \dfrac{A_{z}^{&larr; B_{i}^{C}} + E_{z}^{&larr; B_{i}^{C}}}{R_{z}^{C:N}}$
-
+$$
+\begin{align}
+X_{z}^{&larr; B_{i}^{N}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{1}{R_{i}^{C:N}} - \dfrac{A_{z}^{&larr; B_{i}^{C}} + E_{z}^{&larr; B_{i}^{C}}}{R_{z}^{C:N}}
+\end{align}
+$$
 
 ---
 
@@ -996,11 +1229,15 @@ When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model com
 
 **Production** of $CaCO_3$ in WOMBAT-mid comes from five sources: (1) density-dependent mortality of nano-phytoplankton (i.e., coccolithophorids), (2) density-dependent mortality of micro-zooplankton (i.e., foraminifera), (3) micro-zooplankton egestion of grazed nano-phytoplankton, (4) meso-zooplankton egestion of grazed nano-phytoplankton, and (5) meso-zooplankton egestion of grazed micro-zooplankton. Each term is multiplied by the particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) to return a rate of $CaCO_3$ production in mol C kg<sup>-1</sup> s<sup>-1</sup>.
 
-(1) $P_{CaCO_3}^{\Gamma_{np}^{C}} = \Gamma_{np}^{&rarr; C} \cdot PIC:POC$\
-(2) $P_{CaCO_3}^{\Gamma_{mz}^{C}} = \Gamma_{mp}^{&rarr; C} \cdot PIC:POC$\
-(3) $P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}} = g_{mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)$\
-(4) $P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}} = g_{Mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)$\
-(5) $P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}} = g_{Mz}^{&larr; B_{mz}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)$
+$$
+\begin{align}
+(1) & P_{CaCO_3}^{\Gamma_{np}^{C}} = \Gamma_{np}^{&rarr; C} \cdot PIC:POC
+(2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \Gamma_{mp}^{&rarr; C} \cdot PIC:POC
+(3) & P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}} = g_{mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
+(4) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}} = g_{Mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
+(5) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}} = g_{Mz}^{&larr; B_{mz}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
+\end{align}
+$$
 
 where
 - $\Gamma_{np}^{&rarr; C}$ is the quadratic (density-dependent) loss rate of nano-phytoplankton biomass (`phymorq`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -1011,8 +1248,12 @@ where
 - $F_{gut}$ is the fraction of $CaCO_3$ that is dissolved within zooplankton guts (`fgutdiss`, [mol C (mol C)<sup>-1</sup>])
 
 In the above, the $PIC:POC$ ratio is formulated as 
- 
-$PIC:POC = \min \left( 0.3,  \left( f_{\text{inorg}} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)$
+
+$$
+\begin{align}
+PIC:POC &= \min \left( 0.3,  \left( f_{\text{inorg}} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)
+\end{align}
+$$
 
 where
 - $f_{inorg}$ is the background PIC:POC ratio (f_inorg, [mol C (mol C)-1])
@@ -1032,13 +1273,21 @@ This formulation of $PIC:POC$ is therefore a function of the substrate–inhibit
 
 Total $CaCO_3$ dissolution is:
 
-$D_{CaCO_3} = D_{CaCO_3}^{\Omega_{cal}} + D_{CaCO_3}^{\Omega_{ara}} + D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} + D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}} + D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}$
+$$
+\begin{align}
+D_{CaCO_3} &= D_{CaCO_3}^{\Omega_{cal}} + D_{CaCO_3}^{\Omega_{ara}} + D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} + D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}} + D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}
+\end{align}
+$$
 
 This formulation, at leas the first three terms, follows [Kwon et al. (2024)](https://www.science.org/doi/full/10.1126/sciadv.adl0779).
 
-$D_{CaCO_3}^{\Omega_{cal}} = d_{CaCO_3}^{\Omega_{cal}} \max\left(0,  1 - \Omega_{cal}\right)^{2.2} B_{CaCO_3}^{C}$\ 
-$D_{CaCO_3}^{\Omega_{ara}} = d_{CaCO_3}^{\Omega_{ara}} \max\left(0,  1 - \Omega_{ara}\right)^{1.5} B_{CaCO_3}^{C}$\
-$D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} = d_{CaCO_3}^{\Gamma_{sd}} \Gamma_{sd}^{&rarr; C} B_{CaCO_3}^{C}$
+$$
+\begin{align}
+(1) & D_{CaCO_3}^{\Omega_{cal}} = d_{CaCO_3}^{\Omega_{cal}} \max\left(0,  1 - \Omega_{cal}\right)^{2.2} B_{CaCO_3}^{C} 
+(2) & D_{CaCO_3}^{\Omega_{ara}} = d_{CaCO_3}^{\Omega_{ara}} \max\left(0,  1 - \Omega_{ara}\right)^{1.5} B_{CaCO_3}^{C}
+(3) & D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} = d_{CaCO_3}^{\Gamma_{sd}} \Gamma_{sd}^{&rarr; C} B_{CaCO_3}^{C}
+\end{align}
+$$
 
 where
 - $\Omega_{cal}$ is the saturation state of calcite (`omega_cal(i,j,k)`, [dimenionless])
@@ -1053,8 +1302,12 @@ For $D_{CaCO_3}^{\Omega_{cal}}$ and $D_{CaCO_3}^{\Omega_{ara}}$, dissolution is 
 
 The fourth and fifth terms (`zoodiss(i,j,k)`; `mesdiss(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) represent dissolution of $CaCO_3$ during zooplankton digestion of detrital particulates. 
 
-$D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{&larr; C}}} = g_{mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}$\
-$D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{&larr; C}}} = g_{Mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}$
+$$
+\begin{align}
+(4) & D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{&larr; C}}} = g_{mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}
+(5) & D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{&larr; C}}} = g_{Mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}
+\end{align}
+$$
 
 where
 - $g_{mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -1075,7 +1328,11 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 
 Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability. The equation for new nitrogen (specifically NH<sub>4</sub>) added via diazotrophy is:
 
-$\mu_{diazo}^{&rarr; NH_4} = \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \cdot \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}$ 
+$$
+\begin{align}
+\mu_{diazo}^{&rarr; NH_4} &= \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \cdot \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}
+\end{align}
+$$
 
 where
 - $\mu_{diazo}^{max}$ is the temperature-dependent maximum growth rate of diazotrophs (`trimumax(i,j,k)`, [s<sup>-1</sup>])
@@ -1087,7 +1344,11 @@ where
 
 The temperature-dependent maximum growth rate ($\mu_{diazo}^{max}$) is taken directly from [Wrightson et al. (2022)]( https://doi.org/10.1111/gcb.16399) who based their formulation on the work of [Jiang et al. (2018)](https://doi.org/10.1038/s41558-018-021):
 
-$\mu_{diazo}^{max} = \left( -0.000399(T)^{3} + 0.02685(T)^{2} - 0.555T + 3.633 \right) \dfrac{1}{86400}$ 
+$$
+\begin{align}
+\mu_{diazo}^{max} &= \left( -0.000399(T)^{3} + 0.02685(T)^{2} - 0.555T + 3.633 \right) \dfrac{1}{86400}
+\end{align}
+$$
 
 where
 - $T$ is in situ water temperature (`Temp(i,j,k)`, [ºC]) and we only consider $T > 15.8$ºC
@@ -1095,8 +1356,12 @@ where
 
 The iron and light limitation terms are as follows:
 
-$L_{diazo}^{Fe} = \dfrac{dFe}{dFe + K_{diazo}^{Fe}}$\
-$L_{diazo}^{PAR} = 1 - e^{- \alpha_{diazo} PAR }$
+$$
+\begin{align}
+L_{diazo}^{Fe} &= \dfrac{dFe}{dFe + K_{diazo}^{Fe}}
+L_{diazo}^{PAR} &= 1 - e^{- \alpha_{diazo} PAR}
+\end{align}
+$$
 
 where
 - $dFe$ is the in situ concentration of dissolved iron (`biofer`, [nmol Fe kg<sup>-1</sup>])
@@ -1113,7 +1378,11 @@ We remineralise dissolved organic matter into inorganic consituents via the acti
 
 Our formulation of heterotrophic bacterial growth follows that developed by [Zakem et al. (2020)](https://doi.org/10.1038/s41396-019-0523-8) and subsequently expanded in [Sun et al. (2024)](https://doi.org/10.1073/pnas.2417421121) and [Buchanan et al. (2025)](https://www.science.org/doi/full/10.1126/science.ado0742). In these studies, the realized biomass growth rate (integration of carbon into biomass) of bacterial functional type $b$ (`bac1grow(i,j,k)`; `bac2grow(i,j,k)`, $\mu_{b}^{&larr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is defined by:
 
-$\mu_{b}^{&larr; C} = \max\left(\mu_{b}^{aer}, \mu_{b}^{ana} \right) (β_{hete})^{T} B_{b}^{C}$
+$$
+\begin{align}
+\mu_{b}^{&larr; C} &= \max\left(\mu_{b}^{aer}, \mu_{b}^{ana} \right) (β_{hete})^{T} B_{b}^{C}
+\end{align}
+$$
 
 where
 - $\mu_{b}^{aer}$ is the realized growth rate due to aerobic metabolism (`bac_muaer`, [s<sup>-1</sup>])
@@ -1123,15 +1392,23 @@ where
 
 Thus, whichever of aerobic and anaerobic metabolism offers the greatest growth rate will be chosen as the means by which bacteria grow. We must define what controls aerobic ($\mu_{b}^{aer}$) and anaerobic ($\mu_{b}^{ana}$) growth. In the case of both aerobic and anaerobic metabolisms we compute these growth rates as the minimum of three rates associated with four essential resources: dissolved organic carbon ($B_{DOM}^{C}$), nitrogen ($N$), dissolved iron ($dFe$) and the electron acceptor ($EA$).
 
-$\mu_{b}^{aer} = \min \left(\mu_{b}^{aer(DOC)}, \mu_{b}^{aer(N)}, \mu_{b}^{aer(dFe)}, \mu_{b}^{aer(EA)} \right)$\
-$\mu_{b}^{ana} = \min \left(\mu_{b}^{ana(DOC)}, \mu_{b}^{ana(N)}, \mu_{b}^{ana(dFe)}, \mu_{b}^{ana(EA)} \right)$
+$$
+\begin{align}
+\mu_{b}^{aer} &= \min \left(\mu_{b}^{aer(DOC)}, \mu_{b}^{aer(N)}, \mu_{b}^{aer(dFe)}, \mu_{b}^{aer(EA)} \right)
+\mu_{b}^{ana} &= \min \left(\mu_{b}^{ana(DOC)}, \mu_{b}^{ana(N)}, \mu_{b}^{ana(dFe)}, \mu_{b}^{ana(EA)} \right)
+\end{align}
+$$
 
 For aerobic growth, these resource-specific growth rates are calculated as:
 
-$\mu_{b}^{aer(DOC)} = V_{b}^{DOC} y_{b}^{aer(DOC)}$\
-$\mu_{b}^{aer(N)} = \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{aer(N)}$\
-$\mu_{b}^{aer(dFe)} = V_{b}^{dFe} y_{b}^{aer(Fe)}$\
-$\mu_{b}^{aer(EA)} = V_{b}^{O_{2}} y_{b}^{O_{2}}$
+$$
+\begin{align}
+\mu_{b}^{aer(DOC)} &= V_{b}^{DOC} y_{b}^{aer(DOC)}
+\mu_{b}^{aer(N)} &= \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{aer(N)}
+\mu_{b}^{aer(dFe)} &= V_{b}^{dFe} y_{b}^{aer(Fe)}
+\mu_{b}^{aer(EA)} &= V_{b}^{O_{2}} y_{b}^{O_{2}}
+\end{align}
+$$
 
 where
 - $V_{b}^{DOC}$ is the maximum uptake rate of dissolved organic carbon by bacterial type $b$ (`bac_Vdoc`, [mmol C m<sup>-3</sup> s<sup>-1</sup>])
@@ -1146,11 +1423,15 @@ where
 
 For anaerobic growth, these resource-specific growth rates are calculated in the same manner, except that the yields associated with growth are altered to reflect anaerobic metabolism. Also, the electron acceptor is no longer oxygen and is now either NO<sub>3</sub> for the NO<sub>3</sub>-reducing bacteria (`f_bac1(i,j,k)`, $b1$) or N<sub>2</sub>O for the N<sub>2</sub>O-reducing bacteria (`f_bac2(i,j,k)`, $b2$):
 
-$\mu_{b}^{ana(DOC)} = V_{b}^{DOC} y_{b}^{ana(DOC)}$\
-$\mu_{b}^{ana(N)} = \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{ana(N)}$\
-$\mu_{b}^{ana(dFe)} = V_{b}^{dFe} y_{b}^{ana(Fe)}$\
-$\mu_{b1}^{NO_{3}} = V_{b}^{NO_{3}} y_{b}^{NO_{3}}$
-$\mu_{b2}^{N_{2}O} = V_{b}^{N_{2}O} y_{b}^{N_{2}O}$
+$$
+\begin{align}
+\mu_{b}^{ana(DOC)} = V_{b}^{DOC} y_{b}^{ana(DOC)}
+\mu_{b}^{ana(N)} = \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{ana(N)}
+\mu_{b}^{ana(dFe)} = V_{b}^{dFe} y_{b}^{ana(Fe)}
+\mu_{b1}^{NO_{3}} = V_{b}^{NO_{3}} y_{b}^{NO_{3}}
+\mu_{b2}^{N_{2}O} = V_{b}^{N_{2}O} y_{b}^{N_{2}O}
+\end{align}
+$$
 
 where
 - $V_{b}^{NO_3}$ is the maximum uptake rate of nitrate by bacterial type $b1$ (`bac_Vno3`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
@@ -1163,16 +1444,21 @@ where
 
 Whether aerobic or anaerobic metabolism results in higher growth is therefore dependent on the differences in substrate **uptake rates ($V_{b}$)** and the substrate-specific **biomass yields ($y_{b}$)**. It is crucial to estimate both quantities. 
 
-**Uptake rates**\
+**Uptake rates** 
+
 Uptake rates of reductant ($DOC$), addition resources ($DON$, NH<sub>4</sub> and $dFe$) and oxidant (electron acceptors) are calculated as:
 
-$V_{b}^{DOC} = V_{b}^{max,DOC} \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{C} + K_{b}^{DOC}}$\
-$V_{b}^{DON} = V_{b}^{max,DON} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{N} + K_{b}^{DON}}$\
-$V_{b}^{NH_4} = V_{b}^{max,NH_4} \cdot \dfrac{NH_4}{NH_4 + K_{b}^{NH_4}}$\
-$V_{b}^{dFe} = V_{b}^{max,dFe} \cdot \dfrac{dFe}{dFe + K_{b}^{dFe}}$\
-$V_{b}^{O_{2}} = \rho_{b}^{O_2} \cdot O_{2}$\
-$V_{b}^{NO_{3}} = V_{b}^{max,NO_{3}} \cdot \dfrac{NO_{3}}{NO_{3} + K_{b}^{NO_{3}}}$\
-$V_{b}^{N_{2}O} = \rho_{b}^{N_{2}O} \cdot N_{2}O$
+$$
+\begin{align}
+V_{b}^{DOC} &= V_{b}^{max,DOC} \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{C} + K_{b}^{DOC}}
+V_{b}^{DON} &= V_{b}^{max,DON} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{N} + K_{b}^{DON}}
+V_{b}^{NH_4} &= V_{b}^{max,NH_4} \cdot \dfrac{NH_4}{NH_4 + K_{b}^{NH_4}}
+V_{b}^{dFe} &= V_{b}^{max,dFe} \cdot \dfrac{dFe}{dFe + K_{b}^{dFe}}
+V_{b}^{O_{2}} &= \rho_{b}^{O_2} \cdot O_{2}
+V_{b}^{NO_{3}} &= V_{b}^{max,NO_{3}} \cdot \dfrac{NO_{3}}{NO_{3} + K_{b}^{NO_{3}}}
+V_{b}^{N_{2}O} &= \rho_{b}^{N_{2}O} \cdot N_{2}O
+\end{align}
+$$
 
 where
 - $V_{b}^{max,DOC}$ is the maximum rate of DOC uptake by bacterial functional type $b$ (`bac1_Vmax_doc`; `bac2_Vmax_doc`, [mmol C m<sup>-3</sup> s<sup>-1</sup>])
@@ -1196,10 +1482,15 @@ where
 - N<sub>2</sub>O is the in situ concentration of N<sub>2</sub>O (`bion2o`, [mmol N<sub>2</sub>O m<sup>-3</sup>])
 
 
-**Biomass yields**\
+**Biomass yields**
+
 We further expand on bacterial heterotrophic dynamics by also integrating the findings of [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) to solve for biomass yields as a function of the nominal oxidation state of carbon (NOSC) of DOM (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimensionless]). [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) conceptually link the carbon use efficiency (i.e., yield) of bacteria to the NOSC. They identify a theoretical positive relationship between yield and NOSC and suggest that more oxidized compounds offer a greater energy of content per carbon atom because more reduced compounds require greater processing costs. To account for this dynamic, we scale the biomass yield of heterotrophic bacteria (`bac_ydon(i,j,k)`, $y_{b}^{DON}$, [mol N biomass (mol DON)<sup>-1</sup>]) as:
 
-$y_{b}^{DON} = \max\left( y_{b}^{min(DON)}, \min\left( y_{b}^{max(DON)}, y_{b}^{min(DON)} + DOM^{NOSC} \cdot \left(y_{b}^{max(DON)} - y_{b}^{min(DON)} \right) \right) \right)$
+$$
+\begin{align}
+y_{b}^{DON} &= \max\left( y_{b}^{min(DON)}, \min\left( y_{b}^{max(DON)}, y_{b}^{min(DON)} + DOM^{NOSC} \cdot \left(y_{b}^{max(DON)} - y_{b}^{min(DON)} \right) \right) \right)
+\end{align}
+$$
 
 where
 - $y_{b}^{min(DON)}$ is the minimum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmin`, [mol N biomass (mol DON)<sup>-1</sup>]) 
@@ -1208,8 +1499,12 @@ where
 
 From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on O<sub>2</sub> [mol C biomass (mol DOC)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
 
-$\kappa_{b} = 4 \cdot R_{b}^{C:N} + 1 \cdot R_{b}^{H:N} - 2 \cdot R_{b}^{O:N} - 3$\
-$\kappa_{DOM} = 4 \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{N}} + 1 \cdot R_{DOM}^{H:N} - 2 \cdot R_{DOM}^{O:N} - 3$
+$$
+\begin{align}
+\kappa_{b} &= 4 \cdot R_{b}^{C:N} + 1 \cdot R_{b}^{H:N} - 2 \cdot R_{b}^{O:N} - 3
+\kappa_{DOM} &= 4 \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{N}} + 1 \cdot R_{DOM}^{H:N} - 2 \cdot R_{DOM}^{O:N} - 3
+\end{align}
+$$
 
 where
 - $\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}$ is the in situ carbon:nitrogen ratio of DOM (`1/dom_N2C`, [mol C (mol N)<sup>-1</sup>])
@@ -1218,25 +1513,37 @@ where
 
 These ratios associated with the stoichimometry of bacterial biomass and dissolved organic matter are constants and are informed by reported values from the literature. For dissolved organic matter we set $R_{DOM}^{H:N} = 10.9$ and $R_{DOM}^{O:N} = 2.6$ ([Anderson et al., 1995](https://doi.org/10.1016/0967-0637(95)00072-E). For bacterial biomass we set $R_{b}^{C:N} = 5$, $R_{b}^{H:N} = 7$ and $R_{b}^{O:N} = 2$ ([Zimmerman et al., 2014](https://doi.org/10.1111/1462-2920.12329)). Therefore
 
-$\kappa_{b} = = 20.0$\
-$\kappa_{DOM} = 4 \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{N}} + 2.7$
+$$
+\begin{align}
+\kappa_{b} &= 20.0
+\kappa_{DOM} &= 4 \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{N}} + 2.7
+\end{align}
+$$
 
 Using these electron potentials ($\kappa$) we can solve for the fraction of electrons used for biomass synthesis in both aerobic (`f_bac`, $f_{b}^{aer(\kappa)}$, [dimenionless]) and anaerobic (`f_bac`, $f_{b}^{ana(\kappa)}$, [dimenionless]) growth with
 
-$f_{b}^{aer(\kappa)} = \min\left(0.8, y_{b}^{DON} \dfrac{\kappa_{b}}{\kappa_{DOM}} \right)$
-$f_{b}^{ana(\kappa)} = f_{b}^{aer(\kappa)} P_{ana}$
+$$
+\begin{align}
+f_{b}^{aer(\kappa)} &= \min\left(0.8, y_{b}^{DON} \dfrac{\kappa_{b}}{\kappa_{DOM}} \right)
+f_{b}^{ana(\kappa)} &= f_{b}^{aer(\kappa)} P_{ana}
+\end{align}
+$$
 
 where 
 - $P_{ana}$ is a small penalty on growth yields due to anaerobic metabolism (`bacanapen`, [dimensionless]) ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Sun et al., 2024](https://doi.org/10.1073/pnas.2417421121))
 
 Now that we have the fraction of electrons that are partitioned towards biomass synthesis for both aerobic and anaerobic metabolisms, we can compute all growth yields:
 
-$y_{b}^{aer(DON)} = y_{b}^{DON} \cdot R_{b}^{C:N}$
-$y_{b}^{aer(DOC)} = y_{b}^{DON} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}}$
-$y_{b}^{O_2} = \dfrac{\dfrac{f_{b}^{aer(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{aer(\kappa)}}{4}} \cdot R_{b}^{C:N}$\
-$y_{b}^{ana(DOC)} = y_{b}^{DON} P_{ana} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}}$
-$y_{b}^{NO_{3} &rarr; N_{2}O} = \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{4}} \cdot R_{b}^{C:N}$\
-$y_{b}^{N_{2}O &rarr; N_{2}} = \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{1}} \cdot R_{b}^{C:N}$
+$$
+\begin{align}
+y_{b}^{aer(DON)} &= y_{b}^{DON} \cdot R_{b}^{C:N}
+y_{b}^{aer(DOC)} &= y_{b}^{DON} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}}
+y_{b}^{O_2} &= \dfrac{\dfrac{f_{b}^{aer(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{aer(\kappa)}}{4}} \cdot R_{b}^{C:N}
+y_{b}^{ana(DOC)} &= y_{b}^{DON} P_{ana} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}}
+y_{b}^{NO_{3} &rarr; N_{2}O} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{4}} \cdot R_{b}^{C:N}
+y_{b}^{N_{2}O &rarr; N_{2}} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{1}} \cdot R_{b}^{C:N}
+\end{align}
+$$
 
 where
 - $y_{b}^{aer(DON)}$ is the aerobic growth yield of bacterial functional type $b$ on DON (`bac1_ydonC`; `bac2_ydon`, [mol C biomass (mol DON)<sup>-1</sup>])
@@ -1247,10 +1554,15 @@ where
 - $y_{b}^{N_{2}O &rarr; N_{2}}$ is the anaerobic growth yield of bacterial functional type $b$ on N<sub>2</sub>O (`bac2_yn2oC`, [mol C biomass (mol N<sub>2</sub>O)<sup>-1</sup>])
 
 
-**Consumption of substrates**\
+**Consumption of substrates**
+
 Heterotrophic bacterial growth consumes $B_{DOM}^{C}$, $B_{DOM}^{N}$, NH<sub>4</sub>, $dFe$, O<sub>2</sub>, NO<sub>3</sub> and N<sub>2</sub>O. The consumption of a resource $R$ by bacterial functional type $b$ is calculated as:
 
-$\mu_{b}^{&larr; R} = \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{R}}$
+$$
+\begin{align}
+\mu_{b}^{&larr; R} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{R}}
+\end{align}
+$$
 
 where
 - $\mu_{b}^{&larr; C}$ is the realized biomass growth rate (i.e., integration of carbon into biomass) of bacterial functional type $b$ ([mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -1258,7 +1570,11 @@ where
 
 We must be careful to accommodate the different growth yields asssociated with aerobic and anaerobic growth since these bacterial types are facultatively anaerobic, which means that:
 
-$\mu_{b}^{&larr; R} = \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(R)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(R)}} f_{ana}$
+$$
+\begin{align}
+\mu_{b}^{&larr; R} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(R)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(R)}} f_{ana}
+\end{align}
+$$
 
 where
 - $y_{b}^{aer(R)}$ is the aerobic growth yield of bacterial functional type $b$ on resource $R$ ([mol C biomass (mol R)<sup>-1</sup>]) 
@@ -1267,47 +1583,80 @@ where
 
 $B_{DOM}^{C}$ uptake (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]), for example, is calculated as:
 
-$\mu_{b}^{&larr; B_{DOM}^{C}} = \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DOC)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DOC)}} f_{ana}$
+$$
+\begin{align}
+\mu_{b}^{&larr; B_{DOM}^{C}} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DOC)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DOC)}} f_{ana}
+\end{align}
+$$
 
 However, both $B_{DOM}^{N}$ (`don1remi(i,j,k)`; `don2remi(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and NH<sub>4</sub> (`bac1unh4(i,j,k)`; `bac2unh4(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) serve the bacterial demand for nitrogen and so we must split uptake between these two resources. We do so using the relative $V_{b}^{DON}$ and $V_{b}^{NH_4}$ which depend on the prescribed affinities of bacteria for these resources and the in situ concentrations of $DON$ and NH<sub>4</sub>:
 
-$\mu_{b}^{&larr; B_{DOM}^{N}} = \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{DON}}{V_{b}^{DON} + V_{b}^{NH_4}}$\
-$\mu_{b}^{&larr; NH_4} = \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{NH_4}}{V_{b}^{DON} + V_{b}^{NH_4}}$
+$$
+\begin{align}
+\mu_{b}^{&larr; B_{DOM}^{N}} &= \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{DON}}{V_{b}^{DON} + V_{b}^{NH_4}}
+\mu_{b}^{&larr; NH_4} &= \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{NH_4}}{V_{b}^{DON} + V_{b}^{NH_4}}
+\end{align}
+$$
 
 Since bacteria release NH<sub>4</sub> back to the environment, computing the uptake of NH<sub>4</sub> is only for housekeeping purposes and we only consider uptake of $DON$ in tracer tendency equations (see below).
 
 Consumption of the electron acceptors O<sub>2</sub> (`bac1resp(i,j,k)`; `bac2resp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]), NO<sub>3</sub> (`bac1deni(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and N<sub>2</sub>O (`bac2deni(i,j,k)`, [mol N<sub>2</sub>O kg<sup>-1</sup> s<sup>-1</sup>]) are also calculated only considering aerobic or anaerobic metabolism:
 
-$\mu_{b}^{&larr; O_2} = \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{O_2}} \left(1 - f_{ana} \right) 
-$\mu_{b1}^{&larr; NO_3} = \dfrac{\mu_{b1}^{&larr; C}}{y_{b1}^{NO_3}} f_{ana}$
-$\mu_{b2}^{&larr; N_{2}O} = \dfrac{\mu_{b2}^{&larr; C}}{y_{b2}^{N_{2}O}} f_{ana}$
+$$
+\begin{align}
+\mu_{b}^{&larr; O_2} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{O_2}} \left(1 - f_{ana} \right) 
+\mu_{b1}^{&larr; NO_3} &= \dfrac{\mu_{b1}^{&larr; C}}{y_{b1}^{NO_3}} f_{ana}
+\mu_{b2}^{&larr; N_{2}O} &= \dfrac{\mu_{b2}^{&larr; C}}{y_{b2}^{N_{2}O}} f_{ana}
+\end{align}
+$$
 
 Consumption of dissolved iron is simply:
 
-$\mu_{b}^{&larr; dFe} = \dfrac{\mu_{b}^{&larr; C}}{R_{b}^{C:Fe}}$
+$$
+\begin{align}
+\mu_{b}^{&larr; dFe} &= \dfrac{\mu_{b}^{&larr; C}}{R_{b}^{C:Fe}}
+\end{align}
+$$
 
 where
 - $R_{b}^{C:Fe}$ is the ratio of carbon to iron in the biomass of the bacterial functional type (`bac1_C2Fe`; `bac2_C2Fe`, [mol C (mol Fe)<sup>-1</sup>])
 
 
-**Production of substrates**\
+**Production of substrates**
+
 Heterotrophic bacterial growth produces $DIC$, NH<sub>4</sub> and N<sub>2</sub>O. Because we carry ecosystem components in units of carbon, the production of $DIC$ by bacterial functional type $b$ is calculated as:
 
-$\mu_{b}^{&rarr; DIC} = \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{DOC}} - 1\right)$
+$$
+\begin{align}
+\mu_{b}^{&rarr; DIC} &= \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{DOC}} - 1\right)
+\end{align}
+$$
 
 As before, we must accommodate differences in yields between aerobic and anaerobic growth:
 
-$\mu_{b}^{&rarr; DIC} = \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(aer)DOC}} - 1\right)\left(1 - f_{ana}\right) + \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(ana)DOC}} - 1\right) f_{ana}$
+$$
+\begin{align}
+\mu_{b}^{&rarr; DIC} &= \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(aer)DOC}} - 1\right)\left(1 - f_{ana}\right) + \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(ana)DOC}} - 1\right) f_{ana}
+\end{align}
+$$
 
 Meanwhile, production of NH<sub>4</sub> requires knowledge of how much $DON$ was assimilated by the cell. Assimilated $DON$ is converted into NH<sub>4</sub> for biosynthesis and any excess is exuded into the environment. Release of NH<sub>4</sub> is therefore: 
 
-$\mu_{b}^{&rarr; NH_4} = \mu_{b}^{&larr; B_{DOM}^{N}} - \dfrac{\mu_{b}^{&larr; C}}{R_{b}^{C:N}}$
+$$
+\begin{align}
+\mu_{b}^{&rarr; NH_4} &= \mu_{b}^{&larr; B_{DOM}^{N}} - \dfrac{\mu_{b}^{&larr; C}}{R_{b}^{C:N}}
+\end{align}
+$$
 
 In the scenario where $V_{b}^{DON} << V_{b}^{NH_4}$, either due to very low concentrations of $DON$ or poor affinity of the bacteria for $DON$ uptake, $\mu_{b}^{&rarr; NH_4}$ will be negative. In this case, this negative release of NH<sub>4</sub> functions as a consumption of NH<sub>4</sub>.
 
 Finally, the NO<sub>3</sub>-reducing bacterial functional type produces N<sub>2</sub>O. We carry N<sub>2</sub>O as an explicit tracer and in units of mol N<sub>2</sub>O kg<sup>-1</sup>, such that at every conversion of NO<sub>3</sub> to N<sub>2</sub>O we must account for the necessity of 2 mol NO<sub>3</sub> for every 1 mol N<sub>2</sub>O. Production of N<sub>2</sub>O via NO<sub>3</sub> reduction is calcualted as:
 
-$\mu_{b1}^{&rarr; N_{2}O} = \dfrac{\mu_{b1}^{&larr; NO_3}}{2}$
+$$
+\begin{align}
+\mu_{b1}^{&rarr; N_{2}O} &= \dfrac{\mu_{b1}^{&larr; NO_3}}{2}
+\end{align}
+$$
 
 ---
 
@@ -1316,10 +1665,15 @@ $\mu_{b1}^{&rarr; N_{2}O} = \dfrac{\mu_{b1}^{&larr; NO_3}}{2}$
 
 We consider two forms of chemoautotrophy carried out by two distinct forms of microbes: ammonia oxidizing archaea and anaerobic ammonia oxidizing (anammox) bacteria. Ammonia oxidizing archaea are considered explicitly within WOMBAT-mid (`f_aoa(i,j,k)`, [mol C kg<sup>-1</sup>]), while anammox bacteria are considered implicitly and therefore do not have varying biomasses (i.e., we only compute rates of anammox).
 
-**Ammonia oxidizing archaea**\
+**Ammonia oxidizing archaea**
+
 Growth of ammonia oxidizing archaea (`aoagrow(i,j,k)`, $\mu_{aoa}^{C}$, [mol C kg<sup>-1</sup>]) is defined similarly to other microbes:
 
-$\mu_{aoa}^{C} = \mu_{aoa} B_{aoa}^{C}$
+$$
+\begin{align}
+\mu_{aoa}^{C} &= \mu_{aoa} B_{aoa}^{C}
+\end{align}
+$$
 
 where
 - $\mu_{aoa}$ is the realized growth rate of ammonia oxidizing archaea (`aoa_mu(i,j,k)`, [s<sup>-1</sup>])
@@ -1327,9 +1681,13 @@ where
 
 The realized growth rate, $\mu_{aoa}$, is the minimum growth achievable on oxygen and ammonium:
 
-$\mu_{aoa} = \min\left(\mu_{aoa}^{NH_4}, \mu_{aoa}^{O_2}\right)$\
-$\mu_{aoa}^{NH_4} = \mu_{aoa}^{max} \dfrac{NH_4}{NH_4 + K_{aoa}^{NH_4}}$\
-$\mu_{aoa}^{O_2} = \dfrac{\rho_{aoa}^{O_2} O_2}{y_{aoa}^{O_2}}$
+$$
+\begin{align}
+\mu_{aoa} &= \min\left(\mu_{aoa}^{NH_4}, \mu_{aoa}^{O_2}\right)
+\mu_{aoa}^{NH_4} &= \mu_{aoa}^{max} \dfrac{NH_4}{NH_4 + K_{aoa}^{NH_4}}
+\mu_{aoa}^{O_2} &= \dfrac{\rho_{aoa}^{O_2} O_2}{y_{aoa}^{O_2}}
+\end{align}
+$$
 
 where
 - $\mu_{aoa}^{max}$ is a temperature-dependent maximum growh rate of ammonia oxidizing archaea (`aoa_mumax(i,j,k)`, [s<sup>-1</sup>])
@@ -1341,15 +1699,23 @@ where
 
 The temperature-dependent maximum growth rate of ammonia oxidizing archaea is informed by the cultures of [Qin et al. (2015)](https://doi.org/10.1073/pnas.1501568112):
 
-$\mu_{aoa}^{max} = \dfrac{\max\left(0.2, 0.029 \cdot T - 0.147 \right)}{86400}$
+$$
+\begin{align}
+\mu_{aoa}^{max} &= \dfrac{\max\left(0.2, 0.029 \cdot T - 0.147 \right)}{86400}
+\end{align}
+$$
 
 where
 - $T$ is the in situ temperature of seawater (`Temp(i,j,k)`, [ºC])
 
 In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-mid we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-mid we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> (`aoaresp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
 
-$\mu_{aoa}^{&larr; NH_4} = \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}}$\
-$\mu_{aoa}^{&larr; O_2} = \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}$
+$$
+\begin{align}
+\mu_{aoa}^{&larr; NH_4} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}}
+\mu_{aoa}^{&larr; O_2} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}
+\end{align}
+$$
 
 where
 - $y_aoa^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on NH<sub>4</sub> (`aoa_ynh4`, [mol C biomass (mol NH<sub>4</sub>)<sup>-1</sup>])
@@ -1357,8 +1723,12 @@ where
 
 Ammonia ozidizing archaea produce both NO<sub>3</sub> and a small amount of N<sub>2</sub>O as they oxidize NH<sub>4</sub>. The production of N<sub>2</sub>O is informed by numerous studies that show a relationship between the rate of ammonia oxidation, the ambient oxygen concentration and the production of N<sub>2</sub>O ([Goreau et al., 1980](https://doi.org/10.1128/aem.40.3.526-532.1980); [Santoro et al., 2011](https://www.science.org/doi/full/10.1126/science.1208239); [Qin et al., 2017](https://doi.org/10.1111/1758-2229.12525); [Ji et al., 2018](https://doi.org/10.1029/2018GB005887); [Frey et al., 2023](https://doi.org/10.1002/lno.12283)). We compute these production terms as:
 
-$\mu_{aoa}^{&rarr; NO_3} = \mu_{aoa}^{&larr; NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O}$\
-$\mu_{aoa}^{&rarr; N_{2}O} = \mu_{aoa}^{C} p_{aoa}^{N_{2}O}$
+$$
+\begin{align}
+\mu_{aoa}^{&rarr; NO_3} &= \mu_{aoa}^{&larr; NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O}
+\mu_{aoa}^{&rarr; N_{2}O} &= \mu_{aoa}^{C} p_{aoa}^{N_{2}O}
+\end{align}
+$$
 
 where
 - $R_{aoa}^{C:N}$ is the ratio of carbon to nitrogen within the biomass of ammonia oxidizing archaea (`aoa_C2N`, [mol C (mol N)<sup>-1</sup>])
@@ -1366,11 +1736,19 @@ where
 
 Determining $p_{aoa}^{N_{2}O}$ is key to determining the fraction of NH<sub>4</sub> that is routed to N<sub>2</sub>O during ammonia oxidation. For this we use the oxygen-dependent relationship identified by [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) who found a maximum of 3% per mol of $NO_2$ produced:
 
-$p_{aoa}^{\%N_{2}O} = \min\left(0.03, \dfrac{0.002}{O_2} + p_{aoa}^{min(N_{2}O)} \right)$
+$$
+\begin{align}
+p_{aoa}^{\%N_{2}O} &= \min\left(0.03, \dfrac{0.002}{O_2} + p_{aoa}^{min(N_{2}O)} \right)
+\end{align}
+$$
 
 Because [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) give the production yield of N<sub>2</sub>O in terms of % per mol $NO_2$ produced, we convert this through to units of [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>] via:
 
-$p_{aoa}^{N_{2}O} = \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}$ 
+$$
+\begin{align}
+p_{aoa}^{N_{2}O} &= \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}$
+\end{align}
+$$
 
 since
 
@@ -1379,10 +1757,15 @@ $Y = \% N_{2}O produced per NO_{3} produced$\
 $d = \dfrac{\left(a - c\right) \cdot Y}{2 \cdot Y + 1}$
 
 
-**Anaerobic ammonia oxidizing (Anammox) bacteria**\
+**Anaerobic ammonia oxidizing (Anammox) bacteria**
+
 Anammox bacteria are considered to be an implicit population within WOMBAT-mid and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. As with N<sub>2</sub>O-reducing heterotrophic bacteria, this nitrogen is then permanently lost from the ocean. When `do_anammox = .true.`, we perform this metabolism as:
 
-$\mu_{aox}^{NH_4 &rarr; N_2} = \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana} L_{aox}^{NH_4}$
+$$
+\begin{align}
+\mu_{aox}^{NH_4 &rarr; N_2} &= \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana} L_{aox}^{NH_4}
+\end{align}
+$$
 
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless])
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC])
@@ -1391,7 +1774,11 @@ $\mu_{aox}^{NH_4 &rarr; N_2} = \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana
 
 Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of NH<sub>4</sub>. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
 
-$L_{aox}^{NH_4} = \dfrac{NH_4}{NH_4 + K_{aox}^{NH_4}}$
+$$
+\begin{align}
+L_{aox}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{aox}^{NH_4}}
+\end{align}
+$$
 
 where
 - $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of NH<sub>4</sub> by anammox bacteria (`aox_knh4`, [mmol N m<sup>-3</sup>])
@@ -1404,13 +1791,21 @@ where
 
 In addition to DOC and DON, dissolved organic matter is also affected by changes to the nominal oxidation state of carbon, which we carry as a tracer (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless]). The nominal oxidation state of carbon (NOSC) is estimated by [La Rowe & Van Cappellen (2011)](https://doi.org/10.1016/j.gca.2011.01.020) from stoichiometry:
 
-$NOSC = 4 - \dfrac{\left( 4 \cdot C + H - 3 \cdot N - 2 \cdot O + 5\cdot P - 2 \cdot S\right)}{C}$
+$$
+\begin{align}
+NOSC &= 4 - \dfrac{\left( 4 \cdot C + H - 3 \cdot N - 2 \cdot O + 5\cdot P - 2 \cdot S\right)}{C}
+\end{align}
+$$
 
 This characteristic describes how oxidized or reduced the average carbon atoms are within organic molecules. The NOSC acts as a measure of the energetic potential of organic matter oxidation, where the Gibbs energy released is correlated to the NOSC ([La Rowe & Van Cappellen, 2011](https://doi.org/10.1016/j.gca.2011.01.020)). The more reduced the molecule, the more negative the NOSC value and the more energy is held within the material. The scale varies from -4 to +4, with $CH_4$ representing fully reduced carbon and $CO_2$ representing fully oxidized carbon. 
 
 In WOMBAT-mid, we do not carry information of changes in the stoichiometry of marine organic matter, either dissolved or particulate. We therefore estimate how certian processes affect the NOSC of DOM ($DOM^{DOSC}$). To do so, we apply changes in $DOM^{NOSC}$ occur as a result of changes to the $B_{DOM}^{C}$ pool. Sources of $B_{DOM}^{C}$ alter $DOM^{NOSC}$ via:
 
-$\dfrac{\partial DOM^{NOSC}}{\partial t} = \dfrac{\partial B_{DOM}^{C}}{\partial t} \dfrac{NOSC_{source} - NOSC}{B_{DOM}^{C}}$
+$$
+\begin{align}
+\dfrac{\partial DOM^{NOSC}}{\partial t} &= \dfrac{\partial B_{DOM}^{C}}{\partial t} \dfrac{NOSC_{source} - NOSC}{B_{DOM}^{C}}
+\end{align}
+$$
 
 where
 - $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`f_doc(i,j,k)`, [mol C kg<sup>-1</sup>])
@@ -1419,11 +1814,15 @@ where
 
 Sources of $B_{DOM}^{C}$ include (1) phytoplankton overflow production (`nosdoc_overflow(i,j,k)`, $\Delta DOM_{overflow}^{NOSC}$, [NOSC s<sup>-1</sup>]), (2) excretion by zooplankton (`nosdoc_excretion(i,j,k)`, $\Delta DOM_{excretion}^{NOSC}$, [NOSC s<sup>-1</sup>]), (3) phytoplankton cell death and lysis (`nosdoc_phylysis(i,j,k)`, $\Delta DOM_{photolyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), (4) bacterial cell death and lysis (`nosdoc_baclysis(i,j,k)`, $\Delta DOM_{bacterlyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), and (5) hydrolysation of particulate organic matter (`nosdoc_dethydro(i,j,k)`, $\Delta DOM_{dethydro}^{NOSC}$, [NOSC s<sup>-1</sup>]). The equations describing the effect on $DOM^{NOSC}$ of each process are:
 
-(1) $\Delta DOM_{overflow}^{NOSC} = \left(\sum_{p} \mu_{p}^{&rarr; DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}}$\
-(2) $\Delta DOM_{excretion}^{NOSC} = \left(\sum_{z,i} \left( X_{z}^{&rarr; i^{C}} \cdot f_{z}^{X &rarr; DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}}$\
-(3) $\Delta DOM_{photolyse}^{NOSC} = \left(\sum_{p} \gamma_{p}^{&rarr; C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}}$\
-(4) $\Delta DOM_{bacterlyse}^{NOSC} = \left(\sum_{b} \gamma_{b}^{&rarr; C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}}$\
-(5) $\Delta DOM_{dethydro}^{NOSC} = \left(\sum_{d} \Gamma_{d}^{&rarr; C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}$
+$$
+\begin{align}
+(1) & \Delta DOM_{overflow}^{NOSC} = \left(\sum_{p} \mu_{p}^{&rarr; DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}}
+(2) & \Delta DOM_{excretion}^{NOSC} = \left(\sum_{z,i} \left( X_{z}^{&rarr; i^{C}} \cdot f_{z}^{X &rarr; DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}}
+(3) & \Delta DOM_{photolyse}^{NOSC} = \left(\sum_{p} \gamma_{p}^{&rarr; C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}}
+(4) & \Delta DOM_{bacterlyse}^{NOSC} = \left(\sum_{b} \gamma_{b}^{&rarr; C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}}
+(5) & \Delta DOM_{dethydro}^{NOSC} = \left(\sum_{d} \Gamma_{d}^{&rarr; C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
+\end{align}
+$$
 
 where
 - $\mu_{p}^{&rarr; DOC}$ is the overflow production of DOC by phytoplankton type $p$ ([mol C kg<sup>-1</sup>])
@@ -1444,7 +1843,11 @@ In WOMBAT-mid the only sink of $B_{DOM}^{C}$ is consumption by bacteria (`doc1re
 
 Consumption of $B_{DOM}^{C}$ by bacteria alters $DOM^{NOSC}$ (`nosdoc_docconsu(i,j,k)`, $\Delta DOM_{DOCconsume}^{NOSC}$, [NOSC s<sup>-1</sup>]) via:
 
-$\Delta DOM_{DOCconsume}^{NOSC} = \left(\sum_{b} \mu_{b}^{&larr; B_{DOM}^{C}} \right) \cdot \dfrac{- NOSC_{DOCconsume}}{B_{DOM}^{C}}$\
+$$
+\begin{align}
+\Delta DOM_{DOCconsume}^{NOSC} &= \left(\sum_{b} \mu_{b}^{&larr; B_{DOM}^{C}} \right) \cdot \dfrac{- NOSC_{DOCconsume}}{B_{DOM}^{C}}
+\end{align}
+$$
 
 where
 - $\mu_{b}^{&larr; B_{DOM}^{C}}$ is the consumption of DOC by bacterial type $b$ (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup>])
@@ -1458,10 +1861,14 @@ where
 
 **Nitrate** (`f_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
-$\dfrac{\Delta NO_3}{\Delta t} = \mu_{aoa}^{&rarr; NO_3} 
-                               - \mu_{b1}^{&larr; NO_3} 
-                               - \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} 
-                                      + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}$
+$$
+\begin{align}
+\dfrac{\Delta NO_3}{\Delta t} = \mu_{aoa}^{&rarr; NO_3} \\
+                              - \mu_{b1}^{&larr; NO_3} \\
+                              - \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
+                                     + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+\end{align}
+$$
 
 **Ammonium** (`f_nh4(i,j,k)`, NH<sub>4</sub>, [mol N kg<sup>-1</sup>])
 
