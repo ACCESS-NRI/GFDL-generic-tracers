@@ -68,7 +68,7 @@ As an example, the PAR in the blue band (`b=1`) at the top of level k is compute
 
 $$
 \begin{align}
-PAR^{top}(k,1) = PAR^{top}(k-1,1) * e^{(-ex_{bgr}(k-1,1) * \Delta z(k-1))}
+PAR^{top}(k,1) &= PAR^{top}(k-1,1) * e^{(-ex_{bgr}(k-1,1) * \Delta z(k-1))}
 \end{align}
 $$
 
@@ -76,7 +76,7 @@ where the total attenutation rate of blue light in the grid cell above `k` is th
 
 $$
 \begin{align}
-ex_{bgr}(k-1,1) = ex_{chl}(k-1,1) + ex_{det}(k-1,1) + ex_{CaCO_3}(k-1,1)
+ex_{bgr}(k-1,1) &= ex_{chl}(k-1,1) + ex_{det}(k-1,1) + ex_{CaCO_3}(k-1,1)
 \end{align}
 $$
 
@@ -89,7 +89,7 @@ The irradiance in the red band (`b=3`) at the mid point of layer `k`, in contras
 
 $$
 \begin{align}
-PAR^{mid}(k,3) = PAR^{mid}(k-1,3) * e^{(-0.5*(ex_{bgr}(k-1,3) * \Delta z(k-1) + ex_{bgr}(k,3) * \Delta z(k)))}
+PAR^{mid}(k,3) &= PAR^{mid}(k-1,3) * e^{(-0.5*(ex_{bgr}(k-1,3) * \Delta z(k-1) + ex_{bgr}(k,3) * \Delta z(k)))}
 \end{align}
 $$
 
@@ -105,7 +105,7 @@ PAR that is seen by the average phytoplankton within that cell (`radbio`, $PAR$,
 
 $$
 \begin{align}
-PAR(k) = \sum_{b=1}^3 \dfrac{(PAR^{top}(k,b) - PAR^{top}(k+1,b))}{ex_{bgr}(k,b) * \Delta z(k)}
+PAR(k) &= \sum_{b=1}^3 \dfrac{(PAR^{top}(k,b) - PAR^{top}(k+1,b))}{ex_{bgr}(k,b) * \Delta z(k)}
 \end{align}
 $$
 
@@ -124,27 +124,39 @@ The euphotic depth (`zeuphot(i,j)`, [m]) is defined as the depth where `radbio` 
 
 At the start of each vertical loop `k=1` through `k=kmax` the code computes the biomass of nano-phytoplankton (`biophy`, $B_{np}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton (`biodia`, $B_{mp}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how nitrogen in the form of nitrate (`biono3`, NO<sub>3</sub>, [mmol N m<sup>-3</sup>]) and ammonium (`bionh4`, NH<sub>4</sub>, [mmol N m<sup>-3</sup>]), dissolved iron (`biofer`, $dFe$, [µmol dFe m<sup>-3</sup>]) and silicic acid in the case of micro-phytoplankton (`biosil`, H<sub>4</sub>SiO<sub>4</sub>, [mmol S m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
 
-$aff = V^{-0.57}$
+$$
+\begin{align}
+aff &= V^{-0.57}
+\end{align}
+$$
 
 Additionally, the authors demonstrate that the volume of the average phytoplankton cell is related to the density (i.e., concentration) of phytoplankton via
 
-$V = (B_{phy})^{0.65}$
+$$
+\begin{align}
+V &= (B_{phy})^{0.65}
+\end{align}
+$$
  
 when combining panels c and f of their Figure 1. This then relates the affinity of an average cell to the concentration of phytoplankton biomass as
 
-$aff = (B_{phy})^{-0.37}$
+$$
+\begin{align}
+aff &= (B_{phy})^{-0.37}$
+\end{align}
+$$
 
 With this information, we allow the half-saturation terms for nitrogen (`phy_kni(i,j,k)`, $K_{np}^{N}$, [mmol N m<sup>-3</sup>]; `dia_kni(i,j,k)`, $K_{mp}^{N}$, [mmol N m<sup>-3</sup>]), dissolved iron  (`phy_kfe(i,j,k)`, $K_{np}^{Fe}$, [µmol dFe m<sup>-3</sup>]; `dia_kfe(i,j,k)`, $K_{mp}^{Fe}$, [µmol dFe m<sup>-3</sup>]) and silic acid (`dia_ksi(i,j,k)`, $K_{mp}^{Si}$, [µmol Si m<sup>-3</sup>]) uptake to vary as a function of phytoplankton biomass concentration. We set reference values for the half-saturation coefficient of nitrogen (`phykn`, $K_{np}^{N,0}$, [mmol N m<sup>-3</sup>]; `diakn`, $K_{mp}^{N,0}$, [mmol N m<sup>-3</sup>]), dissolved iron (`phykf`, $K_{np}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]; `diakf`, $K_{mp}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]) and silicic acid (`diaks`, $K_{mp}^{Si,0}$, [µmol Si m<sup>-3</sup>]) as input parameters to the model, and also set thresholds of nano-phytoplankton concentration (`phybiot`, $B_{np}^{thresh}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton concentration (`diabiot`, $B_{mp}^{thresh}$, [mmol C m<sup>-3</sup>]) beneath which cell size cannot decrease and affinity can no longer increase. At this minimum, where affinity is maximised, the half-saturation coefficients are bounded to be 10% of their reference values.
 
-$K_{np}^{N} = K_{np}^{N,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )$ 
-
-$K_{np}^{Fe} = K_{np}^{Fe,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )$
-
-$K_{mp}^{N} = K_{mp}^{N,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$
-
-$K_{mp}^{Fe} = K_{mp}^{Fe,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$
-
-$K_{mp}^{Si} = K_{mp}^{Si,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )$
+$$
+\begin{align}
+K_{np}^{N} &= K_{np}^{N,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )
+K_{np}^{Fe} &= K_{np}^{Fe,0} * \max(0.1, \max(0.0, (B_{np}-B_{np}^{thresh}))^{0.37} )
+K_{mp}^{N} &= K_{mp}^{N,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )
+K_{mp}^{Fe} &= K_{mp}^{Fe,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )
+K_{mp}^{Si} &= K_{mp}^{Si,0} * \max(0.1, \max(0.0, (B_{mp}-B_{mp}^{thresh}))^{0.37} )
+\end{align}
+$$
 
 where
 - $K_{np}^{N}$ and $K_{mp}^{N}$ are the half-saturation coefficients for nitrogen uptake by nano- and micro-phytoplankton (`phy_kni(i,j,k)` and `dia_kni(i,j,k)`, [mmol N m<sup>-3</sup>])
@@ -154,17 +166,16 @@ where
 
 **Limitation of phytoplankton growth by nitrogen** (`phy_lnit(i,j,k)`, $L_{np}^{N}$), [dimensionless]; `dia_lnit(i,j,k)`, $L_{mp}^{N}$), [dimensionless]) is split between ammonium (`phy_lnh4(i,j,k)`, $L_{np}^{NH_4}$), [dimensionless]; `dia_lnh4(i,j,k)`, $L_{mp}^{NH_4}$), [dimensionless]) and nitrate (`phy_lno3(i,j,k)`, $L_{np}^{NO_3}$), [dimensionless]; `dia_lno3(i,j,k)`, $L_{mp}^{NO_3}$), [dimensionless]). Phytoplankton preferentially consume and grow on ammonium because it is most efficiently converted to glutamate for biomass synthesis, while nitrate must be first reduced within the cell ([Dortch, 1990](https://www.jstor.org/stable/24842258)). To represent this preference, we follow [Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/) who assert a 5-fold preference of phytoplankton for ammonium over nitrate and show that this reproduces preferences of ammonium-fueled growth in ocean field data.
 
-$l_{np}^{NH_4} = \dfrac{NH_4}{NH_4 + K_{np}^{N}}$
-
-$l_{np}^{NO_3} = \dfrac{NO_3}{NO_3 + K_{np}^{N}}$
-
-$l_{np}^{N} = \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{np}^{N}}$
-
-$L_{np}^{NH_4} = \dfrac{5 \cdot l_{np}^{N} l_{np}^{NH_4}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}$
-
-$L_{np}^{NO_3} = \dfrac{l_{np}^{N} l_{np}^{NO_3}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}$
-
-$L_{np}^{N} = L_{np}^{NH_4} + L_{np}^{NO_3}$
+$$
+\begin{align}
+l_{np}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{np}^{N}}
+l_{np}^{NO_3} &= \dfrac{NO_3}{NO_3 + K_{np}^{N}}
+l_{np}^{N} &= \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{np}^{N}}
+L_{np}^{NH_4} &= \dfrac{5 \cdot l_{np}^{N} l_{np}^{NH_4}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}
+L_{np}^{NO_3} &= \dfrac{l_{np}^{N} l_{np}^{NO_3}}{l_{np}^{NO_3} + 5 \cdot l_{np}^{NH_4}}
+L_{np}^{N} &= L_{np}^{NH_4} + L_{np}^{NO_3}
+\end{align}
+$$
 
 where
 - NH<sub>4</sub> is the in situ concentration of ammonium (`bionh4`, [mmol N m<sup>-3</sup>]) 
@@ -179,12 +190,16 @@ where
 
 The same set of equations are applied to micro-phytoplankton:
 
-$l_{mp}^{NH_4} = \dfrac{NH_4}{NH_4 + K_{mp}^{N}}$\
-$l_{mp}^{NO_3} = \dfrac{NO_3}{NO_3 + K_{mp}^{N}}$\
-$l_{mp}^{N} = \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{mp}^{N}}$\
-$L_{mp}^{NH_4} = \dfrac{5 \cdot l_{mp}^{N} l_{mp}^{NH_4}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}}$\
-$L_{mp}^{NO_3} = \dfrac{l_{mp}^{N} l_{mp}^{NO_3}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}}$\
-$L_{mp}^{N} = L_{mp}^{NH_4} + L_{mp}^{NO_3}$
+$$
+\begin{align}
+l_{mp}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{mp}^{N}}
+l_{mp}^{NO_3} &= \dfrac{NO_3}{NO_3 + K_{mp}^{N}}
+l_{mp}^{N} &= \dfrac{NH_4 + NO_3}{NH_4 + NO_3 + K_{mp}^{N}}
+L_{mp}^{NH_4} &= \dfrac{5 \cdot l_{mp}^{N} l_{mp}^{NH_4}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}}
+L_{mp}^{NO_3} &= \dfrac{l_{mp}^{N} l_{mp}^{NO_3}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}^{NH_4}}
+L_{mp}^{N} &= L_{mp}^{NH_4} + L_{mp}^{NO_3}
+\end{align}
+$$
 
 where
 - NH<sub>4</sub> is the in situ concentration of ammonium (`bionh4`, [mmol N m<sup>-3</sup>]) 
@@ -221,14 +236,22 @@ The first term reflects the amount of iron required for photosystems I and II. `
 
 The Fe limitation factor (`phy_lfer(i,j,k)`, $L_{np}^{Fe}$, [dimensionless]; `dia_lfer(i,j,k)`, $L_{mp}^{Fe}$, [dimensionless]) is then computed from the present Fe:C quota of the phytoplankton cells (`phy_Fe2C`, $Q_{np}^{Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_Fe2C`, $Q_{mp}^{Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) relative to the minimum and optimal quotas.
 
-$L_{np}^{Fe} = \max\left(0.0, \min\left(1.0, \dfrac{ Q_{np}^{Fe:C} - Q_{np}^{-Fe:C} }{Q_{np}^{*Fe:C}} \right)\right)$
+$$
+\begin{align}
+L_{np}^{Fe} &= \max\left(0.0, \min\left(1.0, \dfrac{ Q_{np}^{Fe:C} - Q_{np}^{-Fe:C} }{Q_{np}^{*Fe:C}} \right)\right)
+\end{align}
+$$
 
 where
 - $Q_{np}^{-Fe:C}$ is the minimum Fe:C quota of the nano-phytoplankton cell (`phy_minqfe`, [mol Fe (mol C)<sup>-1</sup>])
 - $Q_{np}^{*Fe:C}$ is the optimal Fe:C quota of the nano-phytoplankton cell (`phyoptqf`, [mol Fe (mol C)<sup>-1</sup>])
 - $Q_{np}^{Fe:C}$ is the in situ Fe:C quota of the nano-phytoplankton cell (`phy_Fe2C`, [mol Fe (mol C)<sup>-1</sup>])
 
-$L_{mp}^{Fe} = \max\left(0.0, \min\left(1.0, \dfrac{ Q_{mp}^{Fe:C} - Q_{mp}^{-Fe:C} }{Q_{mp}^{*Fe:C}} \right)\right)$
+$$
+\begin{align}
+L_{mp}^{Fe} &= \max\left(0.0, \min\left(1.0, \dfrac{ Q_{mp}^{Fe:C} - Q_{mp}^{-Fe:C} }{Q_{mp}^{*Fe:C}} \right)\right)
+\end{align}
+$$
 
 where
 - $Q_{mp}^{-Fe:C}$ is the minimum Fe:C quota of the micro-phytoplankton cell (`dia_minqfe`, [mol Fe (mol C)<sup>-1</sup>])
@@ -239,7 +262,11 @@ If the cell is Fe‑replete with a quota that exceeds the minimum quota by as mu
 
 **Limitation of micro-phytoplankton growth by silicic acid** is computed as a gating constraint on division via:
 
-$L_{mp}^{Si} = \min\left( 1.0, \max\left( 0.0, \dfrac{ Q_{mp}^{Si:C} - Q_{mp}^{-Si:C} }{ Q_{mp}^{*Si:C} - Q_{mp}^{-Si:C} }  \right) \right)$
+$$
+\begin{align}
+L_{mp}^{Si} &= \min\left( 1.0, \max\left( 0.0, \dfrac{ Q_{mp}^{Si:C} - Q_{mp}^{-Si:C} }{ Q_{mp}^{*Si:C} - Q_{mp}^{-Si:C} }  \right) \right)
+\end{align}
+$$
 
 where
 - $Q_{mp}^{-Si:C}$ is the minimum Si:C quota of the micro-phytoplankton cell (`diaminqs`, [mol Si (mol C)<sup>-1</sup>])
