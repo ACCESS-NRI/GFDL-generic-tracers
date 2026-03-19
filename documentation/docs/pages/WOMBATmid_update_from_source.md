@@ -45,6 +45,7 @@ variable names in $math font$ are pointers to the equations; `i,j,k` refer to ho
 If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
 The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kilogram of seawater (i.e., molarity). Some calculations herein are performed by converting tracers to units of [mmol m-3] or in the case of dissolved iron [µmol m-3]. However, we stress that all tracer tendency terms are converted back to [mol kg-1 s-1] when sources and sinks are applied.
+
 ---
 
 
@@ -498,8 +499,8 @@ Treatment of dissolved iron (`f_fe(i,j,k)`, $dFe$, mol kg<sup>-1</sup>) follows 
 We first estimate the **solubility of free Fe from Fe<sup>3+</sup>** in solution using temperature, pH and salinity using the thermodynamic equilibrium equations of [Liu & Millero (2002)](https://www.sciencedirect.com/science/article/abs/pii/S0304420301000743). 
 
 $T_K = \max(5.0, T) + 273.15$ \
-$T_K^{-1} = \dfrac{1}{T_K}$ \
-$I_{S} = \dfrac{19.924,S}{1000 - 1.005,S}$ \
+$\left(T_K\right)^{-1} = \dfrac{1}{T_K}$ \
+$I_{S} = \dfrac{19.924,S}{1000 - 1.005,S}$
 
 Solubility constants:
 
@@ -739,7 +740,7 @@ where
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{Mz}^{C}$ is the concentration of meso-zooplankton carbon biomass (`f_mes(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{b1}^{C}$ is the concentration of facultative NO<sub>3</sub>-reducing bacteria carbon biomass (`f_bac1(i,j,k)`, [mol kg<sup>-1</sup>])
-- $B_{b2}^{C}$ is the concentration of facultative $N_{2}$O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>])
+- $B_{b2}^{C}$ is the concentration of facultative N<sub>2</sub>O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{aoa}^{C}$ is the concentration of ammonia oxidizing archaea carbon biomass (`f_aoa(i,j,k)`, [mol kg<sup>-1</sup>])
 - $S_{mz}^{\gamma}$ is a scaling factor that reduces micro-zooplankton linear mortality at low biomass (`zoo_slmor`, [dimenionless])
 - $S_{Mz}^{\gamma}$ is a scaling factor that reduces meso-zooplankton linear mortality at low biomass (`mes_slmor`, [dimenionless])
@@ -756,7 +757,7 @@ where
 - $K_{Mz}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses for meso-zooplankton (`meskz`, [mmol C m<sup>-1</sup>])
 
 
-**Quadratic losses** of nano-phytoplankton ($_{np}$), micro-phytoplankton ($_{mp}$), micro-zooplankton ($_{mz}$), meso-zooplankton ($_{Mz}$), facultative nitrate-reducing bacteria ($_{b1}$), facultative nitrous oxide-reducing bacteria ($_{b2}$) and ammonia oxidizing archaea ($_{aoa}$) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
+**Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
 $\Gamma_{np}^{&rarr; C} = \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C}$\
 $\Gamma_{mp}^{&rarr; C} = \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C}$\
@@ -781,8 +782,9 @@ where
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{Mz}^{C}$ is the concentration of meso-zooplankton carbon biomass (`f_mes(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{b1}^{C}$ is the concentration of facultative NO<sub>3</sub>-reducing bacteria carbon biomass (`f_bac1(i,j,k)`, [mol kg<sup>-1</sup>])
-- $B_{b2}^{C}$ is the concentration of facultative $N_{2}$O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>])
+- $B_{b2}^{C}$ is the concentration of facultative N<sub>2</sub>O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{aoa}^{C}$ is the concentration of ammonia oxidizing archaea carbon biomass (`f_aoa(i,j,k)`, [mol kg<sup>-1</sup>])
+
 
 ---
 
