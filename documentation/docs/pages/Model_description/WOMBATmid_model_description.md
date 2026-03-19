@@ -716,11 +716,9 @@ D_{lA}^{&rarr; dFe} &= Fe_{lA} \gamma_{lA}^{diss}
 
 To determine the rate of biogenic silica dissolution we must first determine the equilibrium concentration of silicic acid (H<sub>4</sub>SiO<sub>4</sub>) in seawater. To do so, we solve for this equilibrium concentration via thermodynamic first-principles:
 
-$$
 \begin{align}
 K_{H_{4}SiO_{4}}(T,P) &= \dfrac{\gamma_{H_{4}SiO_{4}^{0}} \cdot [H_{4}SiO_{4}]^{eq}}{(a_{H_{2}O})^{2}}
 \end{align}
-$$
 
 where
 - $K_{H_{4}SiO_{4}}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
@@ -730,41 +728,33 @@ where
 
 The equation is rearranged such that:
 
-$$
 \begin{align}
 [H_{4}SiO_{4}]^{eq} &= \dfrac{K_{H_{4}SiO_{4}}(T,P) \cdot (a_{H_{2}O})^{2}}{\gamma_{H_{4}SiO_{4}^{0}}}
 \end{align}
-$$
 
 The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{H_{4}SiO_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the solubility of H<sub>4</sub>SiO<sub>4</sub> decreases predictably with salinity according to
 
-$$
 \begin{align}
 \gamma_{H_{4}SiO_{4}^{0}} &= 1 + 0.0053 \cdot S - 0.000034 \cdot S^{2}
 \end{align}
-$$
 
 where
 - $S$ is the in situ salinity of seawater (`Salt(i,j,k)`, [psu])
 
 For $K_{H_{4}SiO_{4}}(T,P)$ we follow the derivation of [Gunnarsson & Arnórsson (2000)](https://doi.org/10.1016/S0016-7037(99)00426-3) who relate the thermodynamic equilibrium constant of H<sub>4</sub>SiO<sub>4</sub> to variations in temperature at a constant pressure of 1 bar ($P^{1}$):
 
-$$
 \begin{align}
 K(T,P^{1}) &= 10^{ -8.476 - \dfrac{485.24}{T_{K}} - 2.268 \times 10^{-6} \cdot (T_{K})^{2} + 3.068 log_{10}(T_{K})}
 \end{align}
-$$
 
 where
 - $T_{K}$ is the in situ temperature of seawater ([`zval`, [ºK]])
 
 We add a classic pressure correction to $K(T,P^{1})$ to retrieve $K(T,P)$ of the form:
 
-$$
 \begin{align}
 K(T,P) &= K(T,P^{1}) \cdot e^{- \dfrac{\Delta V^{0}}{RT_{K}}P}
 \end{align}
-$$
 
 where
 - $\Delta V^{0}$ is the partial molal volume change (`deltaV0`, [m<sup>3</sup> mol<sup>-1</sup>])
@@ -779,11 +769,9 @@ We obtain $\Delta V^{0}$ from [Willey, 1982](https://doi.org/10.1016/0016-7037(8
 
 Biogenic silica is only considered associated with the large type of sinking particulate organic matter and dissolution (`bsidiss(i,j,k)`, $D_{B_{ld}^{Si}}^{&rarr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) occurs via
 
-$$
 \begin{align}
 D_{B_{ld}^{Si}}^{&rarr; Si} &= d_{B_{ld}^{Si}} \cdot B_{ld}^{Si}
 \end{align}
-$$
 
 where
 - $d_{B_{ld}^{Si}}$ is the rate of biogenic silica dissolution (`disssi(i,j,k)`, [s<sup>-1</sup>])
@@ -791,11 +779,9 @@ where
 
 We treat the dissolution rate of biogenic silica ($d_{B_{ld}^{Si}}$) as dependent on three conditions: the degree of undersaturation ([Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf); [Van Cappellen & Qiu, 1997](https://doi.org/10.1016/S0967-0645(96)00112-9); [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431)), in situ temperature ([Kamatani, 1982](https://doi.org/10.1007/BF00393146); [Greenwood et al., 2005](https://doi.org/10.1007/s10498-004-9515-y)) and the activity of heterotrophic microbes ([Bidle & Azam, 1999](https://doi.org/10.1038/17351); [Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). To account for these conditions, we formulate the rate of dissolution of biogenic silica (`disssi(i,j,k)`, $d_{Si}$, [s<sup>-1</sup>]) as the product of three terms:
 
-$$
 \begin{align}
 d_{B_{ld}^{Si}} &= d_{B_{ld}^{Si}}^{T} \cdot S_{B_{ld}^{Si}}^{Sat} \cdot S_{B_{ld}^{Si}}^{bio}
 \end{align}
-$$
 
 where
 - $d_{B_{ld}^{Si}}^{T}$ is the temperature-dependent rate of dissolution (`disssi_temp`, [s<sup>-1</sup>])
@@ -804,11 +790,9 @@ where
 
 First, we solve for $d_{B_{ld}^{Si}}^{T}$. [Kamatani, 1982](https://doi.org/10.1007/BF00393146) measured dissolution rates of biogenic silica collected in Tokyo Bay between 8ºC and 30ºC and identified that these roughly obeyed the equation:
 
-$$
 \begin{align}
 d_{B_{ld}^{Si}}^{T} &= \dfrac{e^{\left(\alpha + β T\right)}}{3600}
 \end{align}
-$$
 
 where 
 - $\alpha$ is a species-dependent dissolution intercept that ranges between -7.35 and -10.38. We set $\alpha$ = -8.0
@@ -818,11 +802,9 @@ where
 
 Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of H<sub>4</sub>SiO<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, H<sub>4</sub>SiO<sub>4</sub> is always undersaturated. We therefore assume that H<sub>4</sub>SiO<sub>4</sub> is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
 
-$$
 \begin{align}
 S_{B_{ld}^{Si}}^{Sat} &= 1 - \left(\dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{2}
 \end{align}
-$$
 
 where
 - $[H_{4}SiO_{4}]$ is the in situ concentration of H<sub>4</sub>SiO<sub>4</sub> (`f_sil(i,j,k)`, [mol Si kg<sup>-1</sup>])
@@ -831,11 +813,9 @@ where
 
 The scaling term associated with activity of heterotrophic bacteria is informed by substantial evidence. According to [Rickert et al., 2002](https://doi.org/10.1016/S0016-7037(01)00757-8) "The removal of organic or inorganic coatings enhance the reactivity by at least an order of magnitude". Order of magnitude increases in silica dissolution have been reported for diatom frustules in contact with bacteria ([Bidle & Azam, 1999](https://doi.org/10.1038/17351)), while anti-biotic treatments to mesocosms off Monterey Bay caused silica dissolution to reduced by 50% ([Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). We represent this bacterially-induced stimulation of dissolution with
 
-$$
 \begin{align}
 S_{B_{ld}^{Si}}^{bio} &= 1 + F_{B_{ld}^{Si}}^{bac} \cdot \dfrac{B_{bac}^{C}}{B_{bac}^{C} + K_{B_{ld}^{Si}}^{bac}}
 \end{align}
-$$
 
 where
 - $F_{B_{ld}^{Si}}^{bac}$ is the factor increase in dissolution caused by peak bacterial biomass (`bsi_fbac`, [dimenionless])
@@ -851,7 +831,6 @@ Mortality of ecological functional types are affected by both linear ($\gamma$) 
 
 **Linear losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
-$$
 \begin{align}
 \gamma_{np}^{&rarr; C} &= \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
 \gamma_{mp}^{&rarr; C} &= \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
@@ -861,7 +840,6 @@ $$
 \gamma_{b2}^{&rarr; C} &= \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
 \gamma_{aoa}^{&rarr; C} &= \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
 \end{align}
-$$
 
 where
 - $\gamma_{np}^{0ºC}$ is the rate of linear mortality of nano-phytoplankton at 0ºC (`phylmor`, [s<sup>-1</sup>])
@@ -885,12 +863,10 @@ where
 
 In the above, we scale down **linear mortality** of micro- and meso-zooplannkton when their populations are very small small with
 
-$$
 \begin{align}
 S_{mz}^{\gamma} &= \dfrac{B_{mz}^{C}}{B_{mz}^{C} + K_{mz}^{\gamma}} \\
 S_{Mz}^{\gamma} &= \dfrac{B_{Mz}^{C}}{B_{Mz}^{C} + K_{Mz}^{\gamma}}
 \end{align}
-$$
 
 where
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`biozoo`, [mmol C m<sup>-1</sup>])
@@ -901,7 +877,6 @@ where
 
 **Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
-$$
 \begin{align}
 \Gamma_{np}^{&rarr; C} &= \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
 \Gamma_{mp}^{&rarr; C} &= \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
@@ -911,7 +886,6 @@ $$
 \Gamma_{b2}^{&rarr; C} &= \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
 \Gamma_{aoa}^{&rarr; C} &= \Gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
 \end{align}
-$$
 
 where
 - $\Gamma_{np}^{0ºC}$ is the rate of quadratic mortality of nano-phytoplankton at 0ºC (`phyqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
@@ -938,12 +912,10 @@ where
 
 **Grazing** by micro-zooplankton (`g_zoo`, $g_{mz}$, [s<sup>-1</sup>]) and meso-zooplankton (`g_mes`, $g_{Mz}$, [s<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7), where:
 
-$$
 \begin{align}
 g_{mz} &= \dfrac{\mu_{mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{mz}^{i} \phi_{mz}^{i} (B_{i}^{C})^{2}\right)} \\
 g_{Mz} &= \dfrac{\mu_{Mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{Mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}
 \end{align}
-$$
 
 where 
 - $\mu_{mz}^{max}$ is the maximum rate of micro-zooplankton grazing at 0ºC (`zoogmax`, [s<sup>-1</sup>])
@@ -958,11 +930,9 @@ where
 
 and where
 
-$$
 \begin{align}
 \sum_{i} \phi_{mz}^{i} &= \sum_{i} \phi_{Mz}^{i} = 1.0
 \end{align}
-$$
 
 This formulation suppresses grazing at low prey biomass ($B_{i}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
 
@@ -970,11 +940,9 @@ The application of the temperature-dependent maximum growth rate in both the num
 
 The normalized prey preferences (i.e., dietary fractions) are further modified by prey switching prior to computation of total prey biomass ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)) such that
 
-$$
 \begin{align}
 \phi_{z}^{i} &= \left( \phi_{z}^{i} B_{i}^{C} \right)^{s_{z}}
 \end{align}
-$$
 
 where
 - $\phi_{z}^{i}$ is the relative prey preference of zooplankton type $z$ for prey type $i$
@@ -987,22 +955,18 @@ When $s_{z} > 1$, zooplankton exhibit prey-switching and feed disproportionately
 
 Again, prey preferences are normalized to ensure 
 
-$$
 \begin{align}
 \sum_{i} \phi_{mz}^{i} &= \sum_{i} \phi_{Mz}^{i} = 1.0
 \end{align}
-$$
 
 The community average prey capture rate coefficients of micro-zooplankton (`zooeps(i,j,k)`, $\varepsilon_{mz}$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) and meso-zooplankton (`meseps(i,j,k)`, $\varepsilon_{Mz}$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) vary as a function of the prey biomasses and the consequential variations in prey preferences associated with prey-switching, which is consistent with the prey-dependent behaviour described by [Rohr et al. (2024)](doi.org/10.1029/2023GL107732). 
 
 Total grazing of biomass by micro-zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
-$$
 \begin{align}
 g_{mz}^{&larr; C} &= g_{mz} B_{mz}^{C} \\
 g_{Mz}^{&larr; C} &= g_{Mz} B_{Mz}^{C}
 \end{align}
-$$
 
 where
 - $g_{mz}$ is the total specific rate of grazing of micro-zooplankton (`g_zoo`, [s<sup>-1</sup>])
@@ -1012,20 +976,16 @@ where
 
 Total grazing of prey can also be expressed as the sum of individual prey type consumption:
 
-$$
 \begin{align}
 g_{mz}^{&larr; C} &= g_{mz}^{&larr; B_{np}^{C}} + g_{mz}^{&larr; B_{mp}^{C}} + g_{mz}^{&larr; B_{sd}^{C}} + g_{mz}^{&larr; B_{b1}^{C}} + g_{mz}^{&larr; B_{b2}^{C}} + g_{mz}^{&larr; B_{aoa}^{C}} \\
 g_{Mz}^{&larr; C} &= g_{Mz}^{&larr; B_{np}^{C}} + g_{Mz}^{&larr; B_{mp}^{C}} + g_{Mz}^{&larr; B_{sd}^{C}} + g_{Mz}^{&larr; B_{ld}^{C}} + g_{Mz}^{&larr; B_{b1}^{C}} + g_{Mz}^{&larr; B_{b2}^{C}} + g_{Mz}^{&larr; B_{aoa}^{C}} + g_{Mz}^{&larr; B_{mz}^{C}}
 \end{align}
-$$
 
 In this formulation, consumption of each prey item $i$ in [mol C kg<sup>-1</sup>] is equal to:
 
-$$
 \begin{align}
 g_{z}^{&larr; B_{i}^{C}} &= g_{z} B_{z}^{C} \cdot \dfrac{\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}{\sum_{i} \varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}
 \end{align}
-$$
 
 Thus:
 - $g_{mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -1046,13 +1006,11 @@ Thus:
 
 **Zooplankton egestion, excretion and assimilation** are then calculated assuming static assimilation coefficients. Grazed biomass is routed to either egestion or ingestion via an ingestion coefficient ($\lambda^{C}$, [mol C (mol C)<sup>-1</sup>]), with the egested fraction being equal to $1.0 - \lambda^{C}$. The biomass that is ingested is then split between assimilation and excretion based on an assimilation coefficient ($\eta^{C}$, [mol C (mol C)<sup>-1</sup>]) with the excreted fraction being equal to $1.0 - \eta^{C}$. Egestion ($E$), excretion ($X$) and assimilation ($A$) of organic carbon due to grazing of prey type $i$ by zooplankton type $z$ are:
 
-$$
 \begin{align}
 E_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \left(1 - \lambda_{z}^{C} \right) \\
 X_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
 A_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \eta_{z}^{C}
 \end{align}
-$$
 
 where 
 - $E_{z}^{&larr; B_{i}^{C}}$ is the rate of egestion of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>])
@@ -1064,23 +1022,19 @@ where
 
 Total egestion, excretion and assimilation or carbon are therefore:
 
-$$
 \begin{align}
 E_{z}^{&larr; C} &= g_{z}^{&larr; C} \left(1 - \lambda_{z}^{C} \right) \\
 X_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
 A_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \eta_{z}^{C}
 \end{align}
-$$
 
 Because we track both carbon and iron through the ecosystem components, we assign unique ingestion and assimilation coefficients to carbon and iron. This separation of ingestion and assimilation coefficients for iron and carbon follows [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597). For iron, we apply unique ingestion ($\lambda^{Fe}$, [mol Fe (mol Fe)<sup>-1</sup>]) and assimilation coefficients ($\eta^{Fe}$, [mol Fe (mol Fe)<sup>-1</sup>]). [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597) show that if $\lambda^{Fe} << \lambda^{C}$ then egestion is enriched in Fe:C, and it follows that $\eta^{Fe} >> \eta^{C}$ so that zooplankton can absorb sufficient iron from their prey. Consequently:
 
-$$
 \begin{align}
 E_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \left(1 - \lambda_{z}^{Fe} \right) \\
 X_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
 A_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \eta_{z}^{Fe}
 \end{align}
-$$
 
 where 
 - $E_{z}^{&larr; B_{i}^{Fe}}$ is the rate of egestion of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>])
@@ -1093,31 +1047,25 @@ where
 
 Total egestion, excretion and assimilation or iron are therefore:
 
-$$
 \begin{align}
 E_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \left(1 - \lambda_{z}^{Fe} \right) \\
 X_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
 A_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \eta_{z}^{Fe}
 \end{align}
-$$
 
 **Excretion of nitrogen**
 
 For zooplankton preying on phytoplankton, other zooplankton and detritus, their excretion of nitrogen will be equal to:
 
-$$
 \begin{align}
 X_{z}^{&larr; B_{i}^{N}} &= X_{z}^{&larr; B_{i}^{C}} \dfrac{16}{122}
 \end{align}
-$$
 
 However, since both micro-zooplankton and meso-zooplankton consume heterotrophic bacteria and ammonia oxidizing arcaheal types, which have different C:N ratios to other ecosystem biomass components, we must also compute the specific excretion of NH<sub>4</sub> and $B_{DOM}^{N}$ by zooplankton when feeding on these types. Since these types are richer in N than the other prey types, zooplankton excrete more NH<sub>4</sub> and $B_{DOM}^{N}$ when bacteria and archaea represent a greater proportion of their diet ([Sterner & Elser, 2002](https://press.princeton.edu/books/ebook/9781400885695/ecological-stoichiometry-pdf)). Total excretion of nitrogen from bacterial/archaeal type $i$ by zooplankton type $z$ is as follows:
 
-$$
 \begin{align}
 X_{z}^{&larr; B_{i}^{N}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{1}{R_{i}^{C:N}} - \dfrac{A_{z}^{&larr; B_{i}^{C}} + E_{z}^{&larr; B_{i}^{C}}}{R_{z}^{C:N}}
 \end{align}
-$$
 
 ---
 
@@ -1130,7 +1078,6 @@ When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model com
 
 **Production** of $CaCO_3$ in WOMBAT-mid comes from five sources: (1) density-dependent mortality of nano-phytoplankton (i.e., coccolithophorids), (2) density-dependent mortality of micro-zooplankton (i.e., foraminifera), (3) micro-zooplankton egestion of grazed nano-phytoplankton, (4) meso-zooplankton egestion of grazed nano-phytoplankton, and (5) meso-zooplankton egestion of grazed micro-zooplankton. Each term is multiplied by the particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) to return a rate of $CaCO_3$ production in mol C kg<sup>-1</sup> s<sup>-1</sup>.
 
-$$
 \begin{align}
 (1) & P_{CaCO_3}^{\Gamma_{np}^{C}} = \Gamma_{np}^{&rarr; C} \cdot PIC:POC \\
 (2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \Gamma_{mp}^{&rarr; C} \cdot PIC:POC \\
@@ -1138,7 +1085,6 @@ $$
 (4) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}} = g_{Mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
 (5) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}} = g_{Mz}^{&larr; B_{mz}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
 \end{align}
-$$
 
 where
 - $\Gamma_{np}^{&rarr; C}$ is the quadratic (density-dependent) loss rate of nano-phytoplankton biomass (`phymorq`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
@@ -1150,11 +1096,9 @@ where
 
 In the above, the $PIC:POC$ ratio is formulated as 
 
-$$
 \begin{align}
 PIC:POC &= \min \left( 0.3,  \left( f_{\text{inorg}} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)
 \end{align}
-$$
 
 where
 - $f_{inorg}$ is the background PIC:POC ratio (f_inorg, [mol C (mol C)-1])
@@ -1167,28 +1111,28 @@ This formulation of $PIC:POC$ is therefore a function of the substrate–inhibit
 **Dissolution** of $CaCO_3$ is computed as the sum of five contributions: 
 
 (1) undersaturation-driven dissolution of calcite (`caldiss(i,j,k)`, $D_{CaCO_3}^{\Omega_{cal}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+
 (2) undersaturation-driven dissolution of aragonite (`aradiss(i,j,k)`, $D_{CaCO_3}^{\Omega_{ara}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+
 (3) biologically-mediated dissolution associated with degredation of small detrital organic matter (`pocdiss(i,j,k)`, $D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+
 (4) dissolution within micro-zooplankton during their digestion of detrital aggregates (`zoodiss(i,j,k)`, $D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+
 (5) dissolution within meso-zooplankton during their digestion of detrital aggregates (`mesdiss(i,j,k)`, $D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 
 Total $CaCO_3$ dissolution is:
 
-$$
 \begin{align}
 D_{CaCO_3} &= D_{CaCO_3}^{\Omega_{cal}} + D_{CaCO_3}^{\Omega_{ara}} + D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} + D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}} + D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}
 \end{align}
-$$
 
 This formulation, at leas the first three terms, follows [Kwon et al. (2024)](https://www.science.org/doi/full/10.1126/sciadv.adl0779).
 
-$$
 \begin{align}
 (1) & D_{CaCO_3}^{\Omega_{cal}} = d_{CaCO_3}^{\Omega_{cal}} \max\left(0,  1 - \Omega_{cal}\right)^{2.2} B_{CaCO_3}^{C} \\ 
 (2) & D_{CaCO_3}^{\Omega_{ara}} = d_{CaCO_3}^{\Omega_{ara}} \max\left(0,  1 - \Omega_{ara}\right)^{1.5} B_{CaCO_3}^{C} \\
 (3) & D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} = d_{CaCO_3}^{\Gamma_{sd}} \Gamma_{sd}^{&rarr; C} B_{CaCO_3}^{C}
 \end{align}
-$$
 
 where
 - $\Omega_{cal}$ is the saturation state of calcite (`omega_cal(i,j,k)`, [dimenionless])
@@ -1203,12 +1147,10 @@ For $D_{CaCO_3}^{\Omega_{cal}}$ and $D_{CaCO_3}^{\Omega_{ara}}$, dissolution is 
 
 The fourth and fifth terms (`zoodiss(i,j,k)`; `mesdiss(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) represent dissolution of $CaCO_3$ during zooplankton digestion of detrital particulates. 
 
-$$
 \begin{align}
 (4) & D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{&larr; C}}} = g_{mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}} \\
 (5) & D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{&larr; C}}} = g_{Mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}
 \end{align}
-$$
 
 where
 - $g_{mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
