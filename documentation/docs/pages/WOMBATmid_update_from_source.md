@@ -462,7 +462,7 @@ where
 Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for Si(OH)<sub>4</sub> and (ii) down regulation of Si(OH)<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 (i) 
-$\dfrac{Si\left(OH\right)_{4}}{Si\left(OH\right)_{4} + K_{mp}^{Si}}$
+$\dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}}$
 
 (ii) 
 $\left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}$
