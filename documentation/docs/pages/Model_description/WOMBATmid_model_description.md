@@ -77,9 +77,9 @@ ex_{bgr}(k-1,1) &= ex_{chl}(k-1,1) + ex_{det}(k-1,1) + ex_{CaCO_3}(k-1,1)
 \end{align}
 
 where
-- $ex_{chl}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to chlorophyll (`zbgr(2,ichl)`, [m<sup>-1</sup>])
-- $ex_{det}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to detritus (`ndet * dbgr(1)`, [m<sup>-1</sup>])
-- $ex_{CaCO_3}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to calcium carbonate (`carb * cbgr(1)`, [m<sup>-1</sup>])
+- $ex_{chl}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to chlorophyll (`zbgr(2,ichl)`, [m<sup>-1</sup>]) <br>
+- $ex_{det}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to detritus (`ndet * dbgr(1)`, [m<sup>-1</sup>]) <br>
+- $ex_{CaCO_3}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to calcium carbonate (`carb * cbgr(1)`, [m<sup>-1</sup>]) <br>
 
 The irradiance in the red band (`b=3`) at the mid point of layer `k`, in contrast, is equal to 
 
@@ -88,23 +88,21 @@ PAR^{mid}(k,3) &= PAR^{mid}(k-1,3) * e^{(-0.5*(ex_{bgr}(k-1,3) * \Delta z(k-1) +
 \end{align}
 
 where
-- $PAR^{mid}(k-1,3)$ is the red light (`b=3`) at the mid-point of the overlying grid cell (`par_bgr_mid(k-1,3)`, [W m<sup>-2</sup>])
-- $ex_{bgr}(k-1,3)$ is the total attenuation of red light (`b=3`) in the overlying grid cell (`ek_bgr(k-1,3)`, [m<sup>-1</sup>])
-- $ex_{bgr}(k,3)$ is the total attenuation of red light (`b=3`) in the current grid cell (`ek_bgr(k,3)`, [m<sup>-1</sup>])
-- $\Delta z(k-1)$ and $\Delta z(k)$ are the grid cell thicknesses of the overlying and current grid cells (`dzt(i,j,k)`, [m])
+- $PAR^{mid}(k-1,3)$ is the red light (`b=3`) at the mid-point of the overlying grid cell (`par_bgr_mid(k-1,3)`, [W m<sup>-2</sup>]) <br>
+- $ex_{bgr}(k-1,3)$ is the total attenuation of red light (`b=3`) in the overlying grid cell (`ek_bgr(k-1,3)`, [m<sup>-1</sup>]) <br>
+- $ex_{bgr}(k,3)$ is the total attenuation of red light (`b=3`) in the current grid cell (`ek_bgr(k,3)`, [m<sup>-1</sup>]) <br>
+- $\Delta z(k-1)$ and $\Delta z(k)$ are the grid cell thicknesses of the overlying and current grid cells (`dzt(i,j,k)`, [m]) <br>
 
-The total PAR available to phytoplantkon is assumed to be the sum of the blue, green and red bands. Because we assume that phytoplankton are 
-homogenously distributed within a layer `k`, but we do not assume that light is homogenously distributed within that layer, we solve for the 
-PAR that is seen by the average phytoplankton within that cell (`radbio`, $PAR$, [W m<sup>-2</sup>])
+The total PAR available to phytoplantkon is assumed to be the sum of the blue, green and red bands. Because we assume that phytoplankton are homogenously distributed within a layer `k`, but we do not assume that light is homogenously distributed within that layer, we solve for the PAR that is seen by the average phytoplankton within that cell (`radbio`, $PAR$, [W m<sup>-2</sup>])
 
 \begin{align}
 PAR(k) &= \sum_{b=1}^3 \dfrac{(PAR^{top}(k,b) - PAR^{top}(k+1,b))}{ex_{bgr}(k,b) * \Delta z(k)}
 \end{align}
 
 where
-- $PAR^{top}(k,b)$ is the incoming photosynthetically active radiation at the top of grid cell `k` and light band `b` (`par_bgr_top(k,b)`, [W m<sup>-2</sup>])
-- $ex_{bgr}(k,b)$ is the attenuation rate of light band `b` in grid cell `k` (`ek_bgr(k,b)`, [m<sup>-1</sup>])
-- $\Delta z(k)$ is the grid cell thickness of grid cell `k` (`dzt(i,j,k)`, [m])
+- $PAR^{top}(k,b)$ is the incoming photosynthetically active radiation at the top of grid cell `k` and light band `b` (`par_bgr_top(k,b)`, [W m<sup>-2</sup>]) <br>
+- $ex_{bgr}(k,b)$ is the attenuation rate of light band `b` in grid cell `k` (`ek_bgr(k,b)`, [m<sup>-1</sup>]) <br>
+- $\Delta z(k)$ is the grid cell thickness of grid cell `k` (`dzt(i,j,k)`, [m]) <br>
 
 This ensures phytoplankton growth in the model responds to the mean light they experience in the cell, not just light at one point. See Eq. 19 from [Baird et al. (2020)](https://gmd.copernicus.org/articles/13/4503/2020/).
 
@@ -1171,11 +1169,9 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 
 Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability. The equation for new nitrogen (specifically NH<sub>4</sub>) added via diazotrophy is:
 
-$$
 \begin{align}
 \mu_{diazo}^{&rarr; NH_4} &= \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \cdot \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}
 \end{align}
-$$
 
 where
 - $\mu_{diazo}^{max}$ is the temperature-dependent maximum growth rate of diazotrophs (`trimumax(i,j,k)`, [s<sup>-1</sup>])
@@ -1187,11 +1183,9 @@ where
 
 The temperature-dependent maximum growth rate ($\mu_{diazo}^{max}$) is taken directly from [Wrightson et al. (2022)]( https://doi.org/10.1111/gcb.16399) who based their formulation on the work of [Jiang et al. (2018)](https://doi.org/10.1038/s41558-018-021):
 
-$$
 \begin{align}
 \mu_{diazo}^{max} &= \left( -0.000399(T)^{3} + 0.02685(T)^{2} - 0.555T + 3.633 \right) \dfrac{1}{86400}
 \end{align}
-$$
 
 where
 - $T$ is in situ water temperature (`Temp(i,j,k)`, [ºC]) and we only consider $T > 15.8$ºC
@@ -1199,12 +1193,10 @@ where
 
 The iron and light limitation terms are as follows:
 
-$$
 \begin{align}
 L_{diazo}^{Fe} &= \dfrac{dFe}{dFe + K_{diazo}^{Fe}} \\
 L_{diazo}^{PAR} &= 1 - e^{- \alpha_{diazo} PAR}
 \end{align}
-$$
 
 where
 - $dFe$ is the in situ concentration of dissolved iron (`biofer`, [nmol Fe kg<sup>-1</sup>])
@@ -1221,11 +1213,9 @@ We remineralise dissolved organic matter into inorganic consituents via the acti
 
 Our formulation of heterotrophic bacterial growth follows that developed by [Zakem et al. (2020)](https://doi.org/10.1038/s41396-019-0523-8) and subsequently expanded in [Sun et al. (2024)](https://doi.org/10.1073/pnas.2417421121) and [Buchanan et al. (2025)](https://www.science.org/doi/full/10.1126/science.ado0742). In these studies, the realized biomass growth rate (integration of carbon into biomass) of bacterial functional type $b$ (`bac1grow(i,j,k)`; `bac2grow(i,j,k)`, $\mu_{b}^{&larr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is defined by:
 
-$$
 \begin{align}
 \mu_{b}^{&larr; C} &= \max\left(\mu_{b}^{aer}, \mu_{b}^{ana} \right) (β_{hete})^{T} B_{b}^{C}
 \end{align}
-$$
 
 where
 - $\mu_{b}^{aer}$ is the realized growth rate due to aerobic metabolism (`bac_muaer`, [s<sup>-1</sup>])
@@ -1235,23 +1225,19 @@ where
 
 Thus, whichever of aerobic and anaerobic metabolism offers the greatest growth rate will be chosen as the means by which bacteria grow. We must define what controls aerobic ($\mu_{b}^{aer}$) and anaerobic ($\mu_{b}^{ana}$) growth. In the case of both aerobic and anaerobic metabolisms we compute these growth rates as the minimum of three rates associated with four essential resources: dissolved organic carbon ($B_{DOM}^{C}$), nitrogen ($N$), dissolved iron ($dFe$) and the electron acceptor ($EA$).
 
-$$
 \begin{align}
 \mu_{b}^{aer} &= \min \left(\mu_{b}^{aer(DOC)}, \mu_{b}^{aer(N)}, \mu_{b}^{aer(dFe)}, \mu_{b}^{aer(EA)} \right) \\
 \mu_{b}^{ana} &= \min \left(\mu_{b}^{ana(DOC)}, \mu_{b}^{ana(N)}, \mu_{b}^{ana(dFe)}, \mu_{b}^{ana(EA)} \right)
 \end{align}
-$$
 
 For aerobic growth, these resource-specific growth rates are calculated as:
 
-$$
 \begin{align}
 \mu_{b}^{aer(DOC)} &= V_{b}^{DOC} y_{b}^{aer(DOC)} \\
 \mu_{b}^{aer(N)} &= \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{aer(N)} \\
 \mu_{b}^{aer(dFe)} &= V_{b}^{dFe} y_{b}^{aer(Fe)} \\
 \mu_{b}^{aer(EA)} &= V_{b}^{O_{2}} y_{b}^{O_{2}}
 \end{align}
-$$
 
 where
 - $V_{b}^{DOC}$ is the maximum uptake rate of dissolved organic carbon by bacterial type $b$ (`bac_Vdoc`, [mmol C m<sup>-3</sup> s<sup>-1</sup>])
@@ -1266,15 +1252,13 @@ where
 
 For anaerobic growth, these resource-specific growth rates are calculated in the same manner, except that the yields associated with growth are altered to reflect anaerobic metabolism. Also, the electron acceptor is no longer oxygen and is now either NO<sub>3</sub> for the NO<sub>3</sub>-reducing bacteria (`f_bac1(i,j,k)`, $b1$) or N<sub>2</sub>O for the N<sub>2</sub>O-reducing bacteria (`f_bac2(i,j,k)`, $b2$):
 
-$$
 \begin{align}
-\mu_{b}^{ana(DOC)} = V_{b}^{DOC} y_{b}^{ana(DOC)} \\
-\mu_{b}^{ana(N)} = \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{ana(N)} \\
-\mu_{b}^{ana(dFe)} = V_{b}^{dFe} y_{b}^{ana(Fe)} \\
-\mu_{b1}^{NO_{3}} = V_{b}^{NO_{3}} y_{b}^{NO_{3}} \\
-\mu_{b2}^{N_{2}O} = V_{b}^{N_{2}O} y_{b}^{N_{2}O}
+\mu_{b}^{ana(DOC)} &= V_{b}^{DOC} y_{b}^{ana(DOC)} \\
+\mu_{b}^{ana(N)} &= \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{ana(N)} \\
+\mu_{b}^{ana(dFe)} &= V_{b}^{dFe} y_{b}^{ana(Fe)} \\
+\mu_{b1}^{NO_{3}} &= V_{b}^{NO_{3}} y_{b}^{NO_{3}} \\
+\mu_{b2}^{N_{2}O} &= V_{b}^{N_{2}O} y_{b}^{N_{2}O}
 \end{align}
-$$
 
 where
 - $V_{b}^{NO_3}$ is the maximum uptake rate of nitrate by bacterial type $b1$ (`bac_Vno3`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
@@ -1291,7 +1275,6 @@ Whether aerobic or anaerobic metabolism results in higher growth is therefore de
 
 Uptake rates of reductant ($DOC$), addition resources ($DON$, NH<sub>4</sub> and $dFe$) and oxidant (electron acceptors) are calculated as:
 
-$$
 \begin{align}
 V_{b}^{DOC} &= V_{b}^{max,DOC} \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{C} + K_{b}^{DOC}} \\
 V_{b}^{DON} &= V_{b}^{max,DON} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{N} + K_{b}^{DON}} \\
@@ -1301,11 +1284,12 @@ V_{b}^{O_{2}} &= \rho_{b}^{O_2} \cdot O_{2} \\
 V_{b}^{NO_{3}} &= V_{b}^{max,NO_{3}} \cdot \dfrac{NO_{3}}{NO_{3} + K_{b}^{NO_{3}}} \\
 V_{b}^{N_{2}O} &= \rho_{b}^{N_{2}O} \cdot N_{2}O
 \end{align}
-$$
 
 where
 - $V_{b}^{max,DOC}$ is the maximum rate of DOC uptake by bacterial functional type $b$ (`bac1_Vmax_doc`; `bac2_Vmax_doc`, [mmol C m<sup>-3</sup> s<sup>-1</sup>])
+
 - $V_{b}^{max,DON}$ is the maximum rate of DON uptake by bacterial functional type $b$ (`bac1_Vmax_don`; `bac2_Vmax_don`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
+
 - $V_{b}^{max,NH_{4}}$ is the maximum rate of NH<sub>4</sub> uptake by bacterial functional type $b$ (`bac1_Vmax_nh4`; `bac2_Vmax_nh4`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
 - $V_{b}^{max,dFe}$ is the maximum rate of $dFe$ uptake by bacterial functional type $b$ (`bac1_Vmax_dFe`; `bac2_Vmax_dFe`, [mmol Fe m<sup>-3</sup> s<sup>-1</sup>])
 - $V_{b}^{max,NO_{3}}$ is the maximum rate of NO<sub>3</sub> uptake by bacterial functional type $b$ (`bac1_Vmax_no3`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
