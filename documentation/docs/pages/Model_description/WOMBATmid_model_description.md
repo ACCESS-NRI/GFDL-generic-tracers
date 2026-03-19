@@ -1631,7 +1631,7 @@ _where_ <br>
 \dfrac{\Delta NO_3}{\Delta t} = & \mu_{aoa}^{&rarr; NO_3} \\
                               - & \mu_{b1}^{&larr; NO_3} \\
                               - & \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
-                                & \qquad  + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+                                & \,+ \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
 \end{align}
 
 **Ammonium** (`f_nh4(i,j,k)`, NH<sub>4</sub>, [mol N kg<sup>-1</sup>])
