@@ -282,11 +282,11 @@ In the code, the combined term $\left(β_{hete}\right)^{T}$ is saved as `fbc`. S
 
 **POM --> DOM**
 
-WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM), which occurs before the remineralisation of the DOM by heterotrophic bacteria. The hydrolysation rate of small sinking organic detritus (`detremi(i,j,k)`, $\Gamma_{sd}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`bdetremi(i,j,k)`, $\Gamma_{ld}^{&rarr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
+WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM), which occurs before the remineralisation of the DOM by heterotrophic bacteria. The hydrolysation rate of small sinking organic detritus (`detremi(i,j,k)`, $\Gamma_{sd}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`bdetremi(i,j,k)`, $\Gamma_{ld}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
 
 \begin{align}
-\Gamma_{sd}^{&rarr; C} &= \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2} \\
-\Gamma_{ld}^{&rarr; C} &= \Gamma_{ld}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{ld}^{C}\right)^{2}
+\Gamma_{sd}^{\rightarrow C} &= \Gamma_{sd}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{sd}^{C}\right)^{2} \\
+\Gamma_{ld}^{\rightarrow C} &= \Gamma_{ld}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{ld}^{C}\right)^{2}
 \end{align}
 
 _where_ <br>
@@ -297,13 +297,13 @@ _where_ <br>
 WOMBAT-mid also carries a distinct dissolved organic nitrogen tracer (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>]) that receives material during the hydrolysation of particulate organics:
 
 \begin{align}
-\Gamma_{sd}^{&rarr; N} &= \Gamma_{sd}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122} \\
-\Gamma_{ld}^{&rarr; N} &= \Gamma_{ld}^{&rarr; B_{DOM}^{C}} \dfrac{16}{122}
+\Gamma_{sd}^{\rightarrow N} &= \Gamma_{sd}^{\rightarrow B_{DOM}^{C}} \dfrac{16}{122} \\
+\Gamma_{ld}^{\rightarrow N} &= \Gamma_{ld}^{\rightarrow B_{DOM}^{C}} \dfrac{16}{122}
 \end{align}
 
 _where_ <br>
 - $\dfrac{16}{122}$ is the ratio of nitrogen to carbon in organic material ([mol N (mol C)<sup>-1</sup>]) <br>
-- $\Gamma_{sd}^{&rarr; C}$ and $\Gamma_{ld}^{&rarr; C}$ are the rates of hydrolysation of small and large particulate organic carbon (`detremi(i,j,k)`; `bdetremi(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\Gamma_{sd}^{\rightarrow C}$ and $\Gamma_{ld}^{\rightarrow C}$ are the rates of hydrolysation of small and large particulate organic carbon (`detremi(i,j,k)`; `bdetremi(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 
 ---
 
@@ -369,13 +369,13 @@ Liebig's law of the minimum ([Liebig, 1840](https://archive.org/details/organicc
 Carbon fixation by phytoplankton is then calculated as:
 
 \begin{align}
-\mu_{np}^{&larr; C} &= \mu_{np} B_{np}^{C} \\
-\mu_{mp}^{&larr; C} &= \mu_{mp} B_{mp}^{C}
+\mu_{np}^{\leftarrow C} &= \mu_{np} B_{np}^{C} \\
+\mu_{mp}^{\leftarrow C} &= \mu_{mp} B_{mp}^{C}
 \end{align}
 
 _where_ <br>
-- $\mu_{np}^{&larr; C}$ is the realized rate of carbon biomass growth by nano-phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\mu_{mp}^{&larr; C}$ is the realized rate of carbon biomass growth by micro-phytoplankton (`diagrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{np}^{\leftarrow C}$ is the realized rate of carbon biomass growth by nano-phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{mp}^{\leftarrow C}$ is the realized rate of carbon biomass growth by micro-phytoplankton (`diagrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $B_{np}^{C}$ is the in situ concentration of nano-phytoplankton biomass (`f_phy(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 - $B_{mp}^{C}$ is the in situ concentration of micro-phytoplankton biomass (`f_dia(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
@@ -387,23 +387,23 @@ _where_ <br>
 We implement the overflow hypothesis ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)), which posits that phytoplankton can exude their assimilated carbon as dissolved organic carbon (DOC) in high light, low nutrient conditions. We thus account for a phytoplankton-mediated creation of DOC from dissolved inorganic carbon (DIC) via:
 
 \begin{align}
-\mu_{np}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{&larr; C}\right) \right) \\
-\mu_{mp}^{&rarr; DOC} &= \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{&larr; C}\right) \right)
+\mu_{np}^{\rightarrow DOC} &= \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{\leftarrow C}\right) \right) \\
+\mu_{mp}^{\rightarrow DOC} &= \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{\leftarrow C}\right) \right)
 \end{align}
 
 _where_ <br>
-- $\mu_{np}^{&rarr; DOC}$ is the overflow production of DOC by nano-phytoplankton (`phydoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\mu_{mp}^{&rarr; DOC}$ is the overflow production of DOC by micro-phytoplankton (`diadoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{np}^{\rightarrow DOC}$ is the overflow production of DOC by nano-phytoplankton (`phydoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{mp}^{\rightarrow DOC}$ is the overflow production of DOC by micro-phytoplankton (`diadoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\mu_{np}^{totalC}$ is the total carbon fixation rate of nano-phytoplankton (`zval`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\mu_{mp}^{totalC}$ is the total carbon fixation rate rate of micro-phytoplankton (`zval`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\mu_{np}^{&larr; C}$ is the realized biomass growth rate of nano-phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\mu_{mp}^{&larr; C}$ is the realized biomass growth rate of micro-phytoplankton (`diagrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{np}^{\leftarrow C}$ is the realized biomass growth rate of nano-phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{mp}^{\leftarrow C}$ is the realized biomass growth rate of micro-phytoplankton (`diagrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $f_{overflow}$ is the maximum fraction total carbon fixation that goes to DOC exudation (`overflow`, [dimenionless])
 
 The total carbon fixation rate of phytoplankton type $p$ is 
 
 \begin{align}
-\mu_{p}^{totalC} &= \mu_{p}^{&rarr; DOC} + \mu_{p}^{&larr; C} = \mu_{p}^{max} L_{p}^{PAR}
+\mu_{p}^{totalC} &= \mu_{p}^{\rightarrow DOC} + \mu_{p}^{\leftarrow C} = \mu_{p}^{max} L_{p}^{PAR}
 \end{align}
 
 This formulation is derived from the idea that DOC exudation occurs as a result of the difference between carbon fixation capacity, which is bounded by light, and biosynthesis, which is bounded by light and nutrient resources. Since [Thornton (2014)](https://doi.org/10.1080/09670262.2013.875596) identified that as much as 50% of total phytoplankton carbon fixation can be routed to DOC exudation, we cap DOC exudation at $f_{overflow}$ of total carbon fixation, which is set as to a default of 0.5. We also set a hard bound that 2% of total carbon fixation must at minimum go to DOC production based on the findings of [Bjørnsen (1988)](https://doi.org/10.4319/lo.1988.33.1.0151) who identified that even the healthiest cells lose a small fraction of their assimilated carbon as DOC via passive diffusion across the cell membrane.
@@ -443,8 +443,8 @@ _where_ <br>
 Growth of chlorophyll by nano-phytoplankton and micro-phytoplankton (`pchl_mu(i,j,k)`; `dchl_mu(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
 \begin{align}
-\mu_{np}^{&larr; Chl} &= \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau^{Chl}} \cdot B_{np}^{C} \\
-\mu_{mp}^{&larr; Chl} &= \mu_{mp} B_{mp}^{Chl} + \dfrac{ Q_{mp}^{*Chl:C} - Q_{mp}^{Chl:C} }{\tau^{Chl}} \cdot B_{mp}^{C}
+\mu_{np}^{\leftarrow Chl} &= \mu_{np} B_{np}^{Chl} + \dfrac{ Q_{np}^{*Chl:C} - Q_{np}^{Chl:C} }{\tau^{Chl}} \cdot B_{np}^{C} \\
+\mu_{mp}^{\leftarrow Chl} &= \mu_{mp} B_{mp}^{Chl} + \dfrac{ Q_{mp}^{*Chl:C} - Q_{mp}^{Chl:C} }{\tau^{Chl}} \cdot B_{mp}^{C}
 \end{align}
 
 _where_ <br>
@@ -504,12 +504,12 @@ _where_ <br>
 Under very low light, this fourth term reduces maximum potential Fe uptake by 10-fold than what it otherwise would be. All four terms are dimensionless and are designed to scale dissolved iron uptake either up or down. Dissolved iron uptake by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
 \begin{align}
-\mu_{np}^{&larr; dFe} &= \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np}) \\
-\mu_{mp}^{&larr; dFe} &= \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})
+\mu_{np}^{\leftarrow dFe} &= \mu_{np}^{max} B_{np}^{+Fe} \cdot (i_{np}) \cdot (ii_{np}) \cdot (iii_{np}) \cdot (iv_{np}) \\
+\mu_{mp}^{\leftarrow dFe} &= \mu_{mp}^{max} B_{mp}^{+Fe} \cdot (i_{mp}) \cdot (ii_{mp}) \cdot (iii_{mp}) \cdot (iv_{mp})
 \end{align}
 
 _where_ <br>
-- $\mu_{np}^{&larr; dFe}$ and $\mu_{mp}^{&larr; dFe}$ are the realized uptake rate of dissolved iron by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{np}^{\leftarrow dFe}$ and $\mu_{mp}^{\leftarrow dFe}$ are the realized uptake rate of dissolved iron by nano-phytoplankton and micro-phytoplankton (`phy_dfeupt(i,j,k)`; `dia_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\mu_{np}^{max}$ and $\mu_{mp}^{max}$ are the maximum potential growth rates of nano-phytoplankton and micro-phytoplankton (`phy_mumax(i,j,k)`; `dia_mumax(i,j,k)`, [s<sup>-1</sup>]) <br>
 - $B_{np}^{+Fe}$ and $B_{mp}^{+Fe}$ are the maximum Fe quotas of nano-phytoplankton and micro-phytoplankton cells (`phy_maxqfe`; `dia_maxqfe`, [mol Fe kg<sup>-1</sup>]) <br>
 
@@ -518,7 +518,7 @@ _where_ <br>
 
 ### 9. Phytoplankton uptake of silicic acid.
 
-Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
+Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{\leftarrow Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 \begin{align}
 (i) & \dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}} \\
@@ -535,7 +535,7 @@ _where_ <br>
 Uptake is then calculated as
 
 \begin{align}
-\mu_{mp}^{&larr; Si} &= \max \left(0, V_{mp}^{Si} \cdot B_{mp}^{C} \cdot (i) \cdot (ii) \right)
+\mu_{mp}^{\leftarrow Si} &= \max \left(0, V_{mp}^{Si} \cdot B_{mp}^{C} \cdot (i) \cdot (ii) \right)
 \end{align}
 
 _where_ <br>
@@ -624,10 +624,10 @@ Now that we have separated the dissolved Fe pool into its subcomponents of free,
 
 **Scavenging:**
 
-Scavenging of dissolved iron specifically affects free iron, is accelerated by the presence of particles in the water column and routes this iron to two sinking authigenic phases. Total scavenging of dissolved iron (`fescaven(i,j,k)`, $Sc_{dFe}^{&rarr;}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is calculated as
+Scavenging of dissolved iron specifically affects free iron, is accelerated by the presence of particles in the water column and routes this iron to two sinking authigenic phases. Total scavenging of dissolved iron (`fescaven(i,j,k)`, $Sc_{dFe}^{\rightarrow}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is calculated as
 
 \begin{align}
-Sc_{dFe}^{&rarr;} &= dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)
+Sc_{dFe}^{\rightarrow} &= dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)
 \end{align}
 
 _where_ <br>
@@ -647,21 +647,21 @@ _where_ <br>
 
 Organic carbon-based particle types $B_{sd}^{C}$ and $B_{ld}^{C}$ are multipled by 2 assuming that carbon represents half the mass of the particle, $B_{ld}^{Si}$ is multipled by 2 assuming that it represents biogenic silica with a molecular mass of 60 g mol<sup>-1</sup>, and inorganic carbon-based particles $B_{CaCO_3}^{C}$ is multipled by 8.3 since the moleculate weight of calcium carbonate is 100 g mol<sup>-1</sup>. 
 
-Total scavenging ($Sc_{dFe}^{&rarr;}$) of free iron is then broken into two parts: scavenging to small authigenic particles (`fescaafe(i,j,k)`, $Sc_{dFe}^{&rarr; Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and scavenging to large authigenic particles (`fescabafe(i,j,k)`, $Sc_{dFe}^{&rarr; Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]). 
+Total scavenging ($Sc_{dFe}^{\rightarrow}$) of free iron is then broken into two parts: scavenging to small authigenic particles (`fescaafe(i,j,k)`, $Sc_{dFe}^{\rightarrow Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and scavenging to large authigenic particles (`fescabafe(i,j,k)`, $Sc_{dFe}^{\rightarrow Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]). 
 
 \begin{align}
-Sc_{dFe}^{&rarr; Fe_{sA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{sd}^{C} + 8.3 \cdot B_{CaCO_3}^{C} }{ B_{particles}^{M} } \\
-Sc_{dFe}^{&rarr; Fe_{lA}} &= Sc_{dFe}^{&rarr;} \cdot \dfrac{ 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} }{ B_{particles}^{M} }
+Sc_{dFe}^{\rightarrow Fe_{sA}} &= Sc_{dFe}^{\rightarrow} \cdot \dfrac{ 2 \cdot B_{sd}^{C} + 8.3 \cdot B_{CaCO_3}^{C} }{ B_{particles}^{M} } \\
+Sc_{dFe}^{\rightarrow Fe_{lA}} &= Sc_{dFe}^{\rightarrow} \cdot \dfrac{ 2 \cdot B_{ld}^{C} + 2 \cdot B_{ld}^{Si} }{ B_{particles}^{M} }
 \end{align}
 
 
 **Coagulation:**
 
-Similarly to scavenging of free iron, coagulation routes dissolved iron to two sinking authigenic phases. However, coagulation acts on the colloidal fraction of dissolved iron ([Tagliabue et al., 2023](https://www.nature.com/articles/s41586-023-06210-5)). Rates of coagulation of colloidal iron to small, slowly sinking authigenic iron (`fecoag2afe(i,j,k)`, $Co_{dFe}^{&rarr; Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and large, fast sinking authigenic iron (`fecoag2bafe(i,j,k)`, $Co_{dFe}^{&rarr; Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) follow the form:
+Similarly to scavenging of free iron, coagulation routes dissolved iron to two sinking authigenic phases. However, coagulation acts on the colloidal fraction of dissolved iron ([Tagliabue et al., 2023](https://www.nature.com/articles/s41586-023-06210-5)). Rates of coagulation of colloidal iron to small, slowly sinking authigenic iron (`fecoag2afe(i,j,k)`, $Co_{dFe}^{\rightarrow Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and large, fast sinking authigenic iron (`fecoag2bafe(i,j,k)`, $Co_{dFe}^{\rightarrow Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) follow the form:
 
 \begin{align}
-Co_{dFe}^{&rarr; Fe_{sA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{sA} \\
-Co_{dFe}^{&rarr; Fe_{lA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{lA}
+Co_{dFe}^{\rightarrow Fe_{sA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{sA} \\
+Co_{dFe}^{\rightarrow Fe_{lA}} &= dFe_{col} \gamma_{dFe}^{coag} \cdot S_{coag}^{lA}
 \end{align}
 
 _where_ <br>
@@ -701,8 +701,8 @@ Together, these terms implement a biologically mediated coagulation pathway in w
 Small, slow sinking authigenic (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>]) and a large, fast sinking authigenic iron (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>]) are returned back to the dissolved iron phase through reductive processes or complexation with ligands ([Tagliabue et al., 2023](https://www.nature.com/articles/s41586-023-06210-5)). We represent this process simply via dissolution rate cofficients:
 
 \begin{align}
-D_{sA}^{&rarr; dFe} &= Fe_{sA} \gamma_{sA}^{diss} \\
-D_{lA}^{&rarr; dFe} &= Fe_{lA} \gamma_{lA}^{diss}
+D_{sA}^{\rightarrow dFe} &= Fe_{sA} \gamma_{sA}^{diss} \\
+D_{lA}^{\rightarrow dFe} &= Fe_{lA} \gamma_{lA}^{diss}
 \end{align}
 
 ---
@@ -765,10 +765,10 @@ We obtain $\Delta V^{0}$ from [Willey, 1982](https://doi.org/10.1016/0016-7037(8
 
 **Biogenic silica dissolution**
 
-Biogenic silica is only considered associated with the large type of sinking particulate organic matter and dissolution (`bsidiss(i,j,k)`, $D_{B_{ld}^{Si}}^{&rarr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) occurs via
+Biogenic silica is only considered associated with the large type of sinking particulate organic matter and dissolution (`bsidiss(i,j,k)`, $D_{B_{ld}^{Si}}^{\rightarrow Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) occurs via
 
 \begin{align}
-D_{B_{ld}^{Si}}^{&rarr; Si} &= d_{B_{ld}^{Si}} \cdot B_{ld}^{Si}
+D_{B_{ld}^{Si}}^{\rightarrow Si} &= d_{B_{ld}^{Si}} \cdot B_{ld}^{Si}
 \end{align}
 
 _where_ <br>
@@ -830,13 +830,13 @@ Mortality of ecological functional types are affected by both linear ($\gamma$) 
 **Linear losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
 \begin{align}
-\gamma_{np}^{&rarr; C} &= \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
-\gamma_{mp}^{&rarr; C} &= \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
-\gamma_{mz}^{&rarr; C} &= \gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
-\gamma_{Mz}^{&rarr; C} &= \gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C} \\
-\gamma_{b1}^{&rarr; C} &= \gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C} \\
-\gamma_{b2}^{&rarr; C} &= \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
-\gamma_{aoa}^{&rarr; C} &= \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
+\gamma_{np}^{\rightarrow C} &= \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
+\gamma_{mp}^{\rightarrow C} &= \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
+\gamma_{mz}^{\rightarrow C} &= \gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
+\gamma_{Mz}^{\rightarrow C} &= \gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C} \\
+\gamma_{b1}^{\rightarrow C} &= \gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C} \\
+\gamma_{b2}^{\rightarrow C} &= \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
+\gamma_{aoa}^{\rightarrow C} &= \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
 \end{align}
 
 _where_ <br>
@@ -876,13 +876,13 @@ _where_ <br>
 **Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
 \begin{align}
-\Gamma_{np}^{&rarr; C} &= \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
-\Gamma_{mp}^{&rarr; C} &= \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
-\Gamma_{mz}^{&rarr; C} &= \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
-\Gamma_{Mz}^{&rarr; C} &= \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C} \\
-\Gamma_{b1}^{&rarr; C} &= \Gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C} \\
-\Gamma_{b2}^{&rarr; C} &= \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
-\Gamma_{aoa}^{&rarr; C} &= \Gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
+\Gamma_{np}^{\rightarrow C} &= \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
+\Gamma_{mp}^{\rightarrow C} &= \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
+\Gamma_{mz}^{\rightarrow C} &= \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
+\Gamma_{Mz}^{\rightarrow C} &= \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C} \\
+\Gamma_{b1}^{\rightarrow C} &= \Gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C} \\
+\Gamma_{b2}^{\rightarrow C} &= \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
+\Gamma_{aoa}^{\rightarrow C} &= \Gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
 \end{align}
 
 _where_ <br>
@@ -962,8 +962,8 @@ The community average prey capture rate coefficients of micro-zooplankton (`zooe
 Total grazing of biomass by micro-zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
 \begin{align}
-g_{mz}^{&larr; C} &= g_{mz} B_{mz}^{C} \\
-g_{Mz}^{&larr; C} &= g_{Mz} B_{Mz}^{C}
+g_{mz}^{\leftarrow C} &= g_{mz} B_{mz}^{C} \\
+g_{Mz}^{\leftarrow C} &= g_{Mz} B_{Mz}^{C}
 \end{align}
 
 _where_ <br>
@@ -975,70 +975,70 @@ _where_ <br>
 Total grazing of prey can also be expressed as the sum of individual prey type consumption:
 
 \begin{align}
-g_{mz}^{&larr; C} &= g_{mz}^{&larr; B_{np}^{C}} + g_{mz}^{&larr; B_{mp}^{C}} + g_{mz}^{&larr; B_{sd}^{C}} + g_{mz}^{&larr; B_{b1}^{C}} + g_{mz}^{&larr; B_{b2}^{C}} + g_{mz}^{&larr; B_{aoa}^{C}} \\
-g_{Mz}^{&larr; C} &= g_{Mz}^{&larr; B_{np}^{C}} + g_{Mz}^{&larr; B_{mp}^{C}} + g_{Mz}^{&larr; B_{sd}^{C}} + g_{Mz}^{&larr; B_{ld}^{C}} + g_{Mz}^{&larr; B_{b1}^{C}} + g_{Mz}^{&larr; B_{b2}^{C}} + g_{Mz}^{&larr; B_{aoa}^{C}} + g_{Mz}^{&larr; B_{mz}^{C}}
+g_{mz}^{\leftarrow C} &= g_{mz}^{\leftarrow B_{np}^{C}} + g_{mz}^{\leftarrow B_{mp}^{C}} + g_{mz}^{\leftarrow B_{sd}^{C}} + g_{mz}^{\leftarrow B_{b1}^{C}} + g_{mz}^{\leftarrow B_{b2}^{C}} + g_{mz}^{\leftarrow B_{aoa}^{C}} \\
+g_{Mz}^{\leftarrow C} &= g_{Mz}^{\leftarrow B_{np}^{C}} + g_{Mz}^{\leftarrow B_{mp}^{C}} + g_{Mz}^{\leftarrow B_{sd}^{C}} + g_{Mz}^{\leftarrow B_{ld}^{C}} + g_{Mz}^{\leftarrow B_{b1}^{C}} + g_{Mz}^{\leftarrow B_{b2}^{C}} + g_{Mz}^{\leftarrow B_{aoa}^{C}} + g_{Mz}^{\leftarrow B_{mz}^{C}}
 \end{align}
 
 In this formulation, consumption of each prey item $i$ in [mol C kg<sup>-1</sup>] is equal to:
 
 \begin{align}
-g_{z}^{&larr; B_{i}^{C}} &= g_{z} B_{z}^{C} \cdot \dfrac{\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}{\sum_{i} \varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}
+g_{z}^{\leftarrow B_{i}^{C}} &= g_{z} B_{z}^{C} \cdot \dfrac{\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}{\sum_{i} \varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C} \right)^{2}}
 \end{align}
 
 Thus: <br>
-- $g_{mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{mz}^{&larr; B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by micro-zooplankton (`zoograzdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{mz}^{&larr; B_{b1}^{C}}$ is the grazing rate of facultative NO<sub>3</sub>-reducing bacteria by micro-zooplankton (`zoograzbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{mz}^{&larr; B_{b2}^{C}}$ is the grazing rate of facultative N<sub>2</sub>O-reducing bacteria by micro-zooplankton (`zoograzbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{mz}^{&larr; B_{aoa}^{C}}$ is the grazing rate of ammonia oxidizing archaea by micro-zooplankton (`zoograzaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by meso-zooplankton (`mesgrazphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by meso-zooplankton (`mesgrazdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{ld}^{C}}$ is the grazing rate of large particulate detritus by meso-zooplankton (`mesgrazbdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{b1}^{C}}$ is the grazing rate of facultative NO<sub>3</sub>-reducing bacteria by meso-zooplankton (`mesgrazbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{b2}^{C}}$ is the grazing rate of facultative N<sub>2</sub>O-reducing bacteria by meso-zooplankton (`mesgrazbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{aoa}^{C}}$ is the grazing rate of ammonia oxidizing archaea by meso-zooplankton (`mesgrazaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{mz}^{C}}$ is the grazing rate of micro-zooplankton by meso-zooplankton (`mesgrazzoo(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by micro-zooplankton (`zoograzdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{b1}^{C}}$ is the grazing rate of facultative NO<sub>3</sub>-reducing bacteria by micro-zooplankton (`zoograzbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{b2}^{C}}$ is the grazing rate of facultative N<sub>2</sub>O-reducing bacteria by micro-zooplankton (`zoograzbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{aoa}^{C}}$ is the grazing rate of ammonia oxidizing archaea by micro-zooplankton (`zoograzaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by meso-zooplankton (`mesgrazphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by meso-zooplankton (`mesgrazdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{ld}^{C}}$ is the grazing rate of large particulate detritus by meso-zooplankton (`mesgrazbdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{b1}^{C}}$ is the grazing rate of facultative NO<sub>3</sub>-reducing bacteria by meso-zooplankton (`mesgrazbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{b2}^{C}}$ is the grazing rate of facultative N<sub>2</sub>O-reducing bacteria by meso-zooplankton (`mesgrazbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{aoa}^{C}}$ is the grazing rate of ammonia oxidizing archaea by meso-zooplankton (`mesgrazaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{mz}^{C}}$ is the grazing rate of micro-zooplankton by meso-zooplankton (`mesgrazzoo(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 
 
 **Zooplankton egestion, excretion and assimilation** are then calculated assuming static assimilation coefficients. Grazed biomass is routed to either egestion or ingestion via an ingestion coefficient ($\lambda^{C}$, [mol C (mol C)<sup>-1</sup>]), with the egested fraction being equal to $1.0 - \lambda^{C}$. The biomass that is ingested is then split between assimilation and excretion based on an assimilation coefficient ($\eta^{C}$, [mol C (mol C)<sup>-1</sup>]) with the excreted fraction being equal to $1.0 - \eta^{C}$. Egestion ($E$), excretion ($X$) and assimilation ($A$) of organic carbon due to grazing of prey type $i$ by zooplankton type $z$ are:
 
 \begin{align}
-E_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \left(1 - \lambda_{z}^{C} \right) \\
-X_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
-A_{z}^{&larr; B_{i}^{C}} &= g_{z}^{&larr; B_{i}^{C}} \lambda_{z}^{C} \eta_{z}^{C}
+E_{z}^{\leftarrow B_{i}^{C}} &= g_{z}^{\leftarrow B_{i}^{C}} \left(1 - \lambda_{z}^{C} \right) \\
+X_{z}^{\leftarrow B_{i}^{C}} &= g_{z}^{\leftarrow B_{i}^{C}} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
+A_{z}^{\leftarrow B_{i}^{C}} &= g_{z}^{\leftarrow B_{i}^{C}} \lambda_{z}^{C} \eta_{z}^{C}
 \end{align}
 
 _where_ <br>
-- $E_{z}^{&larr; B_{i}^{C}}$ is the rate of egestion of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
-- $X_{z}^{&larr; B_{i}^{C}}$ is the rate of excretion of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
-- $A_{z}^{&larr; B_{i}^{C}}$ is the rate of assimilation of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
-- $g_{z}^{&larr; B_{i}^{C}}$ is the grazing rate of zooplankton type $z$ on prey type $i$ ([mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $E_{z}^{\leftarrow B_{i}^{C}}$ is the rate of egestion of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
+- $X_{z}^{\leftarrow B_{i}^{C}}$ is the rate of excretion of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
+- $A_{z}^{\leftarrow B_{i}^{C}}$ is the rate of assimilation of carbon biomass by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
+- $g_{z}^{\leftarrow B_{i}^{C}}$ is the grazing rate of zooplankton type $z$ on prey type $i$ ([mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\lambda_{z}^{C}$ is the fraction of prey carbon biomass that is ingested by zooplankton type $z$ (`zooCingest`; `mesCingest`, [mol C (mol C)<sup>-1</sup>]) <br>
 - $\eta_{z}^{C}$ is the fraction of ingested prey carbon biomass that is assimilated by zooplankton type $z$ (`zooCassim`; `mesCassim`, [mol C (mol C)<sup>-1</sup>]) <br>
 
 Total egestion, excretion and assimilation or carbon are therefore:
 
 \begin{align}
-E_{z}^{&larr; C} &= g_{z}^{&larr; C} \left(1 - \lambda_{z}^{C} \right) \\
-X_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
-A_{z}^{&larr; C} &= g_{z}^{&larr; C} \lambda_{z}^{C} \eta_{z}^{C}
+E_{z}^{\leftarrow C} &= g_{z}^{\leftarrow C} \left(1 - \lambda_{z}^{C} \right) \\
+X_{z}^{\leftarrow C} &= g_{z}^{\leftarrow C} \lambda_{z}^{C} \left(1 - \eta_{z}^{C} \right) \\
+A_{z}^{\leftarrow C} &= g_{z}^{\leftarrow C} \lambda_{z}^{C} \eta_{z}^{C}
 \end{align}
 
 Because we track both carbon and iron through the ecosystem components, we assign unique ingestion and assimilation coefficients to carbon and iron. This separation of ingestion and assimilation coefficients for iron and carbon follows [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597). For iron, we apply unique ingestion ($\lambda^{Fe}$, [mol Fe (mol Fe)<sup>-1</sup>]) and assimilation coefficients ($\eta^{Fe}$, [mol Fe (mol Fe)<sup>-1</sup>]). [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597) show that if $\lambda^{Fe} << \lambda^{C}$ then egestion is enriched in Fe:C, and it follows that $\eta^{Fe} >> \eta^{C}$ so that zooplankton can absorb sufficient iron from their prey. Consequently:
 
 \begin{align}
-E_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \left(1 - \lambda_{z}^{Fe} \right) \\
-X_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
-A_{z}^{&larr; B_{i}^{Fe}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \eta_{z}^{Fe}
+E_{z}^{\leftarrow B_{i}^{Fe}} &= g_{z}^{\leftarrow B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \left(1 - \lambda_{z}^{Fe} \right) \\
+X_{z}^{\leftarrow B_{i}^{Fe}} &= g_{z}^{\leftarrow B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
+A_{z}^{\leftarrow B_{i}^{Fe}} &= g_{z}^{\leftarrow B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \lambda_{z}^{Fe} \eta_{z}^{Fe}
 \end{align}
 
 _where_ <br>
-- $E_{z}^{&larr; B_{i}^{Fe}}$ is the rate of egestion of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>]) <br>
-- $X_{z}^{&larr; B_{i}^{Fe}}$ is the rate of excretion of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>]) <br>
-- $A_{z}^{&larr; B_{i}^{Fe}}$ is the rate of assimilation of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>]) <br>
-- $g_{z}^{&larr; B_{i}^{C}}$ is the grazing rate of zooplankton type $z$ on prey type $i$ ([mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $E_{z}^{\leftarrow B_{i}^{Fe}}$ is the rate of egestion of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>]) <br>
+- $X_{z}^{\leftarrow B_{i}^{Fe}}$ is the rate of excretion of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>]) <br>
+- $A_{z}^{\leftarrow B_{i}^{Fe}}$ is the rate of assimilation of iron biomass by zooplankton type $z$ feeding on prey type $i$ ([mol Fe kg<sup>-1</sup>]) <br>
+- $g_{z}^{\leftarrow B_{i}^{C}}$ is the grazing rate of zooplankton type $z$ on prey type $i$ ([mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\dfrac{B_{i}^{Fe}}{B_{i}^{C}}$ is the Fe:C ratio of prey type $i$ ([mol Fe (mol C)<sup>-1</sup>]) <br>
 - $\lambda_{z}^{Fe}$ is the fraction of prey iron biomass that is ingested by zooplankton type $z$ (`zooFeingest`; `mesFeingest`, [mol Fe (mol Fe)<sup>-1</sup>]) <br>
 - $\eta_{z}^{Fe}$ is the fraction of ingested prey iron biomass that is assimilated by zooplankton type $z$ (`zooFeassim`; `mesFeassim`, [mol Fe (mol Fe)<sup>-1</sup>]) <br>
@@ -1046,9 +1046,9 @@ _where_ <br>
 Total egestion, excretion and assimilation or iron are therefore:
 
 \begin{align}
-E_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \left(1 - \lambda_{z}^{Fe} \right) \\
-X_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
-A_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \eta_{z}^{Fe}
+E_{z}^{\leftarrow Fe} &= \sum_{i} \left( g_{z}^{\leftarrow B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \left(1 - \lambda_{z}^{Fe} \right) \\
+X_{z}^{\leftarrow Fe} &= \sum_{i} \left( g_{z}^{\leftarrow B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \left(1 - \eta_{z}^{Fe} \right) \\
+A_{z}^{\leftarrow Fe} &= \sum_{i} \left( g_{z}^{\leftarrow B_{i}^{C}} \dfrac{B_{i}^{Fe}}{B_{i}^{C}} \right) \cdot \lambda_{z}^{Fe} \eta_{z}^{Fe}
 \end{align}
 
 **Excretion of nitrogen**
@@ -1056,13 +1056,13 @@ A_{z}^{&larr; Fe} &= \sum_{i} \left( g_{z}^{&larr; B_{i}^{C}} \dfrac{B_{i}^{Fe}}
 For zooplankton preying on phytoplankton, other zooplankton and detritus, their excretion of nitrogen will be equal to:
 
 \begin{align}
-X_{z}^{&larr; B_{i}^{N}} &= X_{z}^{&larr; B_{i}^{C}} \dfrac{16}{122}
+X_{z}^{\leftarrow B_{i}^{N}} &= X_{z}^{\leftarrow B_{i}^{C}} \dfrac{16}{122}
 \end{align}
 
 However, since both micro-zooplankton and meso-zooplankton consume heterotrophic bacteria and ammonia oxidizing arcaheal types, which have different C:N ratios to other ecosystem biomass components, we must also compute the specific excretion of NH<sub>4</sub> and $B_{DOM}^{N}$ by zooplankton when feeding on these types. Since these types are richer in N than the other prey types, zooplankton excrete more NH<sub>4</sub> and $B_{DOM}^{N}$ when bacteria and archaea represent a greater proportion of their diet ([Sterner & Elser, 2002](https://press.princeton.edu/books/ebook/9781400885695/ecological-stoichiometry-pdf)). Total excretion of nitrogen from bacterial/archaeal type $i$ by zooplankton type $z$ is as follows:
 
 \begin{align}
-X_{z}^{&larr; B_{i}^{N}} &= g_{z}^{&larr; B_{i}^{C}} \dfrac{1}{R_{i}^{C:N}} - \dfrac{A_{z}^{&larr; B_{i}^{C}} + E_{z}^{&larr; B_{i}^{C}}}{R_{z}^{C:N}}
+X_{z}^{\leftarrow B_{i}^{N}} &= g_{z}^{\leftarrow B_{i}^{C}} \dfrac{1}{R_{i}^{C:N}} - \dfrac{A_{z}^{\leftarrow B_{i}^{C}} + E_{z}^{\leftarrow B_{i}^{C}}}{R_{z}^{C:N}}
 \end{align}
 
 ---
@@ -1077,19 +1077,19 @@ When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model com
 **Production** of $CaCO_3$ in WOMBAT-mid comes from five sources: (1) density-dependent mortality of nano-phytoplankton (i.e., coccolithophorids), (2) density-dependent mortality of micro-zooplankton (i.e., foraminifera), (3) micro-zooplankton egestion of grazed nano-phytoplankton, (4) meso-zooplankton egestion of grazed nano-phytoplankton, and (5) meso-zooplankton egestion of grazed micro-zooplankton. Each term is multiplied by the particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) to return a rate of $CaCO_3$ production in mol C kg<sup>-1</sup> s<sup>-1</sup>.
 
 \begin{align}
-(1) & P_{CaCO_3}^{\Gamma_{np}^{C}} = \Gamma_{np}^{&rarr; C} \cdot PIC:POC \\
-(2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \Gamma_{mp}^{&rarr; C} \cdot PIC:POC \\
-(3) & P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}} = g_{mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
-(4) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}} = g_{Mz}^{&larr; B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
-(5) & P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}} = g_{Mz}^{&larr; B_{mz}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
+(1) & P_{CaCO_3}^{\Gamma_{np}^{C}} = \Gamma_{np}^{\rightarrow C} \cdot PIC:POC \\
+(2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \Gamma_{mp}^{\rightarrow C} \cdot PIC:POC \\
+(3) & P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}} = g_{mz}^{\leftarrow B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
+(4) & P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}} = g_{Mz}^{\leftarrow B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
+(5) & P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}} = g_{Mz}^{\leftarrow B_{mz}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
 \end{align}
 
 _where_ <br>
-- $\Gamma_{np}^{&rarr; C}$ is the quadratic (density-dependent) loss rate of nano-phytoplankton biomass (`phymorq`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\Gamma_{mz}^{&rarr; C}$ is the quadratic (density-dependent) loss rate of micro-zooplankton biomass (`zoomorq`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by meso-zooplankton (`mesgrazphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{mz}^{C}}$ is the grazing rate of micro-zooplankton by meso-zooplankton (`mesgrazzoo(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\Gamma_{np}^{\rightarrow C}$ is the quadratic (density-dependent) loss rate of nano-phytoplankton biomass (`phymorq`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\Gamma_{mz}^{\rightarrow C}$ is the quadratic (density-dependent) loss rate of micro-zooplankton biomass (`zoomorq`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by meso-zooplankton (`mesgrazphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{mz}^{C}}$ is the grazing rate of micro-zooplankton by meso-zooplankton (`mesgrazzoo(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $F_{gut}$ is the fraction of $CaCO_3$ that is dissolved within zooplankton guts (`fgutdiss`, [mol C (mol C)<sup>-1</sup>]) <br>
 
 In the above, the $PIC:POC$ ratio is formulated as 
@@ -1110,14 +1110,14 @@ This formulation of $PIC:POC$ is therefore a function of the substrate–inhibit
 
 (1) undersaturation-driven dissolution of calcite (`caldiss(i,j,k)`, $D_{CaCO_3}^{\Omega_{cal}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 (2) undersaturation-driven dissolution of aragonite (`aradiss(i,j,k)`, $D_{CaCO_3}^{\Omega_{ara}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-(3) biologically-mediated dissolution associated with degredation of small detrital organic matter (`pocdiss(i,j,k)`, $D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-(4) dissolution within micro-zooplankton during their digestion of detrital aggregates (`zoodiss(i,j,k)`, $D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-(5) dissolution within meso-zooplankton during their digestion of detrital aggregates (`mesdiss(i,j,k)`, $D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+(3) biologically-mediated dissolution associated with degredation of small detrital organic matter (`pocdiss(i,j,k)`, $D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+(4) dissolution within micro-zooplankton during their digestion of detrital aggregates (`zoodiss(i,j,k)`, $D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+(5) dissolution within meso-zooplankton during their digestion of detrital aggregates (`mesdiss(i,j,k)`, $D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 
 Total $CaCO_3$ dissolution is:
 
 \begin{align}
-D_{CaCO_3} &= D_{CaCO_3}^{\Omega_{cal}} + D_{CaCO_3}^{\Omega_{ara}} + D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} + D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}} + D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}
+D_{CaCO_3} &= D_{CaCO_3}^{\Omega_{cal}} + D_{CaCO_3}^{\Omega_{ara}} + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}} + D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}} + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}
 \end{align}
 
 This formulation, at leas the first three terms, follows [Kwon et al. (2024)](https://www.science.org/doi/full/10.1126/sciadv.adl0779).
@@ -1125,7 +1125,7 @@ This formulation, at leas the first three terms, follows [Kwon et al. (2024)](ht
 \begin{align}
 (1) & D_{CaCO_3}^{\Omega_{cal}} = d_{CaCO_3}^{\Omega_{cal}} \max\left(0,  1 - \Omega_{cal}\right)^{2.2} B_{CaCO_3}^{C} \\ 
 (2) & D_{CaCO_3}^{\Omega_{ara}} = d_{CaCO_3}^{\Omega_{ara}} \max\left(0,  1 - \Omega_{ara}\right)^{1.5} B_{CaCO_3}^{C} \\
-(3) & D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}} = d_{CaCO_3}^{\Gamma_{sd}} \Gamma_{sd}^{&rarr; C} B_{CaCO_3}^{C}
+(3) & D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}} = d_{CaCO_3}^{\Gamma_{sd}} \Gamma_{sd}^{\rightarrow C} B_{CaCO_3}^{C}
 \end{align}
 
 _where_ <br>
@@ -1134,21 +1134,21 @@ _where_ <br>
 - $d_{CaCO_3}^{\Omega_{cal}}$ is the reference dissolution rate constant for calcite (`disscal`, [s<sup>-1</sup>])  <br>
 - $d_{CaCO_3}^{\Omega_{ara}}$ is the reference dissolution rate constant for aragonite (`dissara`, [s<sup>-1</sup>])  <br>
 - $d_{CaCO_3}^{\Gamma_{sd}}$ is the reference dissolution rate constant per unit of small detrital organic carbon remineralised (`dissdet`, [(mmol C m<sup>-3</sup>)<sup>-1</sup>])  <br>
-- $\Gamma_{sd}^{&rarr; C}$ is the in situ remineralisation rate of small detrital organic carbon (`detremi(i,j,k)`, [mmol C m<sup>-3</sup> s<sup>-1</sup>]) <br>
+- $\Gamma_{sd}^{\rightarrow C}$ is the in situ remineralisation rate of small detrital organic carbon (`detremi(i,j,k)`, [mmol C m<sup>-3</sup> s<sup>-1</sup>]) <br>
 - $B_{CaCO_3}^{C}$ is the in situ concentration of $CaCO_3$ in carbon units (`f_caco3(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
-For $D_{CaCO_3}^{\Omega_{cal}}$ and $D_{CaCO_3}^{\Omega_{ara}}$, dissolution is activated only under undersaturated conditions ($\Omega_{cal} < 1$; $\Omega_{ara} < 1$) and increases nonlinearly with increasing undersaturation. In contrast, $D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}}$ represents shallow water dissolution due to reducing microenvironments. In this scenario, $\Omega_{cal}$ and $\Omega_{ara}$ tend to be > 1 ([Sulpis et al., 2021](https://doi.org/10.1038/s41561-021-00743-y)) but dissolution nonetheless occurs in microenvironments enriched in $CO_{2}^{*}$ due to heterotrophic activity ([Borer et al., 2026](https://doi.org/10.1073/pnas.2510025123)).
+For $D_{CaCO_3}^{\Omega_{cal}}$ and $D_{CaCO_3}^{\Omega_{ara}}$, dissolution is activated only under undersaturated conditions ($\Omega_{cal} < 1$; $\Omega_{ara} < 1$) and increases nonlinearly with increasing undersaturation. In contrast, $D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}$ represents shallow water dissolution due to reducing microenvironments. In this scenario, $\Omega_{cal}$ and $\Omega_{ara}$ tend to be > 1 ([Sulpis et al., 2021](https://doi.org/10.1038/s41561-021-00743-y)) but dissolution nonetheless occurs in microenvironments enriched in $CO_{2}^{*}$ due to heterotrophic activity ([Borer et al., 2026](https://doi.org/10.1073/pnas.2510025123)).
 
 The fourth and fifth terms (`zoodiss(i,j,k)`; `mesdiss(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) represent dissolution of $CaCO_3$ during zooplankton digestion of detrital particulates. 
 
 \begin{align}
-(4) & D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{&larr; C}}} = g_{mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}} \\
-(5) & D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{&larr; C}}} = g_{Mz}^{&larr; B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}
+(4) & D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{\leftarrow C}}} = g_{mz}^{\leftarrow B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}} \\
+(5) & D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{\leftarrow C}}} = g_{Mz}^{\leftarrow B_{sd}^{C}} F_{gut} \dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}
 \end{align}
 
 _where_ <br>
-- $g_{mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $F_{gut}$ is the fraction of $CaCO_3$ that is dissolved within zooplankton guts (`fgutdiss`, [mol C (mol C)<sup>-1</sup>]) <br>
 - $\dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}$ is the in situ ratio of $CaCO_3$ to small organic carbon detritus (`biocaco3/biodet`, [mol C (mol C)<sup>-1</sup>]) <br>
 
@@ -1166,7 +1166,7 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability. The equation for new nitrogen (specifically NH<sub>4</sub>) added via diazotrophy is:
 
 \begin{align}
-\mu_{diazo}^{&rarr; NH_4} &= \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \cdot \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}
+\mu_{diazo}^{\rightarrow NH_4} &= \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \cdot \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}
 \end{align}
 
 _where_ <br>
@@ -1207,10 +1207,10 @@ _where_ <br>
 
 We remineralise dissolved organic matter into inorganic consituents via the activity of two facultative bacterial heterotrophs. These bacterial heterotrophs oxidise dissolved organic carbon ($B_{DOM}^{C}$) and reduce dissolved oxygen (O<sub>2</sub>). However, we consider these bacterial types, which relfect the traits of the ubiquitous SAR11, to be faculatively anaerobic ([Zumft, 1997](https://doi.org/10.1128/mmbr.61.4.533-616.1997); [Tsementzi et al., 2016](https://doi.org/10.1038/nature19068)). This means that they can shift their metabolism to using either nitrate (NO<sub>3</sub>) or nitrous oxide (N<sub>2</sub>O) as alternative electron acceptors when O<sub>2</sub> is limiting. These populations of heterotrophic bacteria also assimilate dissolved organic nitrogen ($DON$) and ammonium (NH<sub>4</sub>) and dissolved iron ($dFe$) to support biosynthesis. By taking up NH<sub>4</sub> and $dFe$ bacteria compete directly with phytoplankton, consistent with prior observations ([Kirchman, 1994](https://www.jstor.org/stable/4251383); [Tortell et al., 1996](https://doi.org/10.1038/383330a0); [Kirchman & Wheeler, 1998](https://doi.org/10.1016/S0967-0637(97)00075-7); [Fourquez et al., 2015](https://doi.org/10.5194/bg-12-1893-2015); [Deng et al., 2021](https://doi.org/10.1002/lno.11883); [Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)).
 
-Our formulation of heterotrophic bacterial growth follows that developed by [Zakem et al. (2020)](https://doi.org/10.1038/s41396-019-0523-8) and subsequently expanded in [Sun et al. (2024)](https://doi.org/10.1073/pnas.2417421121) and [Buchanan et al. (2025)](https://www.science.org/doi/full/10.1126/science.ado0742). In these studies, the realized biomass growth rate (integration of carbon into biomass) of bacterial functional type $b$ (`bac1grow(i,j,k)`; `bac2grow(i,j,k)`, $\mu_{b}^{&larr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is defined by:
+Our formulation of heterotrophic bacterial growth follows that developed by [Zakem et al. (2020)](https://doi.org/10.1038/s41396-019-0523-8) and subsequently expanded in [Sun et al. (2024)](https://doi.org/10.1073/pnas.2417421121) and [Buchanan et al. (2025)](https://www.science.org/doi/full/10.1126/science.ado0742). In these studies, the realized biomass growth rate (integration of carbon into biomass) of bacterial functional type $b$ (`bac1grow(i,j,k)`; `bac2grow(i,j,k)`, $\mu_{b}^{\leftarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is defined by:
 
 \begin{align}
-\mu_{b}^{&larr; C} &= \max\left(\mu_{b}^{aer}, \mu_{b}^{ana} \right) (β_{hete})^{T} B_{b}^{C}
+\mu_{b}^{\leftarrow C} &= \max\left(\mu_{b}^{aer}, \mu_{b}^{ana} \right) (β_{hete})^{T} B_{b}^{C}
 \end{align}
 
 _where_ <br>
@@ -1352,8 +1352,8 @@ y_{b}^{aer(DON)} &= y_{b}^{DON} \cdot R_{b}^{C:N} \\
 y_{b}^{aer(DOC)} &= y_{b}^{DON} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}} \\
 y_{b}^{O_2} &= \dfrac{\dfrac{f_{b}^{aer(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{aer(\kappa)}}{4}} \cdot R_{b}^{C:N} \\
 y_{b}^{ana(DOC)} &= y_{b}^{DON} P_{ana} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}} \\
-y_{b}^{NO_{3} &rarr; N_{2}O} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{4}} \cdot R_{b}^{C:N} \\
-y_{b}^{N_{2}O &rarr; N_{2}} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{1}} \cdot R_{b}^{C:N}
+y_{b}^{NO_{3} \rightarrow N_{2}O} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{4}} \cdot R_{b}^{C:N} \\
+y_{b}^{N_{2}O \rightarrow N_{2}} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{1}} \cdot R_{b}^{C:N}
 \end{align}
 
 _where_ <br>
@@ -1361,8 +1361,8 @@ _where_ <br>
 - $y_{b}^{aer(DOC)}$ is the aerobic growth yield of bacterial functional type $b$ on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, [mol C biomass (mol DOC)<sup>-1</sup>]) <br>
 - $y_{b}^{ana(DOC)}$ is the anaerobic growth yield of bacterial functional type $b$ on DOC (`bac1_yana`; `bac2_yana`, [mol C biomass (mol DOC)<sup>-1</sup>]) <br>
 - $y_{b}^{O_2}$ is the aerobic growth yield of bacterial functional type $b$ on O<sub>2</sub> (`bac1_yoxyC`; `bac2_yoxyC`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>]) <br>
-- $y_{b}^{NO_{3} &rarr; N_{2}O}$ is the anaerobic growth yield of bacterial functional type $b$ on NO<sub>3</sub> (`bac1_yno3C`, [mol C biomass (mol NO<sub>3</sub>)<sup>-1</sup>]) <br>
-- $y_{b}^{N_{2}O &rarr; N_{2}}$ is the anaerobic growth yield of bacterial functional type $b$ on N<sub>2</sub>O (`bac2_yn2oC`, [mol C biomass (mol N<sub>2</sub>O)<sup>-1</sup>]) <br>
+- $y_{b}^{NO_{3} \rightarrow N_{2}O}$ is the anaerobic growth yield of bacterial functional type $b$ on NO<sub>3</sub> (`bac1_yno3C`, [mol C biomass (mol NO<sub>3</sub>)<sup>-1</sup>]) <br>
+- $y_{b}^{N_{2}O \rightarrow N_{2}}$ is the anaerobic growth yield of bacterial functional type $b$ on N<sub>2</sub>O (`bac2_yn2oC`, [mol C biomass (mol N<sub>2</sub>O)<sup>-1</sup>]) <br>
 
 
 **Consumption of substrates**
@@ -1370,17 +1370,17 @@ _where_ <br>
 Heterotrophic bacterial growth consumes $B_{DOM}^{C}$, $B_{DOM}^{N}$, NH<sub>4</sub>, $dFe$, O<sub>2</sub>, NO<sub>3</sub> and N<sub>2</sub>O. The consumption of a resource $R$ by bacterial functional type $b$ is calculated as:
 
 \begin{align}
-\mu_{b}^{&larr; R} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{R}}
+\mu_{b}^{\leftarrow R} &= \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{R}}
 \end{align}
 
 _where_ <br>
-- $\mu_{b}^{&larr; C}$ is the realized biomass growth rate (i.e., integration of carbon into biomass) of bacterial functional type $b$ ([mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{b}^{\leftarrow C}$ is the realized biomass growth rate (i.e., integration of carbon into biomass) of bacterial functional type $b$ ([mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $y_{b}^{R}$ is the growth yield of bacterial functional type $b$ on resource $R$ ([mol C biomass (mol R)<sup>-1</sup>])  <br>
 
 We must be careful to accommodate the different growth yields asssociated with aerobic and anaerobic growth since these bacterial types are facultatively anaerobic, which means that:
 
 \begin{align}
-\mu_{b}^{&larr; R} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(R)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(R)}} f_{ana}
+\mu_{b}^{\leftarrow R} &= \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{aer(R)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{ana(R)}} f_{ana}
 \end{align}
 
 _where_ <br>
@@ -1391,14 +1391,14 @@ _where_ <br>
 $B_{DOM}^{C}$ uptake (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]), for example, is calculated as:
 
 \begin{align}
-\mu_{b}^{&larr; B_{DOM}^{C}} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DOC)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DOC)}} f_{ana}
+\mu_{b}^{\leftarrow B_{DOM}^{C}} &= \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{aer(DOC)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{ana(DOC)}} f_{ana}
 \end{align}
 
 However, both $B_{DOM}^{N}$ (`don1remi(i,j,k)`; `don2remi(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and NH<sub>4</sub> (`bac1unh4(i,j,k)`; `bac2unh4(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) serve the bacterial demand for nitrogen and so we must split uptake between these two resources. We do so using the relative $V_{b}^{DON}$ and $V_{b}^{NH_4}$ which depend on the prescribed affinities of bacteria for these resources and the in situ concentrations of $DON$ and NH<sub>4</sub>:
 
 \begin{align}
-\mu_{b}^{&larr; B_{DOM}^{N}} &= \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{DON}}{V_{b}^{DON} + V_{b}^{NH_4}} \\
-\mu_{b}^{&larr; NH_4} &= \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{NH_4}}{V_{b}^{DON} + V_{b}^{NH_4}}
+\mu_{b}^{\leftarrow B_{DOM}^{N}} &= \left(\dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{DON}}{V_{b}^{DON} + V_{b}^{NH_4}} \\
+\mu_{b}^{\leftarrow NH_4} &= \left(\dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{NH_4}}{V_{b}^{DON} + V_{b}^{NH_4}}
 \end{align}
 
 Since bacteria release NH<sub>4</sub> back to the environment, computing the uptake of NH<sub>4</sub> is only for housekeeping purposes and we only consider uptake of $DON$ in tracer tendency equations (see below).
@@ -1406,15 +1406,15 @@ Since bacteria release NH<sub>4</sub> back to the environment, computing the upt
 Consumption of the electron acceptors O<sub>2</sub> (`bac1resp(i,j,k)`; `bac2resp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]), NO<sub>3</sub> (`bac1deni(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and N<sub>2</sub>O (`bac2deni(i,j,k)`, [mol N<sub>2</sub>O kg<sup>-1</sup> s<sup>-1</sup>]) are also calculated only considering aerobic or anaerobic metabolism:
 
 \begin{align}
-\mu_{b}^{&larr; O_2} &= \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{O_2}} \left(1 - f_{ana} \right)  \\
-\mu_{b1}^{&larr; NO_3} &= \dfrac{\mu_{b1}^{&larr; C}}{y_{b1}^{NO_3}} f_{ana} \\
-\mu_{b2}^{&larr; N_{2}O} &= \dfrac{\mu_{b2}^{&larr; C}}{y_{b2}^{N_{2}O}} f_{ana}
+\mu_{b}^{\leftarrow O_2} &= \dfrac{\mu_{b}^{\leftarrow C}}{y_{b}^{O_2}} \left(1 - f_{ana} \right)  \\
+\mu_{b1}^{\leftarrow NO_3} &= \dfrac{\mu_{b1}^{\leftarrow C}}{y_{b1}^{NO_3}} f_{ana} \\
+\mu_{b2}^{\leftarrow N_{2}O} &= \dfrac{\mu_{b2}^{\leftarrow C}}{y_{b2}^{N_{2}O}} f_{ana}
 \end{align}
 
 Consumption of dissolved iron is simply:
 
 \begin{align}
-\mu_{b}^{&larr; dFe} &= \dfrac{\mu_{b}^{&larr; C}}{R_{b}^{C:Fe}}
+\mu_{b}^{\leftarrow dFe} &= \dfrac{\mu_{b}^{\leftarrow C}}{R_{b}^{C:Fe}}
 \end{align}
 
 _where_ <br>
@@ -1426,27 +1426,27 @@ _where_ <br>
 Heterotrophic bacterial growth produces $DIC$, NH<sub>4</sub> and N<sub>2</sub>O. Because we carry ecosystem components in units of carbon, the production of $DIC$ by bacterial functional type $b$ is calculated as:
 
 \begin{align}
-\mu_{b}^{&rarr; DIC} &= \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{DOC}} - 1\right)
+\mu_{b}^{\rightarrow DIC} &= \mu_{b}^{\leftarrow C} \left(\dfrac{1}{y_{b}^{DOC}} - 1\right)
 \end{align}
 
 As before, we must accommodate differences in yields between aerobic and anaerobic growth:
 
 \begin{align}
-\mu_{b}^{&rarr; DIC} &= \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(aer)DOC}} - 1\right)\left(1 - f_{ana}\right) + \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(ana)DOC}} - 1\right) f_{ana}
+\mu_{b}^{\rightarrow DIC} &= \mu_{b}^{\leftarrow C} \left(\dfrac{1}{y_{b}^{(aer)DOC}} - 1\right)\left(1 - f_{ana}\right) + \mu_{b}^{\leftarrow C} \left(\dfrac{1}{y_{b}^{(ana)DOC}} - 1\right) f_{ana}
 \end{align}
 
 Meanwhile, production of NH<sub>4</sub> requires knowledge of how much $DON$ was assimilated by the cell. Assimilated $DON$ is converted into NH<sub>4</sub> for biosynthesis and any excess is exuded into the environment. Release of NH<sub>4</sub> is therefore: 
 
 \begin{align}
-\mu_{b}^{&rarr; NH_4} &= \mu_{b}^{&larr; B_{DOM}^{N}} - \dfrac{\mu_{b}^{&larr; C}}{R_{b}^{C:N}}
+\mu_{b}^{\rightarrow NH_4} &= \mu_{b}^{\leftarrow B_{DOM}^{N}} - \dfrac{\mu_{b}^{\leftarrow C}}{R_{b}^{C:N}}
 \end{align}
 
-In the scenario where $V_{b}^{DON} << V_{b}^{NH_4}$, either due to very low concentrations of $DON$ or poor affinity of the bacteria for $DON$ uptake, $\mu_{b}^{&rarr; NH_4}$ will be negative. In this case, this negative release of NH<sub>4</sub> functions as a consumption of NH<sub>4</sub>.
+In the scenario where $V_{b}^{DON} << V_{b}^{NH_4}$, either due to very low concentrations of $DON$ or poor affinity of the bacteria for $DON$ uptake, $\mu_{b}^{\rightarrow NH_4}$ will be negative. In this case, this negative release of NH<sub>4</sub> functions as a consumption of NH<sub>4</sub>.
 
 Finally, the NO<sub>3</sub>-reducing bacterial functional type produces N<sub>2</sub>O. We carry N<sub>2</sub>O as an explicit tracer and in units of mol N<sub>2</sub>O kg<sup>-1</sup>, such that at every conversion of NO<sub>3</sub> to N<sub>2</sub>O we must account for the necessity of 2 mol NO<sub>3</sub> for every 1 mol N<sub>2</sub>O. Production of N<sub>2</sub>O via NO<sub>3</sub> reduction is calcualted as:
 
 \begin{align}
-\mu_{b1}^{&rarr; N_{2}O} &= \dfrac{\mu_{b1}^{&larr; NO_3}}{2}
+\mu_{b1}^{\rightarrow N_{2}O} &= \dfrac{\mu_{b1}^{\leftarrow NO_3}}{2}
 \end{align}
 
 ---
@@ -1496,8 +1496,8 @@ _where_ <br>
 In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-mid we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-mid we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> (`aoaresp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
 
 \begin{align}
-\mu_{aoa}^{&larr; NH_4} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}} \\
-\mu_{aoa}^{&larr; O_2} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}
+\mu_{aoa}^{\leftarrow NH_4} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}} \\
+\mu_{aoa}^{\leftarrow O_2} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}
 \end{align}
 
 _where_ <br>
@@ -1507,8 +1507,8 @@ _where_ <br>
 Ammonia ozidizing archaea produce both NO<sub>3</sub> and a small amount of N<sub>2</sub>O as they oxidize NH<sub>4</sub>. The production of N<sub>2</sub>O is informed by numerous studies that show a relationship between the rate of ammonia oxidation, the ambient oxygen concentration and the production of N<sub>2</sub>O ([Goreau et al., 1980](https://doi.org/10.1128/aem.40.3.526-532.1980); [Santoro et al., 2011](https://www.science.org/doi/full/10.1126/science.1208239); [Qin et al., 2017](https://doi.org/10.1111/1758-2229.12525); [Ji et al., 2018](https://doi.org/10.1029/2018GB005887); [Frey et al., 2023](https://doi.org/10.1002/lno.12283)). We compute these production terms as:
 
 \begin{align}
-\mu_{aoa}^{&rarr; NO_3} &= \mu_{aoa}^{&larr; NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O} \\
-\mu_{aoa}^{&rarr; N_{2}O} &= \mu_{aoa}^{C} p_{aoa}^{N_{2}O}
+\mu_{aoa}^{\rightarrow NO_3} &= \mu_{aoa}^{\leftarrow NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O} \\
+\mu_{aoa}^{\rightarrow N_{2}O} &= \mu_{aoa}^{C} p_{aoa}^{N_{2}O}
 \end{align}
 
 _where_ <br>
@@ -1529,7 +1529,7 @@ p_{aoa}^{N_{2}O} &= \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - dfrac
 
 since
 
-$a\cdot NH_4 + b \cdot O_2 &rarr; c \cdot B_{aoa}^{C} + d \cdot N_{2}O + e \cdot NO_{3}$ <br>
+$a\cdot NH_4 + b \cdot O_2 \rightarrow c \cdot B_{aoa}^{C} + d \cdot N_{2}O + e \cdot NO_{3}$ <br>
 $Y = \% N_{2}O$ produced per NO<sub>3</sub> produced <br>
 $d = \dfrac{\left(a - c\right) \cdot Y}{2 \cdot Y + 1}$ <br>
 
@@ -1539,7 +1539,7 @@ $d = \dfrac{\left(a - c\right) \cdot Y}{2 \cdot Y + 1}$ <br>
 Anammox bacteria are considered to be an implicit population within WOMBAT-mid and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. As with N<sub>2</sub>O-reducing heterotrophic bacteria, this nitrogen is then permanently lost from the ocean. When `do_anammox = .true.`, we perform this metabolism as:
 
 \begin{align}
-\mu_{aox}^{NH_4 &rarr; N_2} &= \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana} L_{aox}^{NH_4}
+\mu_{aox}^{NH_4 \rightarrow N_2} &= \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana} L_{aox}^{NH_4}
 \end{align}
 
 _where_ <br>
@@ -1585,20 +1585,20 @@ _where_ <br>
 Sources of $B_{DOM}^{C}$ include (1) phytoplankton overflow production (`nosdoc_overflow(i,j,k)`, $\Delta DOM_{overflow}^{NOSC}$, [NOSC s<sup>-1</sup>]), (2) excretion by zooplankton (`nosdoc_excretion(i,j,k)`, $\Delta DOM_{excretion}^{NOSC}$, [NOSC s<sup>-1</sup>]), (3) phytoplankton cell death and lysis (`nosdoc_phylysis(i,j,k)`, $\Delta DOM_{photolyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), (4) bacterial cell death and lysis (`nosdoc_baclysis(i,j,k)`, $\Delta DOM_{bacterlyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), and (5) hydrolysation of particulate organic matter (`nosdoc_dethydro(i,j,k)`, $\Delta DOM_{dethydro}^{NOSC}$, [NOSC s<sup>-1</sup>]). The equations describing the effect on $DOM^{NOSC}$ of each process are:
 
 \begin{align}
-(1) & \Delta DOM_{overflow}^{NOSC} = \left(\sum_{p} \mu_{p}^{&rarr; DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(2) & \Delta DOM_{excretion}^{NOSC} = \left(\sum_{z,i} \left( X_{z}^{&rarr; i^{C}} \cdot f_{z}^{X &rarr; DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(3) & \Delta DOM_{photolyse}^{NOSC} = \left(\sum_{p} \gamma_{p}^{&rarr; C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(4) & \Delta DOM_{bacterlyse}^{NOSC} = \left(\sum_{b} \gamma_{b}^{&rarr; C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(5) & \Delta DOM_{dethydro}^{NOSC} = \left(\sum_{d} \Gamma_{d}^{&rarr; C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
+(1) & \Delta DOM_{overflow}^{NOSC} = \left(\sum_{p} \mu_{p}^{\rightarrow DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(2) & \Delta DOM_{excretion}^{NOSC} = \left(\sum_{z,i} \left( X_{z}^{\rightarrow i^{C}} \cdot f_{z}^{X \rightarrow DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(3) & \Delta DOM_{photolyse}^{NOSC} = \left(\sum_{p} \gamma_{p}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(4) & \Delta DOM_{bacterlyse}^{NOSC} = \left(\sum_{b} \gamma_{b}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(5) & \Delta DOM_{dethydro}^{NOSC} = \left(\sum_{d} \Gamma_{d}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
 \end{align}
 
 _where_ <br>
-- $\mu_{p}^{&rarr; DOC}$ is the overflow production of DOC by phytoplankton type $p$ ([mol C kg<sup>-1</sup>]) <br>
-- $X_{z}^{&rarr; i^{C}}$ is the excretion of carbon by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
-- $f_{z}^{X &rarr; DOM}$ is the fraction of excreted carbon that is directed to DOC by zooplankton type $z$ ([mol C (mol C)<sup>-1</sup>]) <br>
-- $\gamma_{p}^{&rarr; C}$ is the linear mortality rate of phytoplankton type $p$ ([mol C kg<sup>-1</sup>]) <br>
-- $\gamma_{b}^{&rarr; C}$ is the linear mortality rate of bacteria type $b$ (includes ammonia oxidizing archaea) ([mol C kg<sup>-1</sup>]) <br>
-- $\Gamma_{d}^{&rarr; C}$ is the hydrolysation rate of particulate carbon type $d$ ([mol C kg<sup>-1</sup>]) <br>
+- $\mu_{p}^{\rightarrow DOC}$ is the overflow production of DOC by phytoplankton type $p$ ([mol C kg<sup>-1</sup>]) <br>
+- $X_{z}^{\rightarrow i^{C}}$ is the excretion of carbon by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
+- $f_{z}^{X \rightarrow DOM}$ is the fraction of excreted carbon that is directed to DOC by zooplankton type $z$ ([mol C (mol C)<sup>-1</sup>]) <br>
+- $\gamma_{p}^{\rightarrow C}$ is the linear mortality rate of phytoplankton type $p$ ([mol C kg<sup>-1</sup>]) <br>
+- $\gamma_{b}^{\rightarrow C}$ is the linear mortality rate of bacteria type $b$ (includes ammonia oxidizing archaea) ([mol C kg<sup>-1</sup>]) <br>
+- $\Gamma_{d}^{\rightarrow C}$ is the hydrolysation rate of particulate carbon type $d$ ([mol C kg<sup>-1</sup>]) <br>
 - $NOSC_{overflow}$ is the NOSC associated with overflow production of DOC by phytoplankton (`noscphyover`, [dimenionless]) <br>
 - $NOSC_{excretion}$ is the NOSC associated with excretion of DOC by zooplankton (`nosczooexcr`, [dimenionless]) <br>
 - $NOSC_{phytolyse}$ is the NOSC associated with lysis of cell contents of phytoplankton (`noscphylyse`, [dimenionless]) <br>
@@ -1612,11 +1612,11 @@ In WOMBAT-mid the only sink of $B_{DOM}^{C}$ is consumption by bacteria (`doc1re
 Consumption of $B_{DOM}^{C}$ by bacteria alters $DOM^{NOSC}$ (`nosdoc_docconsu(i,j,k)`, $\Delta DOM_{DOCconsume}^{NOSC}$, [NOSC s<sup>-1</sup>]) via:
 
 \begin{align}
-\Delta DOM_{DOCconsume}^{NOSC} &= \left(\sum_{b} \mu_{b}^{&larr; B_{DOM}^{C}} \right) \cdot \dfrac{- NOSC_{DOCconsume}}{B_{DOM}^{C}}
+\Delta DOM_{DOCconsume}^{NOSC} &= \left(\sum_{b} \mu_{b}^{\leftarrow B_{DOM}^{C}} \right) \cdot \dfrac{- NOSC_{DOCconsume}}{B_{DOM}^{C}}
 \end{align}
 
 _where_ <br>
-- $\mu_{b}^{&larr; B_{DOM}^{C}}$ is the consumption of DOC by bacterial type $b$ (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $\mu_{b}^{\leftarrow B_{DOM}^{C}}$ is the consumption of DOC by bacterial type $b$ (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 - $NOSC_{DOCconsume}$ is the effect (i.e., offset) to existing NOSC associated with bacterial reworking of DOC (`noscdocproc`, [dimenionless]) <br>
 - $B_{DOM}^{C}$ is the in situ concentration of DOC (`f_doc(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
@@ -1628,313 +1628,313 @@ _where_ <br>
 **Nitrate** (`f_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
 \begin{align}
-\dfrac{\Delta NO_3}{\Delta t} = & \mu_{aoa}^{&rarr; NO_3} \\
-                              - & \mu_{b1}^{&larr; NO_3} \\
-                              - & \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
-                                & \,+ \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+\dfrac{\Delta NO_3}{\Delta t} = & \mu_{aoa}^{\rightarrow NO_3} \\
+                              - & \mu_{b1}^{\leftarrow NO_3} \\
+                              - & \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
+                                & \,+ \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
 \end{align}
 
 **Ammonium** (`f_nh4(i,j,k)`, NH<sub>4</sub>, [mol N kg<sup>-1</sup>])
 
-$\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{&larr; B_{np}^{N}}
-                                      + X_{mz}^{&larr; B_{mp}^{N}}
-                                      + X_{mz}^{&larr; B_{sd}^{N}}
-                                      + X_{mz}^{&larr; B_{b1}^{N}}
-                                      + X_{mz}^{&larr; B_{b2}^{N}}
-                                      + X_{mz}^{&larr; B_{aoa}^{N}} \right) \left(1 - f_{mz}^{X &rarr; DOM} \right)
-                               + \left( X_{Mz}^{&larr; B_{np}^{N}}
-                                      + X_{Mz}^{&larr; B_{mp}^{N}}
-                                      + X_{Mz}^{&larr; B_{sd}^{N}}
-                                      + X_{Mz}^{&larr; B_{ld}^{N}}
-                                      + X_{Mz}^{&larr; B_{mz}^{N}}
-                                      + X_{Mz}^{&larr; B_{b1}^{N}}
-                                      + X_{Mz}^{&larr; B_{b2}^{N}}
-                                      + X_{Mz}^{&larr; B_{aoa}^{N}} \right) \cdot \left(1 - f_{Mz}^{X &rarr; DOM} \right)
-                               + \left( \gamma_{mz}^{&rarr; C} 
-                                      + \gamma_{Mz}^{&rarr; C} \right) \cdot \dfrac{16}{122}
-                               + \mu_{diazo}^{&rarr; NH_4}
-                               + \mu_{b1}^{&rarr; NH_4} 
-                               + \mu_{b2}^{&rarr; NH_4}
-                               - \mu_{aox}^{NH_4 &rarr; N_2}
-                               - \mu_{aoa}^{&larr; NH_4}
-                               - \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
-                                      + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}$
+$\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{\leftarrow B_{np}^{N}}
+                                      + X_{mz}^{\leftarrow B_{mp}^{N}}
+                                      + X_{mz}^{\leftarrow B_{sd}^{N}}
+                                      + X_{mz}^{\leftarrow B_{b1}^{N}}
+                                      + X_{mz}^{\leftarrow B_{b2}^{N}}
+                                      + X_{mz}^{\leftarrow B_{aoa}^{N}} \right) \left(1 - f_{mz}^{X \rightarrow DOM} \right)
+                               + \left( X_{Mz}^{\leftarrow B_{np}^{N}}
+                                      + X_{Mz}^{\leftarrow B_{mp}^{N}}
+                                      + X_{Mz}^{\leftarrow B_{sd}^{N}}
+                                      + X_{Mz}^{\leftarrow B_{ld}^{N}}
+                                      + X_{Mz}^{\leftarrow B_{mz}^{N}}
+                                      + X_{Mz}^{\leftarrow B_{b1}^{N}}
+                                      + X_{Mz}^{\leftarrow B_{b2}^{N}}
+                                      + X_{Mz}^{\leftarrow B_{aoa}^{N}} \right) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right)
+                               + \left( \gamma_{mz}^{\rightarrow C} 
+                                      + \gamma_{Mz}^{\rightarrow C} \right) \cdot \dfrac{16}{122}
+                               + \mu_{diazo}^{\rightarrow NH_4}
+                               + \mu_{b1}^{\rightarrow NH_4} 
+                               + \mu_{b2}^{\rightarrow NH_4}
+                               - \mu_{aox}^{NH_4 \rightarrow N_2}
+                               - \mu_{aoa}^{\leftarrow NH_4}
+                               - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
+                                      + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}$
 
 **Silicic acid** (`f_sil(i,j,k)`, $H_{4}SiO_{4}$, [mol Si kg<sup>-1</sup>])
 
-$\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} = \left( \gamma_{mp}^{&rarr; C} 
-                                            + g_{mz}^{&larr; B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C}
-                                     + D_{B_{ld}^{Si}}^{&rarr; Si}
-                                     - \mu_{mp}^{&larr; Si}$
+$\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} = \left( \gamma_{mp}^{\rightarrow C} 
+                                            + g_{mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C}
+                                     + D_{B_{ld}^{Si}}^{\rightarrow Si}
+                                     - \mu_{mp}^{\leftarrow Si}$
 
 
 **Nitrous oxide** (`f_n2o(i,j,k)`, N<sub>2</sub>O, [mol N<sub>2</sub>O kg<sup>-1</sup>])
 
-$\dfrac{\Delta N_{2}O}{\Delta t} = \mu_{aoa}^{&rarr; N_{2}O} 
-                                 + \mu_{b1}^{&rarr; N_{2}O}
-                                 - \mu_{b2}^{&larr; N_{2}O}$
+$\dfrac{\Delta N_{2}O}{\Delta t} = \mu_{aoa}^{\rightarrow N_{2}O} 
+                                 + \mu_{b1}^{\rightarrow N_{2}O}
+                                 - \mu_{b2}^{\leftarrow N_{2}O}$
 
 
 **Oxygen** (`f_o2(i,j,k)`, O<sub>2</sub>, [mol O<sub>2</sub> kg<sup>-1</sup>])
 
-$\dfrac{\Delta O_2}{\Delta t} = \left( X_{mz}^{&larr; C} \left(1 - f_{mz}^{X &rarr; DOM} \right)
-                                     + X_{Mz}^{&larr; C} \left(1 - f_{Mz}^{X &rarr; DOM} \right)
-                                     + \gamma_{mz}^{&rarr; C} 
-                                     + \gamma_{Mz}^{&rarr; C}
-                                     - \mu_{np}^{&larr; C} 
-                                     - \mu_{mp}^{&larr; C} \right) \dfrac{-132}{122} 
-                              - \mu_{b1}^{&larr; O_2} 
-                              - \mu_{b2}^{&larr; O_2} 
-                              - \mu_{aoa}^{&larr; O_2} \right)$
+$\dfrac{\Delta O_2}{\Delta t} = \left( X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
+                                     + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right)
+                                     + \gamma_{mz}^{\rightarrow C} 
+                                     + \gamma_{Mz}^{\rightarrow C}
+                                     - \mu_{np}^{\leftarrow C} 
+                                     - \mu_{mp}^{\leftarrow C} \right) \dfrac{-132}{122} 
+                              - \mu_{b1}^{\leftarrow O_2} 
+                              - \mu_{b2}^{\leftarrow O_2} 
+                              - \mu_{aoa}^{\leftarrow O_2} \right)$
  
 
 **Dissolved iron** (`f_fe(i,j,k)`, $dFe$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta dFe}{\Delta t} = \Gamma_{sd}^{&rarr; C} Q_{sd}^{Fe:C} 
-                              + \Gamma_{ld}^{&rarr; C} Q_{ld}^{Fe:C} 
-                              + \gamma_{np}^{&rarr; C} Q_{np}^{Fe:C} 
-                              + \gamma_{mp}^{&rarr; C} Q_{mp}^{Fe:C}
-                              + \gamma_{mz}^{&rarr; C} Q_{mz}^{Fe:C} 
-                              + \gamma_{Mz}^{&rarr; C} Q_{Mz}^{Fe:C}
-                              + \dfrac{\gamma_{b1}^{&rarr; C} + \Gamma_{b1}^{&rarr; C}}{R_{b1}^{C:Fe}}
-                              + \dfrac{\gamma_{b2}^{&rarr; C} + \Gamma_{b2}^{&rarr; C}}{R_{b2}^{C:Fe}}
-                              + \dfrac{\gamma_{aoa}^{&rarr; C} + \Gamma_{aoa}^{&rarr; C}}{R_{aoa}^{C:Fe}}
-                              + X_{mz}^{&larr; Fe} 
-                              + X_{Mz}^{&larr; Fe}
-                              + D_{Fe_{sA}}^{&rarr; dFe} 
-                              + D_{Fe_{lA}}^{&rarr; dFe}
-                              - \mu_{np}^{&larr; dFe} 
-                              - \mu_{mp}^{&larr; dFe}
-                              - \mu_{b1}^{&larr; dFe}
-                              - \mu_{b2}^{&larr; dFe}
-                              - \mu_{aoa}^{&larr; dFe}
-                              - Sc_{dFe}^{&rarr; Fe_{sA}} 
-                              - Sc_{dFe}^{&rarr; Fe_{lA}}
-                              - Co_{dFe}^{&rarr; Fe_{sA}} 
-                              - Co_{dFe}^{&rarr; Fe_{lA}}$
+$\dfrac{\Delta dFe}{\Delta t} = \Gamma_{sd}^{\rightarrow C} Q_{sd}^{Fe:C} 
+                              + \Gamma_{ld}^{\rightarrow C} Q_{ld}^{Fe:C} 
+                              + \gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
+                              + \gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C}
+                              + \gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C} 
+                              + \gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C}
+                              + \dfrac{\gamma_{b1}^{\rightarrow C} + \Gamma_{b1}^{\rightarrow C}}{R_{b1}^{C:Fe}}
+                              + \dfrac{\gamma_{b2}^{\rightarrow C} + \Gamma_{b2}^{\rightarrow C}}{R_{b2}^{C:Fe}}
+                              + \dfrac{\gamma_{aoa}^{\rightarrow C} + \Gamma_{aoa}^{\rightarrow C}}{R_{aoa}^{C:Fe}}
+                              + X_{mz}^{\leftarrow Fe} 
+                              + X_{Mz}^{\leftarrow Fe}
+                              + D_{Fe_{sA}}^{\rightarrow dFe} 
+                              + D_{Fe_{lA}}^{\rightarrow dFe}
+                              - \mu_{np}^{\leftarrow dFe} 
+                              - \mu_{mp}^{\leftarrow dFe}
+                              - \mu_{b1}^{\leftarrow dFe}
+                              - \mu_{b2}^{\leftarrow dFe}
+                              - \mu_{aoa}^{\leftarrow dFe}
+                              - Sc_{dFe}^{\rightarrow Fe_{sA}} 
+                              - Sc_{dFe}^{\rightarrow Fe_{lA}}
+                              - Co_{dFe}^{\rightarrow Fe_{sA}} 
+                              - Co_{dFe}^{\rightarrow Fe_{lA}}$
 
 
 **Small authigenic iron** (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta Fe_{sA}}{\Delta t} = Sc_{dFe}^{&rarr; Fe_{sA}}
-                                  + Co_{dFe}^{&rarr; Fe_{sA}}
-                                  - D_{Fe_{sA}}^{&rarr; dFe}$
+$\dfrac{\Delta Fe_{sA}}{\Delta t} = Sc_{dFe}^{\rightarrow Fe_{sA}}
+                                  + Co_{dFe}^{\rightarrow Fe_{sA}}
+                                  - D_{Fe_{sA}}^{\rightarrow dFe}$
 
 
 **Large authigenic iron** (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta Fe_{lA}}{\Delta t} = Sc_{dFe}^{&rarr; Fe_{lA}}
-                                  + Co_{dFe}^{&rarr; Fe_{lA}}
-                                  - D_{Fe_{lA}}^{&rarr; dFe}$
+$\dfrac{\Delta Fe_{lA}}{\Delta t} = Sc_{dFe}^{\rightarrow Fe_{lA}}
+                                  + Co_{dFe}^{\rightarrow Fe_{lA}}
+                                  - D_{Fe_{lA}}^{\rightarrow dFe}$
 
 
 **Nano-phytoplankton** (`f_phy(i,j,k)`, $B_{np}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{np}^{C}}{\Delta t} = \mu_{np}^{&larr; C} 
-                                     - \Gamma_{np}^{&rarr; C} 
-                                     - \gamma_{np}^{&rarr; C} 
-                                     - g_{mz}^{&larr; B_{np}^{C}} 
-                                     - g_{Mz}^{&larr; B_{np}^{C}}$ 
+$\dfrac{\Delta B_{np}^{C}}{\Delta t} = \mu_{np}^{\leftarrow C} 
+                                     - \Gamma_{np}^{\rightarrow C} 
+                                     - \gamma_{np}^{\rightarrow C} 
+                                     - g_{mz}^{\leftarrow B_{np}^{C}} 
+                                     - g_{Mz}^{\leftarrow B_{np}^{C}}$ 
 
 
 **Nano-phytoplankton chlorophyll** (`f_pchl(i,j,k)`, $B_{np}^{chl}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{np}^{Chl}}{\Delta t} = \mu_{np}^{&larr; Chl} 
-                                       - \left( \Gamma_{np}^{&rarr; C} 
-                                              + \gamma_{np}^{&rarr; C} 
-                                              + g_{mz}^{&larr; B_{np}^{C}} 
-                                              + g_{Mz}^{&larr; B_{np}^{C}} \right) \cdot Q_{np}^{Chl:C}$ 
+$\dfrac{\Delta B_{np}^{Chl}}{\Delta t} = \mu_{np}^{\leftarrow Chl} 
+                                       - \left( \Gamma_{np}^{\rightarrow C} 
+                                              + \gamma_{np}^{\rightarrow C} 
+                                              + g_{mz}^{\leftarrow B_{np}^{C}} 
+                                              + g_{Mz}^{\leftarrow B_{np}^{C}} \right) \cdot Q_{np}^{Chl:C}$ 
 
 **Nano-phytoplankton iron** (`f_phyfe(i,j,k)`, $B_{np}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{np}^{Fe}}{\Delta t} = \mu_{np}^{&larr; dFe} 
-                                      - \left( \Gamma_{np}^{&rarr; C} 
-                                             + \gamma_{np}^{&rarr; C} 
-                                             + g_{mz}^{&larr; B_{np}^{C}} 
-                                             + g_{Mz}^{&larr; B_{np}^{C}} \right) \cdot Q_{np}^{Fe:C}$ 
+$\dfrac{\Delta B_{np}^{Fe}}{\Delta t} = \mu_{np}^{\leftarrow dFe} 
+                                      - \left( \Gamma_{np}^{\rightarrow C} 
+                                             + \gamma_{np}^{\rightarrow C} 
+                                             + g_{mz}^{\leftarrow B_{np}^{C}} 
+                                             + g_{Mz}^{\leftarrow B_{np}^{C}} \right) \cdot Q_{np}^{Fe:C}$ 
 
 
 **Micro-phytoplankton** (`f_dia(i,j,k)`, $B_{mp}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{C}}{\Delta t} = \mu_{mp}^{&larr; C} 
-                                     - \Gamma_{mp}^{&rarr; C} 
-                                     - \gamma_{mp}^{&rarr; C} 
-                                     - g_{mz}^{&larr; B_{mp}^{C}} 
-                                     - g_{Mz}^{&larr; B_{mp}^{C}} $ 
+$\dfrac{\Delta B_{mp}^{C}}{\Delta t} = \mu_{mp}^{\leftarrow C} 
+                                     - \Gamma_{mp}^{\rightarrow C} 
+                                     - \gamma_{mp}^{\rightarrow C} 
+                                     - g_{mz}^{\leftarrow B_{mp}^{C}} 
+                                     - g_{Mz}^{\leftarrow B_{mp}^{C}} $ 
 
 
 **Micro-phytoplankton chlorophyll** (`f_dchl(i,j,k)`, $B_{mp}^{chl}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{Chl}}{\Delta t} = \mu_{mp}^{&larr; Chl} 
-                                       - \left( \Gamma_{mp}^{&rarr; C} 
-                                              + \gamma_{mp}^{&rarr; C} 
-                                              + g_{mz}^{&larr; B_{mp}^{C}} 
-                                              + g_{Mz}^{&larr; B_{mp}^{C}} \right) \cdot Q_{mp}^{Chl:C}$ 
+$\dfrac{\Delta B_{mp}^{Chl}}{\Delta t} = \mu_{mp}^{\leftarrow Chl} 
+                                       - \left( \Gamma_{mp}^{\rightarrow C} 
+                                              + \gamma_{mp}^{\rightarrow C} 
+                                              + g_{mz}^{\leftarrow B_{mp}^{C}} 
+                                              + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Chl:C}$ 
 
 **Micro-phytoplankton iron** (`f_diafe(i,j,k)`, $B_{mp}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{Fe}}{\Delta t} = \mu_{mp}^{&larr; dFe} 
-                                      - \left( \Gamma_{mp}^{&rarr; C} 
-                                             + \gamma_{mp}^{&rarr; C} 
-                                             + g_{mz}^{&larr; B_{mp}^{C}} 
-                                             + g_{Mz}^{&larr; B_{mp}^{C}} \right) \cdot Q_{mp}^{Fe:C}$ 
+$\dfrac{\Delta B_{mp}^{Fe}}{\Delta t} = \mu_{mp}^{\leftarrow dFe} 
+                                      - \left( \Gamma_{mp}^{\rightarrow C} 
+                                             + \gamma_{mp}^{\rightarrow C} 
+                                             + g_{mz}^{\leftarrow B_{mp}^{C}} 
+                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Fe:C}$ 
 
 **Micro-phytoplankton silica** (`f_diasi(i,j,k)`, $B_{mp}^{Si}$, [mol Si kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{Si}}{\Delta t} = \mu_{mp}^{&larr; Si}
-                                      - \left( \Gamma_{mp}^{&rarr; C} 
-                                             + \gamma_{mp}^{&rarr; C} 
-                                             + g_{mz}^{&larr; B_{mp}^{C}} 
-                                             + g_{Mz}^{&larr; B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C}$ 
+$\dfrac{\Delta B_{mp}^{Si}}{\Delta t} = \mu_{mp}^{\leftarrow Si}
+                                      - \left( \Gamma_{mp}^{\rightarrow C} 
+                                             + \gamma_{mp}^{\rightarrow C} 
+                                             + g_{mz}^{\leftarrow B_{mp}^{C}} 
+                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C}$ 
 
 
 **Micro-zooplankton** (`f_zoo(i,j,k)`, $B_{mz}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mz}^{C}}{\Delta t} = \A_{mz}^{&larr; C} 
-                                     - \Gamma_{mz}^{&rarr; C} 
-                                     - \gamma_{mz}^{&rarr; C}
-                                     - g_{Mz}^{&larr; B_{mz}^{C}}$ 
+$\dfrac{\Delta B_{mz}^{C}}{\Delta t} = \A_{mz}^{\leftarrow C} 
+                                     - \Gamma_{mz}^{\rightarrow C} 
+                                     - \gamma_{mz}^{\rightarrow C}
+                                     - g_{Mz}^{\leftarrow B_{mz}^{C}}$ 
 
 
 **Micro-zooplankton iron** (`f_zoofe(i,j,k)`, $B_{mz}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mz}^{Fe}}{\Delta t} = A_{mz}^{&larr; Fe}
-                                      - \left( \Gamma_{mz}^{&rarr; C} 
-                                             - \gamma_{mz}^{&rarr; C} 
-                                             - g_{Mz}^{&larr; B_{mz}^{C}} \right) \cdot Q_{mz}^{Fe:C}$ 
+$\dfrac{\Delta B_{mz}^{Fe}}{\Delta t} = A_{mz}^{\leftarrow Fe}
+                                      - \left( \Gamma_{mz}^{\rightarrow C} 
+                                             - \gamma_{mz}^{\rightarrow C} 
+                                             - g_{Mz}^{\leftarrow B_{mz}^{C}} \right) \cdot Q_{mz}^{Fe:C}$ 
 
 
 **Meso-zooplankton** (`f_mes(i,j,k)`, $B_{Mz}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{Mz}^{C}}{\Delta t} = \A_{Mz}^{&larr; C}
-                                     - \Gamma_{Mz}^{&rarr; C} 
-                                     - \gamma_{Mz}^{&rarr; C}$ 
+$\dfrac{\Delta B_{Mz}^{C}}{\Delta t} = \A_{Mz}^{\leftarrow C}
+                                     - \Gamma_{Mz}^{\rightarrow C} 
+                                     - \gamma_{Mz}^{\rightarrow C}$ 
 
 
 **Meso-zooplankton iron** (`f_mesfe(i,j,k)`, $B_{Mz}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{Mz}^{Fe}}{\Delta t} = A_{Mz}^{&larr; Fe}
-                                      - \left( \Gamma_{Mz}^{&rarr; C} 
-                                             - \gamma_{Mz}^{&rarr; C} \right) \cdot Q_{Mz}^{Fe:C}$ 
+$\dfrac{\Delta B_{Mz}^{Fe}}{\Delta t} = A_{Mz}^{\leftarrow Fe}
+                                      - \left( \Gamma_{Mz}^{\rightarrow C} 
+                                             - \gamma_{Mz}^{\rightarrow C} \right) \cdot Q_{Mz}^{Fe:C}$ 
 
 
 **Small detritus** (`f_det(i,j,k)`, $B_{sd}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{sd}^{C}}{\Delta t} = E_{mz}^{&larr; C}
-                                     + \Gamma_{np}^{&rarr; C} 
-                                     + \Gamma_{mz}^{&rarr; C} 
-                                     - g_{mz}^{&larr; B_{sd}^{C}}
-                                     - g_{Mz}^{&larr; B_{sd}^{C}}
-                                     - \Gamma_{sd}^{&rarr; C}$ 
+$\dfrac{\Delta B_{sd}^{C}}{\Delta t} = E_{mz}^{\leftarrow C}
+                                     + \Gamma_{np}^{\rightarrow C} 
+                                     + \Gamma_{mz}^{\rightarrow C} 
+                                     - g_{mz}^{\leftarrow B_{sd}^{C}}
+                                     - g_{Mz}^{\leftarrow B_{sd}^{C}}
+                                     - \Gamma_{sd}^{\rightarrow C}$ 
 
 
 **Small detritus iron** (`f_detfe(i,j,k)`, $B_{sd}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{sd}^{Fe}}{\Delta t} = E_{mz}^{&larr; Fe}
-                                      +\Gamma_{np}^{&rarr; C} Q_{np}^{Fe:C} 
-                                      + \Gamma_{mz}^{&rarr; C} Q_{mz}^{Fe:C}
-                                      - \left( g_{mz}^{&larr; B_{sd}^{C}}
-                                             + g_{Mz}^{&larr; B_{sd}^{C}}
-                                             + \Gamma_{sd}^{&rarr; C} \right) Q_{sd}^{Fe:C}$ 
+$\dfrac{\Delta B_{sd}^{Fe}}{\Delta t} = E_{mz}^{\leftarrow Fe}
+                                      +\Gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
+                                      + \Gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C}
+                                      - \left( g_{mz}^{\leftarrow B_{sd}^{C}}
+                                             + g_{Mz}^{\leftarrow B_{sd}^{C}}
+                                             + \Gamma_{sd}^{\rightarrow C} \right) Q_{sd}^{Fe:C}$ 
 
 
 **Large detritus** (`f_bdet(i,j,k)`, $B_{ld}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{ld}^{C}}{\Delta t} = E_{Mz}^{&larr; C}
-                                     + \Gamma_{mp}^{&rarr; C} 
-                                     + \Gamma_{Mz}^{&rarr; C} 
-                                     - g_{Mz}^{&larr; B_{ld}^{C}}
-                                     - \Gamma_{ld}^{&rarr; C}$ 
+$\dfrac{\Delta B_{ld}^{C}}{\Delta t} = E_{Mz}^{\leftarrow C}
+                                     + \Gamma_{mp}^{\rightarrow C} 
+                                     + \Gamma_{Mz}^{\rightarrow C} 
+                                     - g_{Mz}^{\leftarrow B_{ld}^{C}}
+                                     - \Gamma_{ld}^{\rightarrow C}$ 
 
 
 **Large detritus iron** (`f_bdetfe(i,j,k)`, $B_{ld}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{ld}^{Fe}}{\Delta t} = E_{Mz}^{&larr; Fe}
-                                      + \Gamma_{mp}^{&rarr; C} Q_{mp}^{Fe:C} 
-                                      + \Gamma_{Mz}^{&rarr; C} Q_{Mz}^{Fe:C}
-                                      - \left( g_{Mz}^{&rarr; B_{ld}^{C}}
-                                             + \Gamma_{ld}^{&rarr; C} \right) Q_{ld}^{Fe:C}$ 
+$\dfrac{\Delta B_{ld}^{Fe}}{\Delta t} = E_{Mz}^{\leftarrow Fe}
+                                      + \Gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C} 
+                                      + \Gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C}
+                                      - \left( g_{Mz}^{\rightarrow B_{ld}^{C}}
+                                             + \Gamma_{ld}^{\rightarrow C} \right) Q_{ld}^{Fe:C}$ 
 
 
 **Large detritus silicon** (`f_bdetsi(i,j,k)`, $B_{ld}^{Si}$, [mol Si kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{ld}^{Si}}{\Delta t} = \left( \Gamma_{mp}^{&rarr; C} 
-                                             + g_{Mz}^{&larr; B_{mp}^{C}} \right) Q_{mp}^{Si:C}  
-                                      - D_{B_{ld}^{Si}}^{&rarr; Si}$ 
+$\dfrac{\Delta B_{ld}^{Si}}{\Delta t} = \left( \Gamma_{mp}^{\rightarrow C} 
+                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) Q_{mp}^{Si:C}  
+                                      - D_{B_{ld}^{Si}}^{\rightarrow Si}$ 
 
 
 **Faculative NO<sub>3</sub>-reducing heterotrophic bacteria** (`f_bac1(i,j,k)`, $B_{b1}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b1}^{&larr; C} 
-                                     - g_{mz}^{&larr; B_{b1}^{C}}
-                                     - g_{Mz}^{&larr; B_{b1}^{C}}
-                                     - \gamma_{b1}^{&rarr; C} 
-                                     - \Gamma_{b1}^{&rarr; C}$ 
+$\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b1}^{\leftarrow C} 
+                                     - g_{mz}^{\leftarrow B_{b1}^{C}}
+                                     - g_{Mz}^{\leftarrow B_{b1}^{C}}
+                                     - \gamma_{b1}^{\rightarrow C} 
+                                     - \Gamma_{b1}^{\rightarrow C}$ 
 
 
 **Faculative N<sub>2</sub>O-reducing heterotrophic bacteria** (`f_bac2(i,j,k)`, $B_{b2}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b2}^{&larr; C} 
-                                     - g_{mz}^{&larr; B_{b2}^{C}}
-                                     - g_{Mz}^{&larr; B_{b2}^{C}}
-                                     - \gamma_{b2}^{&rarr; C} 
-                                     - \Gamma_{b2}^{&rarr; C}$ 
+$\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b2}^{\leftarrow C} 
+                                     - g_{mz}^{\leftarrow B_{b2}^{C}}
+                                     - g_{Mz}^{\leftarrow B_{b2}^{C}}
+                                     - \gamma_{b2}^{\rightarrow C} 
+                                     - \Gamma_{b2}^{\rightarrow C}$ 
 
 
 **Ammonia oxidizing archaea** (`f_aoa(i,j,k)`, $B_{aoa}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{aoa}^{C}}{\Delta t} = \mu_{aoa}^{&larr; C} 
-                                      - g_{mz}^{&larr; B_{aoa}^{C}}
-                                      - g_{Mz}^{&larr; B_{aoa}^{C}}
-                                      - \gamma_{aoa}^{&rarr; C} 
-                                      - \Gamma_{aoa}^{&rarr; C}$ 
+$\dfrac{\Delta B_{aoa}^{C}}{\Delta t} = \mu_{aoa}^{\leftarrow C} 
+                                      - g_{mz}^{\leftarrow B_{aoa}^{C}}
+                                      - g_{Mz}^{\leftarrow B_{aoa}^{C}}
+                                      - \gamma_{aoa}^{\rightarrow C} 
+                                      - \Gamma_{aoa}^{\rightarrow C}$ 
 
 
 **Dissolved organic carbon** (`f_doc(i,j,k)`, $B_{DOM}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{DOM}^{C}}{\Delta t} = \mu_{np}^{&rarr; DOC} 
-                                      + \mu_{mp}^{&rarr; DOC}
-                                      + \Gamma_{sd}^{&rarr; C}
-                                      + \Gamma_{ld}^{&rarr; C}
-                                      + \gamma_{np}^{&rarr; C}
-                                      + \gamma_{mp}^{&rarr; C}
-                                      + \Gamma_{b1}^{&rarr; C}
-                                      + \gamma_{b1}^{&rarr; C}
-                                      + \Gamma_{b2}^{&rarr; C}
-                                      + \gamma_{b2}^{&rarr; C}
-                                      + \Gamma_{aoa}^{&rarr; C}
-                                      + \gamma_{aoa}^{&rarr; C}
-                                      + X_{mz}^{&larr; C} f_{mz}^{X &rarr; DOM} 
-                                      + X_{Mz}^{&larr; C} f_{Mz}^{X &rarr; DOM} 
-                                      - \mu_{b1}^{&larr; B_{DOM}^{C}} 
-                                      - \mu_{b2}^{&larr; B_{DOM}^{C}}$ 
+$\dfrac{\Delta B_{DOM}^{C}}{\Delta t} = \mu_{np}^{\rightarrow DOC} 
+                                      + \mu_{mp}^{\rightarrow DOC}
+                                      + \Gamma_{sd}^{\rightarrow C}
+                                      + \Gamma_{ld}^{\rightarrow C}
+                                      + \gamma_{np}^{\rightarrow C}
+                                      + \gamma_{mp}^{\rightarrow C}
+                                      + \Gamma_{b1}^{\rightarrow C}
+                                      + \gamma_{b1}^{\rightarrow C}
+                                      + \Gamma_{b2}^{\rightarrow C}
+                                      + \gamma_{b2}^{\rightarrow C}
+                                      + \Gamma_{aoa}^{\rightarrow C}
+                                      + \gamma_{aoa}^{\rightarrow C}
+                                      + X_{mz}^{\leftarrow C} f_{mz}^{X \rightarrow DOM} 
+                                      + X_{Mz}^{\leftarrow C} f_{Mz}^{X \rightarrow DOM} 
+                                      - \mu_{b1}^{\leftarrow B_{DOM}^{C}} 
+                                      - \mu_{b2}^{\leftarrow B_{DOM}^{C}}$ 
 
 
 **Dissolved organic nitrogen** (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{DOM}^{N}}{\Delta t} = \left( \Gamma_{b1}^{&rarr; C} + \gamma_{b1}^{&rarr; C}
-                                             + \Gamma_{b2}^{&rarr; C} + \gamma_{b2}^{&rarr; C}
-                                             + \Gamma_{aoa}^{&rarr; C} + \gamma_{aoa}^{&rarr; C}
-                                             + X_{mz}^{&larr; B_{b1}^{C}}
-                                             + X_{mz}^{&larr; B_{b2}^{C}}
-                                             + X_{mz}^{&larr; B_{aoa}^{C}}
-                                             + X_{Mz}^{&larr; B_{b1}^{C}}
-                                             + X_{Mz}^{&larr; B_{b2}^{C}}
-                                             + X_{Mz}^{&larr; B_{aoa}^{C}} \right) \cdot \dfrac{1}{5}
-                                      + \left( \Gamma_{sd}^{&rarr; C} 
-                                             + \Gamma_{ld}^{&rarr; C}
-                                             + \gamma_{np}^{&rarr; C}
-                                             + \gamma_{mp}^{&rarr; C}
-                                             + \left( X_{mz}^{&larr; B_{np}^{C}}
-                                                    + X_{mz}^{&larr; B_{mp}^{C}}
-                                                    + X_{mz}^{&larr; B_{sd}^{C}} \right) f_{mz}^{X &rarr; DOM}
-                                             + \left( X_{Mz}^{&larr; B_{np}^{C}}
-                                                    + X_{Mz}^{&larr; B_{mp}^{C}}
-                                                    + X_{Mz}^{&larr; B_{sd}^{C}}
-                                                    + X_{Mz}^{&larr; B_{ld}^{C}}
-                                                    + X_{Mz}^{&larr; B_{mz}^{C}} \right) f_{Mz}^{X &rarr; DOM} \right) \cdot \dfrac{16}{122}
-                                      - \mu_{b1}^{&larr; B_{DOM}^{N}} 
-                                      - \mu_{b2}^{&larr; B_{DOM}^{N}}$ 
+$\dfrac{\Delta B_{DOM}^{N}}{\Delta t} = \left( \Gamma_{b1}^{\rightarrow C} + \gamma_{b1}^{\rightarrow C}
+                                             + \Gamma_{b2}^{\rightarrow C} + \gamma_{b2}^{\rightarrow C}
+                                             + \Gamma_{aoa}^{\rightarrow C} + \gamma_{aoa}^{\rightarrow C}
+                                             + X_{mz}^{\leftarrow B_{b1}^{C}}
+                                             + X_{mz}^{\leftarrow B_{b2}^{C}}
+                                             + X_{mz}^{\leftarrow B_{aoa}^{C}}
+                                             + X_{Mz}^{\leftarrow B_{b1}^{C}}
+                                             + X_{Mz}^{\leftarrow B_{b2}^{C}}
+                                             + X_{Mz}^{\leftarrow B_{aoa}^{C}} \right) \cdot \dfrac{1}{5}
+                                      + \left( \Gamma_{sd}^{\rightarrow C} 
+                                             + \Gamma_{ld}^{\rightarrow C}
+                                             + \gamma_{np}^{\rightarrow C}
+                                             + \gamma_{mp}^{\rightarrow C}
+                                             + \left( X_{mz}^{\leftarrow B_{np}^{C}}
+                                                    + X_{mz}^{\leftarrow B_{mp}^{C}}
+                                                    + X_{mz}^{\leftarrow B_{sd}^{C}} \right) f_{mz}^{X \rightarrow DOM}
+                                             + \left( X_{Mz}^{\leftarrow B_{np}^{C}}
+                                                    + X_{Mz}^{\leftarrow B_{mp}^{C}}
+                                                    + X_{Mz}^{\leftarrow B_{sd}^{C}}
+                                                    + X_{Mz}^{\leftarrow B_{ld}^{C}}
+                                                    + X_{Mz}^{\leftarrow B_{mz}^{C}} \right) f_{Mz}^{X \rightarrow DOM} \right) \cdot \dfrac{16}{122}
+                                      - \mu_{b1}^{\leftarrow B_{DOM}^{N}} 
+                                      - \mu_{b2}^{\leftarrow B_{DOM}^{N}}$ 
 
 
 **Nominal oxidation state of dissolved organiccarbon** (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless])
@@ -1949,81 +1949,81 @@ $\dfrac{\Delta DOM^{NOSC}}{\Delta t} = \Delta DOM_{overflow}^{NOSC}
 
 **Calcium Carbonate** (`f_caco3(i,j,k)`, $CaCO_3$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta CaCO_3}{\Delta t} = P_{CaCO_3}^{\Gamma_{np}^{&rarr; C}}
-                                 + P_{CaCO_3}^{\Gamma_{mz}^{&rarr; C}}
-                                 + P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}}
-                                 + P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}}
-                                 + P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}}
+$\dfrac{\Delta CaCO_3}{\Delta t} = P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
+                                 + P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
+                                 + P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
+                                 + P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
+                                 + P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}}
                                  - D_{CaCO_3}^{\Omega_{cal}}
                                  - D_{CaCO_3}^{\Omega_{ara}}
-                                 - D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}}
-                                 - D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}}
-                                 - D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}$
+                                 - D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
+                                 - D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
+                                 - D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}$
 
 
 **Dissolved Inorganic Carbon** (`f_dic(i,j,k)`, $DIC$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta DIC}{\Delta t} = X_{mz}^{&larr; C} \left(1 - f_{mz}^{X &rarr; DOM} \right)
-                              + X_{Mz}^{&larr; C} \left(1 - f_{Mz}^{X &rarr; DOM} \right)
-                              + \gamma_{mz}^{&rarr; C}
-                              + \gamma_{Mz}^{&rarr; C}
-                              + \mu_{b1}^{&rarr; DIC}
-                              + \mu_{b2}^{&rarr; DIC}
+$\dfrac{\Delta DIC}{\Delta t} = X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
+                              + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right)
+                              + \gamma_{mz}^{\rightarrow C}
+                              + \gamma_{Mz}^{\rightarrow C}
+                              + \mu_{b1}^{\rightarrow DIC}
+                              + \mu_{b2}^{\rightarrow DIC}
                               + D_{CaCO_3}^{\Omega_{cal}}
                               + D_{CaCO_3}^{\Omega_{ara}}
-                              + D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}}
-                              + D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}}
-                              + D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}
-                              - \mu_{np}^{&larr; C}
-                              - \mu_{mp}^{&larr; C}
-                              - \mu_{aoa}^{&larr; C}
-                              - \mu_{np}^{&rarr; DOC}
-                              - \mu_{mp}^{&rarr; DOC}
-                              - P_{CaCO_3}^{\Gamma_{np}^{&rarr; C}}
-                              - P_{CaCO_3}^{\Gamma_{mz}^{&rarr; C}}
-                              - P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}}
-                              - P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}}
-                              - P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}}$
+                              + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
+                              + D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
+                              + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}
+                              - \mu_{np}^{\leftarrow C}
+                              - \mu_{mp}^{\leftarrow C}
+                              - \mu_{aoa}^{\leftarrow C}
+                              - \mu_{np}^{\rightarrow DOC}
+                              - \mu_{mp}^{\rightarrow DOC}
+                              - P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
+                              - P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
+                              - P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
+                              - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
+                              - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}}$
 
 
 **Alkalinity** (`f_alk(i,j,k)`, $Alk$, [mol Eq kg<sup>-1</sup>])
 
-$\dfrac{\Delta Alk}{\Delta t} = \left( \mu_{np}^{&larr; C} \cdot \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} 
-                                     + \mu_{mp}^{&larr; C} \cdot \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} 
-                                     - \mu_{np}^{&larr; C} \cdot \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
-                                     - \mu_{mp}^{&larr; C} \cdot \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} 
-                                     + \gamma_{mz}^{&rarr; C} 
-                                     + \gamma_{Mz}^{&rarr; C} \right) \cdot \dfrac{16}{122}
-                              + \left( X_{mz}^{&larr; B_{np}^{N}}
-                                     + X_{mz}^{&larr; B_{mp}^{N}}
-                                     + X_{mz}^{&larr; B_{sd}^{N}}
-                                     + X_{mz}^{&larr; B_{b1}^{N}}
-                                     + X_{mz}^{&larr; B_{b2}^{N}}
-                                     + X_{mz}^{&larr; B_{aoa}^{N}} \right) \left(1 - f_{mz}^{X &rarr; DOM} \right)
-                              + \left( X_{Mz}^{&larr; B_{np}^{N}}
-                                     + X_{Mz}^{&larr; B_{mp}^{N}}
-                                     + X_{Mz}^{&larr; B_{sd}^{N}}
-                                     + X_{Mz}^{&larr; B_{ld}^{N}}
-                                     + X_{Mz}^{&larr; B_{mz}^{N}}
-                                     + X_{Mz}^{&larr; B_{b1}^{N}}
-                                     + X_{Mz}^{&larr; B_{b2}^{N}}
-                                     + X_{Mz}^{&larr; B_{aoa}^{N}} \right) \cdot \left(1 - f_{Mz}^{X &rarr; DOM} \right)
-                              + \mu_{b1}^{&rarr; NH_4} 
-                              + \mu_{b2}^{&rarr; NH_4}
-                              + \mu_{b1}^{&larr; NO_{3}}
-                              - \mu_{aoa}^{&larr; NH_{4}}
-                              - \mu_{aoa}^{&rarr; NO_{3}}
-                              - \mu_{aox}^{NH_4 &rarr; N_2}
+$\dfrac{\Delta Alk}{\Delta t} = \left( \mu_{np}^{\leftarrow C} \cdot \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} 
+                                     + \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} 
+                                     - \mu_{np}^{\leftarrow C} \cdot \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
+                                     - \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} 
+                                     + \gamma_{mz}^{\rightarrow C} 
+                                     + \gamma_{Mz}^{\rightarrow C} \right) \cdot \dfrac{16}{122}
+                              + \left( X_{mz}^{\leftarrow B_{np}^{N}}
+                                     + X_{mz}^{\leftarrow B_{mp}^{N}}
+                                     + X_{mz}^{\leftarrow B_{sd}^{N}}
+                                     + X_{mz}^{\leftarrow B_{b1}^{N}}
+                                     + X_{mz}^{\leftarrow B_{b2}^{N}}
+                                     + X_{mz}^{\leftarrow B_{aoa}^{N}} \right) \left(1 - f_{mz}^{X \rightarrow DOM} \right)
+                              + \left( X_{Mz}^{\leftarrow B_{np}^{N}}
+                                     + X_{Mz}^{\leftarrow B_{mp}^{N}}
+                                     + X_{Mz}^{\leftarrow B_{sd}^{N}}
+                                     + X_{Mz}^{\leftarrow B_{ld}^{N}}
+                                     + X_{Mz}^{\leftarrow B_{mz}^{N}}
+                                     + X_{Mz}^{\leftarrow B_{b1}^{N}}
+                                     + X_{Mz}^{\leftarrow B_{b2}^{N}}
+                                     + X_{Mz}^{\leftarrow B_{aoa}^{N}} \right) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right)
+                              + \mu_{b1}^{\rightarrow NH_4} 
+                              + \mu_{b2}^{\rightarrow NH_4}
+                              + \mu_{b1}^{\leftarrow NO_{3}}
+                              - \mu_{aoa}^{\leftarrow NH_{4}}
+                              - \mu_{aoa}^{\rightarrow NO_{3}}
+                              - \mu_{aox}^{NH_4 \rightarrow N_2}
                               + \left( D_{CaCO_3}^{\Omega_{cal}}
                                      + D_{CaCO_3}^{\Omega_{ara}}
-                                     + D_{CaCO_3}^{\Gamma_{sd}^{&rarr; C}}
-                                     + D_{CaCO_3}^{g_{mz}^{&larr; B_{sd}^{C}}}
-                                     + D_{CaCO_3}^{g_{Mz}^{&larr; B_{sd}^{C}}}
-                                     - P_{CaCO_3}^{\Gamma_{np}^{&rarr; C}}
-                                     - P_{CaCO_3}^{\Gamma_{mz}^{&rarr; C}}
-                                     - P_{CaCO_3}^{g_{mz}^{&larr; B_{np}^{C}}}
-                                     - P_{CaCO_3}^{g_{Mz}^{&larr; B_{np}^{C}}}
-                                     - P_{CaCO_3}^{g_{Mz}^{&larr; B_{mz}^{C}}} \right) \cdot 2$
+                                     + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
+                                     + D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
+                                     + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}
+                                     - P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
+                                     - P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
+                                     - P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
+                                     - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
+                                     - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}} \right) \cdot 2$
 
 
 ---
@@ -2227,12 +2227,12 @@ WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i
 
 
 **Organics**\
-Remineralisation of organic carbon ($\gamma_{sed}^{&rarr; C}$) produces DOC and DON and removes O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of organic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
+Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces DOC and DON and removes O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of organic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
 
-$\gamma_{sed}^{&rarr; DOC} = \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C}$\
-$\gamma_{sed}^{&rarr; DON} = \gamma_{sed}^{&rarr; DOC} R^{N:C}$\
-$\gamma_{sed}^{&larr; O_2} = \gamma_{sed}^{&rarr; DOC} R^{O_2:C}$\
-$\gamma_{sed}^{&rarr; dFe} = \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}$
+$\gamma_{sed}^{\rightarrow DOC} = \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C}$\
+$\gamma_{sed}^{\rightarrow DON} = \gamma_{sed}^{\rightarrow DOC} R^{N:C}$\
+$\gamma_{sed}^{\leftarrow O_2} = \gamma_{sed}^{\rightarrow DOC} R^{O_2:C}$\
+$\gamma_{sed}^{\rightarrow dFe} = \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}$
 
 where
 - $\gamma_{sed}^{0^{\circ}C}$ is a base rate of organic matter hydrolysation at 0ºC in the sediments (`detlrem_sed`, [s<sup>-1</sup>])
@@ -2247,7 +2247,7 @@ where
 **Dissolution of biogenic silica**\
 With regard to the dissolution of sedimentary biogenic silica, we compute it in the same way as how it is computed in the water column:
 
-$\gamma_{sed}^{&rarr; Si} = \left(d_{sed^{Si}}^{T} \cdot S_{sed^{Si}}^{Sat} \cdot S_{sed^{Si}}^{bio}\right) B_{sed}^{Si}$
+$\gamma_{sed}^{\rightarrow Si} = \left(d_{sed^{Si}}^{T} \cdot S_{sed^{Si}}^{Sat} \cdot S_{sed^{Si}}^{bio}\right) B_{sed}^{Si}$
 
 where
 - $B_{sed}^{Si}$ is the concentration of organic silicon in the sediment pool (`p_detsi_sediment(i,j,1)`, [mol Si m<sup>-2</sup>])
@@ -2277,7 +2277,7 @@ However, if `do_caco3_dynamics = .false.`, then dissolution of $CaCO_3$ in the s
 **Benthic denitrification**\
 We also consider the consumption of NO<sub>3</sub> via benthic denitrification. When `do_benthic_denitrification = .true.`, a portion of the particulate organic matter within the sediments that is hydrolysed to DOC and DON is performed anaerobically (i.e., using NO<sub>3</sub> as the electron acceptor). Unlike this process in the water column, which is performed by bacterial metabolism, we estimate this process using an empirical parameterization from [Bohlen et al. (2012)](https://doi.org/10.1029/2011GB004198):
 
-$\gamma_{sed}^{&larr; NO_3} = \gamma_{sed}^{&rarr; DOC} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)$
+$\gamma_{sed}^{\leftarrow NO_3} = \gamma_{sed}^{\rightarrow DOC} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)$
 
 where
 - $0.9$ is a hard upper limit stating that 90% of organic matter hydrolysation can potentially be performed anaerobically via denitrification
@@ -2287,18 +2287,18 @@ where
 
 and where the fraction of organic matter that is hydrolysed via denitrification is equal to:
 
-$f_{sed}^{denit} = \gamma_{sed}^{&larr; NO_3} \dfrac{\dfrac{122}{94}}{\gamma_{sed}^{&rarr; DOC}}$
+$f_{sed}^{denit} = \gamma_{sed}^{\leftarrow NO_3} \dfrac{\dfrac{122}{94}}{\gamma_{sed}^{\rightarrow DOC}}$
 
 
 **Tendencies from sediment processes**\
 Overall bottom fluxes of tracers are:
 
-$\dfrac{\Delta DOC}{\Delta t} = \gamma_{det,sed}^{&rarr; DOC}$\
-$\dfrac{\Delta DON}{\Delta t} = \gamma_{det,sed}^{&rarr; DON}$\
-$\dfrac{\Delta NO_3}{\Delta t} = \gamma_{det,sed}^{&larr; NO_3}$\
-$\dfrac{\Delta O_2}{\Delta t} = \gamma_{det,sed}^{&larr; O_2} \left(1 - f_{sed}^{denit}\right)$\
-$\dfrac{\Delta Si}{\Delta t} = \gamma_{det,sed}^{&rarr; Si}$\
-$\dfrac{\Delta dFe}{\Delta t} = \gamma_{det,sed}^{&rarr; dFe}$\
+$\dfrac{\Delta DOC}{\Delta t} = \gamma_{det,sed}^{\rightarrow DOC}$\
+$\dfrac{\Delta DON}{\Delta t} = \gamma_{det,sed}^{\rightarrow DON}$\
+$\dfrac{\Delta NO_3}{\Delta t} = \gamma_{det,sed}^{\leftarrow NO_3}$\
+$\dfrac{\Delta O_2}{\Delta t} = \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right)$\
+$\dfrac{\Delta Si}{\Delta t} = \gamma_{det,sed}^{\rightarrow Si}$\
+$\dfrac{\Delta dFe}{\Delta t} = \gamma_{det,sed}^{\rightarrow dFe}$\
 $\dfrac{\Delta DIC}{\Delta t} = \D_{CaCO_{3},sed}$\
 $\dfrac{\Delta Alk}{\Delta t} = 2 \cdot \D_{CaCO_{3},sed}$
 
