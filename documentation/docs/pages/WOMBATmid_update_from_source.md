@@ -98,7 +98,7 @@ The euphotic depth (`zeuphot(i,j)`, [m]) is defined as the depth where `radbio` 
 
 ### 2. Nutrient limitation of phytoplankton.
 
-At the start of each vertical loop `k=1` through `k=kmax` the code computes the biomass of nano-phytoplankton (`biophy`, $B_{np}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton (`biodia`, $B_{mp}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how nitrogen in the form of nitrate (`biono3`, NO<sub>3</sub>, [mmol N m<sup>-3</sup>]) and ammonium (`bionh4`, NH<sub>4</sub>, [mmol N m<sup>-3</sup>]), dissolved iron (`biofer`, $dFe$, [µmol dFe m<sup>-3</sup>]) and silicic acid in the case of micro-phytoplankton (`biosil`, Si(OH)<sub>4</sub>, [mmol S m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
+At the start of each vertical loop `k=1` through `k=kmax` the code computes the biomass of nano-phytoplankton (`biophy`, $B_{np}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton (`biodia`, $B_{mp}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how nitrogen in the form of nitrate (`biono3`, NO<sub>3</sub>, [mmol N m<sup>-3</sup>]) and ammonium (`bionh4`, NH<sub>4</sub>, [mmol N m<sup>-3</sup>]), dissolved iron (`biofer`, $dFe$, [µmol dFe m<sup>-3</sup>]) and silicic acid in the case of micro-phytoplankton (`biosil`, H<sub>4</sub>SiO<sub>4</sub>, [mmol S m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
 
 $aff = V^{-0.57}$
 
@@ -134,8 +134,8 @@ $L_{np}^{NO_3} = \dfrac{l_{np}^{N} l_{np}^{NO_3}}{l_{np}^{NO_3} + 5 \cdot l_{np}
 $L_{np}^{N} = L_{np}^{NH_4} + L_{np}^{NO_3}$
 
 where
-- $NH_4$ is the in situ concentration of ammonium (`bionh4`, [mmol N m<sup>-3</sup>]) 
-- $NO_3$ is the in situ concentration of nitrate (`biono3`, [mmol N m<sup>-3</sup>]) 
+- NH<sub>4</sub> is the in situ concentration of ammonium (`bionh4`, [mmol N m<sup>-3</sup>]) 
+- NO<sub>3</sub> is the in situ concentration of nitrate (`biono3`, [mmol N m<sup>-3</sup>]) 
 - $l_{np}^{NH_4}$ is the limitation term of nano-phytoplankton growth on ammonium before preferencing (`phy_limnh4`, [dimensionless]) 
 - $l_{np}^{NO_3}$ is the limitation term of nano-phytoplankton growth on nitrate before preferencing (`phy_limno3`, [dimensionless]) 
 - $l_{np}^{N}$ is the limitation term of nano-phytoplankton growth on nitrogen before preferencing (`phy_limdin`, [dimensionless]) 
@@ -154,8 +154,8 @@ $L_{mp}^{NO_3} = \dfrac{l_{mp}^{N} l_{mp}^{NO_3}}{l_{mp}^{NO_3} + 5 \cdot l_{mp}
 $L_{mp}^{N} = L_{mp}^{NH_4} + L_{mp}^{NO_3}$
 
 where
-- $NH_4$ is the in situ concentration of ammonium (`bionh4`, [mmol N m<sup>-3</sup>]) 
-- $NO_3$ is the in situ concentration of nitrate (`biono3`, [mmol N m<sup>-3</sup>]) 
+- NH<sub>4</sub> is the in situ concentration of ammonium (`bionh4`, [mmol N m<sup>-3</sup>]) 
+- NO<sub>3</sub> is the in situ concentration of nitrate (`biono3`, [mmol N m<sup>-3</sup>]) 
 - $l_{mp}^{NH_4}$ is the limitation term of micro-phytoplankton growth on ammonium before preferencing (`dia_limnh4`, [dimensionless]) 
 - $l_{mp}^{NO_3}$ is the limitation term of micro-phytoplankton growth on nitrate before preferencing (`dia_limno3`, [dimensionless]) 
 - $l_{mp}^{N}$ is the limitation term of micro-phytoplankton growth on nitrogen before preferencing (`dia_limdin`, [dimensionless]) 
@@ -164,7 +164,7 @@ where
 - $L_{mp}^{N}$ is the limitation term of micro-phytoplankton growth on nitrogen (`dia_lnit(i,j,k)`, [dimensionless]) 
 
 
-Note that although phytoplankton prefer $NH_4$ over $NO_3$, as $NO_3$ becomes more abundant than $NH_4$ the $L_{mp}^{NO_3}$ term begins to exceed the $L_{mp}^{NH_4}$ term such that phytoplankton switch from regenerated production ($NH_4$-based) to new production ($NO_3$-based). This reproduces the known switch of phytoplankton from regenerated to new production that is observed in the real ocean ([Dugdale & Goering, 1967](https://doi.org/10.4319/lo.1967.12.2.0196), [Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/)). Furthermore, if $K_{mp}^{N}$ > $K_{np}^{N}$, this ensures that (i) micro-phytoplankton are less competitive for $NH_4$ than nano-phytoplankton at any concentration and (ii) micro-phytoplankton growth is greater than nano-phytoplankton under abundant $NO_3$, which is consistent with theory and observations ([Fawcett et al., 2011](https://doi.org/10.1038/ngeo1265), [Glibert et al., 2016](https://doi.org/10.1002/lno.10203))
+Note that although phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, as NO<sub>3</sub> becomes more abundant than NH<sub>4</sub> the $L_{mp}^{NO_3}$ term begins to exceed the $L_{mp}^{NH_4}$ term such that phytoplankton switch from regenerated production (NH<sub>4</sub>-based) to new production (NO<sub>3</sub>-based). This reproduces the known switch of phytoplankton from regenerated to new production that is observed in the real ocean ([Dugdale & Goering, 1967](https://doi.org/10.4319/lo.1967.12.2.0196), [Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/)). Furthermore, if $K_{mp}^{N}$ > $K_{np}^{N}$, this ensures that (i) micro-phytoplankton are less competitive for NH<sub>4</sub> than nano-phytoplankton at any concentration and (ii) micro-phytoplankton growth is greater than nano-phytoplankton under abundant NO<sub>3</sub>, which is consistent with theory and observations ([Fawcett et al., 2011](https://doi.org/10.1038/ngeo1265), [Glibert et al., 2016](https://doi.org/10.1002/lno.10203))
 
 **Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{np}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_minqfe`, $Q_{mp}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phy_optqfe`, $Q_{np}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_optqfe`, $Q_{mp}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{np}^{-Fe:C}$ and $Q_{mp}^{-Fe:C}$, is dependent on three terms that each correspond to the iron required by photosystems, respiration and nitrate reduction ([Flynn & Hipkin, 1999](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x)):
 
@@ -459,7 +459,7 @@ where
 
 ### 9. Phytoplankton uptake of silicic acid.
 
-Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for Si(OH)<sub>4</sub> and (ii) down regulation of Si(OH)<sub>4</sub> uptake associated with enriched cellular quotas. 
+Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 (i) 
 $\dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}}$
@@ -468,7 +468,7 @@ $\dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}}$
 $\left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}$
 
 where 
-- Si(OH)<sub>4</sub> is the in situ silicic acid concentration (`biosil`, [mmol Si m<sup>-3</sup>])
+- H<sub>4</sub>SiO<sub>4</sub> is the in situ silicic acid concentration (`biosil`, [mmol Si m<sup>-3</sup>])
 - $K_{mp}^{Si}$ is the half-saturation coefficient for siliic acid uptake by micro-phytoplankton (`dia_ksi(i,j,k)`, [mmol Si m<sup>-3</sup>])
 - $Q_{mp}^{Si:C}$ is the in situ Si:C ratios of micro-phytoplankton cells (`dia_Si2C`, [mol Si (mol C)-1])
 - $Q_{mp}^{+Si:C}$ is the maximum Si:C ratios of micro-phytoplankton cells (`diamaxqs`, [mol Si (mol C)-1])
@@ -620,28 +620,28 @@ $D_{lA}^{&rarr; dFe} = Fe_{lA} \gamma_{lA}^{diss}$
 ### 11. Biogenic silica dissolution. 
 
 **Silicic acid equilibrium concentration**\
-To determine the rate of biogenic silica dissolution we must first determine the equilibrium concentration of silicic acid (Si(OH)<sub>4</sub>) in seawater. To do so, we solve for this equilibrium concentration via thermodynamic first-principles:
+To determine the rate of biogenic silica dissolution we must first determine the equilibrium concentration of silicic acid (H<sub>4</sub>SiO<sub>4</sub>) in seawater. To do so, we solve for this equilibrium concentration via thermodynamic first-principles:
 
-$K_{Si(OH)_{4}}(T,P) = \dfrac{\gamma_{Si(OH)_{4}^{0}} \cdot [Si(OH)_{4}]^{eq}}{(a_{H_{2}O})^{2}}$
+$K_{H_{4}SiO_{4}}(T,P) = \dfrac{\gamma_{H_{4}SiO_{4}^{0}} \cdot [H_{4}SiO_{4}]^{eq}}{(a_{H_{2}O})^{2}}$
 
 where
-- $K_{Si(OH)_{4}}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
-- $\gamma_{Si(OH)_{4}^{0}}$ is the activity ratio of Si(OH)<sub>4</sub> in seawater (`gamma0`, [dimensionless])
-- $[Si(OH)_{4}]^{eq}$ is the equilibrium concentration of Si(OH)<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
+- $K_{H_{4}SiO_{4}}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
+- $\gamma_{H_{4}SiO_{4}^{0}}$ is the activity ratio of H<sub>4</sub>SiO<sub>4</sub> in seawater (`gamma0`, [dimensionless])
+- $[H_{4}SiO_{4}]^{eq}$ is the equilibrium concentration of H<sub>4</sub>SiO<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
 - $a_{H_{2}O}$ is the activity of seawater (`alphaH2O`, [dimensionless])
 
 The equation is rearranged such that:
 
-$[Si(OH)_{4}]^{eq} = \dfrac{K_{Si(OH)_{4}}(T,P) \cdot (a_{H_{2}O})^{2}}{\gamma_{Si(OH)_{4}^{0}}}$
+$[H_{4}SiO_{4}]^{eq} = \dfrac{K_{H_{4}SiO_{4}}(T,P) \cdot (a_{H_{2}O})^{2}}{\gamma_{H_{4}SiO_{4}^{0}}}$
 
-The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{Si(OH)_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the solubility of Si(OH)<sub>4</sub> decreases predictably with salinity according to
+The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{H_{4}SiO_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the solubility of H<sub>4</sub>SiO<sub>4</sub> decreases predictably with salinity according to
 
-$\gamma_{Si(OH)_{4}^{0}} = 1 + 0.0053 \cdot S - 0.000034 \cdot S^{2}$
+$\gamma_{H_{4}SiO_{4}^{0}} = 1 + 0.0053 \cdot S - 0.000034 \cdot S^{2}$
 
 where
 - $S$ is the in situ salinity of seawater (`Salt(i,j,k)`, [psu])
 
-For $K_{Si(OH)_{4}}(T,P)$ we follow the derivation of [Gunnarsson & Arnórsson (2000)](https://doi.org/10.1016/S0016-7037(99)00426-3) who relate the thermodynamic equilibrium constant of Si(OH)<sub>4</sub> to variations in temperature at a constant pressure of 1 bar ($P^{1}$):
+For $K_{H_{4}SiO_{4}}(T,P)$ we follow the derivation of [Gunnarsson & Arnórsson (2000)](https://doi.org/10.1016/S0016-7037(99)00426-3) who relate the thermodynamic equilibrium constant of H<sub>4</sub>SiO<sub>4</sub> to variations in temperature at a constant pressure of 1 bar ($P^{1}$):
 
 $K(T,P^{1}) = 10^{ -8.476 - \dfrac{485.24}{T_{K}} - 2.268 \times 10^{-6} \cdot (T_{K})^{2} + 3.068 log_{10}(T_{K})}$
 
@@ -689,13 +689,13 @@ where
 - $T$ is the in situ temperature of seawater ([`Temp(i,j,k)`, [ºC]])
 - $3600$ converts the rate from [hour<sup>-1</sup>] to [s<sup>-1</sup>]
 
-Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of Si(OH)<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, Si(OH)<sub>4</sub> is always undersaturated. We therefore assume that Si(OH)<sub>4</sub> is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
+Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of H<sub>4</sub>SiO<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, H<sub>4</sub>SiO<sub>4</sub> is always undersaturated. We therefore assume that H<sub>4</sub>SiO<sub>4</sub> is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
 
-$S_{B_{ld}^{Si}}^{Sat} = 1 - \left(\dfrac{[Si(OH)_{4}]}{[Si(OH)_{4}]^{eq}}\right)^{2}$
+$S_{B_{ld}^{Si}}^{Sat} = 1 - \left(\dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{2}$
  
 where
-- $[Si(OH)_{4}]$ is the in situ concentration of Si(OH)<sub>4</sub> (`f_sil(i,j,k)`, [mol Si kg<sup>-1</sup>])
-- $[Si(OH)_{4}]^{eq}$ is the equilibrium concentration of Si(OH)<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
+- $[H_{4}SiO_{4}]$ is the in situ concentration of H<sub>4</sub>SiO<sub>4</sub> (`f_sil(i,j,k)`, [mol Si kg<sup>-1</sup>])
+- $[H_{4}SiO_{4}]^{eq}$ is the equilibrium concentration of H<sub>4</sub>SiO<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
 - we use an exponent of $2$ informed by the organic carbon-rich biogenic silica dissolution kinetics reported in Table 3.4 of [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf)
 
 The scaling term associated with activity of heterotrophic bacteria is informed by substantial evidence. According to [Rickert et al., 2002](https://doi.org/10.1016/S0016-7037(01)00757-8) "The removal of organic or inorganic coatings enhance the reactivity by at least an order of magnitude". Order of magnitude increases in silica dissolution have been reported for diatom frustules in contact with bacteria ([Bidle & Azam, 1999](https://doi.org/10.1038/17351)), while anti-biotic treatments to mesocosms off Monterey Bay caused silica dissolution to reduced by 50% ([Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). We represent this bacterially-induced stimulation of dissolution with
@@ -729,8 +729,8 @@ where
 - $\gamma_{mp}^{0ºC}$ is the rate of linear mortality of micro-phytoplankton at 0ºC (`dialmor`, [s<sup>-1</sup>])
 - $\gamma_{mz}^{0ºC}$ is the rate of linear mortality of micro-zooplankton at 0ºC (`zoolmor`, [s<sup>-1</sup>])
 - $\gamma_{Mz}^{0ºC}$ is the rate of linear mortality of meso-zooplankton at 0ºC (`meslmor`, [s<sup>-1</sup>])
-- $\gamma_{b1}^{0ºC}$ is the rate of linear mortality of facultative $NO_{3}$-reducing bacteria at 0ºC (`bac1lmor`, [s<sup>-1</sup>])
-- $\gamma_{b2}^{0ºC}$ is the rate of linear mortality of facultative $N_{2}O$-reducing bacteria at 0ºC (`bac2lmor`, [s<sup>-1</sup>])
+- $\gamma_{b1}^{0ºC}$ is the rate of linear mortality of facultative NO<sub>3</sub>-reducing bacteria at 0ºC (`bac1lmor`, [s<sup>-1</sup>])
+- $\gamma_{b2}^{0ºC}$ is the rate of linear mortality of facultative N<sub>2</sub>O-reducing bacteria at 0ºC (`bac2lmor`, [s<sup>-1</sup>])
 - $\gamma_{aoa}^{0ºC}$ is the rate of linear mortality of ammonia oxidizing archaea at 0ºC (`aoalmor`, [s<sup>-1</sup>])
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless])
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC])
@@ -738,7 +738,7 @@ where
 - $B_{mp}^{C}$ is the concentration of micro-phytoplankton carbon biomass (`f_dia(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{Mz}^{C}$ is the concentration of meso-zooplankton carbon biomass (`f_mes(i,j,k)`, [mol kg<sup>-1</sup>])
-- $B_{b1}^{C}$ is the concentration of facultative $NO_{3}$-reducing bacteria carbon biomass (`f_bac1(i,j,k)`, [mol kg<sup>-1</sup>])
+- $B_{b1}^{C}$ is the concentration of facultative NO<sub>3</sub>-reducing bacteria carbon biomass (`f_bac1(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{b2}^{C}$ is the concentration of facultative $N_{2}$O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{aoa}^{C}$ is the concentration of ammonia oxidizing archaea carbon biomass (`f_aoa(i,j,k)`, [mol kg<sup>-1</sup>])
 - $S_{mz}^{\gamma}$ is a scaling factor that reduces micro-zooplankton linear mortality at low biomass (`zoo_slmor`, [dimenionless])
@@ -771,8 +771,8 @@ where
 - $\Gamma_{mp}^{0ºC}$ is the rate of quadratic mortality of micro-phytoplankton at 0ºC (`diaqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $\Gamma_{mz}^{0ºC}$ is the rate of quadratic mortality of micro-zooplankton at 0ºC (`zooqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $\Gamma_{Mz}^{0ºC}$ is the rate of quadratic mortality of meso-zooplankton at 0ºC (`mesqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
-- $\Gamma_{b1}^{0ºC}$ is the rate of quadratic mortality of facultative $NO_{3}$-reducing bacteria at 0ºC (`bac1qmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
-- $\Gamma_{b2}^{0ºC}$ is the rate of quadratic mortality of facultative $N_{2}O$-reducing bacteria at 0ºC (`bac2qmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
+- $\Gamma_{b1}^{0ºC}$ is the rate of quadratic mortality of facultative NO<sub>3</sub>-reducing bacteria at 0ºC (`bac1qmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
+- $\Gamma_{b2}^{0ºC}$ is the rate of quadratic mortality of facultative N<sub>2</sub>O-reducing bacteria at 0ºC (`bac2qmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $\Gamma_{aoa}^{0ºC}$ is the rate of quadratic mortality of ammonia oxidizing archaea at 0ºC (`aoaqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless])
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC])
@@ -780,7 +780,7 @@ where
 - $B_{mp}^{C}$ is the concentration of micro-phytoplankton carbon biomass (`f_dia(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{Mz}^{C}$ is the concentration of meso-zooplankton carbon biomass (`f_mes(i,j,k)`, [mol kg<sup>-1</sup>])
-- $B_{b1}^{C}$ is the concentration of facultative $NO_{3}$-reducing bacteria carbon biomass (`f_bac1(i,j,k)`, [mol kg<sup>-1</sup>])
+- $B_{b1}^{C}$ is the concentration of facultative NO<sub>3</sub>-reducing bacteria carbon biomass (`f_bac1(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{b2}^{C}$ is the concentration of facultative $N_{2}$O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>])
 - $B_{aoa}^{C}$ is the concentration of ammonia oxidizing archaea carbon biomass (`f_aoa(i,j,k)`, [mol kg<sup>-1</sup>])
 
@@ -856,15 +856,15 @@ Thus:
 - $g_{mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{mz}^{&larr; B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by micro-zooplankton (`zoograzdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
-- $g_{mz}^{&larr; B_{b1}^{C}}$ is the grazing rate of facultative $NO_{3}$-reducing bacteria by micro-zooplankton (`zoograzbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
-- $g_{mz}^{&larr; B_{b2}^{C}}$ is the grazing rate of facultative $N_{2}O$-reducing bacteria by micro-zooplankton (`zoograzbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+- $g_{mz}^{&larr; B_{b1}^{C}}$ is the grazing rate of facultative NO<sub>3</sub>-reducing bacteria by micro-zooplankton (`zoograzbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+- $g_{mz}^{&larr; B_{b2}^{C}}$ is the grazing rate of facultative N<sub>2</sub>O-reducing bacteria by micro-zooplankton (`zoograzbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{mz}^{&larr; B_{aoa}^{C}}$ is the grazing rate of ammonia oxidizing archaea by micro-zooplankton (`zoograzaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{Mz}^{&larr; B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by meso-zooplankton (`mesgrazphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{Mz}^{&larr; B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by meso-zooplankton (`mesgrazdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{Mz}^{&larr; B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{Mz}^{&larr; B_{ld}^{C}}$ is the grazing rate of large particulate detritus by meso-zooplankton (`mesgrazbdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
-- $g_{Mz}^{&larr; B_{b1}^{C}}$ is the grazing rate of facultative $NO_{3}$-reducing bacteria by meso-zooplankton (`mesgrazbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
-- $g_{Mz}^{&larr; B_{b2}^{C}}$ is the grazing rate of facultative $N_{2}O$-reducing bacteria by meso-zooplankton (`mesgrazbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+- $g_{Mz}^{&larr; B_{b1}^{C}}$ is the grazing rate of facultative NO<sub>3</sub>-reducing bacteria by meso-zooplankton (`mesgrazbac1(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
+- $g_{Mz}^{&larr; B_{b2}^{C}}$ is the grazing rate of facultative N<sub>2</sub>O-reducing bacteria by meso-zooplankton (`mesgrazbac2(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{Mz}^{&larr; B_{aoa}^{C}}$ is the grazing rate of ammonia oxidizing archaea by meso-zooplankton (`mesgrazaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 - $g_{Mz}^{&larr; B_{mz}^{C}}$ is the grazing rate of micro-zooplankton by meso-zooplankton (`mesgrazzoo(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>])
 
@@ -917,7 +917,7 @@ For zooplankton preying on phytoplankton, other zooplankton and detritus, their 
 
 $X_{z}^{&larr; B_{i}^{N}} = X_{z}^{&larr; B_{i}^{C}} \dfrac{16}{122}$
 
-However, since both micro-zooplankton and meso-zooplankton consume heterotrophic bacteria and ammonia oxidizing arcaheal types, which have different C:N ratios to other ecosystem biomass components, we must also compute the specific excretion of $NH_4$ and $B_{DOM}^{N}$ by zooplankton when feeding on these types. Since these types are richer in N than the other prey types, zooplankton excrete more $NH_4$ and $B_{DOM}^{N}$ when bacteria and archaea represent a greater proportion of their diet ([Sterner & Elser, 2002](https://press.princeton.edu/books/ebook/9781400885695/ecological-stoichiometry-pdf)). Total excretion of nitrogen from bacterial/archaeal type $i$ by zooplankton type $z$ is as follows:
+However, since both micro-zooplankton and meso-zooplankton consume heterotrophic bacteria and ammonia oxidizing arcaheal types, which have different C:N ratios to other ecosystem biomass components, we must also compute the specific excretion of NH<sub>4</sub> and $B_{DOM}^{N}$ by zooplankton when feeding on these types. Since these types are richer in N than the other prey types, zooplankton excrete more NH<sub>4</sub> and $B_{DOM}^{N}$ when bacteria and archaea represent a greater proportion of their diet ([Sterner & Elser, 2002](https://press.princeton.edu/books/ebook/9781400885695/ecological-stoichiometry-pdf)). Total excretion of nitrogen from bacterial/archaeal type $i$ by zooplankton type $z$ is as follows:
 
 $X_{z}^{&larr; B_{i}^{N}} = g_{z}^{&larr; B_{i}^{C}} \dfrac{1}{R_{i}^{C:N}} - \dfrac{A_{z}^{&larr; B_{i}^{C}} + E_{z}^{&larr; B_{i}^{C}}}{R_{z}^{C:N}}$
 
@@ -1010,7 +1010,7 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 
 ### 15. Implicit nitrogen fixation.
 
-Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability. The equation for new nitrogen (specifically $NH_4$) added via diazotrophy is:
+Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability. The equation for new nitrogen (specifically NH<sub>4</sub>) added via diazotrophy is:
 
 $\mu_{diazo}^{&rarr; NH_4} = \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \cdot \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}$ 
 
@@ -1046,7 +1046,7 @@ where
 
 ### 16. Facultative bacterial heterotrophy.
 
-We remineralise dissolved organic matter into inorganic consituents via the activity of two facultative bacterial heterotrophs. These bacterial heterotrophs oxidise dissolved organic carbon ($B_{DOM}^{C}$) and reduce dissolved oxygen ($O_2$). However, we consider these bacterial types, which relfect the traits of the ubiquitous SAR11, to be faculatively anaerobic ([Zumft, 1997](https://doi.org/10.1128/mmbr.61.4.533-616.1997); [Tsementzi et al., 2016](https://doi.org/10.1038/nature19068)). This means that they can shift their metabolism to using either nitrate ($NO_3$) or nitrous oxide ($N_{2}O$) as alternative electron acceptors when $O_2$ is limiting. These populations of heterotrophic bacteria also assimilate dissolved organic nitrogen ($DON$) and ammonium ($NH_4$) and dissolved iron ($dFe$) to support biosynthesis. By taking up $NH_4$ and $dFe$ bacteria compete directly with phytoplankton, consistent with prior observations ([Kirchman, 1994](https://www.jstor.org/stable/4251383); [Tortell et al., 1996](https://doi.org/10.1038/383330a0); [Kirchman & Wheeler, 1998](https://doi.org/10.1016/S0967-0637(97)00075-7); [Fourquez et al., 2015](https://doi.org/10.5194/bg-12-1893-2015); [Deng et al., 2021](https://doi.org/10.1002/lno.11883); [Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)).
+We remineralise dissolved organic matter into inorganic consituents via the activity of two facultative bacterial heterotrophs. These bacterial heterotrophs oxidise dissolved organic carbon ($B_{DOM}^{C}$) and reduce dissolved oxygen (O<sub>2</sub>). However, we consider these bacterial types, which relfect the traits of the ubiquitous SAR11, to be faculatively anaerobic ([Zumft, 1997](https://doi.org/10.1128/mmbr.61.4.533-616.1997); [Tsementzi et al., 2016](https://doi.org/10.1038/nature19068)). This means that they can shift their metabolism to using either nitrate (NO<sub>3</sub>) or nitrous oxide (N<sub>2</sub>O) as alternative electron acceptors when O<sub>2</sub> is limiting. These populations of heterotrophic bacteria also assimilate dissolved organic nitrogen ($DON$) and ammonium (NH<sub>4</sub>) and dissolved iron ($dFe$) to support biosynthesis. By taking up NH<sub>4</sub> and $dFe$ bacteria compete directly with phytoplankton, consistent with prior observations ([Kirchman, 1994](https://www.jstor.org/stable/4251383); [Tortell et al., 1996](https://doi.org/10.1038/383330a0); [Kirchman & Wheeler, 1998](https://doi.org/10.1016/S0967-0637(97)00075-7); [Fourquez et al., 2015](https://doi.org/10.5194/bg-12-1893-2015); [Deng et al., 2021](https://doi.org/10.1002/lno.11883); [Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)).
 
 Our formulation of heterotrophic bacterial growth follows that developed by [Zakem et al. (2020)](https://doi.org/10.1038/s41396-019-0523-8) and subsequently expanded in [Sun et al. (2024)](https://doi.org/10.1073/pnas.2417421121) and [Buchanan et al. (2025)](https://www.science.org/doi/full/10.1126/science.ado0742). In these studies, the realized biomass growth rate (integration of carbon into biomass) of bacterial functional type $b$ (`bac1grow(i,j,k)`; `bac2grow(i,j,k)`, $\mu_{b}^{&larr; C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is defined by:
 
@@ -1079,9 +1079,9 @@ where
 - $y_{b}^{aer(DOC)}$ is the aerobic biomass growth yield on dissolved organic carbon by bacterial type $b$ (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, [mol C (mol C)<sup>-1</sup>])
 - $y_{b}^{aer(N)}$ is the aerobic biomass growth yield on nitrogen by bacterial type $b$ (`bac1_ydonC`; `bac2_ydonC`, [mol C (mol N)<sup>-1</sup>])
 - $y_{b}^{aer(Fe)}$ is the aerobic biomass growth yield on iron by bacterial type $b$ (`bac1_C2Fe`; `bac2_C2Fe`, [mol C (mol Fe)<sup>-1</sup>])
-- $y_{b}^{O_2}$ is the biomass growth yield on dissolved oxygen by bacterial type $b$ (`bac1_yoxyC`; `bac2_yoxyC`, [mol C (mol $O_{2}$)<sup>-1</sup>])
+- $y_{b}^{O_2}$ is the biomass growth yield on dissolved oxygen by bacterial type $b$ (`bac1_yoxyC`; `bac2_yoxyC`, [mol C (mol O<sub>2</sub>)<sup>-1</sup>])
 
-For anaerobic growth, these resource-specific growth rates are calculated in the same manner, except that the yields associated with growth are altered to reflect anaerobic metabolism. Also, the electron acceptor is no longer oxygen and is now either $NO_3$ for the $NO_3$-reducing bacteria (`f_bac1(i,j,k)`, $b1$) or $N_{2}O$ for the $N_{2}O$-reducing bacteria (`f_bac2(i,j,k)`, $b2$):
+For anaerobic growth, these resource-specific growth rates are calculated in the same manner, except that the yields associated with growth are altered to reflect anaerobic metabolism. Also, the electron acceptor is no longer oxygen and is now either NO<sub>3</sub> for the NO<sub>3</sub>-reducing bacteria (`f_bac1(i,j,k)`, $b1$) or N<sub>2</sub>O for the N<sub>2</sub>O-reducing bacteria (`f_bac2(i,j,k)`, $b2$):
 
 $\mu_{b}^{ana(DOC)} = V_{b}^{DOC} y_{b}^{ana(DOC)}$\
 $\mu_{b}^{ana(N)} = \left(V_{b}^{DON} + V_{b}^{NH_{4}}\right) y_{b}^{ana(N)}$\
@@ -1095,13 +1095,13 @@ where
 - $y_{b}^{ana(DOC)}$ is the anaerobic biomass growth yield on dissolved organic carbon by bacterial type $b$ (`bac1_yanaC`; `bac2_yanaC`, [mol C (mol C)<sup>-1</sup>])
 - $y_{b}^{ana(N)}$ is the anaerobic biomass growth yield on nitrogen by bacterial type $b$ (`bac1_ydonC * bacanapen`; `bac2_ydonC * bacanapen`, [mol C (mol N)<sup>-1</sup>])
 - $y_{b}^{ana(Fe)}$ is the anaerobic biomass growth yield on iron by bacterial type $b$ (`bac1_C2Fe * bacanapen`; `bac2_C2Fe * bacanapen`, [mol C (mol Fe)<sup>-1</sup>])
-- $y_{b}^{NO_3}$ is the biomass growth yield on nitrate by bacterial type $b1$ (`bac1_yno3C`, [mol C (mol $NO_{3}$)<sup>-1</sup>])
-- $y_{b}^{N_{2}O}$ is the biomass growth yield on nitrous oxide by bacterial type $b2$ (`bac2_yn2o`, [mol C (mol $N_{2}O$)<sup>-1</sup>])
+- $y_{b}^{NO_3}$ is the biomass growth yield on nitrate by bacterial type $b1$ (`bac1_yno3C`, [mol C (mol NO<sub>3</sub>)<sup>-1</sup>])
+- $y_{b}^{N_{2}O}$ is the biomass growth yield on nitrous oxide by bacterial type $b2$ (`bac2_yn2o`, [mol C (mol N<sub>2</sub>O)<sup>-1</sup>])
 
 Whether aerobic or anaerobic metabolism results in higher growth is therefore dependent on the differences in substrate **uptake rates ($V_{b}$)** and the substrate-specific **biomass yields ($y_{b}$)**. It is crucial to estimate both quantities. 
 
 **Uptake rates**\
-Uptake rates of reductant ($DOC$), addition resources ($DON$, $NH_4$ and $dFe$) and oxidant (electron acceptors) are calculated as:
+Uptake rates of reductant ($DOC$), addition resources ($DON$, NH<sub>4</sub> and $dFe$) and oxidant (electron acceptors) are calculated as:
 
 $V_{b}^{DOC} = V_{b}^{max,DOC} \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{C} + K_{b}^{DOC}}$\
 $V_{b}^{DON} = V_{b}^{max,DON} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{N} + K_{b}^{DON}}$\
@@ -1114,23 +1114,23 @@ $V_{b}^{N_{2}O} = \rho_{b}^{N_{2}O} \cdot N_{2}O$
 where
 - $V_{b}^{max,DOC}$ is the maximum rate of DOC uptake by bacterial functional type $b$ (`bac1_Vmax_doc`; `bac2_Vmax_doc`, [mmol C m<sup>-3</sup> s<sup>-1</sup>])
 - $V_{b}^{max,DON}$ is the maximum rate of DON uptake by bacterial functional type $b$ (`bac1_Vmax_don`; `bac2_Vmax_don`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
-- $V_{b}^{max,NH_{4}}$ is the maximum rate of $NH_{4}$ uptake by bacterial functional type $b$ (`bac1_Vmax_nh4`; `bac2_Vmax_nh4`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
+- $V_{b}^{max,NH_{4}}$ is the maximum rate of NH<sub>4</sub> uptake by bacterial functional type $b$ (`bac1_Vmax_nh4`; `bac2_Vmax_nh4`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
 - $V_{b}^{max,dFe}$ is the maximum rate of $dFe$ uptake by bacterial functional type $b$ (`bac1_Vmax_dFe`; `bac2_Vmax_dFe`, [mmol Fe m<sup>-3</sup> s<sup>-1</sup>])
-- $V_{b}^{max,NO_{3}}$ is the maximum rate of $NO_{3}$ uptake by bacterial functional type $b$ (`bac1_Vmax_no3`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
-- $\rho_{b}^{O_{2}}$ is the diffusive uptake limit of $O_2$ by bacterial functional type $b$ (`bac1_poxy`; `bac2_poxy`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
-- $\rho_{b}^{N_{2}O}$ is the diffusive uptake limit of $N_{2}O$ by bacterial functional type $b$ (`bac2_pn2o`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
+- $V_{b}^{max,NO_{3}}$ is the maximum rate of NO<sub>3</sub> uptake by bacterial functional type $b$ (`bac1_Vmax_no3`, [mmol N m<sup>-3</sup> s<sup>-1</sup>])
+- $\rho_{b}^{O_{2}}$ is the diffusive uptake limit of O<sub>2</sub> by bacterial functional type $b$ (`bac1_poxy`; `bac2_poxy`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
+- $\rho_{b}^{N_{2}O}$ is the diffusive uptake limit of N<sub>2</sub>O by bacterial functional type $b$ (`bac2_pn2o`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
 - $K_{b}^{DOC}$ is the half-saturation coefficient for uptake of $DOC$ by bacterial functional type $b$ (`bac1_kdoc`; `bac2_kdoc`, [mmol C m<sup>-3</sup>])
 - $K_{b}^{DON}$ is the half-saturation coefficient for uptake of $DON$ by bacterial functional type $b$ (`bac1_kdon`; `bac2_kdon`, [mmol N m<sup>-3</sup>])
-- $K_{b}^{NH_{4}}$ is the half-saturation coefficient for uptake of $NH_4$ by bacterial functional type $b$ (`bac1_knh4`; `bac2_knh4`, [mmol N m<sup>-3</sup>])
+- $K_{b}^{NH_{4}}$ is the half-saturation coefficient for uptake of NH<sub>4</sub> by bacterial functional type $b$ (`bac1_knh4`; `bac2_knh4`, [mmol N m<sup>-3</sup>])
 - $K_{b}^{dFe}$ is the half-saturation coefficient for uptake of $dFe$ by bacterial functional type $b$ (`bac1_kfer`; `bac2_kfer`, [µmol Fe m<sup>-3</sup>])
-- $K_{b}^{NO_{3}}$ is the half-saturation coefficient for uptake of $NO_3$ by bacterial functional type $b$ (`bac1_kno3`, [mmol N m<sup>-3</sup>])
+- $K_{b}^{NO_{3}}$ is the half-saturation coefficient for uptake of NO<sub>3</sub> by bacterial functional type $b$ (`bac1_kno3`, [mmol N m<sup>-3</sup>])
 - $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`biodoc`, [mmol C m<sup>-3</sup>])
 - $B_{DOM}^{N}$ is the in situ concentration of dissolved organic nitrogen (`biodon`, [mmol N m<sup>-3</sup>])
-- $NH_{4}$ is the in situ concentration of $NH_{4}$ (`bionh4`, [mmol N m<sup>-3</sup>])
+- NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`bionh4`, [mmol N m<sup>-3</sup>])
 - $dFe$ is the in situ concentration of $dFe$ (`biofer`, [µmol Fe m<sup>-3</sup>])
-- $NO_{3}$ is the in situ concentration of $NO_{3}$$ (`biono3`, [mmol N m<sup>-3</sup>])
-- $O_{2}$ is the in situ concentration of $O_{2}$$ (`biooxy`, [mmol $O_{2}$ m<sup>-3</sup>])
-- $N_{2}O$ is the in situ concentration of $N_{2}O$ (`bion2o`, [mmol $N_{2}O$ m<sup>-3</sup>])
+- NO<sub>3</sub> is the in situ concentration of nitrate (`biono3`, [mmol N m<sup>-3</sup>])
+- O<sub>2</sub> is the in situ concentration of O<sub>2</sub>$ (`biooxy`, [mmol O<sub>2</sub> m<sup>-3</sup>])
+- N<sub>2</sub>O is the in situ concentration of N<sub>2</sub>O (`bion2o`, [mmol N<sub>2</sub>O m<sup>-3</sup>])
 
 
 **Biomass yields**\
@@ -1143,7 +1143,7 @@ where
 - $y_{b}^{max(DON)}$ is the maximum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmax`, [mol N biomass (mol DON)<sup>-1</sup>]) 
 - $DOM^{NOSC}$ is the in situ nominal oxidation state of dissolved organic carbon that is normalized to vary between 0 (most reduced) and 1 (most oxidised) (`f_nosdoc(i,j,k)`, [dimensionless])
 
-From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on $O_2$ [mol C biomass (mol DOC)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
+From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on O<sub>2</sub> [mol C biomass (mol DOC)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
 
 $\kappa_{b} = 4 \cdot R_{b}^{C:N} + 1 \cdot R_{b}^{H:N} - 2 \cdot R_{b}^{O:N} - 3$\
 $\kappa_{DOM} = 4 \cdot \dfrac{B_{DOM}^{C}}{B_{DOM}^{N}} + 1 \cdot R_{DOM}^{H:N} - 2 \cdot R_{DOM}^{O:N} - 3$
@@ -1179,13 +1179,13 @@ where
 - $y_{b}^{aer(DON)}$ is the aerobic growth yield of bacterial functional type $b$ on DON (`bac1_ydonC`; `bac2_ydon`, [mol C biomass (mol DON)<sup>-1</sup>])
 - $y_{b}^{aer(DOC)}$ is the aerobic growth yield of bacterial functional type $b$ on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, [mol C biomass (mol DOC)<sup>-1</sup>])
 - $y_{b}^{ana(DOC)}$ is the anaerobic growth yield of bacterial functional type $b$ on DOC (`bac1_yana`; `bac2_yana`, [mol C biomass (mol DOC)<sup>-1</sup>])
-- $y_{b}^{O_2}$ is the aerobic growth yield of bacterial functional type $b$ on $O_2$ (`bac1_yoxyC`; `bac2_yoxyC`, [mol C biomass (mol $O_2$)<sup>-1</sup>])
-- $y_{b}^{NO_{3} &rarr; N_{2}O}$ is the anaerobic growth yield of bacterial functional type $b$ on $NO_3$ (`bac1_yno3C`, [mol C biomass (mol $NO_3$)<sup>-1</sup>])
-- $y_{b}^{N_{2}O &rarr; N_{2}}$ is the anaerobic growth yield of bacterial functional type $b$ on $N_{2}O$ (`bac2_yn2oC`, [mol C biomass (mol $N_{2}O$)<sup>-1</sup>])
+- $y_{b}^{O_2}$ is the aerobic growth yield of bacterial functional type $b$ on O<sub>2</sub> (`bac1_yoxyC`; `bac2_yoxyC`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>])
+- $y_{b}^{NO_{3} &rarr; N_{2}O}$ is the anaerobic growth yield of bacterial functional type $b$ on NO<sub>3</sub> (`bac1_yno3C`, [mol C biomass (mol NO<sub>3</sub>)<sup>-1</sup>])
+- $y_{b}^{N_{2}O &rarr; N_{2}}$ is the anaerobic growth yield of bacterial functional type $b$ on N<sub>2</sub>O (`bac2_yn2oC`, [mol C biomass (mol N<sub>2</sub>O)<sup>-1</sup>])
 
 
 **Consumption of substrates**\
-Heterotrophic bacterial growth consumes $B_{DOM}^{C}$, $B_{DOM}^{N}$, $NH_4$, $dFe$, $O_2$, $NO_3$ and $N_{2}O$. The consumption of a resource $R$ by bacterial functional type $b$ is calculated as:
+Heterotrophic bacterial growth consumes $B_{DOM}^{C}$, $B_{DOM}^{N}$, NH<sub>4</sub>, $dFe$, O<sub>2</sub>, NO<sub>3</sub> and N<sub>2</sub>O. The consumption of a resource $R$ by bacterial functional type $b$ is calculated as:
 
 $\mu_{b}^{&larr; R} = \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{R}}$
 
@@ -1206,14 +1206,14 @@ $B_{DOM}^{C}$ uptake (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</su
 
 $\mu_{b}^{&larr; B_{DOM}^{C}} = \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DOC)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DOC)}} f_{ana}$
 
-However, both $B_{DOM}^{N}$ (`don1remi(i,j,k)`; `don2remi(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and $NH_4$ (`bac1unh4(i,j,k)`; `bac2unh4(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) serve the bacterial demand for nitrogen and so we must split uptake between these two resources. We do so using the relative $V_{b}^{DON}$ and $V_{b}^{NH_4}$ which depend on the prescribed affinities of bacteria for these resources and the in situ concentrations of $DON$ and $NH_4$:
+However, both $B_{DOM}^{N}$ (`don1remi(i,j,k)`; `don2remi(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and NH<sub>4</sub> (`bac1unh4(i,j,k)`; `bac2unh4(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) serve the bacterial demand for nitrogen and so we must split uptake between these two resources. We do so using the relative $V_{b}^{DON}$ and $V_{b}^{NH_4}$ which depend on the prescribed affinities of bacteria for these resources and the in situ concentrations of $DON$ and NH<sub>4</sub>:
 
 $\mu_{b}^{&larr; B_{DOM}^{N}} = \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{DON}}{V_{b}^{DON} + V_{b}^{NH_4}}$\
 $\mu_{b}^{&larr; NH_4} = \left(\dfrac{\mu_{b}^{&larr; C}}{y_{b}^{aer(DON)}} \left(1 - f_{ana} \right) + \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{ana(DON)}} f_{ana} \right) \dfrac{V_{b}^{NH_4}}{V_{b}^{DON} + V_{b}^{NH_4}}$
 
-Since bacteria release $NH_4$ back to the environment, computing the uptake of $NH_4$ is only for housekeeping purposes and we only consider uptake of $DON$ in tracer tendency equations (see below).
+Since bacteria release NH<sub>4</sub> back to the environment, computing the uptake of NH<sub>4</sub> is only for housekeeping purposes and we only consider uptake of $DON$ in tracer tendency equations (see below).
 
-Consumption of the electron acceptors $O_2$ (`bac1resp(i,j,k)`; `bac2resp(i,j,k)`, [mol $O_2$ kg<sup>-1</sup> s<sup>-1</sup>]), $NO_3$ (`bac1deni(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and $N_{2}O$ (`bac2deni(i,j,k)`, [mol $N_{2}O$ kg<sup>-1</sup> s<sup>-1</sup>]) are also calculated only considering aerobic or anaerobic metabolism:
+Consumption of the electron acceptors O<sub>2</sub> (`bac1resp(i,j,k)`; `bac2resp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]), NO<sub>3</sub> (`bac1deni(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and N<sub>2</sub>O (`bac2deni(i,j,k)`, [mol N<sub>2</sub>O kg<sup>-1</sup> s<sup>-1</sup>]) are also calculated only considering aerobic or anaerobic metabolism:
 
 $\mu_{b}^{&larr; O_2} = \dfrac{\mu_{b}^{&larr; C}}{y_{b}^{O_2}} \left(1 - f_{ana} \right) 
 $\mu_{b1}^{&larr; NO_3} = \dfrac{\mu_{b1}^{&larr; C}}{y_{b1}^{NO_3}} f_{ana}$
@@ -1228,7 +1228,7 @@ where
 
 
 **Production of substrates**\
-Heterotrophic bacterial growth produces $DIC$, $NH_4$ and $N_{2}O$. Because we carry ecosystem components in units of carbon, the production of $DIC$ by bacterial functional type $b$ is calculated as:
+Heterotrophic bacterial growth produces $DIC$, NH<sub>4</sub> and N<sub>2</sub>O. Because we carry ecosystem components in units of carbon, the production of $DIC$ by bacterial functional type $b$ is calculated as:
 
 $\mu_{b}^{&rarr; DIC} = \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{DOC}} - 1\right)$
 
@@ -1236,13 +1236,13 @@ As before, we must accommodate differences in yields between aerobic and anaerob
 
 $\mu_{b}^{&rarr; DIC} = \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(aer)DOC}} - 1\right)\left(1 - f_{ana}\right) + \mu_{b}^{&larr; C} \left(\dfrac{1}{y_{b}^{(ana)DOC}} - 1\right) f_{ana}$
 
-Meanwhile, production of $NH_4$ requires knowledge of how much $DON$ was assimilated by the cell. Assimilated $DON$ is converted into $NH_4$ for biosynthesis and any excess is exuded into the environment. Release of $NH_4$ is therefore: 
+Meanwhile, production of NH<sub>4</sub> requires knowledge of how much $DON$ was assimilated by the cell. Assimilated $DON$ is converted into NH<sub>4</sub> for biosynthesis and any excess is exuded into the environment. Release of NH<sub>4</sub> is therefore: 
 
 $\mu_{b}^{&rarr; NH_4} = \mu_{b}^{&larr; B_{DOM}^{N}} - \dfrac{\mu_{b}^{&larr; C}}{R_{b}^{C:N}}$
 
-In the scenario where $V_{b}^{DON} << V_{b}^{NH_4}$, either due to very low concentrations of $DON$ or poor affinity of the bacteria for $DON$ uptake, $\mu_{b}^{&rarr; NH_4}$ will be negative. In this case, this negative release of $NH_4$ functions as a consumption of $NH_4$.
+In the scenario where $V_{b}^{DON} << V_{b}^{NH_4}$, either due to very low concentrations of $DON$ or poor affinity of the bacteria for $DON$ uptake, $\mu_{b}^{&rarr; NH_4}$ will be negative. In this case, this negative release of NH<sub>4</sub> functions as a consumption of NH<sub>4</sub>.
 
-Finally, the $NO_3$-reducing bacterial functional type produces $N_{2}O$. We carry $N_{2}O$ as an explicit tracer and in units of mol $N_{2}O$ kg<sup>-1</sup>, such that at every conversion of $NO_3$ to $N_{2}O$ we must account for the necessity of 2 mol $NO_3$ for every 1 mol $N_{2}O$. Production of $N_{2}O$ via $NO_3$ reduction is calcualted as:
+Finally, the NO<sub>3</sub>-reducing bacterial functional type produces N<sub>2</sub>O. We carry N<sub>2</sub>O as an explicit tracer and in units of mol N<sub>2</sub>O kg<sup>-1</sup>, such that at every conversion of NO<sub>3</sub> to N<sub>2</sub>O we must account for the necessity of 2 mol NO<sub>3</sub> for every 1 mol N<sub>2</sub>O. Production of N<sub>2</sub>O via NO<sub>3</sub> reduction is calcualted as:
 
 $\mu_{b1}^{&rarr; N_{2}O} = \dfrac{\mu_{b1}^{&larr; NO_3}}{2}$
 
@@ -1270,11 +1270,11 @@ $\mu_{aoa}^{O_2} = \dfrac{\rho_{aoa}^{O_2} O_2}{y_{aoa}^{O_2}}$
 
 where
 - $\mu_{aoa}^{max}$ is a temperature-dependent maximum growh rate of ammonia oxidizing archaea (`aoa_mumax(i,j,k)`, [s<sup>-1</sup])
-- $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of $NH_4$ by ammonia oxidizing archaea (`aoa_knh4`, [mmol N m<sup>-3</sup>])
-- $\rho_{aoa}^{O_2}$ is the diffusive uptake limit of $O_2$ by ammonia oxidizing archaea (`aoa_poxy`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
-- $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on $O_2$ (`aoa_yoxy`, [mol C biomass (mol $O_2$)<sup>-1</sup>])
-- $NH_{4}$ is the in situ concentration of $NH_{4}$ (`bionh4`, [mmol N m<sup>-3</sup>])
-- $O_{2}$ is the in situ concentration of $O_{2}$$ (`biooxy`, [mmol $O_{2}$ m<sup>-3</sup>])
+- $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of NH<sub>4</sub> by ammonia oxidizing archaea (`aoa_knh4`, [mmol N m<sup>-3</sup>])
+- $\rho_{aoa}^{O_2}$ is the diffusive uptake limit of O<sub>2</sub> by ammonia oxidizing archaea (`aoa_poxy`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>])
+- $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on O<sub>2</sub> (`aoa_yoxy`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>])
+- NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`bionh4`, [mmol N m<sup>-3</sup>])
+- O<sub>2</sub> is the in situ concentration of O<sub>2</sub>$ (`biooxy`, [mmol O<sub>2</sub> m<sup>-3</sup>])
 
 The temperature-dependent maximum growth rate of ammonia oxidizing archaea is informed by the cultures of [Qin et al. (2015)](https://doi.org/10.1073/pnas.1501568112):
 
@@ -1283,29 +1283,29 @@ $\mu_{aoa}^{max} = \dfrac{\max\left(0.2, 0.029 \cdot T - 0.147 \right)}{86400}$
 where
 - $T$ is the in situ temperature of seawater (`Temp(i,j,k)`, [ºC])
 
-In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-mid we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-mid we consider ammonia oxidizing archaea to perform full nitrification and oxidize $NH_4$ direclty to $NO_3$. Consumption of $NH_4$ (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and $O_2$ (`aoaresp(i,j,k)`, [mol $O_2$ kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
+In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-mid we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-mid we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> (`aoaresp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
 
 $\mu_{aoa}^{&larr; NH_4} = \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}}$\
 $\mu_{aoa}^{&larr; O_2} = \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}$
 
 where
-- $y_aoa^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on $NH_4$ (`aoa_ynh4`, [mol C biomass (mol $NH_4$)<sup>-1</sup>])
-- $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on $O_2$ (`aoa_yoxy`, [mol C biomass (mol $O_2$)<sup>-1</sup>])
+- $y_aoa^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on NH<sub>4</sub> (`aoa_ynh4`, [mol C biomass (mol NH<sub>4</sub>)<sup>-1</sup>])
+- $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on O<sub>2</sub> (`aoa_yoxy`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>])
 
-Ammonia ozidizing archaea produce both $NO_3$ and a small amount of $N_{2}O$ as they oxidize $NH_4$. The production of $N_{2}O$ is informed by numerous studies that show a relationship between the rate of ammonia oxidation, the ambient oxygen concentration and the production of $N_{2}O$ ([Goreau et al., 1980](https://doi.org/10.1128/aem.40.3.526-532.1980); [Santoro et al., 2011](https://www.science.org/doi/full/10.1126/science.1208239); [Qin et al., 2017](https://doi.org/10.1111/1758-2229.12525); [Ji et al., 2018](https://doi.org/10.1029/2018GB005887); [Frey et al., 2023](https://doi.org/10.1002/lno.12283)). We compute these production terms as:
+Ammonia ozidizing archaea produce both NO<sub>3</sub> and a small amount of N<sub>2</sub>O as they oxidize NH<sub>4</sub>. The production of N<sub>2</sub>O is informed by numerous studies that show a relationship between the rate of ammonia oxidation, the ambient oxygen concentration and the production of N<sub>2</sub>O ([Goreau et al., 1980](https://doi.org/10.1128/aem.40.3.526-532.1980); [Santoro et al., 2011](https://www.science.org/doi/full/10.1126/science.1208239); [Qin et al., 2017](https://doi.org/10.1111/1758-2229.12525); [Ji et al., 2018](https://doi.org/10.1029/2018GB005887); [Frey et al., 2023](https://doi.org/10.1002/lno.12283)). We compute these production terms as:
 
 $\mu_{aoa}^{&rarr; NO_3} = \mu_{aoa}^{&larr; NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O}$\
 $\mu_{aoa}^{&rarr; N_{2}O} = \mu_{aoa}^{C} p_{aoa}^{N_{2}O}$
 
 where
 - $R_{aoa}^{C:N}$ is the ratio of carbon to nitrogen within the biomass of ammonia oxidizing archaea (`aoa_C2N`, [mol C (mol N)<sup>-1</sup>])
-- $p_{aoa}^{N_{2}O}$ is the production yield of $N_{2}O$ by ammonia oxidizing archaea (`aoa_yn2o`, [mol $N_{2}O$ (mol C biomass)<sup>-1</sup>])
+- $p_{aoa}^{N_{2}O}$ is the production yield of N<sub>2</sub>O by ammonia oxidizing archaea (`aoa_yn2o`, [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>])
 
-Determining $p_{aoa}^{N_{2}O}$ is key to determining the fraction of $NH_4$ that is routed to $N_{2}O$ during ammonia oxidation. For this we use the oxygen-dependent relationship identified by [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) who found a maximum of 3% per mol of $NO_2$ produced:
+Determining $p_{aoa}^{N_{2}O}$ is key to determining the fraction of NH<sub>4</sub> that is routed to N<sub>2</sub>O during ammonia oxidation. For this we use the oxygen-dependent relationship identified by [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) who found a maximum of 3% per mol of $NO_2$ produced:
 
 $p_{aoa}^{\%N_{2}O} = \min\left(0.03, \dfrac{0.002}{O_2} + p_{aoa}^{min(N_{2}O)} \right)$
 
-Because [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) give the production yield of $N_{2}O$ in terms of % per mol $NO_2$ produced, we convert this through to units of [mol $N_{2}O$ (mol C biomass)<sup>-1</sup>] via:
+Because [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) give the production yield of N<sub>2</sub>O in terms of % per mol $NO_2$ produced, we convert this through to units of [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>] via:
 
 $p_{aoa}^{N_{2}O} = \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}$ 
 
@@ -1317,22 +1317,22 @@ $d = \dfrac{\left(a - c\right) \cdot Y}{2 \cdot Y + 1}$
 
 
 **Anaerobic ammonia oxidizing (Anammox) bacteria**\
-Anammox bacteria are considered to be an implicit population within WOMBAT-mid and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert $NH_4$ to $N_2$. As with $N_{2}O$-reducing heterotrophic bacteria, this nitrogen is then permanently lost from the ocean. When `do_anammox = .true.`, we perform this metabolism as:
+Anammox bacteria are considered to be an implicit population within WOMBAT-mid and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. As with N<sub>2</sub>O-reducing heterotrophic bacteria, this nitrogen is then permanently lost from the ocean. When `do_anammox = .true.`, we perform this metabolism as:
 
 $\mu_{aox}^{NH_4 &rarr; N_2} = \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana} L_{aox}^{NH_4}$
 
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless])
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC])
 - $f_{ana}$ is the fraction of growth that is supported by anaerobic metabolism (`bac1_fanaer(i,j,k)`, [dimenionless])
-- $L_{aox}^{NH_4}$ is the growth limiter of anammox associated with $NH_4$ availability (`aox_lnh4(i,j,k)`, [dimensionless])
+- $L_{aox}^{NH_4}$ is the growth limiter of anammox associated with NH<sub>4</sub> availability (`aox_lnh4(i,j,k)`, [dimensionless])
 
-Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of $NH_4$. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
+Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of NH<sub>4</sub>. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
 
 $L_{aox}^{NH_4} = \dfrac{NH_4}{NH_4 + K_{aox}^{NH_4}}$
 
 where
-- $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of $NH_4$ by anammox bacteria (`aox_knh4`, [mmol N m<sup>-3</sup>])
-- $NH_{4}$ is the in situ concentration of $NH_{4}$ (`bionh4`, [mmol N m<sup>-3</sup>])
+- $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of NH<sub>4</sub> by anammox bacteria (`aox_knh4`, [mmol N m<sup>-3</sup>])
+- NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`bionh4`, [mmol N m<sup>-3</sup>])
 
 ---
 
@@ -1393,14 +1393,14 @@ where
 
 ### 19. Tracer tendencies
 
-**Nitrate** (`f_no3(i,j,k)`, $NO_3$, [mol N kg<sup>-1</sup>])
+**Nitrate** (`f_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
 $\dfrac{\Delta NO_3}{\Delta t} = \mu_{aoa}^{&rarr; NO_3} 
                                - \mu_{b1}^{&larr; NO_3} 
                                - \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} 
                                       + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}$
 
-**Ammonium** (`f_nh4(i,j,k)`, $NH_4$, [mol N kg<sup>-1</sup>])
+**Ammonium** (`f_nh4(i,j,k)`, NH<sub>4</sub>, [mol N kg<sup>-1</sup>])
 
 $\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{&larr; B_{np}^{N}}
                                       + X_{mz}^{&larr; B_{mp}^{N}}
@@ -1426,22 +1426,22 @@ $\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{&larr; B_{np}^{N}}
                                - \left( \mu_{np}^{&larr; C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
                                       + \mu_{mp}^{&larr; C} \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}$
 
-**Silicic acid** (`f_sil(i,j,k)`, $Si(OH)_{4}$, [mol Si kg<sup>-1</sup>])
+**Silicic acid** (`f_sil(i,j,k)`, $H_{4}SiO_{4}$, [mol Si kg<sup>-1</sup>])
 
-$\dfrac{\Delta Si(OH)_{4}}{\Delta t} = \left( \gamma_{mp}^{&rarr; C} 
+$\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} = \left( \gamma_{mp}^{&rarr; C} 
                                             + g_{mz}^{&larr; B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C}
                                      + D_{B_{ld}^{Si}}^{&rarr; Si}
                                      - \mu_{mp}^{&larr; Si}$
 
 
-**Nitrous oxide** (`f_n2o(i,j,k)`, $N_{2}O$, [mol $N_{2}O$ kg<sup>-1</sup>])
+**Nitrous oxide** (`f_n2o(i,j,k)`, N<sub>2</sub>O, [mol N<sub>2</sub>O kg<sup>-1</sup>])
 
 $\dfrac{\Delta N_{2}O}{\Delta t} = \mu_{aoa}^{&rarr; N_{2}O} 
                                  + \mu_{b1}^{&rarr; N_{2}O}
                                  - \mu_{b2}^{&larr; N_{2}O}$
 
 
-**Oxygen** (`f_o2(i,j,k)`, $O_2$, [mol O<sub>2</sub> kg<sup>-1</sup>])
+**Oxygen** (`f_o2(i,j,k)`, O<sub>2</sub>, [mol O<sub>2</sub> kg<sup>-1</sup>])
 
 $\dfrac{\Delta O_2}{\Delta t} = \left( X_{mz}^{&larr; C} \left(1 - f_{mz}^{X &rarr; DOM} \right)
                                      + X_{Mz}^{&larr; C} \left(1 - f_{Mz}^{X &rarr; DOM} \right)
@@ -1629,7 +1629,7 @@ $\dfrac{\Delta B_{ld}^{Si}}{\Delta t} = \left( \Gamma_{mp}^{&rarr; C}
                                       - D_{B_{ld}^{Si}}^{&rarr; Si}$ 
 
 
-**Faculative $NO_3$-reducing heterotrophic bacteria** (`f_bac1(i,j,k)`, $B_{b1}^{C}$, [mol C kg<sup>-1</sup>])
+**Faculative NO<sub>3</sub>-reducing heterotrophic bacteria** (`f_bac1(i,j,k)`, $B_{b1}^{C}$, [mol C kg<sup>-1</sup>])
 
 $\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b1}^{&larr; C} 
                                      - g_{mz}^{&larr; B_{b1}^{C}}
@@ -1638,7 +1638,7 @@ $\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b1}^{&larr; C}
                                      - \Gamma_{b1}^{&rarr; C}$ 
 
 
-**Faculative $N_{2}O$-reducing heterotrophic bacteria** (`f_bac2(i,j,k)`, $B_{b2}^{C}$, [mol C kg<sup>-1</sup>])
+**Faculative N<sub>2</sub>O-reducing heterotrophic bacteria** (`f_bac2(i,j,k)`, $B_{b2}^{C}$, [mol C kg<sup>-1</sup>])
 
 $\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b2}^{&larr; C} 
                                      - g_{mz}^{&larr; B_{b2}^{C}}
@@ -1989,11 +1989,11 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 
 ### 23. Sedimentary processes.
 
-WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), dissolved organic nitrogen (DON), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (Si(OH)<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
+WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), dissolved organic nitrogen (DON), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
 
 **Organics**\
-Remineralisation of organic carbon ($\gamma_{sed}^{&rarr; C}$) produces DOC and DON and removes $O_2$. Remineralisation of organic iron produces dFe and remineralisation of organic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
+Remineralisation of organic carbon ($\gamma_{sed}^{&rarr; C}$) produces DOC and DON and removes O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of organic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
 
 $\gamma_{sed}^{&rarr; DOC} = \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C}$\
 $\gamma_{sed}^{&rarr; DON} = \gamma_{sed}^{&rarr; DOC} R^{N:C}$\
@@ -2007,7 +2007,7 @@ where
 - $B_{sed}^{C}$ is the concentration of organic carbon in the sediment pool (`p_det_sediment(i,j,1)`, [mol C m<sup>-2</sup>])
 - $B_{sed}^{Fe}$ is the concentration of organic iron in the sediment pool (`p_detfe_sediment(i,j,1)`, [mol Fe m<sup>-2</sup>])
 - $R^{N:C}$ is the static Redfield ratio of nitrogen to carbon in the organic matter (`16/122)` [mol N (mol C)<sup>-1</sup>])
-- $R^{O_2:C}$ is the static Redfield ratio of dissolved oxygen to carbon required to hydrolyse organic matter (`132/122)` [mol $O_2$ (mol C)<sup>-1</sup>])
+- $R^{O_2:C}$ is the static Redfield ratio of dissolved oxygen to carbon required to hydrolyse organic matter (`132/122)` [mol O<sub>2</sub> (mol C)<sup>-1</sup>])
 
 
 **Dissolution of biogenic silica**\
@@ -2041,15 +2041,15 @@ However, if `do_caco3_dynamics = .false.`, then dissolution of $CaCO_3$ in the s
 
 
 **Benthic denitrification**\
-We also consider the consumption of $NO_3$ via benthic denitrification. When `do_benthic_denitrification = .true.`, a portion of the particulate organic matter within the sediments that is hydrolysed to DOC and DON is performed anaerobically (i.e., using $NO_3$ as the electron acceptor). Unlike this process in the water column, which is performed by bacterial metabolism, we estimate this process using an empirical parameterization from [Bohlen et al. (2012)](https://doi.org/10.1029/2011GB004198):
+We also consider the consumption of NO<sub>3</sub> via benthic denitrification. When `do_benthic_denitrification = .true.`, a portion of the particulate organic matter within the sediments that is hydrolysed to DOC and DON is performed anaerobically (i.e., using NO<sub>3</sub> as the electron acceptor). Unlike this process in the water column, which is performed by bacterial metabolism, we estimate this process using an empirical parameterization from [Bohlen et al. (2012)](https://doi.org/10.1029/2011GB004198):
 
 $\gamma_{sed}^{&larr; NO_3} = \gamma_{sed}^{&rarr; DOC} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)$
 
 where
 - $0.9$ is a hard upper limit stating that 90% of organic matter hydrolysation can potentially be performed anaerobically via denitrification
 - $\dfrac{94}{122}$ is the stoichiometry of nitrate demand per mol of organic carbon hydrolysed ([Paulmier et al., 2009](https://doi.org/10.5194/bg-6-923-2009))
-- $O_2$ is the bottom water concentration of dissolved oxygen (mmol m<sup>-3</sup>)
-- $NO_3$ is the bottom water concentration of nitrate (mmol m<sup>-3</sup>)
+- O<sub>2</sub> is the bottom water concentration of dissolved oxygen (mmol m<sup>-3</sup>)
+- NO<sub>3</sub> is the bottom water concentration of nitrate (mmol m<sup>-3</sup>)
 
 and where the fraction of organic matter that is hydrolysed via denitrification is equal to:
 
