@@ -462,14 +462,13 @@ where
 Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{&larr; Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for Si(OH)<sub>4</sub> and (ii) down regulation of Si(OH)<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 (i) 
-
 $\dfrac{Si(OH)<sub>4</sub>}{Si(OH)<sub>4</sub> + K_{mp}^{Si}}$
 
 (ii) 
 $\left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}$
 
 where 
-- $Si(OH)_{4}$ is the in situ silicic acid concentration (`biosil`, [mmol Si m<sup>-3</sup>])
+- Si(OH)<sub>4</sub> is the in situ silicic acid concentration (`biosil`, [mmol Si m<sup>-3</sup>])
 - $K_{mp}^{Si}$ is the half-saturation coefficient for siliic acid uptake by micro-phytoplankton (`dia_ksi(i,j,k)`, [mmol Si m<sup>-3</sup>])
 - $Q_{mp}^{Si:C}$ is the in situ Si:C ratios of micro-phytoplankton cells (`dia_Si2C`, [mol Si (mol C)-1])
 - $Q_{mp}^{+Si:C}$ is the maximum Si:C ratios of micro-phytoplankton cells (`diamaxqs`, [mol Si (mol C)-1])
@@ -477,7 +476,7 @@ where
 
 Uptake is then calculated as
 
-$\mu_{mp}^{&larr; Si} = \max \left(0, V_{mp}^{Si} B_{mp}^{C} \cdot (i) \cdot (ii) \right)$
+$\mu_{mp}^{&larr; Si} = \max \left(0, V_{mp}^{Si} \cdot B_{mp}^{C} \cdot (i) \cdot (ii) \right)$
 
 where
 - $V_{mp}^{Si}$ is the maximum uptake rate of silicon to carbon by a micro-phytoplankton cell (`diaVmaxs`, [mol Si (mol C)<sup>-1</sup> s<sup>-1</sup>])
@@ -504,11 +503,11 @@ $I_{S} = \dfrac{19.924,S}{1000 - 1.005,S}$ \
 
 Solubility constants:
 
-$Fe_{sol1} = 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,T_K^{-1}\right)}$ \
-$Fe_{sol2} = 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,T_K^{-1}\right)}$ \
-$Fe_{sol3} = 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,T_K^{-1}\right)}$ \
-$Fe_{sol4} = 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,T_K^{-1}\right)}$ \
-$Fe_{sol5} = 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,T_K^{-1}\right)}$
+$Fe_{sol1} = 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\left(T_K\right)^{-1}\right)}$ \
+$Fe_{sol2} = 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\left(T_K\right)^{-1}\right)}$ \
+$Fe_{sol3} = 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\left(T_K\right)^{-1}\right)}$ \
+$Fe_{sol4} = 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\left(T_K\right)^{-1}\right)}$ \
+$Fe_{sol5} = 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\left(T_K\right)^{-1}\right)}$
 
 Final Fe(III) solubility:
 
@@ -530,12 +529,14 @@ $dFe_{sFe} = \max\left(0.0,\ dFe - dFe_{col} \right)$
 
 Partitioning is done using a standard quadratic form that drops out of mass balance + equilibrium for 1:1 complexation with a single ligand class. To do so, we need the temperature- and light-dependent conditional stability constant for Fe–ligand complexation (`fe_keq`, $Fe_{Keq}$, [nmol Fe kg<sup>-1</sup>]). The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008). The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log10 units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)):
 
-$Fe_{Keq} = 10^{ \left(17.27 - 1565.7 T_K^{-1} \right) }\times 10^{-9}$, 
+$Fe_{Keq} = 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) }\times 10^{-9}$, 
 
 After finding $Fe_{Keq}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]):
 
-$z = 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq}$ \
+$z = 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq}$
+
 $Fe_{free} = \dfrac{-z + \sqrt{z^2 + 4.0 Fe_{Keq} dFe_{sFe}}}{2 Fe_{Keq} + \varepsilon}$
+
 $Fe_{free} = \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)$
 
 where
@@ -550,7 +551,7 @@ Now that we have separated the dissolved Fe pool into its subcomponents of free,
 **Scavenging:** \
 Scavenging of dissolved iron specifically affects free iron, is accelerated by the presence of particles in the water column and routes this iron to two sinking authigenic phases. Total scavenging of dissolved iron (`fescaven(i,j,k)`, $Sc_{dFe}^{&rarr;}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is calculated as
 
-$Sc_{dFe}^{&rarr;} = dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)$ \
+$Sc_{dFe}^{&rarr;} = dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)$ 
 
 where
 - $dFe_{free}$ is the in situ concentration of dissolved free iron (`feIII(i,j,k)`, [nmol Fe kg<sup>-1</sup>])
@@ -619,14 +620,14 @@ $D_{lA}^{&rarr; dFe} = Fe_{lA} \gamma_{lA}^{diss}$
 ### 11. Biogenic silica dissolution. 
 
 **Silicic acid equilibrium concentration**\
-To determine the rate of biogenic silica dissolution we must first determine the equilibrium concentration of silicic acid ($Si(OH)_{4}$) in seawater. To do so, we solve for this equilibrium concentration via thermodynamic first-principles:
+To determine the rate of biogenic silica dissolution we must first determine the equilibrium concentration of silicic acid (Si(OH)<sub>4</sub>) in seawater. To do so, we solve for this equilibrium concentration via thermodynamic first-principles:
 
-$K_{Si(OH)_{4}}(T,P) = \dfrac{\gamma_{Si(OH)_{4}^{0}} \cdot [Si(OH)_{4}]^{eq}}{(a_{H_{2}O})^{2}}$
+$K_{Si(OH)<sub>4</sub>}(T,P) = \dfrac{\gamma_{Si(OH)<sub>4</sub>^{0}} \cdot [Si(OH)<sub>4</sub>]^{eq}}{(a_{H_{2}O})^{2}}$
 
 where
-- $K_{Si(OH)_{4}}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
-- $\gamma_{Si(OH)_{4}^{0}}$ is the activity ratio of $Si(OH)_{4}$ in seawater (`gamma0`, [dimensionless])
-- $[Si(OH)_{4}]^{eq}$ is the equilibrium concentration of $Si(OH)_{4}$ (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
+- $K_{Si(OH)<sub>4</sub>}(T,P)$ is the thermodynamic equilibrium constant in seawater at a given temperature and pressure (`K_am_silica`, [mol Si kg<sup>-1</sup>])
+- $\gamma_{<sub>4</sub>^{0}}$ is the activity ratio of Si(OH)<sub>4</sub> in seawater (`gamma0`, [dimensionless])
+- $[Si(OH)<sub>4</sub>]^{eq}$ is the equilibrium concentration of Si(OH)<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>])
 - $a_{H_{2}O}$ is the activity of seawater (`alphaH2O`, [dimensionless])
 
 The equation is rearranged such that:
