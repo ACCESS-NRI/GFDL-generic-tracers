@@ -2180,7 +2180,7 @@ Therefore, the average radius of nano-phytoplankton (`rad_phy`, [m]) and micro-p
 
 $$
 \begin{align}
-r_{np} =& \quad r_{np}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{np}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
+r_{np} =& \quad r_{np}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{np}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6} \\
 r_{mp} =& \quad r_{mp}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{mp}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
 \end{align}
 $$
@@ -2189,7 +2189,7 @@ which simplifies to:
 
 $$
 \begin{align}
-r_{np} =& \quad r_{np}^{-} \left(B_{np}^{C}\right)^{0.217} \cdot 0.62 \times 10^{-6}
+r_{np} =& \quad r_{np}^{-} \left(B_{np}^{C}\right)^{0.217} \cdot 0.62 \times 10^{-6} \\
 r_{mp} =& \quad r_{mp}^{-} \left(B_{mp}^{C}\right)^{0.217} \cdot 0.62 \times 10^{-6}
 \end{align}
 $$
@@ -2222,7 +2222,7 @@ We determine the mean radius of small (`rad_det`, [m]) and large particulate det
 
 $$
 \begin{align}
-r_{s} =& \dfrac{B_{np}^{C} r_{np} + B_{mz}^{C} r_{mz}}{B_{np}^{C} + B_{mz}^{C}}
+r_{s} =& \dfrac{B_{np}^{C} r_{np} + B_{mz}^{C} r_{mz}}{B_{np}^{C} + B_{mz}^{C}} \\
 r_{l} =& \dfrac{B_{mp}^{C} r_{mp} + B_{Mz}^{C} r_{Mz}}{B_{mp}^{C} + B_{Mz}^{C}}
 \end{align}
 $$
@@ -2250,8 +2250,8 @@ _where_ <br>
 
 $$
 \begin{align}
-A =& 1.541 + 1.998 \times 10^{-2} \cdot T - 9.52 \times 10^{-5} \cdot T^{2}
-B =& 7.974 - 7.561 \times 10^{-2} \cdot T + 4.724 \times 10^{-4} \cdot T^{2}
+A =& 1.541 + 1.998 \times 10^{-2} \cdot T - 9.52 \times 10^{-5} \cdot T^{2} \\
+B =& 7.974 - 7.561 \times 10^{-2} \cdot T + 4.724 \times 10^{-4} \cdot T^{2} \\
 \eta_{w}^{1atm} =& 4.2844 \times 10^{-5} + \left(0.157 \left( T + 64.993 \right)^{2} - 91.296 \right)^{-1}
 \end{align}
 $$
@@ -2277,7 +2277,7 @@ P_{MPa} =& \left(101325 + 9.81 * 1025.0 * z\right) 1 \times 10^{-6}
           &     - 9.095290 \times 10^{-3} \cdot T^{2} \\
           &     + 1.001685 \times 10^{-4} \cdot T^{3} \\
           &     - 1.120083 \times 10^{-6} \cdot T^{4} \\
-          &     + 6.536332 \times 10^{-9} \cdot T^{5}
+          &     + 6.536332 \times 10^{-9} \cdot T^{5} \\
 \rho_{w} =& \dfrac{\rho_{0}}{1 - \dfrac{P_{MPa} - 0.101325}{2.2 \times 10^{3}}}
 \end{align}
 $$
@@ -2328,9 +2328,9 @@ WOMBAT-mid explicitly considers small organic carbon, large aggregates of organi
 
 $$
 \begin{align}
-M_{sd} =& B_{sd}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4}
-M_{ld} =& B_{ld}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4}
-M_{CaCO_3} =& B_{CaCO_3}^{C} \cdot 1 \times 10{-6} \cdot 100
+M_{sd} =& B_{sd}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
+M_{ld} =& B_{ld}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
+M_{CaCO_3} =& B_{CaCO_3}^{C} \cdot 1 \times 10{-6} \cdot 100 \\
 M_{BSi} =& B_{ld}^{Si} \cdot 1 \times 10{-6} \cdot 60
 \end{align}
 $$
@@ -2348,7 +2348,7 @@ We consider $CaCO_3$ to be part of the small sinking particulates because, altho
 
 $$
 \begin{align}
-M_{s} =& M_{sd} + M_{CaCO_3}
+M_{s} =& M_{sd} + M_{CaCO_3} \\
 M_{l} =& M_{ld} + M_{BSi}
 \end{align}
 $$
@@ -2357,7 +2357,7 @@ And we compute the harmonic mean density of the small particulates (`rho_small`,
 
 $$
 \begin{align}
-\rho_{s} =& \dfrac{1}{\dfrac{M_{sd} / M_{s}}{\rho_{orgC}} + \dfrac{M_{CaCO_3} / M_{s}}{\rho_{CaCO_3}} }
+\rho_{s} =& \dfrac{1}{\dfrac{M_{sd} / M_{s}}{\rho_{orgC}} + \dfrac{M_{CaCO_3} / M_{s}}{\rho_{CaCO_3}} } \\
 \rho_{l} =& \dfrac{1}{\dfrac{M_{ld} / M_{l}}{\rho_{orgC}} + \dfrac{M_{Bsi} / M_{l}}{\rho_{Bsi}} }
 \end{align}
 $$
@@ -2371,7 +2371,7 @@ Finally, we incorporate estimates of particle porosity to their density:
 
 $$
 \begin{align}
-\rho_{s} =& \left(1 - p_{s}\right) \rho_{s} + p_{s} \rho_{sw}
+\rho_{s} =& \left(1 - p_{s}\right) \rho_{s} + p_{s} \rho_{sw} \\
 \rho_{l} =& \left(1 - p_{l}\right) \rho_{l} + p_{l} \rho_{sw}
 \end{align}
 $$
@@ -2421,9 +2421,9 @@ Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces DOC
 
 $$
 \begin{align}
-\gamma_{sed}^{\rightarrow DOC} =& \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C}
-\gamma_{sed}^{\rightarrow DON} =& \gamma_{sed}^{\rightarrow DOC} R^{N:C}
-\gamma_{sed}^{\leftarrow O_2} =& \gamma_{sed}^{\rightarrow DOC} R^{O_2:C}
+\gamma_{sed}^{\rightarrow DOC} =& \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C} \\
+\gamma_{sed}^{\rightarrow DON} =& \gamma_{sed}^{\rightarrow DOC} R^{N:C} \\
+\gamma_{sed}^{\leftarrow O_2} =& \gamma_{sed}^{\rightarrow DOC} R^{O_2:C} \\
 \gamma_{sed}^{\rightarrow dFe} =& \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}
 \end{align}
 $$
@@ -2508,13 +2508,13 @@ Overall bottom fluxes of tracers are:
 
 $$
 \begin{align}
-\dfrac{\Delta DOC}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DOC}
-\dfrac{\Delta DON}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DON}
-\dfrac{\Delta NO_3}{\Delta t} =& \gamma_{det,sed}^{\leftarrow NO_3}
-\dfrac{\Delta O_2}{\Delta t} =& \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right)
-\dfrac{\Delta Si}{\Delta t} =& \gamma_{det,sed}^{\rightarrow Si}
-\dfrac{\Delta dFe}{\Delta t} =& \gamma_{det,sed}^{\rightarrow dFe}
-\dfrac{\Delta DIC}{\Delta t} =& D_{CaCO_{3},sed}
+\dfrac{\Delta DOC}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DOC} \\
+\dfrac{\Delta DON}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DON} \\
+\dfrac{\Delta NO_3}{\Delta t} =& \gamma_{det,sed}^{\leftarrow NO_3} \\
+\dfrac{\Delta O_2}{\Delta t} =& \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right) \\
+\dfrac{\Delta Si}{\Delta t} =& \gamma_{det,sed}^{\rightarrow Si} \\
+\dfrac{\Delta dFe}{\Delta t} =& \gamma_{det,sed}^{\rightarrow dFe} \\
+\dfrac{\Delta DIC}{\Delta t} =& D_{CaCO_{3},sed} \\
 \dfrac{\Delta Alk}{\Delta t} =& 2 \cdot D_{CaCO_{3},sed}
 \end{align}
 $$
