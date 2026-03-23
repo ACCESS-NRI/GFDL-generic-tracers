@@ -1673,9 +1673,9 @@ $\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{\leftarrow B_{np}^{N}}
 **Nitrous oxide** (`f_n2o(i,j,k)`, N<sub>2</sub>O, [mol N<sub>2</sub>O kg<sup>-1</sup>])
 
 \begin{align}
-\dfrac{\Delta N_{2}O}{\Delta t} &= \mu_{aoa}^{\rightarrow N_{2}O} \\
-                                & + \mu_{b1}^{\rightarrow N_{2}O} \\
-                                & - \mu_{b2}^{\leftarrow N_{2}O}
+\dfrac{\Delta N_{2}O}{\Delta t} =& \mu_{aoa}^{\rightarrow N_{2}O} \\
+                                 & + \mu_{b1}^{\rightarrow N_{2}O} \\
+                                 & - \mu_{b2}^{\leftarrow N_{2}O}
 \end{align}
 
 
