@@ -195,15 +195,15 @@ Note that although phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, as N
 **Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{np}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_minqfe`, $Q_{mp}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phy_optqfe`, $Q_{np}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_optqfe`, $Q_{mp}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{np}^{-Fe:C}$ and $Q_{mp}^{-Fe:C}$, is dependent on three terms that each correspond to the iron required by photosystems, respiration and nitrate reduction ([Flynn & Hipkin, 1999](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x)):
 
 \begin{align}
-Q_{np}^{-Fe:C} = & 0.00167 / 55.85 * Q_{np}^{Chl:C} * 12 \\
-&  + 1.21 \times 10^{-5} * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * L_{np}^{N} \\
-&  + 1.15 \times 10^{-4} * 14.0 / 55.85 / 7.625 * 0.5 * L_{np}^{NO_3}
+Q_{np}^{-Fe:C} = & 0.00167 / 55.85 \cdot Q_{np}^{Chl:C} \cdot 12 \\
+&  + 1.21 \times 10^{-5} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot 1.5 \cdot L_{np}^{N} \\
+&  + 1.15 \times 10^{-4} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot L_{np}^{NO_3}
 \end{align}
 
 \begin{align}
-Q_{mp}^{-Fe:C} &= 0.00167 / 55.85 * Q_{mp}^{Chl:C} * 12 \\
-&\qquad  + 1.21 \times 10^{-5} * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * L_{mp}^{N} \\
-&\qquad  + 1.15 \times 10^{-4} * 14.0 / 55.85 / 7.625 * 0.5 * L_{mp}^{NO_3}
+Q_{mp}^{-Fe:C} &= 0.00167 / 55.85 \cdot Q_{mp}^{Chl:C} \cdot 12 \\
+&\qquad  + 1.21 \times 10^{-5} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot 1.5 \cdot L_{mp}^{N} \\
+&\qquad  + 1.15 \times 10^{-4} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot L_{mp}^{NO_3}
 \end{align}
 
 The first term reflects the amount of iron required for photosystems I and II. `0.00167/55.85` is equivalent to the grams of Fe per gram of chlorophyll divided by the grams of Fe per mol Fe, giving mol Fe per gram chlorophyll. This term is multipled by the chlorophyll to carbon ratio of the phytoplantkon cell (`phy_chlc`, $Q_{np}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]; `dia_chlc`, $Q_{mp}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]) and grams of C per mol C, returning mol Fe per mol C. At a healthy chlorophyll:C ratio of 0.03, this term returns an Fe:C ratio of roughly 10 µmol:mol, which reproduces well known requirements of phytoplankton cells ([Morel, Rueter & Price, 1991](https://www.jstor.org/stable/43924569)). The second term, representing the respiratory iron requirement, is derived from [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) who estimated 1.21 $\times 10^{-5}$ grams Fe per gram N assimilated into the cell, which is converted to mol Fe per mol C with 14 g N per mol N divided by 55.85 g Fe per mol Fe $\times$ 7.625 mol C per mol N. This second term assumes that respiration is reduced as growth becomes more limited by available nitrogen (`phy_lnit(i,j,k)`, $L_{np}^{N}$, [dimensionless]; `dia_lnit(i,j,k)`, $L_{mp}^{N}$, [dimensionless]). Finally, the third term represents the iron required by nitrate/nitrite reduction. Nitrate assimilation requires roughly 1.8-fold more iron than ammonia assimilation ([Raven, 1988](https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1988.tb04196.x)). [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) estimated a demand of 1.15 $\times 10^{-4}$ g Fe per mol NO$_3$ reduced, which is accounted for by the nitrate limitation term (`phy_lno3(i,j,k)`, $L_{np}^{NO_3}$, [dimensionless]; `dia_lno3(i,j,k)`, $L_{mp}^{NO_3}$, [dimensionless])). Note that the `1.5` is designed to account for dark respiration (i.e., respiration when the cells are not growing) and the `0.5` refers to the fact that during cell division the cell must reinstate half of its Fe reserves. 
@@ -1627,20 +1627,13 @@ _where_ <br>
 
 **Nitrate** (`f_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
-\begin{align}
-Q_{mp}^{-Fe:C} &= 0.00167 / 55.85 * Q_{mp}^{Chl:C} * 12 \\
-&\qquad  + 1.21 \times 10^{-5} * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * L_{mp}^{N} \\
-&\qquad  + 1.15 \times 10^{-4} * 14.0 / 55.85 / 7.625 * 0.5 * L_{mp}^{NO_3}
-\end{align}
-
-$$
 \begin{aligned}
 \dfrac{\Delta NO_3}{\Delta t} &= \mu_{aoa}^{\rightarrow NO_3} \\
 &\qquad  - \mu_{b1}^{\leftarrow NO_3} \\
 &\qquad  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
 &\qquad  + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
 \end{aligned}
-$$
+
 
 **Ammonium** (`f_nh4(i,j,k)`, NH<sub>4</sub>, [mol N kg<sup>-1</sup>])
 
@@ -1677,6 +1670,12 @@ $\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} = \left( \gamma_{mp}^{\rightarrow C}
 
 
 **Nitrous oxide** (`f_n2o(i,j,k)`, N<sub>2</sub>O, [mol N<sub>2</sub>O kg<sup>-1</sup>])
+
+\begin{align}
+\dfrac{\Delta N_{2}O}{\Delta t} &= \mu_{aoa}^{\rightarrow N_{2}O} \\
+                                & + \mu_{b1}^{\rightarrow N_{2}O} \\
+                                & - \mu_{b2}^{\leftarrow N_{2}O}
+\end{align}
 
 $\dfrac{\Delta N_{2}O}{\Delta t} = \mu_{aoa}^{\rightarrow N_{2}O} 
                                  + \mu_{b1}^{\rightarrow N_{2}O}
