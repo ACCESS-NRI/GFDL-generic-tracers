@@ -742,7 +742,7 @@ _where_ <br>
 For $K_{H_{4}SiO_{4}}(T,P)$ we follow the derivation of [Gunnarsson & Arnórsson (2000)](https://doi.org/10.1016/S0016-7037(99)00426-3) who relate the thermodynamic equilibrium constant of H<sub>4</sub>SiO<sub>4</sub> to variations in temperature at a constant pressure of 1 bar ($P^{1}$):
 
 \begin{align}
-K(T,P^{1}) &= 10^{ -8.476 - \dfrac{485.24}{T_{K}} - 2.268 \times 10^{-6} \cdot (T_{K})^{2} + 3.068 log_{10}(T_{K})}
+K(T,P^{1}) &= 10^{ \left( -8.476 - \frac{485.24}{T_{K}} - 2.268 \times 10^{-6} \cdot (T_{K})^{2} + 3.068 \cdot log_{10}(T_{K}) \right)}
 \end{align}
 
 _where_ <br>
@@ -1165,9 +1165,12 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 
 Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability. The equation for new nitrogen (specifically NH<sub>4</sub>) added via diazotrophy is:
 
+$$
 \begin{align}
-\mu_{diazo}^{\rightarrow NH_4} &= \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \cdot \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}
+\mu_{diazo}^{\rightarrow NH_4} &= \mu_{diazo}^{max} \left(1 - L_{np}^{N} \right) \\
+                               & \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}
 \end{align}
+$$
 
 _where_ <br>
 - $\mu_{diazo}^{max}$ is the temperature-dependent maximum growth rate of diazotrophs (`trimumax(i,j,k)`, [s<sup>-1</sup>]) <br>
@@ -1307,9 +1310,13 @@ _where_ <br>
 
 We further expand on bacterial heterotrophic dynamics by also integrating the findings of [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) to solve for biomass yields as a function of the nominal oxidation state of carbon (NOSC) of DOM (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimensionless]). [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) conceptually link the carbon use efficiency (i.e., yield) of bacteria to the NOSC. They identify a theoretical positive relationship between yield and NOSC and suggest that more oxidized compounds offer a greater energy of content per carbon atom because more reduced compounds require greater processing costs. To account for this dynamic, we scale the biomass yield of heterotrophic bacteria (`bac_ydon(i,j,k)`, $y_{b}^{DON}$, [mol N biomass (mol DON)<sup>-1</sup>]) as:
 
+$$
 \begin{align}
-y_{b}^{DON} &= \max\left( y_{b}^{min(DON)}, \min\left( y_{b}^{max(DON)}, y_{b}^{min(DON)} + DOM^{NOSC} \cdot \left(y_{b}^{max(DON)} - y_{b}^{min(DON)} \right) \right) \right)
+y_{b}^{DON} &= \quad \max\bigg( y_{b}^{min(DON)}, \\
+            &  \qquad      \min\bigg( y_{b}^{max(DON)}, \\
+            &  \qquad \qquad          y_{b}^{min(DON)} + DOM^{NOSC} \cdot \left(y_{b}^{max(DON)} - y_{b}^{min(DON)} \right) \bigg) \bigg)
 \end{align}
+$$
 
 _where_ <br>
 - $y_{b}^{min(DON)}$ is the minimum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmin`, [mol N biomass (mol DON)<sup>-1</sup>])  <br>
@@ -1350,10 +1357,10 @@ Now that we have the fraction of electrons that are partitioned towards biomass 
 \begin{align}
 y_{b}^{aer(DON)} &= y_{b}^{DON} \cdot R_{b}^{C:N} \\
 y_{b}^{aer(DOC)} &= y_{b}^{DON} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}} \\
-y_{b}^{O_2} &= \dfrac{\dfrac{f_{b}^{aer(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{aer(\kappa)}}{4}} \cdot R_{b}^{C:N} \\
-y_{b}^{ana(DOC)} &= y_{b}^{DON} P_{ana} \cdot \dfrac{R_{b}^{C:N}}{\dfrac{B_{DOM}^{C}}{B_{DOM}^{N}}} \\
-y_{b}^{NO_{3} \rightarrow N_{2}O} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{4}} \cdot R_{b}^{C:N} \\
-y_{b}^{N_{2}O \rightarrow N_{2}} &= \dfrac{\dfrac{f_{b}^{ana(\kappa)}}{\kappa_{b}}}{\dfrac{1 - f_{b}^{ana(\kappa)}}{1}} \cdot R_{b}^{C:N}
+y_{b}^{O_2} &= \dfrac{\left(f_{b}^{aer(\kappa)} / \kappa_{b} \right)}{\left(1 - f_{b}^{aer(\kappa)}\right)/4} \cdot R_{b}^{C:N} \\
+y_{b}^{ana(DOC)} &= y_{b}^{DON} P_{ana} \cdot \dfrac{R_{b}^{C:N}}{ \left(B_{DOM}^{C} / B_{DOM}^{N} \right)} \\
+y_{b}^{NO_{3} \rightarrow N_{2}O} &= \dfrac{\left(f_{b}^{ana(\kappa)} / \kappa_{b} \right)}{\left(1 - f_{b}^{ana(\kappa)}\right)/4} \cdot R_{b}^{C:N} \\
+y_{b}^{N_{2}O \rightarrow N_{2}} &= \dfrac{\left(f_{b}^{ana(\kappa)} / \kappa_{b} \right)}{\left(1 - f_{b}^{ana(\kappa)}\right)/1} \cdot R_{b}^{C:N}
 \end{align}
 
 _where_ <br>
@@ -1431,9 +1438,12 @@ Heterotrophic bacterial growth produces $DIC$, NH<sub>4</sub> and N<sub>2</sub>O
 
 As before, we must accommodate differences in yields between aerobic and anaerobic growth:
 
+$$
 \begin{align}
-\mu_{b}^{\rightarrow DIC} &= \mu_{b}^{\leftarrow C} \left(\dfrac{1}{y_{b}^{(aer)DOC}} - 1\right)\left(1 - f_{ana}\right) + \mu_{b}^{\leftarrow C} \left(\dfrac{1}{y_{b}^{(ana)DOC}} - 1\right) f_{ana}
+\mu_{b}^{\rightarrow DIC} =& \quad \mu_{b}^{\leftarrow C} \left(\dfrac{1}{y_{b}^{(aer)DOC}} - 1\right)\left(1 - f_{ana}\right) \\
+                           &     + \mu_{b}^{\leftarrow C} \left(\dfrac{1}{y_{b}^{(ana)DOC}} - 1\right) f_{ana}
 \end{align}
+$$
 
 Meanwhile, production of NH<sub>4</sub> requires knowledge of how much $DON$ was assimilated by the cell. Assimilated $DON$ is converted into NH<sub>4</sub> for biosynthesis and any excess is exuded into the environment. Release of NH<sub>4</sub> is therefore: 
 
@@ -1524,7 +1534,7 @@ p_{aoa}^{\%N_{2}O} &= \min\left(0.03, \dfrac{0.002}{O_2} + p_{aoa}^{min(N_{2}O)}
 Because [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) give the production yield of N<sub>2</sub>O in terms of % per mol $NO_2$ produced, we convert this through to units of [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>] via:
 
 \begin{align}
-p_{aoa}^{N_{2}O} &= \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}$
+p_{aoa}^{N_{2}O} &= \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - \dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}
 \end{align}
 
 since
@@ -1829,7 +1839,7 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta B_{mz}^{C}}{\Delta t} =& \quad \A_{mz}^{\leftarrow C} 
+\dfrac{\Delta B_{mz}^{C}}{\Delta t} =& \quad A_{mz}^{\leftarrow C} 
                                            - \Gamma_{mz}^{\rightarrow C} 
                                            - \gamma_{mz}^{\rightarrow C}
                                            - g_{Mz}^{\leftarrow B_{mz}^{C}}
@@ -1851,7 +1861,7 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta B_{Mz}^{C}}{\Delta t} =& \quad \A_{Mz}^{\leftarrow C}
+\dfrac{\Delta B_{Mz}^{C}}{\Delta t} =& \quad A_{Mz}^{\leftarrow C}
                                            - \Gamma_{Mz}^{\rightarrow C} 
                                            - \gamma_{Mz}^{\rightarrow C}
 \end{align}
@@ -2148,158 +2158,251 @@ WOMBAT-mid functions with a spatially variable sinking rate of organic detritus 
 
 This approach is inspired by the study of [Dinauer et al. (2022)](https://doi.org/10.1029/2021GB007131). We deal with each of these steps below.
 
-**Average radii of particulates**\
+**Average radii of particulates**
+
 We first estimate the average radius of sinking particles belonging to small and large detritus. Nano-phytoplankton and micro-zooplankton contribute to the small detritus pool, and as such variations in the mean size of these plankton types determine the mean radius of small particles. Similarly, micro-phytoplankton and meso-zooplankton contribute to the large detritus pool, and their sizes determine the mean radius of large particles. According to [Wickman et al. (2024)]((https://doi.org/10.1126/science.adk6901)), the average volume, $V$, of phytoplankton, $p$, in the marine community scales with the biomass density according to:
 
-$V = \left(B_{p}^{C}\right)^{0.65}$
+$$
+\begin{align}
+V =& \left(B_{p}^{C}\right)^{0.65}
+\end{align}
+$$
 
 We can relate the radius $r$ in units of µm to the volume of phytoplankton cells via:
 
-$r = 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{p}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}}$
+$$
+\begin{align}
+r =& 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{p}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}}
+\end{align}
+$$
 
 Therefore, the average radius of nano-phytoplankton (`rad_phy`, [m]) and micro-phytoplankton (`rad_dia`, [m]) is equal to:
 
-$r_{np} = r_{np}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{np}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}$\
-$r_{mp} = r_{mp}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{mp}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}$
+$$
+\begin{align}
+r_{np} =& \quad r_{np}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{np}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
+r_{mp} =& \quad r_{mp}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{mp}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
+\end{align}
+$$
 
 which simplifies to:
 
-$r_{np} = r_{np}^{-} \left(B_{np}^{C}\right)^{0.217} \cdot 0.62 \times 10^{-6}$\
-$r_{mp} = r_{mp}^{-} \left(B_{mp}^{C}\right)^{0.217} \cdot 0.62 \times 10^{-6}$
+$$
+\begin{align}
+r_{np} =& \quad r_{np}^{-} \left(B_{np}^{C}\right)^{0.217} \cdot 0.62 \times 10^{-6}
+r_{mp} =& \quad r_{mp}^{-} \left(B_{mp}^{C}\right)^{0.217} \cdot 0.62 \times 10^{-6}
+\end{align}
+$$
 
 For micro-zooplankton, we use a relationship presented by [Menden-Deuer & Lessard (2000)](https://doi.org/10.4319/lo.2000.45.3.0569) who identified that the carbon concentration of diverse protists, including heterotrophic dinoflagellates and other micro-zooplankton, was related to their cell volume to the power of 0.939. Hence, we estimate the radius of micro-zooplankton (`rad_zoo`, [m]) from their carbon biomass concentration by inverting this exponent:
 
-$r_{mz} = r_{mz}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{mz}^{C}\right)^{1.065} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}$
+$$
+\begin{align}
+r_{mz} =& r_{mz}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{mz}^{C}\right)^{1.065} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
+\end{align}
+$$
 
 which simplifies to:
 
-$r_{mz} = r_{mz}^{-} \left(B_{mz}^{C}\right)^{0.355} \cdot 0.62 \times 10^{-6}$
+$$
+\begin{align}
+r_{mz} =& r_{mz}^{-} \left(B_{mz}^{C}\right)^{0.355} \cdot 0.62 \times 10^{-6}
+\end{align}
+$$
 
-For meso-zooplankton, we assume that the dry carbon biomass scales with the body length to the power of 3, such that $B_{Mz}^{C} \prop L^{3}$ ([Uye, 1982](https://doi.org/10.1007/BF02110286); [Lehette & Hernandez-Leon, 2009](https://doi.org/10.4319/lom.2009.7.304)). Thus, $L \prop \left(B_{Mz}^{C}\right)^{\dfrac{1}{3}}$, and:
+For meso-zooplankton, we assume that the dry carbon biomass scales with the body length to the power of 3, such that $B_{Mz}^{C} \propto L^{3}$ ([Uye, 1982](https://doi.org/10.1007/BF02110286); [Lehette & Hernandez-Leon, 2009](https://doi.org/10.4319/lom.2009.7.304)). Thus, $L \propto \left(B_{Mz}^{C}\right)^{\dfrac{1}{3}}$, and:
 
-$r_{Mz} = r_{Mz}^{-} \cdot 0.5 \cdot \left(B_{Mz}^{C}\right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}$
+$$
+\begin{align}
+r_{Mz} =& r_{Mz}^{-} \cdot 0.5 \cdot \left(B_{Mz}^{C}\right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
+\end{align}
+$$
 
 We determine the mean radius of small (`rad_det`, [m]) and large particulate detritus (`rad_bdet`, [m]) by taking the biomass-weighted means of each plankton functional type:
 
-$r_{s} = \dfrac{B_{np}^{C} r_{np} + B_{mz}^{C} r_{mz}}{B_{np}^{C} + B_{mz}^{C}}\
-$r_{l} = \dfrac{B_{mp}^{C} r_{mp} + B_{Mz}^{C} r_{Mz}}{B_{mp}^{C} + B_{Mz}^{C}}$
+$$
+\begin{align}
+r_{s} =& \dfrac{B_{np}^{C} r_{np} + B_{mz}^{C} r_{mz}}{B_{np}^{C} + B_{mz}^{C}}
+r_{l} =& \dfrac{B_{mp}^{C} r_{mp} + B_{Mz}^{C} r_{Mz}}{B_{mp}^{C} + B_{Mz}^{C}}
+\end{align}
+$$
 
-where
-- $B_{np}^{C}$ is the concentration of nano-phytoplankton biomass at the surface of the water column (`biophy`, [mmol C m<sup>-3</sup>])
-- $B_{mp}^{C}$ is the concentration of micro-phytoplankton biomass at the surface of the water column (`biodia`, [mmol C m<sup>-3</sup>])
-- $B_{mz}^{C}$ is the concentration of micro-zooplankton biomass at the surface of the water column (`biozoo`, [mmol C m<sup>-3</sup>])
-- $B_{Mz}^{C}$ is the concentration of meso-zooplankton biomass at the surface of the water column (`biomes`, [mmol C m<sup>-3</sup>])
+_where_ <br>
+- $B_{np}^{C}$ is the concentration of nano-phytoplankton biomass at the surface of the water column (`biophy`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{mp}^{C}$ is the concentration of micro-phytoplankton biomass at the surface of the water column (`biodia`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{mz}^{C}$ is the concentration of micro-zooplankton biomass at the surface of the water column (`biozoo`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{Mz}^{C}$ is the concentration of meso-zooplankton biomass at the surface of the water column (`biomes`, [mmol C m<sup>-3</sup>]) <br>
 
 
-**Seawater dynamic viscosity**\
+**Seawater dynamic viscosity**
+
 If `do_viscous_sinking = .true.`, we calculate the dynamic viscosity of the in situ seawater (`dynvis_sw(i,j,k)`, $\eta_{sw}$, [kg m<sup>-1</sup> s<sup>-1</sup>]) that particulates are sinking through. This involves three steps and is dependent on temperature, salinity and pressure.
 
 The dynamic viscosity of seawater at atmospheric pressure ($\eta_{sw}^{1atm}$) is described by equations 22 and 23 from [Sharqawy et al. (2010)](https://doi.org/10.5004/dwt.2010.1079), which are based on [Isdale et al. (1972)](https://doi.org/10.1016/S0011-9164(00)80002-8):
 
-$\eta_{sw}^{1atm} = \eta_{w}^{1atm} \left(1 + A \dfrac{S}{1000} + B \left(\dfrac{S}{1000}\right)^{2} \right)$
+$$
+\begin{align}
+\eta_{sw}^{1atm} =& \eta_{w}^{1atm} \left(1 + A \dfrac{S}{1000} + B \left(\dfrac{S}{1000}\right)^{2} \right)
+\end{align}
+$$
 
-where
+_where_ <br>
 
-$A = 1.541 + 1.998 \times 10^{-2} \cdot T - 9.52 \times 10^{-5} \cdot T^{2}$\
-$B = 7.974 - 7.561 \times 10^{-2} \cdot T + 4.724 \times 10^{-4} \cdot T^{2}$\
-$\eta_{w}^{1atm} = 4.2844 \times 10^{-5} + \left(0.157 \left( T + 64.993 \right)^{2} - 91.296 \right)^{-1}$
+$$
+\begin{align}
+A =& 1.541 + 1.998 \times 10^{-2} \cdot T - 9.52 \times 10^{-5} \cdot T^{2}
+B =& 7.974 - 7.561 \times 10^{-2} \cdot T + 4.724 \times 10^{-4} \cdot T^{2}
+\eta_{w}^{1atm} =& 4.2844 \times 10^{-5} + \left(0.157 \left( T + 64.993 \right)^{2} - 91.296 \right)^{-1}
+\end{align}
+$$
 
-and where
-- T is in situ seawater temperature (`Temp(i,j,k)`, [ºC])
-- S is in situ seawater salinity (`Salt(i,j,k)`, [g kg<sup>-1</sup>])
+_where_ <br>
+- T is in situ seawater temperature (`Temp(i,j,k)`, [ºC]) <br>
+- S is in situ seawater salinity (`Salt(i,j,k)`, [g kg<sup>-1</sup>]) <br>
 
 After calculating $\eta_{sw}^{1atm}$, we must correct for pressure changes in the water column. This is done by calculating the effect of pressure and temperature changes on the dynamic viscosity of pure water ($\eta_{w}$), and then applying this correction to our estimate of seawater dynamic viscosity at atmospheric pressure, such that:
 
-$\eta_{sw} = \eta_{sw}^{1atm} \dfrac{\eta_{w}}{\eta_{w}^{1atm}}$
+$$
+\begin{align}
+\eta_{sw} =& \eta_{sw}^{1atm} \dfrac{\eta_{w}}{\eta_{w}^{1atm}}
+\end{align}
+$$
 
 We solve for $\eta_{w}$, the dynamic viscosity of pure water corrected for pressure effects, by following the [IAPWS (2008)](https://iapws.org/documents/release/viscosity). This formulation requires multiple steps. First, we estimate the density of pure water, $\rho_{w}$, at a given temperature $T$ and pressure $P$ using equation 14 from the UNESCO EOS-80:
 
-$P_{MPa} = \left(101325 + 9.81 * 1025.0 * z\right) 1 \times 10^{-6}$\
-$\rho_{0} = 999.842594 + 6.793952 \times 10^{-2} \cdot T - 9.095290 \times 10^{-3} \cdot T^{2} + 1.001685 \times 10^{-4} \cdot T^{3} - 1.120083 \times 10^{-6} \cdot T^{4} + 6.536332 \times 10^{-9} \cdot T^{5}$\
-$\rho_{w} = \dfrac{\rho_{0}}{1 - \dfrac{P_{MPa} - 0.101325}{2.2 \times 10^{3}}}$\
+$$
+\begin{align}
+P_{MPa} =& \left(101325 + 9.81 * 1025.0 * z\right) 1 \times 10^{-6}
+\rho_{0} =& \quad 999.842594 + 6.793952 \times 10^{-2} \cdot T \\
+          &     - 9.095290 \times 10^{-3} \cdot T^{2} \\
+          &     + 1.001685 \times 10^{-4} \cdot T^{3} \\
+          &     - 1.120083 \times 10^{-6} \cdot T^{4} \\
+          &     + 6.536332 \times 10^{-9} \cdot T^{5}
+\rho_{w} =& \dfrac{\rho_{0}}{1 - \dfrac{P_{MPa} - 0.101325}{2.2 \times 10^{3}}}
+\end{align}
+$$
 
-where
-- $P_{MPa}$ is the in situ pressure at a given depth [`P_MPa`, [MPa]]
-- $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC])
+_where_ <br>
+- $P_{MPa}$ is the in situ pressure at a given depth [`P_MPa`, [MPa]] <br>
+- $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
 
 Next, we solve for the dynamic viscosity at the dilute gas-limit, $\hat{\eta_{0}}$, detailed in equation 11 in the [IAPWS (2008)](https://iapws.org/documents/release/viscosity) and with $H_{i}$ coefficients detailed in their Table 1.
 
-$\hat{\eta_{0}} = \dfrac{100 \sqrt{\hat{T}}}{\sum_{i=0}^{3} \dfrac{H_{i}}{\left(\hat{T}\right)^{i}}}$\
+$$
+\begin{align}
+\hat{\eta_{0}} =& \dfrac{100 \sqrt{\hat{T}}}{\sum_{i=0}^{3} \dfrac{H_{i}}{\left(\hat{T}\right)^{i}}}
+\end{align}
+$$
 
-where
-- $\hat{T} = \dfrac{T + 273.15}{647.096}$ (`T_hat`, [dimenionless])
+_where_ <br>
+- $\hat{T} = \dfrac{T + 273.15}{647.096}$ (`T_hat`, [dimenionless]) <br>
 
 Next, we solve for the contribution of finite density to dynamic viscosity, $\hat{\eta_{1}}$, detailed in equation 12 in the [IAPWS (2008)](https://iapws.org/documents/release/viscosity) and with $H_{ij}$ coefficients detailed in their Table 2.
 
-$\hat{\eta_{1}} = e^{\left[ \hat{\rho} \sum_{i=0}^{5}\left( \dfrac{1}{\hat{T} - 1} \right)^{i} \sum_{j=0}^{6} H_{ij}\left(\hat{\rho} - 1\right)^{j} \right]}$
+$$
+\begin{align}
+\hat{\eta_{1}} =& e^{\left[ \hat{\rho} \sum_{i=0}^{5}\left( \dfrac{1}{\hat{T} - 1} \right)^{i} \sum_{j=0}^{6} H_{ij}\left(\hat{\rho} - 1\right)^{j} \right]}
+\end{align}
+$$
  
-where
-- $\hat{\rho} = \dfrac{\rho_{w}}{322}$ (`rho_hat`, [dimensionless])
+_where_ <br>
+- $\hat{\rho} = \dfrac{\rho_{w}}{322}$ (`rho_hat`, [dimensionless]) <br>
 
 Finally, we compute the density-corrected pure water dynamic viscosity:
 
-$\eta_{w} = \left(\hat{\eta_{0}} \cdot \hat{\eta_{1}} \right) \eta^{*}$
+$$
+\begin{align}
+\eta_{w} =& \left(\hat{\eta_{0}} \cdot \hat{\eta_{1}} \right) \eta^{*}
+\end{align}
+$$
 
-where
-- $\eta^{*} = 1 \times 10^{-6}$ (`mu_star`, [kg m<sup>-1</sup> s<sup>-1</sup>])
+_where_ <br>
+- $\eta^{*} = 1 \times 10^{-6}$ (`mu_star`, [kg m<sup>-1</sup> s<sup>-1</sup>]) <br>
 
 which we apply above to calculate the dynamic viscosity of seawater ($\eta_{sw}$) for a given temperature, salinity and pressure. We note that it is expected that the dynamic viscosity of water actually decreases with increasing pressure at low temperatures ([Percy W. Bridgman (1925)](https://api.semanticscholar.org/CorpusID:27500909)). 
 
 
-**Mineral ballasting and excess density**\
+**Mineral ballasting and excess density**
+
 WOMBAT-mid explicitly considers small organic carbon, large aggregates of organic carbon, $CaCO_3$ and biogenic silica. Each of these particulate types have unique densities. We compute the mass of each particulate type in [kg m</sup>-3</sup>]:
 
-$M_{sd} = B_{sd}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4}$\
-$M_{ld} = B_{ld}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4}$\
-$M_{CaCO_3} = B_{CaCO_3}^{C} \cdot 1 \times 10{-6} \cdot 100$\
-$M_{BSi} = B_{ld}^{Si} \cdot 1 \times 10{-6} \cdot 60$
+$$
+\begin{align}
+M_{sd} =& B_{sd}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4}
+M_{ld} =& B_{ld}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4}
+M_{CaCO_3} =& B_{CaCO_3}^{C} \cdot 1 \times 10{-6} \cdot 100
+M_{BSi} =& B_{ld}^{Si} \cdot 1 \times 10{-6} \cdot 60
+\end{align}
+$$
 
-where
-- $B_{sd}^{C}$ is the in situ concentration of small particulate organic carbon (`biodet`, [mmol C m<sup>-3</sup>])
-- $B_{ld}^{C}$ is the in situ concentration of large particulate organic carbon (`biobdet`, [mmol C m<sup>-3</sup>])
-- $B_{CaCO_3}^{C}$ is the in situ concentration of calcium carbonate carbon (`biocaco3`, [mmol C m<sup>-3</sup>])
-- $B_{ld}^{Si}$ is the in situ concentration of biogenic silica (`biobdetsi`, [mmol Si m<sup>-3</sup>])
-- $\dfrac{12}{0.4}$ is the g (mol C)<sup>-1</sup> and assuming that 40% of the total biomass of particulate organics is carbon.
-- $100$ is the g (mol C)<sup>-1</sup> of calcium carbonate.
-- $60$ is the g (mol Si)<sup>-1</sup> of biogenic silica.
+_where_ <br>
+- $B_{sd}^{C}$ is the in situ concentration of small particulate organic carbon (`biodet`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{ld}^{C}$ is the in situ concentration of large particulate organic carbon (`biobdet`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{CaCO_3}^{C}$ is the in situ concentration of calcium carbonate carbon (`biocaco3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{ld}^{Si}$ is the in situ concentration of biogenic silica (`biobdetsi`, [mmol Si m<sup>-3</sup>]) <br>
+- $\dfrac{12}{0.4}$ is the g (mol C)<sup>-1</sup> and assuming that 40% of the total biomass of particulate organics is carbon. <br>
+- $100$ is the g (mol C)<sup>-1</sup> of calcium carbonate. <br>
+- $60$ is the g (mol Si)<sup>-1</sup> of biogenic silica. <br>
 
 We consider $CaCO_3$ to be part of the small sinking particulates because, although more dense than organic matter, $CaCO_3$ particles tend to be smaller than organic aggregates and sink at a slower rate ([De La Rocha & Passow, 2007](https://doi.org/10.1016/j.dsr2.2007.01.004); [Zhang et al., 2018](https://doi.org/10.5194/bg-15-4759-2018)). Furthermore, the shedding of coccoliths by coccolithophores, which are near-neutrally bouyant, also contributes to a slower mean sinking speed of $CaCO_3$ ([Balch et al., 2009](https://doi.org/10.1029/2008JC004902)). In contrast, we consider biogenic silica to be part of the large sinking particulates:
 
-$M_{s} = M_{sd} + M_{CaCO_3}$\
-$M_{l} = M_{ld} + M_{BSi}$
+$$
+\begin{align}
+M_{s} =& M_{sd} + M_{CaCO_3}
+M_{l} =& M_{ld} + M_{BSi}
+\end{align}
+$$
 
 And we compute the harmonic mean density of the small particulates (`rho_small`, $\rho_{s}$, [kg m<sup>-3</sup>]) and large particulates (`rho_large`, $\rho_{l}$, [kg m<sup>-3</sup>]) weighted by mass fractions, which accounts for the fact that less dense mass fractions account for greater volume within aggregates:
 
-$\rho_{s} = \dfrac{1}{\dfrac{M_{sd} / M_{s}}{\rho_{orgC}} + \dfrac{M_{CaCO_3} / M_{s}}{\rho_{CaCO_3}} }$\
-$\rho_{l} = \dfrac{1}{\dfrac{M_{ld} / M_{l}}{\rho_{orgC}} + \dfrac{M_{Bsi} / M_{l}}{\rho_{Bsi}} }$
+$$
+\begin{align}
+\rho_{s} =& \dfrac{1}{\dfrac{M_{sd} / M_{s}}{\rho_{orgC}} + \dfrac{M_{CaCO_3} / M_{s}}{\rho_{CaCO_3}} }
+\rho_{l} =& \dfrac{1}{\dfrac{M_{ld} / M_{l}}{\rho_{orgC}} + \dfrac{M_{Bsi} / M_{l}}{\rho_{Bsi}} }
+\end{align}
+$$
 
-where
-- $\rho_{orgC}$ is the density of organic carbon particles (`detrho`, [kg m<sup>-3</sup>])
-- $\rho_{CaCO_3}$ is the density of calcium carbonate particles (`caco3rho`, [kg m<sup>-3</sup>])
-- $\rho_{BSi}$ is the density of biogenic silica particles (`bsirho`, [kg m<sup>-3</sup>])
+_where_ <br>
+- $\rho_{orgC}$ is the density of organic carbon particles (`detrho`, [kg m<sup>-3</sup>]) <br>
+- $\rho_{CaCO_3}$ is the density of calcium carbonate particles (`caco3rho`, [kg m<sup>-3</sup>]) <br>
+- $\rho_{BSi}$ is the density of biogenic silica particles (`bsirho`, [kg m<sup>-3</sup>]) <br>
 
 Finally, we incorporate estimates of particle porosity to their density:
 
-$\rho_{s} = \left(1 - p_{s}\right) \rho_{s} + p_{s} \rho_{sw} $\
-$\rho_{l} = \left(1 - p_{l}\right) \rho_{l} + p_{l} \rho_{sw} $
+$$
+\begin{align}
+\rho_{s} =& \left(1 - p_{s}\right) \rho_{s} + p_{s} \rho_{sw}
+\rho_{l} =& \left(1 - p_{l}\right) \rho_{l} + p_{l} \rho_{sw}
+\end{align}
+$$
 
-where
-- $p_{s}$ is the porosity of small particles (`detphi`, [dimensionless])
-- $p_{l}$ is the porosity of large particles (`bdetphi`, [dimensionless])
-- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-1</sup>)
+_where_ <br>
+- $p_{s}$ is the porosity of small particles (`detphi`, [dimensionless]) <br>
+- $p_{l}$ is the porosity of large particles (`bdetphi`, [dimensionless]) <br>
+- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-1</sup>) <br>
 
 
-**Rubey's equation**\
+**Rubey's equation**
+
 Rubey's equation ([Rubey, 1933](https://doi.org/10.2475/ajs.s5-25.148.325)) combines the radius of particles, their excess density relative to fluid and the dynamic viscosity of that fluid to compute the sinking rate of particles. We find the sinking rate of small (`wsink1(k)`, [m s<sup>-1</sup>]) and large particles (`wsink2(k)`, [m s<sup>-1</sup>]) using Rubey's equation:
 
-$\omega_{s} = \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{s} - \rho_{sw} \right) \left(r_{s}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{s}}$
-$\omega_{l} = \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{l} - \rho_{sw} \right) \left(r_{l}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{l}}$
+$$
+\begin{align}
+\omega_{s} =& \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{s} - \rho_{sw} \right) \left(r_{s}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{s}}
+\end{align}
+$$
 
-where
-- $r_{s}$ and $r_{l}$ are the mean radii of small and large particles (`rad_det`; `rad_bdet`; [m])
-- $\eta_{sw}$ is the dynamic viscosity of seawater at in situ temperature, salinity and pressure (`dynvis_sw(i,j,k)`, [kg m<sup>-1</sup> s<sup>-1</sup>])
-- $\rho_{s}$ and $\rho_{l}$ are the harmonic mean densities of small and large particles (`rho_small`; `rho_large`, [kg m<sup>-3</sup>]) 
-- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-1</sup>)
+$$
+\begin{align}
+\omega_{l} =& \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{l} - \rho_{sw} \right) \left(r_{l}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{l}}
+\end{align}
+$$
+
+_where_ <br>
+- $r_{s}$ and $r_{l}$ are the mean radii of small and large particles (`rad_det`; `rad_bdet`; [m]) <br>
+- $\eta_{sw}$ is the dynamic viscosity of seawater at in situ temperature, salinity and pressure (`dynvis_sw(i,j,k)`, [kg m<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\rho_{s}$ and $\rho_{l}$ are the harmonic mean densities of small and large particles (`rho_small`; `rho_large`, [kg m<sup>-3</sup>]) <br>
+- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-1</sup>) <br>
 
 Our approach therefore considers mineral ballasting on particle excess density, particle size and the viscosity of fluid in determining sinking rates. This allows for "an environmentally dependent, space-varying $\omega_{s}$ and $\omega_{l}$" ([Dinauer et al., 2022](https://doi.org/10.1029/2021GB007131)).
 
@@ -2312,81 +2415,109 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), dissolved organic nitrogen (DON), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
 
-**Organics**\
+**Organics**
+
 Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces DOC and DON and removes O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of organic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
 
-$\gamma_{sed}^{\rightarrow DOC} = \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C}$\
-$\gamma_{sed}^{\rightarrow DON} = \gamma_{sed}^{\rightarrow DOC} R^{N:C}$\
-$\gamma_{sed}^{\leftarrow O_2} = \gamma_{sed}^{\rightarrow DOC} R^{O_2:C}$\
-$\gamma_{sed}^{\rightarrow dFe} = \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}$
+$$
+\begin{align}
+\gamma_{sed}^{\rightarrow DOC} =& \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C}
+\gamma_{sed}^{\rightarrow DON} =& \gamma_{sed}^{\rightarrow DOC} R^{N:C}
+\gamma_{sed}^{\leftarrow O_2} =& \gamma_{sed}^{\rightarrow DOC} R^{O_2:C}
+\gamma_{sed}^{\rightarrow dFe} =& \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}
+\end{align}
+$$
 
-where
-- $\gamma_{sed}^{0^{\circ}C}$ is a base rate of organic matter hydrolysation at 0ºC in the sediments (`detlrem_sed`, [s<sup>-1</sup>])
-- $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless])
-- $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC])
-- $B_{sed}^{C}$ is the concentration of organic carbon in the sediment pool (`p_det_sediment(i,j,1)`, [mol C m<sup>-2</sup>])
-- $B_{sed}^{Fe}$ is the concentration of organic iron in the sediment pool (`p_detfe_sediment(i,j,1)`, [mol Fe m<sup>-2</sup>])
-- $R^{N:C}$ is the static Redfield ratio of nitrogen to carbon in the organic matter (`16/122)` [mol N (mol C)<sup>-1</sup>])
-- $R^{O_2:C}$ is the static Redfield ratio of dissolved oxygen to carbon required to hydrolyse organic matter (`132/122)` [mol O<sub>2</sub> (mol C)<sup>-1</sup>])
+_where_ <br>
+- $\gamma_{sed}^{0^{\circ}C}$ is a base rate of organic matter hydrolysation at 0ºC in the sediments (`detlrem_sed`, [s<sup>-1</sup>]) <br>
+- $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
+- $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
+- $B_{sed}^{C}$ is the concentration of organic carbon in the sediment pool (`p_det_sediment(i,j,1)`, [mol C m<sup>-2</sup>]) <br>
+- $B_{sed}^{Fe}$ is the concentration of organic iron in the sediment pool (`p_detfe_sediment(i,j,1)`, [mol Fe m<sup>-2</sup>]) <br>
+- $R^{N:C}$ is the static Redfield ratio of nitrogen to carbon in the organic matter (`16/122)` [mol N (mol C)<sup>-1</sup>]) <br>
+- $R^{O_2:C}$ is the static Redfield ratio of dissolved oxygen to carbon required to hydrolyse organic matter (`132/122)` [mol O<sub>2</sub> (mol C)<sup>-1</sup>]) <br>
 
 
-**Dissolution of biogenic silica**\
+**Dissolution of biogenic silica**
+
 With regard to the dissolution of sedimentary biogenic silica, we compute it in the same way as how it is computed in the water column:
 
-$\gamma_{sed}^{\rightarrow Si} = \left(d_{sed^{Si}}^{T} \cdot S_{sed^{Si}}^{Sat} \cdot S_{sed^{Si}}^{bio}\right) B_{sed}^{Si}$
+$$
+\begin{align}
+\gamma_{sed}^{\rightarrow Si} =& \left(d_{sed^{Si}}^{T} \cdot S_{sed^{Si}}^{Sat} \cdot S_{sed^{Si}}^{bio}\right) B_{sed}^{Si}
+\end{align}
+$$
 
-where
-- $B_{sed}^{Si}$ is the concentration of organic silicon in the sediment pool (`p_detsi_sediment(i,j,1)`, [mol Si m<sup>-2</sup>])
-- $d_{sed^{Si}}^{T}$ is the temperature-dependent rate of dissolution (`disssi_temp`, [s<sup>-1</sup>])
-- $S_{sed^{Si}}^{Sat}$ is a scaling factor that decelerates dissolution as the in situ concentration approachs the equilibrium concentration (`disssi_usat`, [dimenionless])
-- $S_{sed^{Si}}^{bio}$ is a scaling factor that accelerates dissolution in the presence of heterotrophic bacterial biomass (`disssi_bact`, [dimenionless])
+_where_ <br>
+- $B_{sed}^{Si}$ is the concentration of organic silicon in the sediment pool (`p_detsi_sediment(i,j,1)`, [mol Si m<sup>-2</sup>]) 
+- $d_{sed^{Si}}^{T}$ is the temperature-dependent rate of dissolution (`disssi_temp`, [s<sup>-1</sup>]) <br>
+- $S_{sed^{Si}}^{Sat}$ is a scaling factor that decelerates dissolution as the in situ concentration approachs the equilibrium concentration (`disssi_usat`, [dimenionless]) <br>
+- $S_{sed^{Si}}^{bio}$ is a scaling factor that accelerates dissolution in the presence of heterotrophic bacterial biomass (`disssi_bact`, [dimenionless]) <br>
 
 Please refer to the description above for the equations that describe these terms.
 
 
-**Dissolution of $CaCO_3$**\
+**Dissolution of $CaCO_3$**
+
 Dissolution of $CaCO_3$ produces DIC and alkalinity. The sedimenary $CaCO_3$ pool is considered as entirely calcite. If `do_caco3_dynamics = .true.`, then sedimentary dissolution is controlled by bottom water temperature and an estimate of the pore-water calcite saturation state ($\Omega_{cal,sed}$):
 
-$\D_{CaCO_{3},sed} = d_{CaCO_{3},sed} (β_{hete})^{T} \left(1 - \Omega_{cal,sed}\right)^{4.5}$
+$$
+\begin{align}
+D_{CaCO_{3},sed} =& d_{CaCO_{3},sed} (β_{hete})^{T} \left(1 - \Omega_{cal,sed}\right)^{4.5}
+\end{align}
+$$
 
-where
-- $d_{CaCO_{3},sed}$ is a base rate of dissolution in units of [day<sup>-1</sup>], and
-- $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless])
-- $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC])
-- $\Omega_{cal,sed}$ is the calcite saturation state within sedimentary pore waters (`sedomega_cal(i,j)`, [dimensionless])
+_where_ <br>
+- $d_{CaCO_{3},sed}$ is a base rate of dissolution in units of [day<sup>-1</sup>] <br>
+- $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
+- $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
+- $\Omega_{cal,sed}$ is the calcite saturation state within sedimentary pore waters (`sedomega_cal(i,j)`, [dimensionless]) <br>
 
 The $\Omega_{cal,sed}$ is calculated using the `mocsy` package for solving carbonate chemistry of seawater ([Orr & Epitalon, 2015](https://doi.org/10.5194/gmd-8-485-2015)). These routines require Alk and DIC as inputs, along with nutrient concentrations and temperature and salinity of bottom waters. For DIC, we chose to sum the water column concentration of DIC and the organic carbon content of the sediment to approximate the interstitial (i.e., porewater) DIC concentration. We assume that the organic carbon content of the sediment (`p_det_sediment`), which is held in units of in [mol m<sup>-2</sup>] is relevant over 10 centimeters, and therefore can be automatically converted to [mol m<sup>-3</sup>] via division by 0.1. With this assumption these arrays can be added together and approximates the reducing conditions of organic-rich sediments, which have lower $\Omega_{cal,sed}$. This ensures a greater rate of $CaCO_3$ dissolution within the sediment as organic matter accumulates.
 
 However, if `do_caco3_dynamics = .false.`, then dissolution of $CaCO_3$ in the sediments proceeds according to a constant assumed $\Omega_{cal,sed}$ of 0.2. We are aware that such a low $\Omega_{cal,sed}$ would not occur in real sediments given the buffering effect of dissolving $CaCO_3$ and the subsequent release of alkalinity. However, in the absence of feedbacks between organic carbon remineralisation and $CaCO_3$ dissolution, we assert a low $\Omega_{cal,sed}$ to ensure that sufficient $CaCO_3$ is dissolved back into the water column.
 
 
-**Benthic denitrification**\
+**Benthic denitrification**
+
 We also consider the consumption of NO<sub>3</sub> via benthic denitrification. When `do_benthic_denitrification = .true.`, a portion of the particulate organic matter within the sediments that is hydrolysed to DOC and DON is performed anaerobically (i.e., using NO<sub>3</sub> as the electron acceptor). Unlike this process in the water column, which is performed by bacterial metabolism, we estimate this process using an empirical parameterization from [Bohlen et al. (2012)](https://doi.org/10.1029/2011GB004198):
 
-$\gamma_{sed}^{\leftarrow NO_3} = \gamma_{sed}^{\rightarrow DOC} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)$
+$$
+\begin{align}
+\gamma_{sed}^{\leftarrow NO_3} =& \gamma_{sed}^{\rightarrow DOC} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)
+\end{align}
+$$
 
-where
-- $0.9$ is a hard upper limit stating that 90% of organic matter hydrolysation can potentially be performed anaerobically via denitrification
-- $\dfrac{94}{122}$ is the stoichiometry of nitrate demand per mol of organic carbon hydrolysed ([Paulmier et al., 2009](https://doi.org/10.5194/bg-6-923-2009))
-- O<sub>2</sub> is the bottom water concentration of dissolved oxygen (mmol m<sup>-3</sup>)
-- NO<sub>3</sub> is the bottom water concentration of nitrate (mmol m<sup>-3</sup>)
+_where_ <br>
+- $0.9$ is a hard upper limit stating that 90% of organic matter hydrolysation can potentially be performed anaerobically via denitrification <br>
+- $\dfrac{94}{122}$ is the stoichiometry of nitrate demand per mol of organic carbon hydrolysed ([Paulmier et al., 2009](https://doi.org/10.5194/bg-6-923-2009)) <br>
+- O<sub>2</sub> is the bottom water concentration of dissolved oxygen (mmol m<sup>-3</sup>) <br>
+- NO<sub>3</sub> is the bottom water concentration of nitrate (mmol m<sup>-3</sup>) <br>
 
 and where the fraction of organic matter that is hydrolysed via denitrification is equal to:
 
-$f_{sed}^{denit} = \gamma_{sed}^{\leftarrow NO_3} \dfrac{\dfrac{122}{94}}{\gamma_{sed}^{\rightarrow DOC}}$
+$$
+\begin{align}
+f_{sed}^{denit} =& \gamma_{sed}^{\leftarrow NO_3} \dfrac{122/94}{\gamma_{sed}^{\rightarrow DOC}}
+\end{align}
+$$
 
+**Tendencies from sediment processes**
 
-**Tendencies from sediment processes**\
 Overall bottom fluxes of tracers are:
 
-$\dfrac{\Delta DOC}{\Delta t} = \gamma_{det,sed}^{\rightarrow DOC}$\
-$\dfrac{\Delta DON}{\Delta t} = \gamma_{det,sed}^{\rightarrow DON}$\
-$\dfrac{\Delta NO_3}{\Delta t} = \gamma_{det,sed}^{\leftarrow NO_3}$\
-$\dfrac{\Delta O_2}{\Delta t} = \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right)$\
-$\dfrac{\Delta Si}{\Delta t} = \gamma_{det,sed}^{\rightarrow Si}$\
-$\dfrac{\Delta dFe}{\Delta t} = \gamma_{det,sed}^{\rightarrow dFe}$\
-$\dfrac{\Delta DIC}{\Delta t} = \D_{CaCO_{3},sed}$\
-$\dfrac{\Delta Alk}{\Delta t} = 2 \cdot \D_{CaCO_{3},sed}$
+$$
+\begin{align}
+\dfrac{\Delta DOC}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DOC}
+\dfrac{\Delta DON}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DON}
+\dfrac{\Delta NO_3}{\Delta t} =& \gamma_{det,sed}^{\leftarrow NO_3}
+\dfrac{\Delta O_2}{\Delta t} =& \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right)
+\dfrac{\Delta Si}{\Delta t} =& \gamma_{det,sed}^{\rightarrow Si}
+\dfrac{\Delta dFe}{\Delta t} =& \gamma_{det,sed}^{\rightarrow dFe}
+\dfrac{\Delta DIC}{\Delta t} =& D_{CaCO_{3},sed}
+\dfrac{\Delta Alk}{\Delta t} =& 2 \cdot D_{CaCO_{3},sed}
+\end{align}
+$$
 
 ---
 
@@ -2403,7 +2534,11 @@ If `do_burial = .true.`, we compute the fraction of incident sinking particualte
 
 The fraction buried is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
 
-$F_{bury} = 0.013 \cdot 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}$
+$$
+\begin{align}
+F_{bury} =& 0.013 \cdot 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
+\end{align}
+$$
 
 where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>].
 
