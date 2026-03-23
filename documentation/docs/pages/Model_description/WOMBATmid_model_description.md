@@ -1628,11 +1628,19 @@ _where_ <br>
 **Nitrate** (`f_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
 \begin{align}
-\dfrac{\Delta NO_3}{\Delta t} &=  \mu_{aoa}^{\rightarrow NO_3} \\
-&                              \quad - \mu_{b1}^{\leftarrow NO_3} \\
-&                              \quad - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
-&                              \qquad + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+Q_{mp}^{-Fe:C} &= 0.00167 / 55.85 * Q_{mp}^{Chl:C} * 12 \\
+&\qquad  + 1.21 \times 10^{-5} * 14.0 / 55.85 / 7.625 * 0.5 * 1.5 * L_{mp}^{N} \\
+&\qquad  + 1.15 \times 10^{-4} * 14.0 / 55.85 / 7.625 * 0.5 * L_{mp}^{NO_3}
 \end{align}
+
+$$
+\begin{aligned}
+\dfrac{\Delta NO_3}{\Delta t} &= \mu_{aoa}^{\rightarrow NO_3} \\
+&\qquad  - \mu_{b1}^{\leftarrow NO_3} \\
+&\qquad  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
+&\qquad  + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+\end{aligned}
+$$
 
 **Ammonium** (`f_nh4(i,j,k)`, NH<sub>4</sub>, [mol N kg<sup>-1</sup>])
 
