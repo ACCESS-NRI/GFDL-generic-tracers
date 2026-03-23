@@ -1663,11 +1663,12 @@ $\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{\leftarrow B_{np}^{N}}
 
 **Silicic acid** (`f_sil(i,j,k)`, $H_{4}SiO_{4}$, [mol Si kg<sup>-1</sup>])
 
-$\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} = \left( \gamma_{mp}^{\rightarrow C} 
-                                            + g_{mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C}
-                                     + D_{B_{ld}^{Si}}^{\rightarrow Si}
-                                     - \mu_{mp}^{\leftarrow Si}$
-
+\begin{align}
+\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =& \left( \gamma_{mp}^{\rightarrow C} \\
+                                       &      + g_{mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C} \\
+                                       & + D_{B_{ld}^{Si}}^{\rightarrow Si} \\
+                                       & - \mu_{mp}^{\leftarrow Si}
+\end{align}
 
 **Nitrous oxide** (`f_n2o(i,j,k)`, N<sub>2</sub>O, [mol N<sub>2</sub>O kg<sup>-1</sup>])
 
@@ -1676,10 +1677,6 @@ $\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} = \left( \gamma_{mp}^{\rightarrow C}
                                 & + \mu_{b1}^{\rightarrow N_{2}O} \\
                                 & - \mu_{b2}^{\leftarrow N_{2}O}
 \end{align}
-
-$\dfrac{\Delta N_{2}O}{\Delta t} = \mu_{aoa}^{\rightarrow N_{2}O} 
-                                 + \mu_{b1}^{\rightarrow N_{2}O}
-                                 - \mu_{b2}^{\leftarrow N_{2}O}$
 
 
 **Oxygen** (`f_o2(i,j,k)`, O<sub>2</sub>, [mol O<sub>2</sub> kg<sup>-1</sup>])
