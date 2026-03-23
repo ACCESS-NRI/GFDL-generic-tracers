@@ -2137,10 +2137,14 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 **Second**, if dissolved iron concentrations dip below that measureable by operational detection limits, we reset these concentrations to this minimum  (`zfermin`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
 
-$[dFe]^{min} = \min\left( \max\left( 0.003 \cdot [NO_3]^{2}, 0.005 \right), 0.007 \right)$
+$$
+\begin{align}
+[dFe]^{min} =& \min\left( \max\left( 0.003 \cdot [NO_3]^{2}, 0.005 \right), 0.007 \right)
+\end{align}
+$$
 
-where:
-- $[NO_3]$ is the ambient nitrate concentration in units of [mmol m<sup>-3</sup>] 
+_where_ <br>
+- $[NO_3]$ is the ambient nitrate concentration in units of [mmol m<sup>-3</sup>] <br>
 
 This resetting of minimum dFe concentration comes directly from the PISCES ocean model and functions essentially as a constant source of dFe to the ocean when surface concentrations are drawn down to near zero values.
 
@@ -2272,7 +2276,7 @@ We solve for $\eta_{w}$, the dynamic viscosity of pure water corrected for press
 
 $$
 \begin{align}
-P_{MPa} =& \left(101325 + 9.81 * 1025.0 * z\right) 1 \times 10^{-6}
+P_{MPa} =& \left(101325 + 9.81 * 1025.0 * z\right) 1 \times 10^{-6} \\
 \rho_{0} =& \quad 999.842594 + 6.793952 \times 10^{-2} \cdot T \\
           &     - 9.095290 \times 10^{-3} \cdot T^{2} \\
           &     + 1.001685 \times 10^{-4} \cdot T^{3} \\
