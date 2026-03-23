@@ -1728,314 +1728,388 @@ $$
 
 **Small authigenic iron** (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta Fe_{sA}}{\Delta t} = Sc_{dFe}^{\rightarrow Fe_{sA}}
-                                  + Co_{dFe}^{\rightarrow Fe_{sA}}
-                                  - D_{Fe_{sA}}^{\rightarrow dFe}$
-
+$$
+\begin{align}
+\dfrac{\Delta Fe_{sA}}{\Delta t} =& \quad Sc_{dFe}^{\rightarrow Fe_{sA}}
+                                        + Co_{dFe}^{\rightarrow Fe_{sA}}
+                                        - D_{Fe_{sA}}^{\rightarrow dFe}
+\end{align}
+$$
 
 **Large authigenic iron** (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta Fe_{lA}}{\Delta t} = Sc_{dFe}^{\rightarrow Fe_{lA}}
-                                  + Co_{dFe}^{\rightarrow Fe_{lA}}
-                                  - D_{Fe_{lA}}^{\rightarrow dFe}$
-
+$$
+\begin{align}
+\dfrac{\Delta Fe_{lA}}{\Delta t} =& \quad Sc_{dFe}^{\rightarrow Fe_{lA}}
+                                        + Co_{dFe}^{\rightarrow Fe_{lA}}
+                                        - D_{Fe_{lA}}^{\rightarrow dFe}
+\end{align}
+$$
 
 **Nano-phytoplankton** (`f_phy(i,j,k)`, $B_{np}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{np}^{C}}{\Delta t} = \mu_{np}^{\leftarrow C} 
-                                     - \Gamma_{np}^{\rightarrow C} 
-                                     - \gamma_{np}^{\rightarrow C} 
-                                     - g_{mz}^{\leftarrow B_{np}^{C}} 
-                                     - g_{Mz}^{\leftarrow B_{np}^{C}}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{np}^{C}}{\Delta t} =& \quad \mu_{np}^{\leftarrow C} 
+                                           - \Gamma_{np}^{\rightarrow C} 
+                                           - \gamma_{np}^{\rightarrow C}
+                                           - g_{mz}^{\leftarrow B_{np}^{C}} 
+                                           - g_{Mz}^{\leftarrow B_{np}^{C}}
+\end{align}
+$$
 
 **Nano-phytoplankton chlorophyll** (`f_pchl(i,j,k)`, $B_{np}^{chl}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{np}^{Chl}}{\Delta t} = \mu_{np}^{\leftarrow Chl} 
-                                       - \left( \Gamma_{np}^{\rightarrow C} 
-                                              + \gamma_{np}^{\rightarrow C} 
-                                              + g_{mz}^{\leftarrow B_{np}^{C}} 
-                                              + g_{Mz}^{\leftarrow B_{np}^{C}} \right) \cdot Q_{np}^{Chl:C}$ 
+$$
+\begin{align}
+\dfrac{\Delta B_{np}^{Chl}}{\Delta t} =& \quad \mu_{np}^{\leftarrow Chl}
+                                       - \bigg( \Gamma_{np}^{\rightarrow C} + \gamma_{np}^{\rightarrow C} 
+                                               + g_{mz}^{\leftarrow B_{np}^{C}} + g_{Mz}^{\leftarrow B_{np}^{C}} \bigg) \cdot Q_{np}^{Chl:C}
+\end{align}
+$$
 
 **Nano-phytoplankton iron** (`f_phyfe(i,j,k)`, $B_{np}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{np}^{Fe}}{\Delta t} = \mu_{np}^{\leftarrow dFe} 
-                                      - \left( \Gamma_{np}^{\rightarrow C} 
-                                             + \gamma_{np}^{\rightarrow C} 
-                                             + g_{mz}^{\leftarrow B_{np}^{C}} 
-                                             + g_{Mz}^{\leftarrow B_{np}^{C}} \right) \cdot Q_{np}^{Fe:C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{np}^{Fe}}{\Delta t} =& \quad \mu_{np}^{\leftarrow dFe} - \bigg( \Gamma_{np}^{\rightarrow C} + \gamma_{np}^{\rightarrow C} 
+                                              + g_{mz}^{\leftarrow B_{np}^{C}} + g_{Mz}^{\leftarrow B_{np}^{C}} \bigg) \cdot Q_{np}^{Fe:C}
+\end{align}
+$$
 
 **Micro-phytoplankton** (`f_dia(i,j,k)`, $B_{mp}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{C}}{\Delta t} = \mu_{mp}^{\leftarrow C} 
-                                     - \Gamma_{mp}^{\rightarrow C} 
-                                     - \gamma_{mp}^{\rightarrow C} 
-                                     - g_{mz}^{\leftarrow B_{mp}^{C}} 
-                                     - g_{Mz}^{\leftarrow B_{mp}^{C}} $ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{mp}^{C}}{\Delta t} =& \quad \mu_{mp}^{\leftarrow C} 
+                                           - \Gamma_{mp}^{\rightarrow C} 
+                                           - \gamma_{mp}^{\rightarrow C} 
+                                           - g_{mz}^{\leftarrow B_{mp}^{C}} 
+                                           - g_{Mz}^{\leftarrow B_{mp}^{C}} 
+\end{align}
+$$
 
 **Micro-phytoplankton chlorophyll** (`f_dchl(i,j,k)`, $B_{mp}^{chl}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{Chl}}{\Delta t} = \mu_{mp}^{\leftarrow Chl} 
-                                       - \left( \Gamma_{mp}^{\rightarrow C} 
+$$
+\begin{align}
+\dfrac{\Delta B_{mp}^{Chl}}{\Delta t} =& \quad \mu_{mp}^{\leftarrow Chl} 
+                                       - \bigg( \Gamma_{mp}^{\rightarrow C} 
                                               + \gamma_{mp}^{\rightarrow C} 
                                               + g_{mz}^{\leftarrow B_{mp}^{C}} 
-                                              + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Chl:C}$ 
+                                              + g_{Mz}^{\leftarrow B_{mp}^{C}} \bigg) \cdot Q_{mp}^{Chl:C}
+\end{align}
+$$
 
 **Micro-phytoplankton iron** (`f_diafe(i,j,k)`, $B_{mp}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{Fe}}{\Delta t} = \mu_{mp}^{\leftarrow dFe} 
-                                      - \left( \Gamma_{mp}^{\rightarrow C} 
+$$
+\begin{align}
+\dfrac{\Delta B_{mp}^{Fe}}{\Delta t} =& \quad \mu_{mp}^{\leftarrow dFe} 
+                                      - \bigg( \Gamma_{mp}^{\rightarrow C} 
                                              + \gamma_{mp}^{\rightarrow C} 
                                              + g_{mz}^{\leftarrow B_{mp}^{C}} 
-                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Fe:C}$ 
+                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \bigg) \cdot Q_{mp}^{Fe:C}
+\end{align}
+$$
 
 **Micro-phytoplankton silica** (`f_diasi(i,j,k)`, $B_{mp}^{Si}$, [mol Si kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mp}^{Si}}{\Delta t} = \mu_{mp}^{\leftarrow Si}
-                                      - \left( \Gamma_{mp}^{\rightarrow C} 
+$$
+\begin{align}
+\dfrac{\Delta B_{mp}^{Si}}{\Delta t} =& \quad \mu_{mp}^{\leftarrow Si}
+                                      - \bigg( \Gamma_{mp}^{\rightarrow C} 
                                              + \gamma_{mp}^{\rightarrow C} 
                                              + g_{mz}^{\leftarrow B_{mp}^{C}} 
-                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C}$ 
-
+                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \bigg) \cdot Q_{mp}^{Si:C}
+\end{align}
+$$
 
 **Micro-zooplankton** (`f_zoo(i,j,k)`, $B_{mz}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mz}^{C}}{\Delta t} = \A_{mz}^{\leftarrow C} 
-                                     - \Gamma_{mz}^{\rightarrow C} 
-                                     - \gamma_{mz}^{\rightarrow C}
-                                     - g_{Mz}^{\leftarrow B_{mz}^{C}}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{mz}^{C}}{\Delta t} =& \quad \A_{mz}^{\leftarrow C} 
+                                           - \Gamma_{mz}^{\rightarrow C} 
+                                           - \gamma_{mz}^{\rightarrow C}
+                                           - g_{Mz}^{\leftarrow B_{mz}^{C}}
+\end{align}
+$$
 
 **Micro-zooplankton iron** (`f_zoofe(i,j,k)`, $B_{mz}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{mz}^{Fe}}{\Delta t} = A_{mz}^{\leftarrow Fe}
-                                      - \left( \Gamma_{mz}^{\rightarrow C} 
+$$
+\begin{align}
+\dfrac{\Delta B_{mz}^{Fe}}{\Delta t} =& \quad A_{mz}^{\leftarrow Fe}
+                                      - \bigg( \Gamma_{mz}^{\rightarrow C} 
                                              - \gamma_{mz}^{\rightarrow C} 
-                                             - g_{Mz}^{\leftarrow B_{mz}^{C}} \right) \cdot Q_{mz}^{Fe:C}$ 
-
+                                             - g_{Mz}^{\leftarrow B_{mz}^{C}} \bigg) \cdot Q_{mz}^{Fe:C}
+\end{align}
+$$
 
 **Meso-zooplankton** (`f_mes(i,j,k)`, $B_{Mz}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{Mz}^{C}}{\Delta t} = \A_{Mz}^{\leftarrow C}
-                                     - \Gamma_{Mz}^{\rightarrow C} 
-                                     - \gamma_{Mz}^{\rightarrow C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{Mz}^{C}}{\Delta t} =& \quad \A_{Mz}^{\leftarrow C}
+                                           - \Gamma_{Mz}^{\rightarrow C} 
+                                           - \gamma_{Mz}^{\rightarrow C}
+\end{align}
+$$
 
 **Meso-zooplankton iron** (`f_mesfe(i,j,k)`, $B_{Mz}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{Mz}^{Fe}}{\Delta t} = A_{Mz}^{\leftarrow Fe}
-                                      - \left( \Gamma_{Mz}^{\rightarrow C} 
-                                             - \gamma_{Mz}^{\rightarrow C} \right) \cdot Q_{Mz}^{Fe:C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{Mz}^{Fe}}{\Delta t} =& \quad A_{Mz}^{\leftarrow Fe}
+                                      - \bigg( \Gamma_{Mz}^{\rightarrow C} 
+                                             - \gamma_{Mz}^{\rightarrow C} \bigg) \cdot Q_{Mz}^{Fe:C}
+\end{align}
+$$
 
 **Small detritus** (`f_det(i,j,k)`, $B_{sd}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{sd}^{C}}{\Delta t} = E_{mz}^{\leftarrow C}
-                                     + \Gamma_{np}^{\rightarrow C} 
-                                     + \Gamma_{mz}^{\rightarrow C} 
-                                     - g_{mz}^{\leftarrow B_{sd}^{C}}
-                                     - g_{Mz}^{\leftarrow B_{sd}^{C}}
-                                     - \Gamma_{sd}^{\rightarrow C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{sd}^{C}}{\Delta t} =& \quad E_{mz}^{\leftarrow C}
+                                           + \Gamma_{np}^{\rightarrow C} 
+                                           + \Gamma_{mz}^{\rightarrow C}
+                                           - g_{mz}^{\leftarrow B_{sd}^{C}}
+                                           - g_{Mz}^{\leftarrow B_{sd}^{C}}
+                                           - \Gamma_{sd}^{\rightarrow C}
+\end{align}
+$$
 
 **Small detritus iron** (`f_detfe(i,j,k)`, $B_{sd}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
+$$
+\begin{align}
 $\dfrac{\Delta B_{sd}^{Fe}}{\Delta t} = E_{mz}^{\leftarrow Fe}
                                       +\Gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
                                       + \Gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C}
                                       - \left( g_{mz}^{\leftarrow B_{sd}^{C}}
                                              + g_{Mz}^{\leftarrow B_{sd}^{C}}
                                              + \Gamma_{sd}^{\rightarrow C} \right) Q_{sd}^{Fe:C}$ 
-
+\end{align}
+$$
 
 **Large detritus** (`f_bdet(i,j,k)`, $B_{ld}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{ld}^{C}}{\Delta t} = E_{Mz}^{\leftarrow C}
-                                     + \Gamma_{mp}^{\rightarrow C} 
-                                     + \Gamma_{Mz}^{\rightarrow C} 
-                                     - g_{Mz}^{\leftarrow B_{ld}^{C}}
-                                     - \Gamma_{ld}^{\rightarrow C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{ld}^{C}}{\Delta t} =& \quad E_{Mz}^{\leftarrow C}
+                                           + \Gamma_{mp}^{\rightarrow C} 
+                                           + \Gamma_{Mz}^{\rightarrow C}
+                                           - g_{Mz}^{\leftarrow B_{ld}^{C}}
+                                           - \Gamma_{ld}^{\rightarrow C}
+\end{align}
+$$
 
 **Large detritus iron** (`f_bdetfe(i,j,k)`, $B_{ld}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{ld}^{Fe}}{\Delta t} = E_{Mz}^{\leftarrow Fe}
-                                      + \Gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C} 
-                                      + \Gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C}
-                                      - \left( g_{Mz}^{\rightarrow B_{ld}^{C}}
-                                             + \Gamma_{ld}^{\rightarrow C} \right) Q_{ld}^{Fe:C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{ld}^{Fe}}{\Delta t} =& \quad E_{Mz}^{\leftarrow Fe}
+                                            + \Gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C} 
+                                            + \Gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C}
+                                            - \bigg( g_{Mz}^{\rightarrow B_{ld}^{C}} + \Gamma_{ld}^{\rightarrow C} \bigg) Q_{ld}^{Fe:C}
+\end{align}
+$$
 
 **Large detritus silicon** (`f_bdetsi(i,j,k)`, $B_{ld}^{Si}$, [mol Si kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{ld}^{Si}}{\Delta t} = \left( \Gamma_{mp}^{\rightarrow C} 
-                                             + g_{Mz}^{\leftarrow B_{mp}^{C}} \right) Q_{mp}^{Si:C}  
-                                      - D_{B_{ld}^{Si}}^{\rightarrow Si}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{ld}^{Si}}{\Delta t} =& \quad \bigg( \Gamma_{mp}^{\rightarrow C} 
+                                                    + g_{Mz}^{\leftarrow B_{mp}^{C}} \bigg) Q_{mp}^{Si:C}  
+                                      - D_{B_{ld}^{Si}}^{\rightarrow Si} 
+\end{align}
+$$
 
 **Faculative NO<sub>3</sub>-reducing heterotrophic bacteria** (`f_bac1(i,j,k)`, $B_{b1}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b1}^{\leftarrow C} 
-                                     - g_{mz}^{\leftarrow B_{b1}^{C}}
-                                     - g_{Mz}^{\leftarrow B_{b1}^{C}}
-                                     - \gamma_{b1}^{\rightarrow C} 
-                                     - \Gamma_{b1}^{\rightarrow C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{b1}^{C}}{\Delta t} =& \quad \mu_{b1}^{\leftarrow C} 
+                                            - g_{mz}^{\leftarrow B_{b1}^{C}}
+                                            - g_{Mz}^{\leftarrow B_{b1}^{C}}
+                                            - \gamma_{b1}^{\rightarrow C} 
+                                            - \Gamma_{b1}^{\rightarrow C}
+\end{align}
+$$
 
 **Faculative N<sub>2</sub>O-reducing heterotrophic bacteria** (`f_bac2(i,j,k)`, $B_{b2}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{b1}^{C}}{\Delta t} = \mu_{b2}^{\leftarrow C} 
-                                     - g_{mz}^{\leftarrow B_{b2}^{C}}
-                                     - g_{Mz}^{\leftarrow B_{b2}^{C}}
-                                     - \gamma_{b2}^{\rightarrow C} 
-                                     - \Gamma_{b2}^{\rightarrow C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{b1}^{C}}{\Delta t} =& \quad \mu_{b2}^{\leftarrow C} 
+                                           - g_{mz}^{\leftarrow B_{b2}^{C}}
+                                           - g_{Mz}^{\leftarrow B_{b2}^{C}}
+                                           - \gamma_{b2}^{\rightarrow C} 
+                                           - \Gamma_{b2}^{\rightarrow C}
+\end{align}
+$$
 
 **Ammonia oxidizing archaea** (`f_aoa(i,j,k)`, $B_{aoa}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{aoa}^{C}}{\Delta t} = \mu_{aoa}^{\leftarrow C} 
-                                      - g_{mz}^{\leftarrow B_{aoa}^{C}}
-                                      - g_{Mz}^{\leftarrow B_{aoa}^{C}}
-                                      - \gamma_{aoa}^{\rightarrow C} 
-                                      - \Gamma_{aoa}^{\rightarrow C}$ 
-
+$$
+\begin{align}
+\dfrac{\Delta B_{aoa}^{C}}{\Delta t} =& \quad \mu_{aoa}^{\leftarrow C} 
+                                            - g_{mz}^{\leftarrow B_{aoa}^{C}}
+                                            - g_{Mz}^{\leftarrow B_{aoa}^{C}}
+                                            - \gamma_{aoa}^{\rightarrow C} 
+                                            - \Gamma_{aoa}^{\rightarrow C}
+\end{align}
+$$
 
 **Dissolved organic carbon** (`f_doc(i,j,k)`, $B_{DOM}^{C}$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{DOM}^{C}}{\Delta t} = \mu_{np}^{\rightarrow DOC} 
-                                      + \mu_{mp}^{\rightarrow DOC}
-                                      + \Gamma_{sd}^{\rightarrow C}
-                                      + \Gamma_{ld}^{\rightarrow C}
-                                      + \gamma_{np}^{\rightarrow C}
-                                      + \gamma_{mp}^{\rightarrow C}
-                                      + \Gamma_{b1}^{\rightarrow C}
-                                      + \gamma_{b1}^{\rightarrow C}
-                                      + \Gamma_{b2}^{\rightarrow C}
-                                      + \gamma_{b2}^{\rightarrow C}
-                                      + \Gamma_{aoa}^{\rightarrow C}
-                                      + \gamma_{aoa}^{\rightarrow C}
-                                      + X_{mz}^{\leftarrow C} f_{mz}^{X \rightarrow DOM} 
-                                      + X_{Mz}^{\leftarrow C} f_{Mz}^{X \rightarrow DOM} 
-                                      - \mu_{b1}^{\leftarrow B_{DOM}^{C}} 
-                                      - \mu_{b2}^{\leftarrow B_{DOM}^{C}}$ 
+$$
+\begin{align}
+\dfrac{\Delta B_{DOM}^{C}}{\Delta t} =& \quad \mu_{np}^{\rightarrow DOC} 
+                                            + \mu_{mp}^{\rightarrow DOC}
+                                            + \Gamma_{sd}^{\rightarrow C}
+                                            + \Gamma_{ld}^{\rightarrow C} \\
+                                      &     + \gamma_{np}^{\rightarrow C}
+                                            + \gamma_{mp}^{\rightarrow C}
+                                            + \Gamma_{b1}^{\rightarrow C}
+                                            + \gamma_{b1}^{\rightarrow C} \\
+                                      &     + \Gamma_{b2}^{\rightarrow C}
+                                            + \gamma_{b2}^{\rightarrow C}
+                                            + \Gamma_{aoa}^{\rightarrow C}
+                                            + \gamma_{aoa}^{\rightarrow C} \\
+                                      &     + X_{mz}^{\leftarrow C} f_{mz}^{X \rightarrow DOM} 
+                                            + X_{Mz}^{\leftarrow C} f_{Mz}^{X \rightarrow DOM} \\
+                                      &     - \mu_{b1}^{\leftarrow B_{DOM}^{C}} 
+                                            - \mu_{b2}^{\leftarrow B_{DOM}^{C}}
+\end{align}
+$$
 
 
 **Dissolved organic nitrogen** (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>])
 
-$\dfrac{\Delta B_{DOM}^{N}}{\Delta t} = \left( \Gamma_{b1}^{\rightarrow C} + \gamma_{b1}^{\rightarrow C}
-                                             + \Gamma_{b2}^{\rightarrow C} + \gamma_{b2}^{\rightarrow C}
-                                             + \Gamma_{aoa}^{\rightarrow C} + \gamma_{aoa}^{\rightarrow C}
-                                             + X_{mz}^{\leftarrow B_{b1}^{C}}
-                                             + X_{mz}^{\leftarrow B_{b2}^{C}}
-                                             + X_{mz}^{\leftarrow B_{aoa}^{C}}
-                                             + X_{Mz}^{\leftarrow B_{b1}^{C}}
-                                             + X_{Mz}^{\leftarrow B_{b2}^{C}}
-                                             + X_{Mz}^{\leftarrow B_{aoa}^{C}} \right) \cdot \dfrac{1}{5}
-                                      + \left( \Gamma_{sd}^{\rightarrow C} 
-                                             + \Gamma_{ld}^{\rightarrow C}
-                                             + \gamma_{np}^{\rightarrow C}
-                                             + \gamma_{mp}^{\rightarrow C}
-                                             + \left( X_{mz}^{\leftarrow B_{np}^{C}}
-                                                    + X_{mz}^{\leftarrow B_{mp}^{C}}
-                                                    + X_{mz}^{\leftarrow B_{sd}^{C}} \right) f_{mz}^{X \rightarrow DOM}
-                                             + \left( X_{Mz}^{\leftarrow B_{np}^{C}}
-                                                    + X_{Mz}^{\leftarrow B_{mp}^{C}}
-                                                    + X_{Mz}^{\leftarrow B_{sd}^{C}}
-                                                    + X_{Mz}^{\leftarrow B_{ld}^{C}}
-                                                    + X_{Mz}^{\leftarrow B_{mz}^{C}} \right) f_{Mz}^{X \rightarrow DOM} \right) \cdot \dfrac{16}{122}
-                                      - \mu_{b1}^{\leftarrow B_{DOM}^{N}} 
-                                      - \mu_{b2}^{\leftarrow B_{DOM}^{N}}$ 
+$$
+\begin{align}
+\dfrac{\Delta B_{DOM}^{N}}{\Delta t} =& \quad \bigg( \Gamma_{b1}^{\rightarrow C} + \gamma_{b1}^{\rightarrow C}
+                                                   + \Gamma_{b2}^{\rightarrow C} + \gamma_{b2}^{\rightarrow C}
+                                                   + \Gamma_{aoa}^{\rightarrow C} + \gamma_{aoa}^{\rightarrow C} \\
+                                      &            + X_{mz}^{\leftarrow B_{b1}^{C}} + X_{mz}^{\leftarrow B_{b2}^{C}}
+                                                   + X_{mz}^{\leftarrow B_{aoa}^{C}} + X_{Mz}^{\leftarrow B_{b1}^{C}}
+                                                   + X_{Mz}^{\leftarrow B_{b2}^{C}} + X_{Mz}^{\leftarrow B_{aoa}^{C}} \bigg) \cdot \dfrac{1}{5} \\
+                                      & \quad + \Bigg( \Gamma_{sd}^{\rightarrow C} + \Gamma_{ld}^{\rightarrow C}
+                                                     + \gamma_{np}^{\rightarrow C} + \gamma_{mp}^{\rightarrow C} \\
+                                      &  \qquad + \bigg( X_{mz}^{\leftarrow B_{np}^{C}} + X_{mz}^{\leftarrow B_{mp}^{C}}
+                                                       + X_{mz}^{\leftarrow B_{sd}^{C}} \bigg) f_{mz}^{X \rightarrow DOM} \\
+                                      &  \qquad + \bigg( X_{Mz}^{\leftarrow B_{np}^{C}} + X_{Mz}^{\leftarrow B_{mp}^{C}}
+                                                       + X_{Mz}^{\leftarrow B_{sd}^{C}} + X_{Mz}^{\leftarrow B_{ld}^{C}}
+                                                    + X_{Mz}^{\leftarrow B_{mz}^{C}} \bigg) f_{Mz}^{X \rightarrow DOM} \Bigg) \cdot \dfrac{16}{122} \\
+                                      & - \mu_{b1}^{\leftarrow B_{DOM}^{N}} - \mu_{b2}^{\leftarrow B_{DOM}^{N}} 
+\end{align}
+$$
 
 
 **Nominal oxidation state of dissolved organiccarbon** (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless])
 
-$\dfrac{\Delta DOM^{NOSC}}{\Delta t} = \Delta DOM_{overflow}^{NOSC}
-                                     + \Delta DOM_{excretion}^{NOSC}
-                                     + \Delta DOM_{photolyse}^{NOSC}
-                                     + \Delta DOM_{bacterlyse}^{NOSC}
-                                     + \Delta DOM_{dethydro}^{NOSC}
-                                     + \Delta DOM_{DOCconsume}^{NOSC}$
+$$
+\begin{align}
+\dfrac{\Delta DOM^{NOSC}}{\Delta t} =& \quad \Delta DOM_{overflow}^{NOSC}
+                                           + \Delta DOM_{excretion}^{NOSC}
+                                           + \Delta DOM_{photolyse}^{NOSC} \\
+                                     &     + \Delta DOM_{bacterlyse}^{NOSC}
+                                           + \Delta DOM_{dethydro}^{NOSC}
+                                           + \Delta DOM_{DOCconsume}^{NOSC}
+\end{align}
+$$
 
 
 **Calcium Carbonate** (`f_caco3(i,j,k)`, $CaCO_3$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta CaCO_3}{\Delta t} = P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
-                                 + P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
-                                 + P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
-                                 + P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
-                                 + P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}}
-                                 - D_{CaCO_3}^{\Omega_{cal}}
-                                 - D_{CaCO_3}^{\Omega_{ara}}
-                                 - D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
-                                 - D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
-                                 - D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}$
-
+$$
+\begin{align}
+\dfrac{\Delta CaCO_3}{\Delta t} =& \quad P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}} 
+                                       + P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
+                                       + P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
+                                       + P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
+                                       + P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}} \\
+                                 &     - D_{CaCO_3}^{\Omega_{cal}}
+                                       - D_{CaCO_3}^{\Omega_{ara}}
+                                       - D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
+                                       - D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
+                                       - D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}
+\end{align}
+$$
 
 **Dissolved Inorganic Carbon** (`f_dic(i,j,k)`, $DIC$, [mol C kg<sup>-1</sup>])
 
-$\dfrac{\Delta DIC}{\Delta t} = X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
-                              + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right)
-                              + \gamma_{mz}^{\rightarrow C}
-                              + \gamma_{Mz}^{\rightarrow C}
-                              + \mu_{b1}^{\rightarrow DIC}
-                              + \mu_{b2}^{\rightarrow DIC}
-                              + D_{CaCO_3}^{\Omega_{cal}}
-                              + D_{CaCO_3}^{\Omega_{ara}}
-                              + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
-                              + D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
-                              + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}
-                              - \mu_{np}^{\leftarrow C}
-                              - \mu_{mp}^{\leftarrow C}
-                              - \mu_{aoa}^{\leftarrow C}
-                              - \mu_{np}^{\rightarrow DOC}
-                              - \mu_{mp}^{\rightarrow DOC}
-                              - P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
-                              - P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
-                              - P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
-                              - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
-                              - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}}$
+$$
+\begin{align}
+\dfrac{\Delta DIC}{\Delta t} =& \quad X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
+                                    + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
+                              &     + \gamma_{mz}^{\rightarrow C}
+                                    + \gamma_{Mz}^{\rightarrow C}
+                                    + \mu_{b1}^{\rightarrow DIC}
+                                    + \mu_{b2}^{\rightarrow DIC} \\
+                              &     + D_{CaCO_3}^{\Omega_{cal}}
+                                    + D_{CaCO_3}^{\Omega_{ara}}
+                                    + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
+                                    + D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
+                                    + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}} \\
+                              &     - \mu_{np}^{\leftarrow C}
+                                    - \mu_{mp}^{\leftarrow C}
+                                    - \mu_{aoa}^{\leftarrow C}
+                                    - \mu_{np}^{\rightarrow DOC}
+                                    - \mu_{mp}^{\rightarrow DOC} \\
+                              &     - P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
+                                    - P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
+                                    - P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
+                                    - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
+                                    - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}}
+\end{align}
+$$
 
 
 **Alkalinity** (`f_alk(i,j,k)`, $Alk$, [mol Eq kg<sup>-1</sup>])
 
-$\dfrac{\Delta Alk}{\Delta t} = \left( \mu_{np}^{\leftarrow C} \cdot \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} 
-                                     + \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} 
-                                     - \mu_{np}^{\leftarrow C} \cdot \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
-                                     - \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} 
-                                     + \gamma_{mz}^{\rightarrow C} 
-                                     + \gamma_{Mz}^{\rightarrow C} \right) \cdot \dfrac{16}{122}
-                              + \left( X_{mz}^{\leftarrow B_{np}^{N}}
-                                     + X_{mz}^{\leftarrow B_{mp}^{N}}
-                                     + X_{mz}^{\leftarrow B_{sd}^{N}}
-                                     + X_{mz}^{\leftarrow B_{b1}^{N}}
-                                     + X_{mz}^{\leftarrow B_{b2}^{N}}
-                                     + X_{mz}^{\leftarrow B_{aoa}^{N}} \right) \left(1 - f_{mz}^{X \rightarrow DOM} \right)
-                              + \left( X_{Mz}^{\leftarrow B_{np}^{N}}
-                                     + X_{Mz}^{\leftarrow B_{mp}^{N}}
-                                     + X_{Mz}^{\leftarrow B_{sd}^{N}}
-                                     + X_{Mz}^{\leftarrow B_{ld}^{N}}
-                                     + X_{Mz}^{\leftarrow B_{mz}^{N}}
-                                     + X_{Mz}^{\leftarrow B_{b1}^{N}}
-                                     + X_{Mz}^{\leftarrow B_{b2}^{N}}
-                                     + X_{Mz}^{\leftarrow B_{aoa}^{N}} \right) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right)
-                              + \mu_{b1}^{\rightarrow NH_4} 
-                              + \mu_{b2}^{\rightarrow NH_4}
-                              + \mu_{b1}^{\leftarrow NO_{3}}
-                              - \mu_{aoa}^{\leftarrow NH_{4}}
-                              - \mu_{aoa}^{\rightarrow NO_{3}}
-                              - \mu_{aox}^{NH_4 \rightarrow N_2}
-                              + \left( D_{CaCO_3}^{\Omega_{cal}}
-                                     + D_{CaCO_3}^{\Omega_{ara}}
-                                     + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
-                                     + D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
-                                     + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}}
-                                     - P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
-                                     - P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
-                                     - P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
-                                     - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
-                                     - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}} \right) \cdot 2$
+$$
+\begin{align}
+\dfrac{\Delta Alk}{\Delta t} =& \quad \bigg( \mu_{np}^{\leftarrow C} \cdot \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} 
+                                           + \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} 
+                                           - \mu_{np}^{\leftarrow C} \cdot \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} \\
+                              &            - \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} 
+                                           + \gamma_{mz}^{\rightarrow C} 
+                                           + \gamma_{Mz}^{\rightarrow C} \bigg) \cdot \dfrac{16}{122} \\
+                              &     + \bigg( X_{mz}^{\leftarrow B_{np}^{N}}
+                                           + X_{mz}^{\leftarrow B_{mp}^{N}}
+                                           + X_{mz}^{\leftarrow B_{sd}^{N}} \\
+                              &            + X_{mz}^{\leftarrow B_{b1}^{N}}
+                                           + X_{mz}^{\leftarrow B_{b2}^{N}}
+                                           + X_{mz}^{\leftarrow B_{aoa}^{N}} \bigg) \left(1 - f_{mz}^{X \rightarrow DOM} \right) \\
+                              &     + \bigg( X_{Mz}^{\leftarrow B_{np}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{mp}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{sd}^{N}} \\
+                              &            + X_{Mz}^{\leftarrow B_{ld}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{mz}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{b1}^{N}} \\
+                              &            + X_{Mz}^{\leftarrow B_{b2}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{aoa}^{N}} \bigg) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
+                              &            + \mu_{b1}^{\rightarrow NH_4} 
+                                           + \mu_{b2}^{\rightarrow NH_4}
+                                           + \mu_{b1}^{\leftarrow NO_{3}}
+                                           - \mu_{aoa}^{\leftarrow NH_{4}}
+                                           - \mu_{aoa}^{\rightarrow NO_{3}}
+                                           - \mu_{aox}^{NH_4 \rightarrow N_2} \\
+                              &            + \bigg( D_{CaCO_3}^{\Omega_{cal}}
+                                           + D_{CaCO_3}^{\Omega_{ara}}
+                                           + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
+                                           + D_{CaCO_3}^{g_{mz}^{\leftarrow B_{sd}^{C}}}
+                                           + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}} \\
+                              &            - P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
+                                           - P_{CaCO_3}^{\Gamma_{mz}^{\rightarrow C}}
+                                           - P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}}
+                                           - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}}
+                                           - P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}} \bigg) \cdot 2
+\end{align}
+$$
 
 
 ---
