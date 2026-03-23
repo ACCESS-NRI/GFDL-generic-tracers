@@ -1629,8 +1629,7 @@ _where_ <br>
 
 $$
 \begin{aligned}
-\dfrac{\Delta NO_3}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow NO_3}
-                               &  - \mu_{b1}^{\leftarrow NO_3} \\
+\dfrac{\Delta NO_3}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow NO_3} - \mu_{b1}^{\leftarrow NO_3} \\
                                &  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
 \end{aligned}
 $$
@@ -1640,27 +1639,27 @@ $$
 $$
 \begin{align}
 \dfrac{\Delta NH_4}{\Delta t} =& \quad \bigg( X_{mz}^{\leftarrow B_{np}^{N}} 
-                               &        + X_{mz}^{\leftarrow B_{mp}^{N}} 
-                               &        + X_{mz}^{\leftarrow B_{sd}^{N}} \\
+                                        + X_{mz}^{\leftarrow B_{mp}^{N}} 
+                                        + X_{mz}^{\leftarrow B_{sd}^{N}} \\
                                &        + X_{mz}^{\leftarrow B_{b1}^{N}} 
-                               &        + X_{mz}^{\leftarrow B_{b2}^{N}} 
-                               &        + X_{mz}^{\leftarrow B_{aoa}^{N}} \bigg) \left(1 - f_{mz}^{X \rightarrow DOM} \right) \\
+                                        + X_{mz}^{\leftarrow B_{b2}^{N}} 
+                                        + X_{mz}^{\leftarrow B_{aoa}^{N}} \bigg) \left(1 - f_{mz}^{X \rightarrow DOM} \right) \\
                                & + \bigg( X_{Mz}^{\leftarrow B_{np}^{N}} 
-                               &        + X_{Mz}^{\leftarrow B_{mp}^{N}} 
-                               &        + X_{Mz}^{\leftarrow B_{sd}^{N}} \\
+                                        + X_{Mz}^{\leftarrow B_{mp}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{sd}^{N}} \\
                                &        + X_{Mz}^{\leftarrow B_{ld}^{N}} 
-                               &        + X_{Mz}^{\leftarrow B_{mz}^{N}} 
-                               &        + X_{Mz}^{\leftarrow B_{b1}^{N}} \\
+                                        + X_{Mz}^{\leftarrow B_{mz}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{b1}^{N}} \\
                                &        + X_{Mz}^{\leftarrow B_{b2}^{N}} 
-                               &        + X_{Mz}^{\leftarrow B_{aoa}^{N}} \bigg) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
+                                        + X_{Mz}^{\leftarrow B_{aoa}^{N}} \bigg) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
                                & + \bigg( \gamma_{mz}^{\rightarrow C}  
-                               &        + \gamma_{Mz}^{\rightarrow C} \bigg) \cdot \dfrac{16}{122} \\
+                                        + \gamma_{Mz}^{\rightarrow C} \bigg) \cdot \dfrac{16}{122} \\
                                & + \mu_{diazo}^{\rightarrow NH_4} 
-                               & + \mu_{b1}^{\rightarrow NH_4} 
-                               & + \mu_{b2}^{\rightarrow NH_4} \\
+                                + \mu_{b1}^{\rightarrow NH_4} 
+                                 + \mu_{b2}^{\rightarrow NH_4} \\
                                & - \mu_{aox}^{NH_4 \rightarrow N_2} 
-                               & - \mu_{aoa}^{\leftarrow NH_4} 
-                               & - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}}  \\
+                                 - \mu_{aoa}^{\leftarrow NH_4} 
+                                 - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}}  \\
                                &        + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \bigg) \cdot \dfrac{16}{122}
 \end{align}
 $$
@@ -1670,8 +1669,7 @@ $$
 $$
 \begin{align}
 \dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =&\quad \left( \gamma_{mp}^{\rightarrow C} + g_{mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C} \\
-                                       & + D_{B_{ld}^{Si}}^{\rightarrow Si}
-                                       & - \mu_{mp}^{\leftarrow Si}
+                                       & + D_{B_{ld}^{Si}}^{\rightarrow Si} - \mu_{mp}^{\leftarrow Si}
 \end{align}
 $$
 
@@ -1679,9 +1677,7 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta N_{2}O}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow N_{2}O}
-                                 & + \mu_{b1}^{\rightarrow N_{2}O}
-                                 & - \mu_{b2}^{\leftarrow N_{2}O}
+\dfrac{\Delta N_{2}O}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow N_{2}O} + \mu_{b1}^{\rightarrow N_{2}O} - \mu_{b2}^{\leftarrow N_{2}O}
 \end{align}
 $$
 
@@ -1689,18 +1685,17 @@ $$
 $$
 \begin{align}
 \dfrac{\Delta O_2}{\Delta t} =& \quad \bigg( X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
-                              &             + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
+                                            + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
                               &             + \gamma_{mz}^{\rightarrow C}
-                              &             + \gamma_{Mz}^{\rightarrow C} \\
+                                            + \gamma_{Mz}^{\rightarrow C} \\
                               &             - \mu_{np}^{\leftarrow C}
-                              &             - \mu_{mp}^{\leftarrow C} \bigg) \dfrac{-132}{122} \\
+                                            - \mu_{mp}^{\leftarrow C} \bigg) \dfrac{-132}{122} \\
                               & - \mu_{b1}^{\leftarrow O_2}
-                              & - \mu_{b2}^{\leftarrow O_2}
-                              & - \mu_{aoa}^{\leftarrow O_2}
+                                - \mu_{b2}^{\leftarrow O_2}
+                                - \mu_{aoa}^{\leftarrow O_2}
 \end{align}
 $$
  
-
 **Dissolved iron** (`f_fe(i,j,k)`, $dFe$, [mol Fe kg<sup>-1</sup>])
 
 $\dfrac{\Delta dFe}{\Delta t} = \Gamma_{sd}^{\rightarrow C} Q_{sd}^{Fe:C} 
