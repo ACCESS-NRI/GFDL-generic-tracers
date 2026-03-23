@@ -1699,29 +1699,32 @@ $$
  
 **Dissolved iron** (`f_fe(i,j,k)`, $dFe$, [mol Fe kg<sup>-1</sup>])
 
-$\dfrac{\Delta dFe}{\Delta t} = \Gamma_{sd}^{\rightarrow C} Q_{sd}^{Fe:C} 
-                              + \Gamma_{ld}^{\rightarrow C} Q_{ld}^{Fe:C} 
-                              + \gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
-                              + \gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C}
-                              + \gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C} 
-                              + \gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C}
-                              + \dfrac{\gamma_{b1}^{\rightarrow C} + \Gamma_{b1}^{\rightarrow C}}{R_{b1}^{C:Fe}}
-                              + \dfrac{\gamma_{b2}^{\rightarrow C} + \Gamma_{b2}^{\rightarrow C}}{R_{b2}^{C:Fe}}
-                              + \dfrac{\gamma_{aoa}^{\rightarrow C} + \Gamma_{aoa}^{\rightarrow C}}{R_{aoa}^{C:Fe}}
-                              + X_{mz}^{\leftarrow Fe} 
-                              + X_{Mz}^{\leftarrow Fe}
-                              + D_{Fe_{sA}}^{\rightarrow dFe} 
-                              + D_{Fe_{lA}}^{\rightarrow dFe}
-                              - \mu_{np}^{\leftarrow dFe} 
-                              - \mu_{mp}^{\leftarrow dFe}
-                              - \mu_{b1}^{\leftarrow dFe}
-                              - \mu_{b2}^{\leftarrow dFe}
-                              - \mu_{aoa}^{\leftarrow dFe}
-                              - Sc_{dFe}^{\rightarrow Fe_{sA}} 
-                              - Sc_{dFe}^{\rightarrow Fe_{lA}}
-                              - Co_{dFe}^{\rightarrow Fe_{sA}} 
-                              - Co_{dFe}^{\rightarrow Fe_{lA}}$
-
+$$
+\begin{align}
+\dfrac{\Delta dFe}{\Delta t} =& \quad \Gamma_{sd}^{\rightarrow C} Q_{sd}^{Fe:C} 
+                                    + \Gamma_{ld}^{\rightarrow C} Q_{ld}^{Fe:C} \\
+                              &     + \gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
+                                    + \gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C} \\
+                              &     + \gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C} 
+                                    + \gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C} \\
+                              &     + \dfrac{\gamma_{b1}^{\rightarrow C} + \Gamma_{b1}^{\rightarrow C}}{R_{b1}^{C:Fe}}
+                                    + \dfrac{\gamma_{b2}^{\rightarrow C} + \Gamma_{b2}^{\rightarrow C}}{R_{b2}^{C:Fe}}
+                                    + \dfrac{\gamma_{aoa}^{\rightarrow C} + \Gamma_{aoa}^{\rightarrow C}}{R_{aoa}^{C:Fe}} \\
+                              &     + X_{mz}^{\leftarrow Fe} 
+                                    + X_{Mz}^{\leftarrow Fe} \\
+                              &     + D_{Fe_{sA}}^{\rightarrow dFe} 
+                                    + D_{Fe_{lA}}^{\rightarrow dFe} \\
+                              &     - \mu_{np}^{\leftarrow dFe} 
+                                    - \mu_{mp}^{\leftarrow dFe}
+                                    - \mu_{b1}^{\leftarrow dFe}
+                                    - \mu_{b2}^{\leftarrow dFe}
+                                    - \mu_{aoa}^{\leftarrow dFe} \\
+                              &     - Sc_{dFe}^{\rightarrow Fe_{sA}} 
+                                    - Sc_{dFe}^{\rightarrow Fe_{lA}}
+                                    - Co_{dFe}^{\rightarrow Fe_{sA}} 
+                                    - Co_{dFe}^{\rightarrow Fe_{lA}}
+\end{align}
+$$
 
 **Small authigenic iron** (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>])
 
