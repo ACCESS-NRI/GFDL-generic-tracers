@@ -1628,10 +1628,9 @@ _where_ <br>
 **Nitrate** (`f_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
 \begin{aligned}
-\dfrac{\Delta NO_3}{\Delta t} &= \mu_{aoa}^{\rightarrow NO_3} \\
-&\qquad  - \mu_{b1}^{\leftarrow NO_3} \\
-&\qquad  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
-&\qquad  + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+\dfrac{\Delta NO_3}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow NO_3} \\
+                               &  - \mu_{b1}^{\leftarrow NO_3} \\
+                               &  - ( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}}) \cdot \dfrac{16}{122}
 \end{aligned}
 
 
@@ -1664,8 +1663,7 @@ $\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{\leftarrow B_{np}^{N}}
 **Silicic acid** (`f_sil(i,j,k)`, $H_{4}SiO_{4}$, [mol Si kg<sup>-1</sup>])
 
 \begin{align}
-\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =& ( \gamma_{mp}^{\rightarrow C} \\
-                                       & + g_{mz}^{\leftarrow B_{mp}^{C}} ) \cdot Q_{mp}^{Si:C} \\
+\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =&\quad ( \gamma_{mp}^{\rightarrow C} + g_{mz}^{\leftarrow B_{mp}^{C}} ) \cdot Q_{mp}^{Si:C} \\
                                        & + D_{B_{ld}^{Si}}^{\rightarrow Si} \\
                                        & - \mu_{mp}^{\leftarrow Si}
 \end{align}
@@ -1673,7 +1671,7 @@ $\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{\leftarrow B_{np}^{N}}
 **Nitrous oxide** (`f_n2o(i,j,k)`, N<sub>2</sub>O, [mol N<sub>2</sub>O kg<sup>-1</sup>])
 
 \begin{align}
-\dfrac{\Delta N_{2}O}{\Delta t} =& \mu_{aoa}^{\rightarrow N_{2}O} \\
+\dfrac{\Delta N_{2}O}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow N_{2}O} \\
                                  & + \mu_{b1}^{\rightarrow N_{2}O} \\
                                  & - \mu_{b2}^{\leftarrow N_{2}O}
 \end{align}
