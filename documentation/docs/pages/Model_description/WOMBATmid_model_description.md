@@ -1664,8 +1664,8 @@ $\dfrac{\Delta NH_4}{\Delta t} = \left( X_{mz}^{\leftarrow B_{np}^{N}}
 **Silicic acid** (`f_sil(i,j,k)`, $H_{4}SiO_{4}$, [mol Si kg<sup>-1</sup>])
 
 \begin{align}
-\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =& \left( \gamma_{mp}^{\rightarrow C} \\
-                                       &      + g_{mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C} \\
+\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =& ( \gamma_{mp}^{\rightarrow C} \\
+                                       & + g_{mz}^{\leftarrow B_{mp}^{C}} ) \cdot Q_{mp}^{Si:C} \\
                                        & + D_{B_{ld}^{Si}}^{\rightarrow Si} \\
                                        & - \mu_{mp}^{\leftarrow Si}
 \end{align}
