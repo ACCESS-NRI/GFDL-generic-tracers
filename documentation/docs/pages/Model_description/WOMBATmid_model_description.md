@@ -1641,16 +1641,16 @@ $$
 \dfrac{\Delta NH_4}{\Delta t} =& \quad \bigg( X_{mz}^{\leftarrow B_{np}^{N}} 
                                         + X_{mz}^{\leftarrow B_{mp}^{N}} 
                                         + X_{mz}^{\leftarrow B_{sd}^{N}} \\
-                               &        + X_{mz}^{\leftarrow B_{b1}^{N}} 
+                               & \qquad + X_{mz}^{\leftarrow B_{b1}^{N}} 
                                         + X_{mz}^{\leftarrow B_{b2}^{N}} 
                                         + X_{mz}^{\leftarrow B_{aoa}^{N}} \bigg) \left(1 - f_{mz}^{X \rightarrow DOM} \right) \\
                                & + \bigg( X_{Mz}^{\leftarrow B_{np}^{N}} 
                                         + X_{Mz}^{\leftarrow B_{mp}^{N}} 
                                         + X_{Mz}^{\leftarrow B_{sd}^{N}} \\
-                               &        + X_{Mz}^{\leftarrow B_{ld}^{N}} 
+                               & \qquad + X_{Mz}^{\leftarrow B_{ld}^{N}} 
                                         + X_{Mz}^{\leftarrow B_{mz}^{N}} 
                                         + X_{Mz}^{\leftarrow B_{b1}^{N}} \\
-                               &        + X_{Mz}^{\leftarrow B_{b2}^{N}} 
+                               & \qquad + X_{Mz}^{\leftarrow B_{b2}^{N}} 
                                         + X_{Mz}^{\leftarrow B_{aoa}^{N}} \bigg) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
                                & + \bigg( \gamma_{mz}^{\rightarrow C}  
                                         + \gamma_{Mz}^{\rightarrow C} \bigg) \cdot \dfrac{16}{122} \\
@@ -1658,9 +1658,9 @@ $$
                                 + \mu_{b1}^{\rightarrow NH_4} 
                                  + \mu_{b2}^{\rightarrow NH_4} \\
                                & - \mu_{aox}^{NH_4 \rightarrow N_2} 
-                                 - \mu_{aoa}^{\leftarrow NH_4} 
-                                 - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}}  \\
-                               &        + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \bigg) \cdot \dfrac{16}{122}
+                                 - \mu_{aoa}^{\leftarrow NH_4} \\
+                               & - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
+                                        + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \bigg) \cdot \dfrac{16}{122}
 \end{align}
 $$
 
@@ -1682,6 +1682,7 @@ $$
 $$
 
 **Oxygen** (`f_o2(i,j,k)`, O<sub>2</sub>, [mol O<sub>2</sub> kg<sup>-1</sup>])
+
 $$
 \begin{align}
 \dfrac{\Delta O_2}{\Delta t} =& \quad \bigg( X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
