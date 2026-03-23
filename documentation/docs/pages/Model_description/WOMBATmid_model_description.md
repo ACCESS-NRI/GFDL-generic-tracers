@@ -1470,9 +1470,11 @@ We consider two forms of chemoautotrophy carried out by two distinct forms of mi
 
 Growth of ammonia oxidizing archaea (`aoagrow(i,j,k)`, $\mu_{aoa}^{C}$, [mol C kg<sup>-1</sup>]) is defined similarly to other microbes:
 
+$$
 \begin{align}
-\mu_{aoa}^{C} &= \mu_{aoa} B_{aoa}^{C}
+\mu_{aoa}^{C} =& \quad \mu_{aoa} B_{aoa}^{C}
 \end{align}
+$$
 
 _where_ <br>
 - $\mu_{aoa}$ is the realized growth rate of ammonia oxidizing archaea (`aoa_mu(i,j,k)`, [s<sup>-1</sup>]) <br>
@@ -1480,11 +1482,13 @@ _where_ <br>
 
 The realized growth rate, $\mu_{aoa}$, is the minimum growth achievable on oxygen and ammonium:
 
+$$
 \begin{align}
-\mu_{aoa} &= \min\left(\mu_{aoa}^{NH_4}, \mu_{aoa}^{O_2}\right) \\
-\mu_{aoa}^{NH_4} &= \mu_{aoa}^{max} \dfrac{NH_4}{NH_4 + K_{aoa}^{NH_4}} \\
-\mu_{aoa}^{O_2} &= \dfrac{\rho_{aoa}^{O_2} O_2}{y_{aoa}^{O_2}}
+\mu_{aoa} =& \quad \min\left(\mu_{aoa}^{NH_4}, \mu_{aoa}^{O_2}\right) \\
+\mu_{aoa}^{NH_4} =& \quad \mu_{aoa}^{max} \dfrac{NH_4}{NH_4 + K_{aoa}^{NH_4}} \\
+\mu_{aoa}^{O_2} =& \quad \dfrac{\rho_{aoa}^{O_2} O_2}{y_{aoa}^{O_2}}
 \end{align}
+$$
 
 _where_ <br>
 - $\mu_{aoa}^{max}$ is a temperature-dependent maximum growh rate of ammonia oxidizing archaea (`aoa_mumax(i,j,k)`, [s<sup>-1</sup>]) <br>
@@ -1496,19 +1500,23 @@ _where_ <br>
 
 The temperature-dependent maximum growth rate of ammonia oxidizing archaea is informed by the cultures of [Qin et al. (2015)](https://doi.org/10.1073/pnas.1501568112):
 
+$$
 \begin{align}
-\mu_{aoa}^{max} &= \dfrac{\max\left(0.2, 0.029 \cdot T - 0.147 \right)}{86400}
+\mu_{aoa}^{max} =& \quad \dfrac{\max\left(0.2, 0.029 \cdot T - 0.147 \right)}{86400}
 \end{align}
+$$
 
 _where_ <br>
 - $T$ is the in situ temperature of seawater (`Temp(i,j,k)`, [ºC]) <br>
 
 In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-mid we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-mid we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> (`aoaresp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
 
+$$
 \begin{align}
-\mu_{aoa}^{\leftarrow NH_4} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}} \\
-\mu_{aoa}^{\leftarrow O_2} &= \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}
+\mu_{aoa}^{\leftarrow NH_4} =& \quad \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}} \\
+\mu_{aoa}^{\leftarrow O_2} =& \quad \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}
 \end{align}
+$$
 
 _where_ <br>
 - $y_aoa^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on NH<sub>4</sub> (`aoa_ynh4`, [mol C biomass (mol NH<sub>4</sub>)<sup>-1</sup>]) <br>
@@ -1516,10 +1524,12 @@ _where_ <br>
 
 Ammonia ozidizing archaea produce both NO<sub>3</sub> and a small amount of N<sub>2</sub>O as they oxidize NH<sub>4</sub>. The production of N<sub>2</sub>O is informed by numerous studies that show a relationship between the rate of ammonia oxidation, the ambient oxygen concentration and the production of N<sub>2</sub>O ([Goreau et al., 1980](https://doi.org/10.1128/aem.40.3.526-532.1980); [Santoro et al., 2011](https://www.science.org/doi/full/10.1126/science.1208239); [Qin et al., 2017](https://doi.org/10.1111/1758-2229.12525); [Ji et al., 2018](https://doi.org/10.1029/2018GB005887); [Frey et al., 2023](https://doi.org/10.1002/lno.12283)). We compute these production terms as:
 
+$$
 \begin{align}
-\mu_{aoa}^{\rightarrow NO_3} &= \mu_{aoa}^{\leftarrow NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O} \\
-\mu_{aoa}^{\rightarrow N_{2}O} &= \mu_{aoa}^{C} p_{aoa}^{N_{2}O}
+\mu_{aoa}^{\rightarrow NO_3} =& \quad \mu_{aoa}^{\leftarrow NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O} \\
+\mu_{aoa}^{\rightarrow N_{2}O} =& \quad \mu_{aoa}^{C} p_{aoa}^{N_{2}O}
 \end{align}
+$$
 
 _where_ <br>
 - $R_{aoa}^{C:N}$ is the ratio of carbon to nitrogen within the biomass of ammonia oxidizing archaea (`aoa_C2N`, [mol C (mol N)<sup>-1</sup>]) <br>
@@ -1527,15 +1537,19 @@ _where_ <br>
 
 Determining $p_{aoa}^{N_{2}O}$ is key to determining the fraction of NH<sub>4</sub> that is routed to N<sub>2</sub>O during ammonia oxidation. For this we use the oxygen-dependent relationship identified by [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) who found a maximum of 3% per mol of $NO_2$ produced:
 
+$$
 \begin{align}
-p_{aoa}^{\%N_{2}O} &= \min\left(0.03, \dfrac{0.002}{O_2} + p_{aoa}^{min(N_{2}O)} \right)
+p_{aoa}^{\%N_{2}O} =& \quad \min\left(0.03, \dfrac{0.002}{O_2} + p_{aoa}^{min(N_{2}O)} \right)
 \end{align}
+$$
 
 Because [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) give the production yield of N<sub>2</sub>O in terms of % per mol $NO_2$ produced, we convert this through to units of [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>] via:
 
+$$
 \begin{align}
-p_{aoa}^{N_{2}O} &= \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - \dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}
+p_{aoa}^{N_{2}O} =& \quad \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - \dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}
 \end{align}
+$$
 
 since
 
@@ -1548,9 +1562,11 @@ $d = \dfrac{\left(a - c\right) \cdot Y}{2 \cdot Y + 1}$ <br>
 
 Anammox bacteria are considered to be an implicit population within WOMBAT-mid and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. As with N<sub>2</sub>O-reducing heterotrophic bacteria, this nitrogen is then permanently lost from the ocean. When `do_anammox = .true.`, we perform this metabolism as:
 
+$$
 \begin{align}
-\mu_{aox}^{NH_4 \rightarrow N_2} &= \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana} L_{aox}^{NH_4}
+\mu_{aox}^{NH_4 \rightarrow N_2} =& \quad \mu_{aox}^{max} \left(β_{hete}\right)^{T} f_{ana} L_{aox}^{NH_4}
 \end{align}
+$$
 
 _where_ <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
@@ -1560,9 +1576,11 @@ _where_ <br>
 
 Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of NH<sub>4</sub>. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
 
+$$
 \begin{align}
-L_{aox}^{NH_4} &= \dfrac{NH_4}{NH_4 + K_{aox}^{NH_4}}
+L_{aox}^{NH_4} =& \quad \dfrac{NH_4}{NH_4 + K_{aox}^{NH_4}}
 \end{align}
+$$
 
 _where_ <br>
 - $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of NH<sub>4</sub> by anammox bacteria (`aox_knh4`, [mmol N m<sup>-3</sup>]) <br>
@@ -1575,17 +1593,21 @@ _where_ <br>
 
 In addition to DOC and DON, dissolved organic matter is also affected by changes to the nominal oxidation state of carbon, which we carry as a tracer (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless]). The nominal oxidation state of carbon (NOSC) is estimated by [La Rowe & Van Cappellen (2011)](https://doi.org/10.1016/j.gca.2011.01.020) from stoichiometry:
 
+$$
 \begin{align}
-NOSC &= 4 - \dfrac{\left( 4 \cdot C + H - 3 \cdot N - 2 \cdot O + 5\cdot P - 2 \cdot S\right)}{C}
+NOSC =& \quad 4 - \dfrac{\left( 4 \cdot C + H - 3 \cdot N - 2 \cdot O + 5\cdot P - 2 \cdot S\right)}{C}
 \end{align}
+$$
 
 This characteristic describes how oxidized or reduced the average carbon atoms are within organic molecules. The NOSC acts as a measure of the energetic potential of organic matter oxidation, where the Gibbs energy released is correlated to the NOSC ([La Rowe & Van Cappellen, 2011](https://doi.org/10.1016/j.gca.2011.01.020)). The more reduced the molecule, the more negative the NOSC value and the more energy is held within the material. The scale varies from -4 to +4, with $CH_4$ representing fully reduced carbon and $CO_2$ representing fully oxidized carbon. 
 
 In WOMBAT-mid, we do not carry information of changes in the stoichiometry of marine organic matter, either dissolved or particulate. We therefore estimate how certian processes affect the NOSC of DOM ($DOM^{DOSC}$). To do so, we apply changes in $DOM^{NOSC}$ occur as a result of changes to the $B_{DOM}^{C}$ pool. Sources of $B_{DOM}^{C}$ alter $DOM^{NOSC}$ via:
 
+$$
 \begin{align}
-\dfrac{\partial DOM^{NOSC}}{\partial t} &= \dfrac{\partial B_{DOM}^{C}}{\partial t} \dfrac{NOSC_{source} - NOSC}{B_{DOM}^{C}}
+\dfrac{\partial DOM^{NOSC}}{\partial t} &= \quad \dfrac{\partial B_{DOM}^{C}}{\partial t} \dfrac{NOSC_{source} - NOSC}{B_{DOM}^{C}}
 \end{align}
+$$
 
 _where_ <br>
 - $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`f_doc(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
@@ -1594,13 +1616,15 @@ _where_ <br>
 
 Sources of $B_{DOM}^{C}$ include (1) phytoplankton overflow production (`nosdoc_overflow(i,j,k)`, $\Delta DOM_{overflow}^{NOSC}$, [NOSC s<sup>-1</sup>]), (2) excretion by zooplankton (`nosdoc_excretion(i,j,k)`, $\Delta DOM_{excretion}^{NOSC}$, [NOSC s<sup>-1</sup>]), (3) phytoplankton cell death and lysis (`nosdoc_phylysis(i,j,k)`, $\Delta DOM_{photolyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), (4) bacterial cell death and lysis (`nosdoc_baclysis(i,j,k)`, $\Delta DOM_{bacterlyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), and (5) hydrolysation of particulate organic matter (`nosdoc_dethydro(i,j,k)`, $\Delta DOM_{dethydro}^{NOSC}$, [NOSC s<sup>-1</sup>]). The equations describing the effect on $DOM^{NOSC}$ of each process are:
 
+$$
 \begin{align}
-(1) & \Delta DOM_{overflow}^{NOSC} = \left(\sum_{p} \mu_{p}^{\rightarrow DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(2) & \Delta DOM_{excretion}^{NOSC} = \left(\sum_{z,i} \left( X_{z}^{\rightarrow i^{C}} \cdot f_{z}^{X \rightarrow DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(3) & \Delta DOM_{photolyse}^{NOSC} = \left(\sum_{p} \gamma_{p}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(4) & \Delta DOM_{bacterlyse}^{NOSC} = \left(\sum_{b} \gamma_{b}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(5) & \Delta DOM_{dethydro}^{NOSC} = \left(\sum_{d} \Gamma_{d}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
+(1) & \Delta DOM_{overflow}^{NOSC} = \quad \left(\sum_{p} \mu_{p}^{\rightarrow DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(2) & \Delta DOM_{excretion}^{NOSC} = \quad \left(\sum_{z,i} \left( X_{z}^{\rightarrow i^{C}} \cdot f_{z}^{X \rightarrow DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(3) & \Delta DOM_{photolyse}^{NOSC} = \quad \left(\sum_{p} \gamma_{p}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(4) & \Delta DOM_{bacterlyse}^{NOSC} = \quad \left(\sum_{b} \gamma_{b}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(5) & \Delta DOM_{dethydro}^{NOSC} = \quad \left(\sum_{d} \Gamma_{d}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
 \end{align}
+$$
 
 _where_ <br>
 - $\mu_{p}^{\rightarrow DOC}$ is the overflow production of DOC by phytoplankton type $p$ ([mol C kg<sup>-1</sup>]) <br>
@@ -1621,9 +1645,11 @@ In WOMBAT-mid the only sink of $B_{DOM}^{C}$ is consumption by bacteria (`doc1re
 
 Consumption of $B_{DOM}^{C}$ by bacteria alters $DOM^{NOSC}$ (`nosdoc_docconsu(i,j,k)`, $\Delta DOM_{DOCconsume}^{NOSC}$, [NOSC s<sup>-1</sup>]) via:
 
+$$
 \begin{align}
-\Delta DOM_{DOCconsume}^{NOSC} &= \left(\sum_{b} \mu_{b}^{\leftarrow B_{DOM}^{C}} \right) \cdot \dfrac{- NOSC_{DOCconsume}}{B_{DOM}^{C}}
+\Delta DOM_{DOCconsume}^{NOSC} &= \quad \left(\sum_{b} \mu_{b}^{\leftarrow B_{DOM}^{C}} \right) \cdot \dfrac{- NOSC_{DOCconsume}}{B_{DOM}^{C}}
 \end{align}
+$$
 
 _where_ <br>
 - $\mu_{b}^{\leftarrow B_{DOM}^{C}}$ is the consumption of DOC by bacterial type $b$ (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
@@ -1639,7 +1665,7 @@ _where_ <br>
 
 $$
 \begin{aligned}
-\dfrac{\Delta NO_3}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow NO_3} - \mu_{b1}^{\leftarrow NO_3} \\
+\dfrac{\Delta NO_3}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow NO_3} - \mu_{b1}^{\leftarrow NO_3} \\
                                &  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
 \end{aligned}
 $$
@@ -1678,7 +1704,7 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =&\quad \left( \gamma_{mp}^{\rightarrow C} + g_{mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C} \\
+\dfrac{\Delta H_{4}SiO_{4}}{\Delta t} =& \quad \left( \gamma_{mp}^{\rightarrow C} + g_{mz}^{\leftarrow B_{mp}^{C}} \right) \cdot Q_{mp}^{Si:C} \\
                                        & + D_{B_{ld}^{Si}}^{\rightarrow Si} - \mu_{mp}^{\leftarrow Si}
 \end{align}
 $$
@@ -1687,7 +1713,7 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta N_{2}O}{\Delta t} =&\quad \mu_{aoa}^{\rightarrow N_{2}O} + \mu_{b1}^{\rightarrow N_{2}O} - \mu_{b2}^{\leftarrow N_{2}O}
+\dfrac{\Delta N_{2}O}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow N_{2}O} + \mu_{b1}^{\rightarrow N_{2}O} - \mu_{b2}^{\leftarrow N_{2}O}
 \end{align}
 $$
 
@@ -1894,8 +1920,8 @@ $$
 
 $$
 \begin{align}
-$\dfrac{\Delta B_{sd}^{Fe}}{\Delta t} = E_{mz}^{\leftarrow Fe}
-                                      +\Gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
+$\dfrac{\Delta B_{sd}^{Fe}}{\Delta t} = \quad E_{mz}^{\leftarrow Fe}
+                                      + \Gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
                                       + \Gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C}
                                       - \left( g_{mz}^{\leftarrow B_{sd}^{C}}
                                              + g_{Mz}^{\leftarrow B_{sd}^{C}}
@@ -2139,7 +2165,7 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 $$
 \begin{align}
-[dFe]^{min} =& \min\left( \max\left( 0.003 \cdot [NO_3]^{2}, 0.005 \right), 0.007 \right)
+[dFe]^{min} =& \quad \min\left( \max\left( 0.003 \cdot [NO_3]^{2}, 0.005 \right), 0.007 \right)
 \end{align}
 $$
 
@@ -2168,7 +2194,7 @@ We first estimate the average radius of sinking particles belonging to small and
 
 $$
 \begin{align}
-V =& \left(B_{p}^{C}\right)^{0.65}
+V =& \quad \left(B_{p}^{C}\right)^{0.65}
 \end{align}
 $$
 
@@ -2176,7 +2202,7 @@ We can relate the radius $r$ in units of µm to the volume of phytoplankton cell
 
 $$
 \begin{align}
-r =& 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{p}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}}
+r =& \quad 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{p}^{C}\right)^{0.65} \right)^{\dfrac{1}{3}}
 \end{align}
 $$
 
@@ -2202,7 +2228,7 @@ For micro-zooplankton, we use a relationship presented by [Menden-Deuer & Lessar
 
 $$
 \begin{align}
-r_{mz} =& r_{mz}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{mz}^{C}\right)^{1.065} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
+r_{mz} =& \quad r_{mz}^{-} \cdot 0.5 \cdot \left(\dfrac{6}{\pi} \left(B_{mz}^{C}\right)^{1.065} \right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
 \end{align}
 $$
 
@@ -2210,7 +2236,7 @@ which simplifies to:
 
 $$
 \begin{align}
-r_{mz} =& r_{mz}^{-} \left(B_{mz}^{C}\right)^{0.355} \cdot 0.62 \times 10^{-6}
+r_{mz} =& \quad r_{mz}^{-} \left(B_{mz}^{C}\right)^{0.355} \cdot 0.62 \times 10^{-6}
 \end{align}
 $$
 
@@ -2218,7 +2244,7 @@ For meso-zooplankton, we assume that the dry carbon biomass scales with the body
 
 $$
 \begin{align}
-r_{Mz} =& r_{Mz}^{-} \cdot 0.5 \cdot \left(B_{Mz}^{C}\right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
+r_{Mz} =& \quad r_{Mz}^{-} \cdot 0.5 \cdot \left(B_{Mz}^{C}\right)^{\dfrac{1}{3}} \cdot 1 \times 10^{-6}
 \end{align}
 $$
 
@@ -2226,8 +2252,8 @@ We determine the mean radius of small (`rad_det`, [m]) and large particulate det
 
 $$
 \begin{align}
-r_{s} =& \dfrac{B_{np}^{C} r_{np} + B_{mz}^{C} r_{mz}}{B_{np}^{C} + B_{mz}^{C}} \\
-r_{l} =& \dfrac{B_{mp}^{C} r_{mp} + B_{Mz}^{C} r_{Mz}}{B_{mp}^{C} + B_{Mz}^{C}}
+r_{s} =& \quad \dfrac{B_{np}^{C} r_{np} + B_{mz}^{C} r_{mz}}{B_{np}^{C} + B_{mz}^{C}} \\
+r_{l} =& \quad \dfrac{B_{mp}^{C} r_{mp} + B_{Mz}^{C} r_{Mz}}{B_{mp}^{C} + B_{Mz}^{C}}
 \end{align}
 $$
 
@@ -2246,7 +2272,7 @@ The dynamic viscosity of seawater at atmospheric pressure ($\eta_{sw}^{1atm}$) i
 
 $$
 \begin{align}
-\eta_{sw}^{1atm} =& \eta_{w}^{1atm} \left(1 + A \dfrac{S}{1000} + B \left(\dfrac{S}{1000}\right)^{2} \right)
+\eta_{sw}^{1atm} =& \quad \eta_{w}^{1atm} \left(1 + A \dfrac{S}{1000} + B \left(\dfrac{S}{1000}\right)^{2} \right)
 \end{align}
 $$
 
@@ -2254,9 +2280,9 @@ _where_ <br>
 
 $$
 \begin{align}
-A =& 1.541 + 1.998 \times 10^{-2} \cdot T - 9.52 \times 10^{-5} \cdot T^{2} \\
-B =& 7.974 - 7.561 \times 10^{-2} \cdot T + 4.724 \times 10^{-4} \cdot T^{2} \\
-\eta_{w}^{1atm} =& 4.2844 \times 10^{-5} + \left(0.157 \left( T + 64.993 \right)^{2} - 91.296 \right)^{-1}
+A =& \quad 1.541 + 1.998 \times 10^{-2} \cdot T - 9.52 \times 10^{-5} \cdot T^{2} \\
+B =& \quad 7.974 - 7.561 \times 10^{-2} \cdot T + 4.724 \times 10^{-4} \cdot T^{2} \\
+\eta_{w}^{1atm} =& \quad 4.2844 \times 10^{-5} + \left(0.157 \left( T + 64.993 \right)^{2} - 91.296 \right)^{-1}
 \end{align}
 $$
 
@@ -2268,7 +2294,7 @@ After calculating $\eta_{sw}^{1atm}$, we must correct for pressure changes in th
 
 $$
 \begin{align}
-\eta_{sw} =& \eta_{sw}^{1atm} \dfrac{\eta_{w}}{\eta_{w}^{1atm}}
+\eta_{sw} =& \quad \eta_{sw}^{1atm} \dfrac{\eta_{w}}{\eta_{w}^{1atm}}
 \end{align}
 $$
 
@@ -2276,13 +2302,13 @@ We solve for $\eta_{w}$, the dynamic viscosity of pure water corrected for press
 
 $$
 \begin{align}
-P_{MPa} =& \left(101325 + 9.81 * 1025.0 * z\right) 1 \times 10^{-6} \\
+P_{MPa} =& \quad \left(101325 + 9.81 * 1025.0 * z\right) 1 \times 10^{-6} \\
 \rho_{0} =& \quad 999.842594 + 6.793952 \times 10^{-2} \cdot T \\
           &     - 9.095290 \times 10^{-3} \cdot T^{2} \\
           &     + 1.001685 \times 10^{-4} \cdot T^{3} \\
           &     - 1.120083 \times 10^{-6} \cdot T^{4} \\
           &     + 6.536332 \times 10^{-9} \cdot T^{5} \\
-\rho_{w} =& \dfrac{\rho_{0}}{1 - \dfrac{P_{MPa} - 0.101325}{2.2 \times 10^{3}}}
+\rho_{w} =& \quad \dfrac{\rho_{0}}{1 - \dfrac{P_{MPa} - 0.101325}{2.2 \times 10^{3}}}
 \end{align}
 $$
 
@@ -2294,7 +2320,7 @@ Next, we solve for the dynamic viscosity at the dilute gas-limit, $\hat{\eta_{0}
 
 $$
 \begin{align}
-\hat{\eta_{0}} =& \dfrac{100 \sqrt{\hat{T}}}{\sum_{i=0}^{3} \dfrac{H_{i}}{\left(\hat{T}\right)^{i}}}
+\hat{\eta_{0}} =& \quad \dfrac{100 \sqrt{\hat{T}}}{\sum_{i=0}^{3} \dfrac{H_{i}}{\left(\hat{T}\right)^{i}}}
 \end{align}
 $$
 
@@ -2305,7 +2331,7 @@ Next, we solve for the contribution of finite density to dynamic viscosity, $\ha
 
 $$
 \begin{align}
-\hat{\eta_{1}} =& e^{\left[ \hat{\rho} \sum_{i=0}^{5}\left( \dfrac{1}{\hat{T} - 1} \right)^{i} \sum_{j=0}^{6} H_{ij}\left(\hat{\rho} - 1\right)^{j} \right]}
+\hat{\eta_{1}} =& \quad e^{\left[ \hat{\rho} \sum_{i=0}^{5}\left( \dfrac{1}{\hat{T} - 1} \right)^{i} \sum_{j=0}^{6} H_{ij}\left(\hat{\rho} - 1\right)^{j} \right]}
 \end{align}
 $$
  
@@ -2316,7 +2342,7 @@ Finally, we compute the density-corrected pure water dynamic viscosity:
 
 $$
 \begin{align}
-\eta_{w} =& \left(\hat{\eta_{0}} \cdot \hat{\eta_{1}} \right) \eta^{*}
+\eta_{w} =& \quad \left(\hat{\eta_{0}} \cdot \hat{\eta_{1}} \right) \eta^{*}
 \end{align}
 $$
 
@@ -2332,10 +2358,10 @@ WOMBAT-mid explicitly considers small organic carbon, large aggregates of organi
 
 $$
 \begin{align}
-M_{sd} =& B_{sd}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
-M_{ld} =& B_{ld}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
-M_{CaCO_3} =& B_{CaCO_3}^{C} \cdot 1 \times 10{-6} \cdot 100 \\
-M_{BSi} =& B_{ld}^{Si} \cdot 1 \times 10{-6} \cdot 60
+M_{sd} =& \quad B_{sd}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
+M_{ld} =& \quad B_{ld}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
+M_{CaCO_3} =& \quad B_{CaCO_3}^{C} \cdot 1 \times 10{-6} \cdot 100 \\
+M_{BSi} =& \quad B_{ld}^{Si} \cdot 1 \times 10{-6} \cdot 60
 \end{align}
 $$
 
@@ -2352,8 +2378,8 @@ We consider $CaCO_3$ to be part of the small sinking particulates because, altho
 
 $$
 \begin{align}
-M_{s} =& M_{sd} + M_{CaCO_3} \\
-M_{l} =& M_{ld} + M_{BSi}
+M_{s} =& \quad M_{sd} + M_{CaCO_3} \\
+M_{l} =& \quad M_{ld} + M_{BSi}
 \end{align}
 $$
 
@@ -2361,8 +2387,8 @@ And we compute the harmonic mean density of the small particulates (`rho_small`,
 
 $$
 \begin{align}
-\rho_{s} =& \dfrac{1}{\dfrac{M_{sd} / M_{s}}{\rho_{orgC}} + \dfrac{M_{CaCO_3} / M_{s}}{\rho_{CaCO_3}} } \\
-\rho_{l} =& \dfrac{1}{\dfrac{M_{ld} / M_{l}}{\rho_{orgC}} + \dfrac{M_{Bsi} / M_{l}}{\rho_{Bsi}} }
+\rho_{s} =& \quad \dfrac{1}{\dfrac{M_{sd} / M_{s}}{\rho_{orgC}} + \dfrac{M_{CaCO_3} / M_{s}}{\rho_{CaCO_3}} } \\
+\rho_{l} =& \quad \dfrac{1}{\dfrac{M_{ld} / M_{l}}{\rho_{orgC}} + \dfrac{M_{Bsi} / M_{l}}{\rho_{Bsi}} }
 \end{align}
 $$
 
@@ -2375,8 +2401,8 @@ Finally, we incorporate estimates of particle porosity to their density:
 
 $$
 \begin{align}
-\rho_{s} =& \left(1 - p_{s}\right) \rho_{s} + p_{s} \rho_{sw} \\
-\rho_{l} =& \left(1 - p_{l}\right) \rho_{l} + p_{l} \rho_{sw}
+\rho_{s} =& \quad \left(1 - p_{s}\right) \rho_{s} + p_{s} \rho_{sw} \\
+\rho_{l} =& \quad \left(1 - p_{l}\right) \rho_{l} + p_{l} \rho_{sw}
 \end{align}
 $$
 
@@ -2392,13 +2418,13 @@ Rubey's equation ([Rubey, 1933](https://doi.org/10.2475/ajs.s5-25.148.325)) comb
 
 $$
 \begin{align}
-\omega_{s} =& \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{s} - \rho_{sw} \right) \left(r_{s}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{s}}
+\omega_{s} =& \quad \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{s} - \rho_{sw} \right) \left(r_{s}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{s}}
 \end{align}
 $$
 
 $$
 \begin{align}
-\omega_{l} =& \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{l} - \rho_{sw} \right) \left(r_{l}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{l}}
+\omega_{l} =& \quad \dfrac{ \sqrt{\dfrac{4}{3} 9.8 \cdot \rho_{sw} \left(\rho_{l} - \rho_{sw} \right) \left(r_{l}\right)^{3} + 9 \left(\eta_{sw}\right)^{2}} - 3 \eta_{sw} }{\rho_{sw} \cdot r_{l}}
 \end{align}
 $$
 
@@ -2425,10 +2451,10 @@ Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces DOC
 
 $$
 \begin{align}
-\gamma_{sed}^{\rightarrow DOC} =& \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C} \\
-\gamma_{sed}^{\rightarrow DON} =& \gamma_{sed}^{\rightarrow DOC} R^{N:C} \\
-\gamma_{sed}^{\leftarrow O_2} =& \gamma_{sed}^{\rightarrow DOC} R^{O_2:C} \\
-\gamma_{sed}^{\rightarrow dFe} =& \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}
+\gamma_{sed}^{\rightarrow DOC} =& \quad \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C} \\
+\gamma_{sed}^{\rightarrow DON} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{N:C} \\
+\gamma_{sed}^{\leftarrow O_2} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{O_2:C} \\
+\gamma_{sed}^{\rightarrow dFe} =& \quad \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}
 \end{align}
 $$
 
@@ -2448,7 +2474,7 @@ With regard to the dissolution of sedimentary biogenic silica, we compute it in 
 
 $$
 \begin{align}
-\gamma_{sed}^{\rightarrow Si} =& \left(d_{sed^{Si}}^{T} \cdot S_{sed^{Si}}^{Sat} \cdot S_{sed^{Si}}^{bio}\right) B_{sed}^{Si}
+\gamma_{sed}^{\rightarrow Si} =& \quad \left(d_{sed^{Si}}^{T} \cdot S_{sed^{Si}}^{Sat} \cdot S_{sed^{Si}}^{bio}\right) B_{sed}^{Si}
 \end{align}
 $$
 
@@ -2467,7 +2493,7 @@ Dissolution of $CaCO_3$ produces DIC and alkalinity. The sedimenary $CaCO_3$ poo
 
 $$
 \begin{align}
-D_{CaCO_{3},sed} =& d_{CaCO_{3},sed} (β_{hete})^{T} \left(1 - \Omega_{cal,sed}\right)^{4.5}
+D_{CaCO_{3},sed} =& \quad d_{CaCO_{3},sed} \left(β_{hete}\right)^{T} \left(1 - \Omega_{cal,sed}\right)^{4.5}
 \end{align}
 $$
 
@@ -2488,7 +2514,7 @@ We also consider the consumption of NO<sub>3</sub> via benthic denitrification. 
 
 $$
 \begin{align}
-\gamma_{sed}^{\leftarrow NO_3} =& \gamma_{sed}^{\rightarrow DOC} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)
+\gamma_{sed}^{\leftarrow NO_3} =& \quad \gamma_{sed}^{\rightarrow DOC} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)
 \end{align}
 $$
 
@@ -2502,7 +2528,7 @@ and where the fraction of organic matter that is hydrolysed via denitrification 
 
 $$
 \begin{align}
-f_{sed}^{denit} =& \gamma_{sed}^{\leftarrow NO_3} \dfrac{122/94}{\gamma_{sed}^{\rightarrow DOC}}
+f_{sed}^{denit} =& \quad \gamma_{sed}^{\leftarrow NO_3} \dfrac{122/94}{\gamma_{sed}^{\rightarrow DOC}}
 \end{align}
 $$
 
@@ -2512,14 +2538,14 @@ Overall bottom fluxes of tracers are:
 
 $$
 \begin{align}
-\dfrac{\Delta DOC}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DOC} \\
-\dfrac{\Delta DON}{\Delta t} =& \gamma_{det,sed}^{\rightarrow DON} \\
-\dfrac{\Delta NO_3}{\Delta t} =& \gamma_{det,sed}^{\leftarrow NO_3} \\
-\dfrac{\Delta O_2}{\Delta t} =& \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right) \\
-\dfrac{\Delta Si}{\Delta t} =& \gamma_{det,sed}^{\rightarrow Si} \\
-\dfrac{\Delta dFe}{\Delta t} =& \gamma_{det,sed}^{\rightarrow dFe} \\
-\dfrac{\Delta DIC}{\Delta t} =& D_{CaCO_{3},sed} \\
-\dfrac{\Delta Alk}{\Delta t} =& 2 \cdot D_{CaCO_{3},sed}
+\dfrac{\Delta DOC}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow DOC} \\
+\dfrac{\Delta DON}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow DON} \\
+\dfrac{\Delta NO_3}{\Delta t} =& \quad \gamma_{det,sed}^{\leftarrow NO_3} \\
+\dfrac{\Delta O_2}{\Delta t} =& \quad \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right) \\
+\dfrac{\Delta Si}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow Si} \\
+\dfrac{\Delta dFe}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow dFe} \\
+\dfrac{\Delta DIC}{\Delta t} =& \quad D_{CaCO_{3},sed} \\
+\dfrac{\Delta Alk}{\Delta t} =& \quad 2 \cdot D_{CaCO_{3},sed}
 \end{align}
 $$
 
@@ -2540,7 +2566,7 @@ The fraction buried is calculated according to Equation 3 of [Dunne et al. (2007
 
 $$
 \begin{align}
-F_{bury} =& 0.013 \cdot 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury} =& \quad 0.013 \cdot 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
 \end{align}
 $$
 
