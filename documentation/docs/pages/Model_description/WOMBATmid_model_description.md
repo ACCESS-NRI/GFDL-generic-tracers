@@ -1719,43 +1719,56 @@ $$
 $$
 
 _where_ <br>
-- $y_aoa^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on NH<sub>4</sub> (`aoa_ynh4`, [mol C biomass (mol NH<sub>4</sub>)<sup>-1</sup>]) <br>
+- $y_{aoa}^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on NH<sub>4</sub> (`aoa_ynh4`, [mol C biomass (mol NH<sub>4</sub>)<sup>-1</sup>]) <br>
 - $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on O<sub>2</sub> (`aoa_yoxy`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>]) <br>
 
-Ammonia ozidizing archaea produce both NO<sub>3</sub> and a small amount of N<sub>2</sub>O as they oxidize NH<sub>4</sub>. The production of N<sub>2</sub>O is informed by numerous studies that show a relationship between the rate of ammonia oxidation, the ambient oxygen concentration and the production of N<sub>2</sub>O ([Goreau et al., 1980](https://doi.org/10.1128/aem.40.3.526-532.1980); [Santoro et al., 2011](https://www.science.org/doi/full/10.1126/science.1208239); [Qin et al., 2017](https://doi.org/10.1111/1758-2229.12525); [Ji et al., 2018](https://doi.org/10.1029/2018GB005887); [Frey et al., 2023](https://doi.org/10.1002/lno.12283)). We compute these production terms as:
+Ammonia ozidizing archaea produce both NO<sub>3</sub> (in our model, while in reality they produce nitrite (NO<sub>2</sub>)) and a small amount of N<sub>2</sub>O as they oxidize NH<sub>4</sub>. The production of N<sub>2</sub>O is informed by numerous studies that show a positive relationship between the production of N<sub>2</sub>O and declining ambient dissolved oxygen concentrations ([Goreau et al., 1980](https://doi.org/10.1128/aem.40.3.526-532.1980); [Santoro et al., 2011](https://www.science.org/doi/full/10.1126/science.1208239); [Qin et al., 2017](https://doi.org/10.1111/1758-2229.12525); [Ji et al., 2018](https://doi.org/10.1029/2018GB005887); [Frey et al., 2023](https://doi.org/10.1002/lno.12283); [Kelly et al., 2024](https://doi.org/10.5194/bg-21-3215-2024)). We parameterize N<sub>2</sub>O production by ammonia oxidation via the relationships reported in [Kelly et al. (2024)](https://doi.org/10.5194/bg-21-3215-2024). These authors determined the fraction of N<sub>2</sub>O produced per unit of NO<sub>2</sub> via two pathways:
 
 $$
 \begin{align}
-\mu_{aoa}^{\rightarrow NO_3} =& \quad \mu_{aoa}^{\leftarrow NH_4} - \dfrac{\mu_{aoa}^{C}}{R_{aoa}^{C:N}} - \mu_{aoa}^{C} \cdot 2 p_{aoa}^{N_{2}O} \\
-\mu_{aoa}^{\rightarrow N_{2}O} =& \quad \mu_{aoa}^{C} p_{aoa}^{N_{2}O}
+f_{aoa ( NH_4 + NH_4 )}^{\rightarrow N_{2}O} =& \quad 0.022 e^{\left( -1.50 \cdot O_2 \right)} + f_{min}^{\rightarrow N_{2}O} \\
+f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O} =& \quad 0.204 e^{\left( -0.58 \cdot O_2 \right)}
 \end{align}
 $$
 
 _where_ <br>
+- $f_{aoa ( NH_4 + NH_4 )}^{\rightarrow N_{2}O}$ is the fraction of NH<sub>4</sub> diverted to N<sub>2</sub>O via the combination of two NH<sub>4</sub> (`aoa_en2o_nh4`, [mol N (mol N)<sup>-1</sup>]) <br>
+- $f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O}$ is the fraction of NH<sub>4</sub> diverted to N<sub>2</sub>O via the combination of one NH<sub>4</sub> and one NO<sub>2</sub> (`aoa_en2o_hyb`, [mol N (mol N)<sup>-1</sup>]) <br>
+- $O_2$ is the in situ concentration of dissolved oxygen (`biooxy`, [mmol $O_2$ m<sup>-3</sup>]) <br>
+- $f_{min}^{\rightarrow N_{2}O}$ is the minimum fraction of NH<sub>4</sub> diverted to N<sub>2</sub>O in fully oxic conditions (`aoa_en2omin`, [mol N (mol N)<sup>-1</sup>]) <br>
+
+Both pathways of N<sub>2</sub>O production show an exponential decline as dissolved oxygen increases. We then calculate the production of N<sub>2</sub>O per unit of biomass growth of ammonia oxidizing archaea (`aoa_en2o(i,j,k)`, $e_{aoa}^{\rightarrow N_{2}O}$, [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>]) with:
+
+$$
+\begin{align}
+e_{aoa}^{N_{2}O} =& \quad \left( \dfrac{1}{y_{aoa}^{NH_4} - R_{aoa}^{C:N}} \right) \cdot \left(0.5 \cdot f_{aoa ( NH_4 + NH_4 )}^{\rightarrow N_{2}O} + f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O} \right)
+\end{align}
+$$
+
+_where_ <br>
+- $y_{aoa}^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on NH<sub>4</sub> (`aoa_ynh4`, [mol C biomass (mol NH<sub>4</sub>)<sup>-1</sup>]) <br>
 - $R_{aoa}^{C:N}$ is the ratio of carbon to nitrogen within the biomass of ammonia oxidizing archaea (`aoa_C2N`, [mol C (mol N)<sup>-1</sup>]) <br>
-- $p_{aoa}^{N_{2}O}$ is the production yield of N<sub>2</sub>O by ammonia oxidizing archaea (`aoa_yn2o`, [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>]) <br>
+- and $0.5$ is applied against $f_{aoa ( NH_4 + NH_4 )}^{\rightarrow N_{2}O}$ because two molecules of NH<sub>4</sub> are combined to one molecule of N<sub>2</sub> <br>
 
-Determining $p_{aoa}^{N_{2}O}$ is key to determining the fraction of NH<sub>4</sub> that is routed to N<sub>2</sub>O during ammonia oxidation. For this we use the oxygen-dependent relationship identified by [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) who found a maximum of 3% per mol of $NO_2$ produced:
-
-$$
-\begin{align}
-p_{aoa}^{\%N_{2}O} =& \quad \min\left(0.03, \dfrac{0.002}{O_2} + p_{aoa}^{min(N_{2}O)} \right)
-\end{align}
-$$
-
-Because [Frey et al. (2023)](https://doi.org/10.1002/lno.12283) give the production yield of N<sub>2</sub>O in terms of % per mol $NO_2$ produced, we convert this through to units of [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>] via:
+We then finally compute the amount of NO<sub>3</sub> that is excreted by the ammonia oxidizing archaea as the residual of the remaining nitrogen atoms.
 
 $$
 \begin{align}
-p_{aoa}^{N_{2}O} =& \quad \dfrac{p_{aoa}^{\%N_{2}O} \cdot \left(y_{aoa}^{NH_4} - \dfrac{1}{R_{aoa}^{C:N}} \right)}{2 \cdot p_{aoa}^{\%N_{2}O} + 1}
+e_{aoa}^{NO_{3}} =& \quad \left( \dfrac{1}{y_{aoa}^{NH_4} - R_{aoa}^{C:N}} \right) \cdot \left(1 - f_{aoa ( NH_4 + NH_4 )}^{\rightarrow N_{2}O} - 2\cdot f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O} \right)
 \end{align}
 $$
 
-since
+_where_ <br>
+- the $2$ is applied against $f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O}$ because one molecule of NO<sub>3</sub> is consumed <br>
 
-$a\cdot NH_4 + b \cdot O_2 \rightarrow c \cdot B_{aoa}^{C} + d \cdot N_{2}O + e \cdot NO_{3}$ <br>
-$Y = \% N_{2}O$ produced per NO<sub>3</sub> produced <br>
-$d = \dfrac{\left(a - c\right) \cdot Y}{2 \cdot Y + 1}$ <br>
+Thus, the production of N<sub>2</sub>O and NO<sub>3</sub> are:
+
+$$
+\begin{align}
+\mu_{aoa}^{\rightarrow N_{2}O} =& \quad \mu_{aoa}^{C} e_{aoa}^{N_{2}O}
+\mu_{aoa}^{\rightarrow NO_3} =& \quad \mu_{aoa}^{C} e_{aoa}^{NO_{3}}
+\end{align}
+$$
 
 
 **Anaerobic ammonia oxidizing (Anammox) bacteria**
