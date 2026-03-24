@@ -1713,8 +1713,8 @@ In reality, ammonia oxidizing archaea perform the first step of the nitrificatio
 
 $$
 \begin{align}
-\mu_{aoa}^{\leftarrow NH_4} =& \quad \dfrac{\mu_{aoa}^{C}}{y_aoa^{NH_4}} \\
-\mu_{aoa}^{\leftarrow O_2} =& \quad \dfrac{\mu_{aoa}^{C}}{y_aoa^{O_2}}
+\mu_{aoa}^{\leftarrow NH_4} =& \quad \dfrac{\mu_{aoa}^{C}}{y_{aoa}^{NH_4}} \\
+\mu_{aoa}^{\leftarrow O_2} =& \quad \dfrac{\mu_{aoa}^{C}}{y_{aoa}^{O_2}}
 \end{align}
 $$
 
@@ -1726,8 +1726,8 @@ Ammonia ozidizing archaea produce both NO<sub>3</sub> (in our model, while in re
 
 $$
 \begin{align}
-f_{aoa ( NH_4 + NH_4 )}^{\rightarrow N_{2}O} =& \quad 0.022 e^{\left( -1.50 \cdot O_2 \right)} + f_{min}^{\rightarrow N_{2}O} \\
-f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O} =& \quad 0.204 e^{\left( -0.58 \cdot O_2 \right)}
+f_{aoa ( NH_4 + NH_4 )}^{\rightarrow N_{2}O} =& \quad 0.022 \cdot e^{\left( -1.50 \cdot O_2 \right)} + f_{min}^{\rightarrow N_{2}O} \\
+f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O} =& \quad 0.204 \cdot e^{\left( -0.58 \cdot O_2 \right)}
 \end{align}
 $$
 
@@ -1759,7 +1759,7 @@ e_{aoa}^{NO_{3}} =& \quad \left( \dfrac{1}{y_{aoa}^{NH_4} - R_{aoa}^{C:N}} \righ
 $$
 
 _where_ <br>
-- the $2$ is applied against $f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O}$ because one molecule of NO<sub>3</sub> is consumed <br>
+- the $2$ is applied against $f_{aoa ( NH_4 + NO_2 )}^{\rightarrow N_{2}O}$ because one molecule of NO<sub>2</sub> is consumed during hybrid N<sub>2</sub>O production (from NH<sub>4</sub> and NO<sub>2</sub>). Because we don't represent NO<sub>2</sub>, this instead removes NO<sub>3</sub> <br>
 
 Thus, the production of N<sub>2</sub>O and NO<sub>3</sub> are:
 
