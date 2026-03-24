@@ -1765,7 +1765,7 @@ Thus, the production of N<sub>2</sub>O and NO<sub>3</sub> are:
 
 $$
 \begin{align}
-\mu_{aoa}^{\rightarrow N_{2}O} =& \quad \mu_{aoa}^{C} e_{aoa}^{N_{2}O}
+\mu_{aoa}^{\rightarrow N_{2}O} =& \quad \mu_{aoa}^{C} e_{aoa}^{N_{2}O} \\
 \mu_{aoa}^{\rightarrow NO_3} =& \quad \mu_{aoa}^{C} e_{aoa}^{NO_{3}}
 \end{align}
 $$
