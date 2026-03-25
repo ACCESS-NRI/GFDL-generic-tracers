@@ -1757,7 +1757,7 @@ module generic_WOMBATlite
       do i = isc, iec
         do j = jsc, jec
           orgflux = wombat%det_btm(i,j) / dt * 86400 * 1e3 ! mmol C m-2 day-1
-          wombat%fbury(i,j) = 0.013 + 0.53 * orgflux**2.0 / (7.0 + orgflux)**2.0  ! Eq. 3 Dunne et al. 2007
+          wombat%fbury(i,j) = 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0  ! Eq. 3 Dunne et al. 2007
         enddo
       enddo
     endif
@@ -2679,8 +2679,10 @@ module generic_WOMBATlite
         !  We also add a T-dependent function to scale down CaCO3 production in waters colder
         !  than 3 degrees C based off the observation of no E hux growth beneath this (Fielding 2013; L&O)
         hco3 = wombat%f_dic(i,j,k) - wombat%co3(i,j,k) - wombat%co2_star(i,j,k)
-        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(-3.0 + 4.31e-6 * &
-                                          hco3 / wombat%htotal(i,j,k))) * &
+        ! Note the min(2.0, ...) in the exponent is just to prevent potential overflow. It does
+        ! not affect answers as pic2poc is capped at 0.3
+        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(min(2.0, -3.0 + 4.31e-6 * &
+                                          hco3 / wombat%htotal(i,j,k)))) * &
                                          (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
         ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
         !  concentration of POC, following Kwon et al., 2024, Science Advances; Table S1, and
