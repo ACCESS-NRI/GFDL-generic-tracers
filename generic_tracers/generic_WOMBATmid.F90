@@ -615,7 +615,7 @@ module generic_WOMBATmid
         det_density, &
         bdet_density, &
         dissratcal, &
-        dissratara, & 
+        dissratara, &
         dissratpoc, &
         caldiss, &
         aradiss, &
@@ -3031,7 +3031,7 @@ module generic_WOMBATmid
     !  Frey et al. (2023) find a baseline yield of ~0.5% in oxic conditions
     !  (i.e., when O2 is not limiting), which we note here is in excess of the baseline
     !  yields of other studies (Ji et al., 2018; Santoro et al., 2011; Qin et al., 2017;
-    !  Kelly et al., 2024) that place the baseline near 0.05% - 0.1%. We set it at 
+    !  Kelly et al., 2024) that place the baseline near 0.05% - 0.1%. We set it at
     !  0.08% to align with Kelly et al., 2024.
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_en2omin', wombat%aoa_en2omin, 0.0008)
@@ -4002,7 +4002,7 @@ module generic_WOMBATmid
     real                                    :: g_zoo, g_mes, Xzoo, I_Xzoo, Xmes, I_Xmes
     real                                    :: biono3, bion2o, bionh4, biooxy, biofer, biosil, biodoc, biodon, biocaco3
     real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobdetsi, biobac1, biobac2, bioaoa
-    real                                    :: biophyfe, biodiafe   
+    real                                    :: biophyfe, biodiafe
     real                                    :: I_denom, wzbac1, wzbac2, wzaoa, wzphy, wzdia, wzdet, wzbdet, wzzoo, I_wzsum
     real                                    :: fbc
     real, parameter                         :: epsi = 1.0e-30
@@ -4022,7 +4022,7 @@ module generic_WOMBATmid
     real                                    :: mass_det, mass_bdet, mass_caco3, mass_bsi, mass_small, mass_large
     real                                    :: w1, w2, rho_small, rho_large
     real                                    :: par_phy_mldsum, par_z_mldsum
-    real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, dia_chlc 
+    real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, dia_chlc
     real                                    :: phy_limnh4, phy_limno3, phy_limdin
     real                                    :: dia_limnh4, dia_limno3, dia_limdin
     real                                    :: phy_pisl, dia_pisl
@@ -4058,7 +4058,7 @@ module generic_WOMBATmid
     real                                    :: bac2_ydonC, bac2_yoxyC, bac2_yanaC, bac2_yn2oC
     real                                    :: bac_Vdoc, bac1_Vdon, bac1_Vnh4, bac2_Vdon, bac2_Vnh4
     real                                    :: bac_VdFe, bac_Voxy, bac_Vno3, bac_Vn2o
-    real                                    :: bac_gC, bac_gN, bac_gFe, bac_gEA 
+    real                                    :: bac_gC, bac_gN, bac_gFe, bac_gEA
     real                                    :: bac_muana, bac_muaer
     real                                    :: aoa_Vnh4, aoa_Voxy, aoa_en2o_nh4, aoa_en2o_hyb
     real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect
@@ -4624,7 +4624,7 @@ module generic_WOMBATmid
     !    9.  Phytoplankton uptake of silicic acid                           !
     !    10. Iron chemistry (scavenging, coagulation, dissolution)          !
     !    11. Biogenic silica dissolution                                    !
-    !    12. Mortality terms                                                ! 
+    !    12. Mortality terms                                                !
     !    13. Zooplankton grazing, egestion, excretion, assimilation         !
     !    14. Calcium carbonate production and dissolution                   !
     !    15. Implicit nitrogen fixation                                     !
@@ -5074,7 +5074,7 @@ module generic_WOMBATmid
       !------------------------------------------------------------------------!
       !------------------------------------------------------------------------!
 
-      ! Estimate solubility of Fe3+ (free Fe) in solution using temperature, 
+      ! Estimate solubility of Fe3+ (free Fe) in solution using temperature,
       ! pH and salinity using the equations of Liu & Millero (2002)
       ztemk = max(5.0, Temp(i,j,k)) + 273.15    ! temperature in kelvin
       I_ztemk = 1.0 / ztemk
@@ -5093,7 +5093,7 @@ module generic_WOMBATmid
       fe3sol = fesol1 * ( hp*hp*hp + fesol2*hp*hp + fesol3*hp + fesol4 + fesol5/hp ) *1e9
 
       ! Estimate total colloidal iron following Tagliabue et al. (2023).
-      ! Colloidal dFe is considered to be whatever exceeds the inorganic solubility 
+      ! Colloidal dFe is considered to be whatever exceeds the inorganic solubility
       ! ceiling, although there is always a hard lower limit of 10% of total dFe.
       wombat%fecol(i,j,k) = max(0.1*biofer, biofer - fe3sol)
 
@@ -5189,7 +5189,7 @@ module generic_WOMBATmid
         !    - Kamatani (1982) measure dissolution rates (K, hr-1) dependent on temperature (T, ºC)
         !      according to ln(K) = alpha + 0.0833*T, where alpha is ~-8 to -10.
         !    - Greenwood et al. (2005) finds dissolution rates [1/s] at a given temperature
-        !      equal to exp(20 - 10050/T), with T in Kelvin (Figure 4). But these T are too high. 
+        !      equal to exp(20 - 10050/T), with T in Kelvin (Figure 4). But these T are too high.
         !    We use Kamatani (1982):
         disssi_temp = exp(-8.0 + 0.0833*Temp(i,j,k)) / 3600.0 ! [1/s]
         ! 2. Undersaturation term with an exponent of 2.0
@@ -5682,7 +5682,7 @@ module generic_WOMBATmid
       bac_Vno3 = wombat%bac1_Vmax_no3 * biono3 / (biono3 + wombat%bac1_kno3) ! Uptake of NO3 (i.e., NO3-limited growth)
       bac_gC = bac_Vdoc * bac1_yanaC ! Growth of C biomass due to DOC uptake
       bac_gN = (bac1_Vdon + bac1_Vnh4) * bac1_ydonC * wombat%bacanapen ! Growth of C biomass due to N uptake
-      bac_gFe = bac_VdFe * wombat%bac1_C2Fe * wombat%bacanapen ! Growth of C biomass due to Fe uptake 
+      bac_gFe = bac_VdFe * wombat%bac1_C2Fe * wombat%bacanapen ! Growth of C biomass due to Fe uptake
       bac_gEA = bac_Vno3 * bac1_yno3C ! Growth of C biomass due to electron acceptor (NO3) uptake
       bac_muana = max(0.0, min( bac_gC, bac_gN, bac_gFe, bac_gEA ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
@@ -5706,10 +5706,10 @@ module generic_WOMBATmid
       if (bac_gN<min(bac_gC,bac_gFe,bac_gEA)) wombat%bac2_fnlim(i,j,k) = 1.0
       if (bac_gFe<min(bac_gC,bac_gN,bac_gEA)) wombat%bac2_ffelim(i,j,k) = 1.0
       ! Anaerobic growth
-      bac_Vn2o = bion2o * wombat%bac2_pn2o 
+      bac_Vn2o = bion2o * wombat%bac2_pn2o
       bac_gC = bac_Vdoc * bac2_yanaC ! Growth of C biomass due to DOC uptake
       bac_gN = (bac2_Vdon + bac2_Vnh4) * bac2_ydonC * wombat%bacanapen ! Growth of C biomass due to N uptake
-      bac_gFe = bac_VdFe * wombat%bac2_C2Fe * wombat%bacanapen ! Growth of C biomass due to Fe uptake 
+      bac_gFe = bac_VdFe * wombat%bac2_C2Fe * wombat%bacanapen ! Growth of C biomass due to Fe uptake
       bac_gEA = bac_Vn2o * bac2_yn2oC ! Growth of C biomass due to electron acceptor (N2O) uptake
       bac_muana = max(0.0, min( bac_gC, bac_gN, bac_gFe, bac_gEA ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
@@ -5762,7 +5762,7 @@ module generic_WOMBATmid
 
       ! 4. Determine N2O yield from ammonia oxidation as a dependence on ambient O2
       !    We follow McCoy et al. 2026 PNAS who implemented Kelly et al. 2024 Biogeosciences
-      aoa_en2o_nh4 = 0.022 * exp(-1.5 * biooxy) + wombat%aoa_en2omin 
+      aoa_en2o_nh4 = 0.022 * exp(-1.5 * biooxy) + wombat%aoa_en2omin
       aoa_en2o_hyb = 0.204 * exp(-0.58 * biooxy)
       wombat%aoa_en2o(i,j,k) = (wombat%aoa_ynh4 - 1.0/wombat%aoa_C2N) * (0.5 * aoa_en2o_nh4 + aoa_en2o_hyb)
       wombat%aoa_eno3(i,j,k) = (wombat%aoa_ynh4 - 1.0/wombat%aoa_C2N) * (1.0 - aoa_en2o_nh4 - 2*aoa_en2o_hyb)
@@ -6193,7 +6193,7 @@ module generic_WOMBATmid
                             + wombat%mesexcrdia(i,j,k) &
                             + wombat%mesexcrdet(i,j,k) &
                             + wombat%mesexcrbdet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom ) 
+                            + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom )
 
       ! Nominal oxidation state of dissolved organic carbon equation ! [unitless]
       !-----------------------------------------------------------------------
@@ -6268,7 +6268,7 @@ module generic_WOMBATmid
                                 + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
                               + wombat%phymorq(i,j,k)  &
                               + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) &
-                            - wombat%zoodiss(i,j,k) & 
+                            - wombat%zoodiss(i,j,k) &
                             - wombat%mesdiss(i,j,k) &
                             - wombat%caldiss(i,j,k) &
                             - wombat%aradiss(i,j,k) &
@@ -6359,10 +6359,10 @@ module generic_WOMBATmid
                           + wombat%zoomorl(i,j,k) &
                           + wombat%mesmorl(i,j,k) &
                           + ( wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) & 
+                            + wombat%zooexcrdia(i,j,k) &
                             + wombat%zooexcrdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                          + ( wombat%mesexcrphy(i,j,k) & 
-                            + wombat%mesexcrdia(i,j,k) & 
+                          + ( wombat%mesexcrphy(i,j,k) &
+                            + wombat%mesexcrdia(i,j,k) &
                             + wombat%mesexcrdet(i,j,k) &
                             + wombat%mesexcrbdet(i,j,k) &
                             + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) ) &
@@ -6404,7 +6404,7 @@ module generic_WOMBATmid
                            + wombat%bac1morq(i,j,k) ) / wombat%bac1_C2Fe &
                          + ( wombat%bac2morl(i,j,k) &
                            + wombat%bac2morq(i,j,k) ) / wombat%bac2_C2Fe &
-                         + ( wombat%aoamorl(i,j,k) & 
+                         + ( wombat%aoamorl(i,j,k) &
                            + wombat%aoamorq(i,j,k) ) / wombat%aoa_C2Fe &
                          + zooexcrbac1fe &
                          + zooexcrbac2fe &
@@ -6858,7 +6858,7 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------
-    
+
     call g_tracer_get_pointer(tracer_list, 'det_sediment', 'field', wombat%p_det_sediment) ! [mol/m2]
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment) ! [mol/m2]
     call g_tracer_get_pointer(tracer_list, 'detsi_sediment', 'field', wombat%p_detsi_sediment) ! [mol/m2]
