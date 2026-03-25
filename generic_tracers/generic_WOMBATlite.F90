@@ -2718,7 +2718,7 @@ module generic_WOMBATlite
         k_loss = wombat%phyqmor / mmol_m3_to_mol_kg * wombat%f_phy(i,j,k)
         wombat%f_phy(i,j,k) = (wombat%f_phy(i,j,k) + dtsb * P_expl) / (1.0 + dtsb * k_loss)
 
-        ! Back-calculate phymorq for use below
+        ! Back-calculate phymorq for use below and for diagnostic output
         wombat%phymorq(i,j,k) = k_loss * wombat%f_phy(i,j,k) ! [molC/kg/s]
       else
         wombat%f_phy(i,j,k) = wombat%f_phy(i,j,k) + dtsb * P_expl
@@ -2756,7 +2756,7 @@ module generic_WOMBATlite
         k_loss = wombat%zooqmor / mmol_m3_to_mol_kg * wombat%f_zoo(i,j,k)
         wombat%f_zoo(i,j,k) = (wombat%f_zoo(i,j,k) + dtsb * P_expl) / (1.0 + dtsb * k_loss)
 
-        ! Back-calculate zoomorq for use below
+        ! Back-calculate zoomorq for use below and diagnostic output
         wombat%zoomorq(i,j,k) = k_loss * wombat%f_zoo(i,j,k) ! [molC/kg/s]
       else
         wombat%f_zoo(i,j,k) = wombat%f_zoo(i,j,k) + dtsb * P_expl
@@ -2790,7 +2790,7 @@ module generic_WOMBATlite
         k_loss = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * wombat%f_det(i,j,k)
         wombat%f_det(i,j,k) = (wombat%f_det(i,j,k) + dtsb * P_expl) / (1.0 + dtsb * k_loss)
 
-        ! Back-calculate detremi for use below
+        ! Back-calculate detremi for use below and diagnostic output
         wombat%detremi(i,j,k) = k_loss * wombat%f_det(i,j,k) ! [molC/kg/s]
       else
         wombat%f_det(i,j,k) = wombat%f_det(i,j,k) + dtsb * P_expl
@@ -2845,7 +2845,7 @@ module generic_WOMBATlite
                         + k_loss_zoodiss
           wombat%f_caco3(i,j,k) = (wombat%f_caco3(i,j,k) + dtsb * P_expl) / (1.0 + dtsb * k_loss)
 
-          ! Back-calculate the dissolution terms for use below
+          ! Back-calculate the dissolution terms for use below and diagnostic output
           wombat%zoodiss(i,j,k) = k_loss_zoodiss * wombat%f_caco3(i,j,k)
           wombat%caldiss(i,j,k) = wombat%dissratcal(i,j,k) * wombat%f_caco3(i,j,k)
           wombat%aradiss(i,j,k) = wombat%dissratara(i,j,k) * wombat%f_caco3(i,j,k)
