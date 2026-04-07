@@ -916,7 +916,7 @@ Next, we apply scaling terms that either decelerate or accelerate dissolution. G
 
 $$
 \begin{align}
-S_{B_{ld}^{Si}}^{Sat} =& \quad 1 - \left(\dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{2}
+S_{B_{ld}^{Si}}^{Sat} =& \quad \left(1 - \dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{2}
 \end{align}
 $$
 
