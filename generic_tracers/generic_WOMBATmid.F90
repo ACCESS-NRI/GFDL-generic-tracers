@@ -411,6 +411,8 @@ module generic_WOMBATmid
         b_o2, &
         b_fe, &
         npp2d, &
+        rpp2d, &
+        zsp2d, &
         det_btm, &
         detfe_btm, &
         bdet_btm, &
@@ -482,7 +484,7 @@ module generic_WOMBATmid
         radmid, &
         radmld, &
         npp3d, &
-        regpp3d, &
+        rpp3d, &
         zsp3d, &
         phy_mumax, &
         phy_mu, &
@@ -903,9 +905,11 @@ module generic_WOMBATmid
         id_dia_mu = -1, &
         id_dchl_mu = -1, &
         id_npp3d = -1, &
-        id_npp2d = -1, &
-        id_regpp3d = -1, &
+        id_rpp3d = -1, &
         id_zsp3d = -1, &
+        id_npp2d = -1, &
+        id_rpp2d = -1, &
+        id_zsp2d = -1, &
         id_det_sed_remin = -1, &
         id_det_sed_depst = -1, &
         id_det_sed_denit = -1, &
@@ -1343,14 +1347,28 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'npp2d', 'Vertically integrated net primary productivity', &
-        'h', '1', 's', 'mol/m^2/s', 'f')
+        'rpp3d', 'Regenerated phytoplankton production', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_rpp3d = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'zsp3d', 'Gross zooplankton production', 'h', 'L', 's', 'mol/kg/s', 'f')
+    wombat%id_zsp3d = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'npp2d', 'Vertically integrated net primary productivity', 'h', '1', 's', 'mol/m^2/s', 'f')
     wombat%id_npp2d = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'regpp3d', 'Regenerated phytoplankton production', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_regpp3d = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'rpp2d', 'Vertically integrated regenerated primary productivity', 'h', '1', 's', 'mol/m^2/s', 'f')
+    wombat%id_rpp2d = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'zsp2d', 'Vertically integrated zooplankton secondary productivity', 'h', '1', 's', 'mol/m^2/s', 'f')
+    wombat%id_zsp2d = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2263,11 +2281,6 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'nosdoc_docconsu', 'Rate of change to local NOSC by DOC consumption', 'h', 'L', 's', '[NOSC/s]', 'f')
     wombat%id_nosdoc_docconsu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
-        'zsp3d', 'Gross zooplankton production', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_zsp3d = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -4296,7 +4309,7 @@ module generic_WOMBATmid
     wombat%radmid(:,:,:) = 0.0
     wombat%radmld(:,:,:) = 0.0
     wombat%npp3d(:,:,:) = 0.0
-    wombat%regpp3d(:,:,:) = 0.0
+    wombat%rpp3d(:,:,:) = 0.0
     wombat%zsp3d(:,:,:) = 0.0
     wombat%phy_mumax(:,:,:) = 0.0
     wombat%phy_mu(:,:,:) = 0.0
@@ -5981,7 +5994,7 @@ module generic_WOMBATmid
                               + wombat%zoograzdia(i,j,k) ) * dia_Si2C )
 
       ! Estimate primary productivity from phytoplankton growth ! [molC/kg/s]
-      wombat%regpp3d(i,j,k) = wombat%regpp3d(i,j,k) + dtsb * ( &
+      wombat%rpp3d(i,j,k) = wombat%rpp3d(i,j,k) + dtsb * ( &
                               wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                             + wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
 
@@ -6605,7 +6618,7 @@ module generic_WOMBATmid
       ! tracers to solve for the change in alkalinity without needing the large number of terms above
 
       wombat%npp3d(i,j,k) = rdtts * wombat%npp3d(i,j,k) * grid_tmask(i,j,k) ! [mol/kg/s]
-      wombat%regpp3d(i,j,k) = rdtts * wombat%regpp3d(i,j,k) * grid_tmask(i,j,k) ! [mol/kg/s]
+      wombat%rpp3d(i,j,k) = rdtts * wombat%rpp3d(i,j,k) * grid_tmask(i,j,k) ! [mol/kg/s]
       wombat%zsp3d(i,j,k) = rdtts * wombat%zsp3d(i,j,k) * grid_tmask(i,j,k) ! [mol/kg/s]
       wombat%fesources(i,j,k) = rdtts * wombat%fesources(i,j,k) * grid_tmask(i,j,k) ! [mol/kg/s]
       wombat%fesinks(i,j,k) = rdtts * wombat%fesinks(i,j,k) * grid_tmask(i,j,k) ! [mol/kg/s]
@@ -7066,6 +7079,48 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_alk_vstf, wombat%alk_vstf, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
+    if (wombat%id_npp3d > 0) &
+      used = g_send_data(wombat%id_npp3d, wombat%npp3d, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_rpp3d > 0) &
+      used = g_send_data(wombat%id_rpp3d, wombat%rpp3d, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_zsp3d > 0) &
+      used = g_send_data(wombat%id_zsp3d, wombat%zsp3d, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_npp2d > 0) then
+      wombat%npp2d = 0.0
+      do k = 1,nk
+        wombat%npp2d(isc:iec,jsc:jec) = wombat%npp2d(isc:iec,jsc:jec) + &
+            wombat%npp3d(isc:iec,jsc:jec,k) * rho_dzt(isc:iec,jsc:jec,k) ! [mol/m2/s]
+      enddo
+      used = g_send_data(wombat%id_npp2d, wombat%npp2d, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+    endif
+
+    if (wombat%id_rpp2d > 0) then
+      wombat%rpp2d = 0.0
+      do k = 1,nk
+        wombat%rpp2d(isc:iec,jsc:jec) = wombat%rpp2d(isc:iec,jsc:jec) + &
+            wombat%rpp3d(isc:iec,jsc:jec,k) * rho_dzt(isc:iec,jsc:jec,k) ! [mol/m2/s]
+      enddo
+      used = g_send_data(wombat%id_rpp2d, wombat%rpp2d, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+    endif
+
+    if (wombat%id_zsp2d > 0) then
+      wombat%zsp2d = 0.0
+      do k = 1,nk
+        wombat%zsp2d(isc:iec,jsc:jec) = wombat%zsp2d(isc:iec,jsc:jec) + &
+            wombat%zsp3d(isc:iec,jsc:jec,k) * rho_dzt(isc:iec,jsc:jec,k) ! [mol/m2/s]
+      enddo
+      used = g_send_data(wombat%id_zsp2d, wombat%zsp2d, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+    endif
+
     if (wombat%id_dynvis_sw > 0) &
       used = g_send_data(wombat%id_dynvis_sw, wombat%dynvis_sw, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -7080,10 +7135,6 @@ module generic_WOMBATmid
 
     if (wombat%id_radmld > 0) &
       used = g_send_data(wombat%id_radmld, wombat%radmld, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
-    if (wombat%id_regpp3d > 0) &
-      used = g_send_data(wombat%id_regpp3d, wombat%regpp3d, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_phy_mumax > 0) &
@@ -7814,24 +7865,6 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_nosdoc_docconsu, wombat%nosdoc_docconsu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_npp3d > 0) &
-      used = g_send_data(wombat%id_npp3d, wombat%npp3d, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
-    if (wombat%id_npp2d > 0) then
-      wombat%npp2d = 0.0
-      do k = 1,nk
-        wombat%npp2d(isc:iec,jsc:jec) = wombat%npp2d(isc:iec,jsc:jec) + &
-            wombat%npp3d(isc:iec,jsc:jec,k) * rho_dzt(isc:iec,jsc:jec,k) ! [mol/m2/s]
-      enddo
-      used = g_send_data(wombat%id_npp2d, wombat%npp2d, model_time, &
-          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
-    endif
-
-    if (wombat%id_zsp3d > 0) &
-      used = g_send_data(wombat%id_zsp3d, wombat%zsp3d, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
     if (wombat%id_det_density > 0) &
       used = g_send_data(wombat%id_det_density, wombat%det_density, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -8287,10 +8320,12 @@ module generic_WOMBATmid
     allocate(wombat%radbio(isd:ied, jsd:jed, 1:nk)); wombat%radbio(:,:,:)=0.0
     allocate(wombat%radmid(isd:ied, jsd:jed, 1:nk)); wombat%radmid(:,:,:)=0.0
     allocate(wombat%radmld(isd:ied, jsd:jed, 1:nk)); wombat%radmld(:,:,:)=0.0
-    allocate(wombat%regpp3d(isd:ied, jsd:jed, 1:nk)); wombat%regpp3d(:,:,:)=0.0
+    allocate(wombat%npp3d(isd:ied, jsd:jed, 1:nk)); wombat%npp3d(:,:,:)=0.0
+    allocate(wombat%rpp3d(isd:ied, jsd:jed, 1:nk)); wombat%rpp3d(:,:,:)=0.0
     allocate(wombat%zsp3d(isd:ied, jsd:jed, 1:nk)); wombat%zsp3d(:,:,:)=0.0
     allocate(wombat%npp2d(isd:ied, jsd:jed)); wombat%npp2d(:,:)=0.0
-    allocate(wombat%npp3d(isd:ied, jsd:jed, 1:nk)); wombat%npp3d(:,:,:)=0.0
+    allocate(wombat%rpp2d(isd:ied, jsd:jed)); wombat%rpp2d(:,:)=0.0
+    allocate(wombat%zsp2d(isd:ied, jsd:jed)); wombat%zsp2d(:,:)=0.0
     allocate(wombat%phy_mumax(isd:ied, jsd:jed, 1:nk)); wombat%phy_mumax(:,:,:)=0.0
     allocate(wombat%phy_mu(isd:ied, jsd:jed, 1:nk)); wombat%phy_mu(:,:,:)=0.0
     allocate(wombat%pchl_mu(isd:ied, jsd:jed, 1:nk)); wombat%pchl_mu(:,:,:)=0.0
@@ -8596,9 +8631,11 @@ module generic_WOMBATmid
         wombat%radmid, &
         wombat%radmld, &
         wombat%zsp3d, &
-        wombat%npp2d, &
+        wombat%rpp3d, &
         wombat%npp3d, &
-        wombat%regpp3d, &
+        wombat%npp2d, &
+        wombat%rpp2d, &
+        wombat%zsp2d, &
         wombat%phy_mumax, &
         wombat%phy_mu, &
         wombat%pchl_mu, &
