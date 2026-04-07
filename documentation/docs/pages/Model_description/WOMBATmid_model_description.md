@@ -2378,7 +2378,7 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 $$
 \begin{align}
-[dFe]^{min} =& \quad \min\left( \max\left( 0.003 \cdot [NO_3]^{2}, 0.005 \right), 0.007 \right)
+[dFe]^{min} =& \quad \max\left( 0.03 \cdot \left(\dfrac{[NO_3]}{40}\right)^{2}, 0.005 \right)
 \end{align}
 $$
 
