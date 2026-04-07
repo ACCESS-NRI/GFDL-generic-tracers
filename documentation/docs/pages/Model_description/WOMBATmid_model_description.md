@@ -2779,7 +2779,7 @@ The fraction buried is calculated according to Equation 3 of [Dunne et al. (2007
 
 $$
 \begin{align}
-F_{bury} =& \quad 0.013 \cdot 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury} =& \quad 0.013 + 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
 \end{align}
 $$
 
