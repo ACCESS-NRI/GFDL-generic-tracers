@@ -452,7 +452,7 @@ The total carbon fixation rate of phytoplankton type $p$ is
 
 $$
 \begin{align}
-\mu_{p}^{totalC} =& \quad \mu_{p}^{\rightarrow DOC} + \mu_{p}^{\leftarrow C} = \mu_{p}^{max} L_{p}^{PAR}
+\mu_{p}^{totalC} =& \quad \mu_{p}^{\rightarrow DOC} + \mu_{p}^{\leftarrow C} = \mu_{p}^{max} L_{p}^{PAR} B_{p}^{C}
 \end{align}
 $$
 
@@ -486,8 +486,8 @@ We set a floor for the minimum chlorophyll-to-carbon ratio of phytoplankton via:
 
 $$
 \begin{align}
-Q_{np}^{*Chl:C} =& \quad \min \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right) \\
-Q_{mp}^{*Chl:C} =& \quad \min \left( Q_{mp}^{*Chl:C}, Q_{mp}^{-Chl:C} \right)
+Q_{np}^{*Chl:C} =& \quad \max \left( Q_{np}^{*Chl:C}, Q_{np}^{-Chl:C} \right) \\
+Q_{mp}^{*Chl:C} =& \quad \max \left( Q_{mp}^{*Chl:C}, Q_{mp}^{-Chl:C} \right)
 \end{align}
 $$
 
@@ -999,13 +999,13 @@ _where_ <br>
 
 $$
 \begin{align}
-\Gamma_{np}^{\rightarrow C} =& \quad \Gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
-\Gamma_{mp}^{\rightarrow C} =& \quad \Gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
-\Gamma_{mz}^{\rightarrow C} =& \quad \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
-\Gamma_{Mz}^{\rightarrow C} =& \quad \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C} \\
-\Gamma_{b1}^{\rightarrow C} =& \quad \Gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b1}^{C} \\
-\Gamma_{b2}^{\rightarrow C} =& \quad \Gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b2}^{C} \\
-\Gamma_{aoa}^{\rightarrow C} =& \quad \Gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
+\Gamma_{np}^{\rightarrow C} =& \quad \Gamma_{np}^{0ºC} (β_{hete})^{T} \left(B_{np}^{C}\right)^(2) \\
+\Gamma_{mp}^{\rightarrow C} =& \quad \Gamma_{mp}^{0ºC} (β_{hete})^{T} \left(B_{mp}^{C}\right)^(2) \\
+\Gamma_{mz}^{\rightarrow C} =& \quad \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} \left(B_{mz}^{C}\right)^(2) \\
+\Gamma_{Mz}^{\rightarrow C} =& \quad \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} \left(B_{Mz}^{C}\right)^(2) \\
+\Gamma_{b1}^{\rightarrow C} =& \quad \Gamma_{b1}^{0ºC} (β_{hete})^{T} \left(B_{b1}^{C}\right)^(2) \\
+\Gamma_{b2}^{\rightarrow C} =& \quad \Gamma_{b2}^{0ºC} (β_{hete})^{T} \left(B_{b2}^{C}\right)^(2) \\
+\Gamma_{aoa}^{\rightarrow C} =& \quad \Gamma_{aoa}^{0ºC} (β_{hete})^{T} \left(B_{aoa}^{C}\right)^(2)
 \end{align}
 $$
 
@@ -1229,7 +1229,7 @@ When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model com
 $$
 \begin{align}
 (1) & P_{CaCO_3}^{\Gamma_{np}^{C}} = \quad \Gamma_{np}^{\rightarrow C} \cdot PIC:POC \\
-(2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \quad \Gamma_{mp}^{\rightarrow C} \cdot PIC:POC \\
+(2) & P_{CaCO_3}^{\Gamma_{mz}^{C}} = \quad \Gamma_{mz}^{\rightarrow C} \cdot PIC:POC \\
 (3) & P_{CaCO_3}^{g_{mz}^{\leftarrow B_{np}^{C}}} = \quad g_{mz}^{\leftarrow B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
 (4) & P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{np}^{C}}} = \quad g_{Mz}^{\leftarrow B_{np}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right) \\
 (5) & P_{CaCO_3}^{g_{Mz}^{\leftarrow B_{mz}^{C}}} = \quad g_{Mz}^{\leftarrow B_{mz}^{C}} \cdot PIC:POC \left(1 - F_{gut}\right)
@@ -2191,7 +2191,7 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta B_{b1}^{C}}{\Delta t} =& \quad \mu_{b2}^{\leftarrow C} 
+\dfrac{\Delta B_{b2}^{C}}{\Delta t} =& \quad \mu_{b2}^{\leftarrow C} 
                                            - g_{mz}^{\leftarrow B_{b2}^{C}}
                                            - g_{Mz}^{\leftarrow B_{b2}^{C}}
                                            - \gamma_{b2}^{\rightarrow C} 
