@@ -4863,7 +4863,7 @@ module generic_WOMBATmid
       dia_limnh4 = bionh4 / (bionh4 + wombat%dia_kni(i,j,k) + epsi)
       dia_limno3 = biono3 / (biono3 + wombat%dia_kni(i,j,k) + epsi)
       dia_limdin = (biono3 + bionh4) / (biono3 + bionh4 + wombat%dia_kni(i,j,k) + epsi)
-      wombat%dia_lnh4(i,j,k) = 5.0 * dia_limdin * phy_limnh4 / (dia_limno3 + 5.0 * dia_limnh4 + epsi)
+      wombat%dia_lnh4(i,j,k) = 5.0 * dia_limdin * dia_limnh4 / (dia_limno3 + 5.0 * dia_limnh4 + epsi)
       wombat%dia_lno3(i,j,k) = dia_limdin * dia_limno3 / (dia_limno3 + 5.0 * dia_limnh4 + epsi)
       wombat%dia_lnit(i,j,k) = wombat%dia_lno3(i,j,k) + wombat%dia_lnh4(i,j,k)
       ! Iron limitation (Quota model, constants from Flynn & Hipkin 1999)
@@ -5129,7 +5129,7 @@ module generic_WOMBATmid
       partic = (biodet*2 + biobdet*2 + biobdetsi*2 + biocaco3*8.3) ! total particle concentration [mmol/m3]
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
       wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet*2 + biocaco3*8.3) / (partic+epsi)
-      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 * biobdetsi*2) / (partic+epsi)
+      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 + biobdetsi*2) / (partic+epsi)
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
@@ -6645,7 +6645,7 @@ module generic_WOMBATmid
         !       this is essential for ensuring dFe is replenished in upper ocean and actually
         !       looks to be the secret of PISCES ability to replicate dFe limitation in the right places
         zno3 = wombat%f_no3(i,j,k) / mmol_m3_to_mol_kg
-        zfermin = min( max( 3e-2 * zno3 * zno3, 5e-2), 7e-2) * umol_m3_to_mol_kg
+        zfermin = max( 3e-2 / 1600 * zno3 * zno3, 5e-3) * umol_m3_to_mol_kg
         wombat%f_fe(i,j,k) = max(zfermin, wombat%f_fe(i,j,k)) * grid_tmask(i,j,k)
       enddo
     enddo; enddo
