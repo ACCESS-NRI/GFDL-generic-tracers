@@ -3149,8 +3149,12 @@ module generic_WOMBATlite
         ! pjb: tune minimum dissolved iron concentration to detection limit...
         !       this is essential for ensuring dFe is replenished in upper ocean and actually
         !       looks to be the secret of PISCES ability to replicate dFe limitation in the right places
-        wombat%f_fe(i,j,k) = max(wombat%dfefloor * umol_m3_to_mol_kg, &
-                                 wombat%f_fe(i,j,k)) * grid_tmask(i,j,k)
+        ! Only do this where the ocean is > 200m deep to avoid truncating negative tracer concentrations
+        ! at river mouths
+        if (wombat%zw(i,j,k) > 200) then
+          wombat%f_fe(i,j,k) = max(wombat%dfefloor * umol_m3_to_mol_kg, &
+                                wombat%f_fe(i,j,k)) * grid_tmask(i,j,k)
+        endif
       enddo
     enddo; enddo
 
