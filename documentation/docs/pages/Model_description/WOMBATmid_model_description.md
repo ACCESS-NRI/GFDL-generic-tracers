@@ -663,7 +663,7 @@ _where_ <br>
 - $[H^+]$ is in situ hydrogen ion concentration (`hp`, [mol L<sup>-1</sup>]) <br>
 - $Fe_{sol}$ is the final estimated solubility of dissolved iron in seawater (`fe3sol`, [nmol Fe kg<sup>-1</sup>]) <br>
 
-Next we **estimate the concentration of colloidal iron** in solution following [Tagliabue et al. 2023](https://www.nature.com/articles/s41586-023-06210-5). Colloidal dissolved Fe (`fecol(i,j,k)`, $dFe_{col}$, [mmol Fe m<sup>-3</sup>]) is whatever exceeds the inorganic solubility ceiling (`fe3sol`, $dFe_{sol}$, [mmol Fe m<sup>-3</sup>]), but we enforce a hard minimum that colloids are at least 10% of total dissolved Fe (`biofer`, $dFe$, [mmol Fe m<sup>-3</sup>]).
+Next we **estimate the concentration of colloidal iron** in solution following [Tagliabue et al. 2023](https://www.nature.com/articles/s41586-023-06210-5) in the case that `do_colloidal_shunt == .true.`. If `do_colloidal_shunt == .false.` we consider no dissolved Fe to be in colloidal form. Colloidal dissolved Fe (`fecol(i,j,k)`, $dFe_{col}$, [mmol Fe m<sup>-3</sup>]) is whatever exceeds the inorganic solubility ceiling (`fe3sol`, $dFe_{sol}$, [mmol Fe m<sup>-3</sup>]), but we enforce a hard minimum that colloids are at least 10% of total dissolved Fe (`biofer`, $dFe$, [mmol Fe m<sup>-3</sup>]).
 
 $$
 \begin{align}
@@ -679,27 +679,67 @@ dFe_{sFe} =& \quad \max\left(0.0,\ dFe - dFe_{col} \right)
 \end{align}
 $$
 
-Partitioning is done using a standard quadratic form that drops out of mass balance + equilibrium for 1:1 complexation with a single ligand class. To do so, we need the temperature- and light-dependent conditional stability constant for Fe–ligand complexation (`fe_keq`, $Fe_{Keq}$, [nmol Fe kg<sup>-1</sup>]). The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008). The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log10 units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)):
+Partitioning of iron between free and ligand-bound forms is done using one of two approaches.
+
+When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative, bisectional root solver.
+
+In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a weak ligand (`ligW_Keq(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>) and then consider the stability constant of a strong ligand to be a constant positive offset equal to 2.67 log<sub>10</sub> units ([Ye et al., 2020](https://doi.org/10.1029/2019GB006425)). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a weak ligand but add a constant 1.0 log<sub>10</sub> units to it to accommodate the effect strong ligands. 
+
+The stability constant (`ligW_Keq(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
-Fe_{Keq} =& \quad 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) }\times 10^{-9}
+Fe_{Keq} =& \quad \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)  - 0.7 \dfrac{PAR}{PAR + 10} } \\
+& \quad 10^{-0.0002  \left(DOC\right)^{2} + 0.034 \cdot DOC - 1.67 \cdot pH + 24.36} \bigg) \times 10^{-9}
 \end{align}
 $$
 
-After finding $Fe_{Keq}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]):
+After finding $Lig_{w}^{K_{eq}}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
 $$
 \begin{align}
-z =& \quad 1.0 + [Ligand] \cdot Fe_{Keq} - dFe_{sFe}\cdot Fe_{Keq} \\
-Fe_{free} =& \quad \dfrac{-z + \sqrt{z^2 + 4.0 Fe_{Keq} dFe_{sFe}}}{2 Fe_{Keq} + \varepsilon} \\
+z =& \quad 1.0 + [Ligand] \cdot Lig_{bulk}^{K_{eq}} - dFe_{sFe}\cdot Lig_{bulk}^{K_{eq}} \\
+Fe_{free} =& \quad \dfrac{-z + \sqrt{z^2 + 4.0 Lig_{bulk}^{K_{eq}} dFe_{sFe}}}{2 Lig_{bulk}^{K_{eq}} + \varepsilon} \\
 Fe_{free} =& \quad \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)
 \end{align}
 $$
 
 _where_ <br>
-- $[Ligand]$ is the in situ concentration of iron-binding ligands (`ligand`, [nmol kg<sup>-1</sup>]) <br>
+- $[Ligand]$ is the in situ concentration of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to the sum of weak and strong ligand concentrations (`ligW` + `ligS`, [nmol kg<sup>-1</sup>]) <br>
+- $Lig_{bulk}^{K_{eq}}$ is the conditional stability constant of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to $Lig_{w}^{K_{eq}}$ + 1 <br>
 
+
+In the case of `do_two_ligands == .true.`, we solve for (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the iterative method. For this approach, we know that:
+
+$$
+\begin{align}
+dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right) \\    
+\end{align}
+$$
+
+and we seek to minimize the residual of free iron ($R(dFe_{free})$) to zero where:
+
+$$
+\begin{align}
+R(dFe_{free}) =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right)  - dFe_{free} \\    
+\end{align}
+$$
+
+To do so, we set initial bounds $F_{lo} = 0$ and $F_{hi} = dFe_{sFe}$ and iterate over $n = 1, ..., N_{iter}$. At each $n$ iteration, we evaluate:
+
+$$
+\begin{align}
+F_{mid} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
+\end{align}
+$$
+
+within the equation for $R(dFe_{free})$ above. If $R(dFe_{free}) > 0$, then we set $F_{hi}$ to equal $F_{mid}$. If $R(dFe_{free}) ≤ 0$, then we set $F_{lo}$ to equal $F_{mid}$. After $N_{iter}$ we achieve a final solution where:
+
+$$
+\begin{align}
+dFe_{free} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
+\end{align}
+$$
 Whatever soluble dissolved iron is not present as inorganic free iron is assigned to ligand-bound dissolved iron:
 
 $$
@@ -708,7 +748,7 @@ dFe_{lig} =& \quad dFe_{sFe} - dFe_{free}
 \end{align}
 $$
 
-Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe, we solve for scavenging of free iron and coagulation of colloidal, both of which remove dissolved iron and transfer these to two sinking authigenic particles. These authigenic sinking particles included a small, slowly sinking type (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>]) and a large, fast sinking type (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>]). Both scavenging and colloidal coagulation are the major sinks of dissolved iron outside of phytoplankton uptake and this dissolved iron is transferred to the authigenics.
+Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe, we solve for scavenging of free iron and coagulation of colloidal, both of which remove dissolved iron and transfer these to two sinking authigenic particles. These authigenic sinking particles include a small, slowly sinking type (`f_afe(i,j,k)`, $Fe_{sA}$, [mol Fe kg<sup>-1</sup>]) and a large, fast sinking type (`f_bafe(i,j,k)`, $Fe_{lA}$, [mol Fe kg<sup>-1</sup>]). Their sinking rates are controlled by the input parameters `wafe` and `wbafe`. Both scavenging and colloidal coagulation are the major sinks of dissolved iron outside of phytoplankton uptake and this dissolved iron is transferred to the sinking authigenic pools.
 
 **Scavenging:**
 
@@ -722,7 +762,7 @@ $$
 
 _where_ <br>
 - $dFe_{free}$ is the in situ concentration of dissolved free iron (`feIII(i,j,k)`, [nmol Fe kg<sup>-1</sup>]) <br>
-- $\gamma_{dFe}^{scav}$ is the rate constant of scavenging (`kscav_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\gamma_{dFe}^{scav}$ is the rate constant of scavenging (`kscav_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> day<sup>-1</sup>]) <br>
 - $B_{particles}^{M}$ is the in situ concentration of detrital particles in the water column (`partic`, [mmol m<sup>-3</sup>]) <br>
 
 $$
@@ -734,10 +774,10 @@ $$
 _where_ <br>
 - $B_{sd}^{C}$ is the in situ concentration of small organic carbon detritus (`biodet`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{ld}^{C}$ is the in situ concentration of large organic carbon detritus (`biobdet`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{ld}^{Si}$ is the in situ concentration of biogenic silica detritus (`biodet`, [mmol Si m<sup>-3</sup>]) <br>
+- $B_{ld}^{Si}$ is the in situ concentration of biogenic silica detritus (`biobdetsi`, [mmol Si m<sup>-3</sup>]) <br>
 - $B_{CaCO_3}^{C}$ is the in situ concentration of calcium carbonate detritus (`biocaco3`, [mmol C m<sup>-3</sup>]) <br>
 
-Organic carbon-based particle types $B_{sd}^{C}$ and $B_{ld}^{C}$ are multipled by 2 assuming that carbon represents half the mass of the particle, $B_{ld}^{Si}$ is multipled by 2 assuming that it represents biogenic silica with a molecular mass of 60 g mol<sup>-1</sup>, and inorganic carbon-based particles $B_{CaCO_3}^{C}$ is multipled by 8.3 since the moleculate weight of calcium carbonate is 100 g mol<sup>-1</sup>. 
+Organic carbon-based particle types $B_{sd}^{C}$ and $B_{ld}^{C}$ are multipled by 2 assuming that carbon represents half the mass of the particle, $B_{ld}^{Si}$ is multipled by 2 assuming that it represents biogenic silica with a molecular mass of 60 g mol<sup>-1</sup>, and inorganic carbon-based particles $B_{CaCO_3}^{C}$ is multipled by 8.3 since the molecular weight of calcium carbonate is 100 g mol<sup>-1</sup>. 
 
 Total scavenging ($Sc_{dFe}^{\rightarrow}$) of free iron is then broken into two parts: scavenging to small authigenic particles (`fescaafe(i,j,k)`, $Sc_{dFe}^{\rightarrow Fe_{sA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) and scavenging to large authigenic particles (`fescabafe(i,j,k)`, $Sc_{dFe}^{\rightarrow Fe_{lA}}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]). 
 
@@ -762,24 +802,28 @@ $$
 
 _where_ <br>
 - $dFe_{col}$ is the in situ concentration of dissolved colloidal iron (`fecol(i,j,k)`, [mol Fe kg<sup>-1</sup>]) <br>
-- $\gamma_{dFe}^{coag}$ is the iron coagulation rate constant (`kcoag_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\gamma_{dFe}^{coag}$ is the iron coagulation rate constant (`kcoag_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> day<sup>-1</sup>]) <br>
 - $S_{coag}^{sA}$ and $S_{coag}^{lA}$ are scaling coefficients to decelerate or accelerate coagulation of small and large particles (`zval`, [mmol C m<sup>-3</sup>]) <br>
 
 The coagulation scaling coefficients are themselves dependent on the concentrations of dissolved organic carbon, particulate organic carbon, phytoplankton biomass and the rate of mixing. For small particle coagulation:
 
 $$
 \begin{align}
-S_{coag}^{sA} =& \quad H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9 \cdot B_{sd}^{C}\right) + 2.5 \cdot B_{sd}^{C} + 128 \cdot F_{coag} B_{DOC}^{C} + 725 \cdot B_{sd}^{C} \\
+S_{coag}^{sA} =& \quad H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9.05 \cdot B_{sd}^{C}\right) \\
+& \quad + 2.49 \cdot B_{sd}^{C} + 128 \cdot F_{coag} \left(B_{DOC}^{C} + 40\right) + 725 \cdot B_{sd}^{C} \\
+& \quad \gamma_{dFe}^{agg} \cdot \dfrac{\left(dFe_{col}\right)^{4}}{\left(dFe_{col}\right)^{4} + \left(K_{dFe}^{agg}\right)^{4}} \\ 
 F_{coag} =& \quad \dfrac{B_{np}^{C} + B_{mp}^{C}}{B_{np}^{C} + B_{mp}^{C} + 0.03}
 \end{align}
 $$
 
 _where_ <br>
-- $H_{mix}$ is a heavyside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless]) <br>
+- $H_{mix}$ is a Heaviside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless]) <br>
 - $F_{coag}$ is a phytoplankton concentration dependent coagulation factor (`biof`, [dimensionless])  <br>
 - $B_{np}^{C}$ and $B_{mp}^{C}$ are the concentrations of nano- and micro-phytoplankton biomass (`biophy`; `biodia`, [mmol C m<sup>-3</sup>])  <br>
 - $B_{DOM}^{C}$ is the concentration of dissolved organic matter in carbon (`biodoc`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{sd}^{C}$ is the concentration of small organic detrital particles (`biodet`, [mmol C m<sup>-3</sup>]) <br>
+- $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
+- $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
 
 For large particle coagulation:
 
@@ -790,7 +834,7 @@ S_{coag}^{lA} =& \quad \left(2 \cdot H_{mix} + 1.37 \right) B_{ld}^{C} + 1.94 \c
 $$
 
 _where_ <br>
-- $H_{mix}$ is a heavyside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless]) <br>
+- $H_{mix}$ is a Heaviside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless]) <br>
 - $B_{ld}^{C}$ is the concentration of large organic detrital particles (`biobdet`, [mmol C m<sup>-3</sup>]) <br>
 
 Together, these terms implement a biologically mediated coagulation pathway in which iron removal from the dissolved pool is tightly coupled to ecosystem state. The formulation reflects the central conclusion of [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5): that iron cycling is not governed solely by inorganic chemistry, but is strongly regulated by biological activity, organic matter dynamics, and particle ecology across the upper ocean. 
@@ -806,6 +850,10 @@ D_{sA}^{\rightarrow dFe} =& \quad Fe_{sA} \gamma_{sA}^{diss} \\
 D_{lA}^{\rightarrow dFe} =& \quad Fe_{lA} \gamma_{lA}^{diss}
 \end{align}
 $$
+
+_where_ <br>
+- $\gamma_{sA}^{diss}$ is the constant dissolution rate of the small sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
+- $\gamma_{lA}^{diss}$ is the constant dissolution rate of the large sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
 
 ---
 
