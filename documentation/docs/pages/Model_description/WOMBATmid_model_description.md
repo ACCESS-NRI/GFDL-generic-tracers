@@ -51,7 +51,7 @@ Below is a step‑by‑step explanation of each section together with the key eq
 variable names in $math font$ are pointers to the equations; `i,j,k` refer to horizontal and vertical indices; [square brackets] denote units. 
 If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
-The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kilogram of seawater (i.e., molarity). Some calculations herein are performed by converting tracers to units of [mmol m-3] or in the case of dissolved iron [µmol m-3]. However, we stress that all tracer tendency terms are converted back to [mol kg-1 s-1] when sources and sinks are applied.
+The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kilogram of seawater (i.e., molality). Some calculations herein are performed by converting tracers to units of [mmol m-3] or in the case of dissolved iron [µmol m-3]. However, we stress that all tracer tendency terms are converted back to [mol kg-1 s-1] when sources and sinks are applied.
 
 ---
 
@@ -60,7 +60,11 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 
 Photosynthetically available radiation (PAR) is split into blue, green and red wavelengths. The incoming visible (photosynthetically available) short wave radiation flux (PAR, [W m<sup>-2</sup>]) is received from the physical model, and is then split evenly into each of blue, green and red light bands.
 
-At the top (`par_bgr_top(k,b)`, $PAR^{top}$) and mid‑point (`par_bgr_mid(k,b)`, $PAR^{mid}$) of each layer `k` we calculate the downward irradiance by exponential decay of each band `b` through the layer thickness (`dzt(i,j,k)`, $\Delta z$, [m]) using band‑specific attenuation coefficients (`ek_bgr(k,b)`, $ex_{bgr}$, [m<sup>-1</sup>]). These attenuation coefficients are related to the concentration of chlorophyll (`chl`, [mg m<sup>-3</sup>]), organic detritus (`ndet`, [mg N m<sup>-3</sup>]) and calcium carbonate (`carb`, [kg m<sup>-3</sup>]) in the water column. For chlorophyll, attentuation coefficients for each of blue, green and red light are retrieved from the look-up table of [Morel & Maritorena (2001)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2000JC000319) (their Table 2) that explicitly relates chlorophyll concentration to attenutation rates and accounts for the packaging effect of chlorophyll in larger cells. For organic detritus, attenutation coefficients for blue, green and red light are taken from [Dutkiewicz et al. (2015)](https://bg.copernicus.org/articles/12/4447/2015/bg-12-4447-2015.html) (their Fig. 1b), while for calcium carbonate we take the coefficients defined in [Soja-Wozniak et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019JC014998). For both detritus and calcium carbonate, these studies provide concentration normalized attenutation coefficients, which must be multipled against concentrations to retrieve the correct units of [m<sup>-1</sup>].
+At the top (`par_bgr_top(k,b)`, $PAR^{top}$) and mid‑point (`par_bgr_mid(k,b)`, $PAR^{mid}$) of each layer `k` we calculate the downward irradiance by exponential decay of each band `b` through the layer thickness (`dzt(i,j,k)`, $\Delta z$, [m]) using band‑specific attenuation coefficients. These attenuation coefficients are related to the concentration of chlorophyll (`chl`, [mg m<sup>-3</sup>]), organic detritus (`ndet`, [mg N m<sup>-3</sup>]) and calcium carbonate (`carb`, [kg m<sup>-3</sup>]) in the water column. 
+
+For chlorophyll, attenuation coefficients for each of blue, green and red light (`zbgr(ichl,b)`, [m<sup>-1</sup>]) are retrieved from the look-up table of [Morel & Maritorena (2001)](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2000JC000319) (their Table 2) that explicitly relates chlorophyll concentration to attenuation rates and accounts for the packaging effect of chlorophyll in larger cells. Within `zbgr(ichl,b)`, `ichl` is an integer that corresponds to a particular band of chlorophyll concentration, with increasing chlorophyll concentrations associated with increasing attenuation.  
+
+For organic detritus, attenuation coefficients for blue, green and red light (`dbgr(b)`, [(mg N m<sup>-3</sup>)<sup>-1</sup> m<sup>-1</sup>]) are taken from [Dutkiewicz et al. (2015)](https://bg.copernicus.org/articles/12/4447/2015/bg-12-4447-2015.html) (their Fig. 1b), while for calcium carbonate (`cbgr(b)`, [(kg CaCO<sub>3</sub> m<sup>-3</sup>)<sup>-1</sup>m<sup>-1</sup>]) we take the coefficients defined in [Soja-Wozniak et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019JC014998). For both detritus and calcium carbonate, these studies provide concentration-normalized attenuation coefficients, which must be multiplied against concentrations to retrieve the correct units of [m<sup>-1</sup>].
 
 Because WOMBAT-mid has two forms of phytoplankton (nanophytoplankton and microphytoplankton) with their own chlorophyll quotas and two forms of particulate detritus (small and large), we sum both chlorophyll pools and particulate detritus pools to return the total chlorophyll and the total particulate detritus. 
 
@@ -144,7 +148,7 @@ aff =& \quad (B_{phy})^{-0.37}
 \end{align}
 $$
 
-With this information, we allow the half-saturation terms for nitrogen (`phy_kni(i,j,k)`, $K_{np}^{N}$, [mmol N m<sup>-3</sup>]; `dia_kni(i,j,k)`, $K_{mp}^{N}$, [mmol N m<sup>-3</sup>]), dissolved iron  (`phy_kfe(i,j,k)`, $K_{np}^{Fe}$, [µmol dFe m<sup>-3</sup>]; `dia_kfe(i,j,k)`, $K_{mp}^{Fe}$, [µmol dFe m<sup>-3</sup>]) and silic acid (`dia_ksi(i,j,k)`, $K_{mp}^{Si}$, [µmol Si m<sup>-3</sup>]) uptake to vary as a function of phytoplankton biomass concentration. We set reference values for the half-saturation coefficient of nitrogen (`phykn`, $K_{np}^{N,0}$, [mmol N m<sup>-3</sup>]; `diakn`, $K_{mp}^{N,0}$, [mmol N m<sup>-3</sup>]), dissolved iron (`phykf`, $K_{np}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]; `diakf`, $K_{mp}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]) and silicic acid (`diaks`, $K_{mp}^{Si,0}$, [µmol Si m<sup>-3</sup>]) as input parameters to the model, and also set thresholds of nano-phytoplankton concentration (`phybiot`, $B_{np}^{thresh}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton concentration (`diabiot`, $B_{mp}^{thresh}$, [mmol C m<sup>-3</sup>]) beneath which cell size cannot decrease and affinity can no longer increase. At this minimum, where affinity is maximised, the half-saturation coefficients are bounded to be 10% of their reference values.
+With this information, we allow the half-saturation terms for nitrogen (`phy_kni(i,j,k)`, $K_{np}^{N}$, [mmol N m<sup>-3</sup>]; `dia_kni(i,j,k)`, $K_{mp}^{N}$, [mmol N m<sup>-3</sup>]), dissolved iron  (`phy_kfe(i,j,k)`, $K_{np}^{Fe}$, [µmol dFe m<sup>-3</sup>]; `dia_kfe(i,j,k)`, $K_{mp}^{Fe}$, [µmol dFe m<sup>-3</sup>]) and silicic acid (`dia_ksi(i,j,k)`, $K_{mp}^{Si}$, [mmol Si m<sup>-3</sup>]) uptake to vary as a function of phytoplankton biomass concentration. We set reference values for the half-saturation coefficient of nitrogen (`phykn`, $K_{np}^{N,0}$, [mmol N m<sup>-3</sup>]; `diakn`, $K_{mp}^{N,0}$, [mmol N m<sup>-3</sup>]), dissolved iron (`phykf`, $K_{np}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]; `diakf`, $K_{mp}^{Fe,0}$, [µmol dFe m<sup>-3</sup>]) and silicic acid (`diaks`, $K_{mp}^{Si,0}$, [mmol Si m<sup>-3</sup>]) as input parameters to the model, and also set thresholds of nano-phytoplankton concentration (`phybiot`, $B_{np}^{thresh}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton concentration (`diabiot`, $B_{mp}^{thresh}$, [mmol C m<sup>-3</sup>]) beneath which cell size cannot decrease and affinity can no longer increase. At this minimum, where affinity is maximised, the half-saturation coefficients are bounded to be 10% of their reference values.
 
 $$
 \begin{align}
@@ -159,7 +163,7 @@ $$
 _where_ <br>
 - $K_{np}^{N}$ and $K_{mp}^{N}$ are the half-saturation coefficients for nitrogen uptake by nano- and micro-phytoplankton (`phy_kni(i,j,k)` and `dia_kni(i,j,k)`, [mmol N m<sup>-3</sup>]) <br>
 - $K_{np}^{Fe}$ and $K_{mp}^{Fe}$ are the half-saturation coefficients for iron uptake by nano- and micro-phytoplankton (`phy_kfe(i,j,k)` and `dia_kfe(i,j,k)`, [µmol Fe m<sup>-3</sup>]) <br>
-- $K_{mp}^{Si}$ are the half-saturation coefficients for nitrogen uptake by nano- and micro-phytoplankton (`dia_ksi(i,j,k)`, [mmol Si m<sup>-3</sup>]) <br>
+- $K_{mp}^{Si}$ is the half-saturation coefficient of silicic acid uptake by micro-phytoplankton (`dia_ksi(i,j,k)`, [mmol Si m<sup>-3</sup>]) <br>
 
 
 **Limitation of phytoplankton growth by nitrogen** (`phy_lnit(i,j,k)`, $L_{np}^{N}$), [dimensionless]; `dia_lnit(i,j,k)`, $L_{mp}^{N}$), [dimensionless]) is split between ammonium (`phy_lnh4(i,j,k)`, $L_{np}^{NH_4}$), [dimensionless]; `dia_lnh4(i,j,k)`, $L_{mp}^{NH_4}$), [dimensionless]) and nitrate (`phy_lno3(i,j,k)`, $L_{np}^{NO_3}$), [dimensionless]; `dia_lno3(i,j,k)`, $L_{mp}^{NO_3}$), [dimensionless]). Phytoplankton preferentially consume and grow on ammonium because it is most efficiently converted to glutamate for biomass synthesis, while nitrate must be first reduced within the cell ([Dortch, 1990](https://www.jstor.org/stable/24842258)). To represent this preference, we follow [Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/) who assert a 5-fold preference of phytoplankton for ammonium over nitrate and show that this reproduces preferences of ammonium-fueled growth in ocean field data.
@@ -212,7 +216,7 @@ _where_ <br>
 
 Note that although phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, as NO<sub>3</sub> becomes more abundant than NH<sub>4</sub> the $L_{mp}^{NO_3}$ term begins to exceed the $L_{mp}^{NH_4}$ term such that phytoplankton switch from regenerated production (NH<sub>4</sub>-based) to new production (NO<sub>3</sub>-based). This reproduces the known switch of phytoplankton from regenerated to new production that is observed in the real ocean ([Dugdale & Goering, 1967](https://doi.org/10.4319/lo.1967.12.2.0196), [Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/)). Furthermore, if $K_{mp}^{N}$ > $K_{np}^{N}$, this ensures that (i) micro-phytoplankton are less competitive for NH<sub>4</sub> than nano-phytoplankton at any concentration and (ii) micro-phytoplankton growth is greater than nano-phytoplankton under abundant NO<sub>3</sub>, which is consistent with theory and observations ([Fawcett et al., 2011](https://doi.org/10.1038/ngeo1265), [Glibert et al., 2016](https://doi.org/10.1002/lno.10203))
 
-**Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{np}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_minqfe`, $Q_{mp}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phy_optqfe`, $Q_{np}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_optqfe`, $Q_{mp}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{np}^{-Fe:C}$ and $Q_{mp}^{-Fe:C}$, is dependent on three terms that each correspond to the iron required by photosystems, respiration and nitrate reduction ([Flynn & Hipkin, 1999](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x)):
+**Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{np}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `dia_minqfe`, $Q_{mp}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phyoptqf`, $Q_{np}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]; `diaoptqf`, $Q_{mp}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{np}^{-Fe:C}$ and $Q_{mp}^{-Fe:C}$, is dependent on three terms that each correspond to the iron required by photosystems, respiration and nitrate reduction ([Flynn & Hipkin, 1999](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x)):
 
 $$
 \begin{align}
@@ -224,7 +228,7 @@ $$
 
 $$
 \begin{align}
-Q_{mp}^{-Fe:C} =& \quad 0.00167 / 55.85 \cdot Q_{mp}^{Chl:C} \cdot 12 \\
+Q_{mp}^{-Fe:C} =& \quad 0.00167 / 55.85 \cdot \max\left( Q_{mp}^{Chl:C}, Q_{mp}^{-Chl:C} \right) \cdot 12 \\
                 & + 1.21 \times 10^{-5} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot 1.5 \cdot L_{mp}^{N} \\
                 & + 1.15 \times 10^{-4} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot L_{mp}^{NO_3}
 \end{align}
@@ -456,21 +460,21 @@ $$
 \end{align}
 $$
 
-This formulation is derived from the idea that DOC exudation occurs as a result of the difference between carbon fixation capacity, which is bounded by light, and biosynthesis, which is bounded by light and nutrient resources. Since [Thornton (2014)](https://doi.org/10.1080/09670262.2013.875596) identified that as much as 50% of total phytoplankton carbon fixation can be routed to DOC exudation, we cap DOC exudation at $f_{overflow}$ of total carbon fixation, which is set as to a default of 0.5. We also set a hard bound that 2% of total carbon fixation must at minimum go to DOC production based on the findings of [Bjørnsen (1988)](https://doi.org/10.4319/lo.1988.33.1.0151) who identified that even the healthiest cells lose a small fraction of their assimilated carbon as DOC via passive diffusion across the cell membrane.
+This formulation is derived from the idea that DOC exudation occurs as a result of the difference between carbon fixation capacity, which is bounded by light, and biosynthesis, which is bounded by light and nutrient resources. Since [Thornton (2014)](https://doi.org/10.1080/09670262.2013.875596) identified that as much as 50% of total phytoplankton carbon fixation can be routed to DOC exudation, we cap DOC exudation at $f_{overflow}$ of total carbon fixation, which is set as to a default of 0.75. We also set a hard bound that 2% of total carbon fixation must at minimum go to DOC production based on the findings of [Bjørnsen (1988)](https://doi.org/10.4319/lo.1988.33.1.0151) who identified that even the healthiest cells lose a small fraction of their assimilated carbon as DOC via passive diffusion across the cell membrane.
 
 ---
 
 
-### 7. Growth of chlorophyll
+### 7. Synthesis of chlorophyll
 
-This step diagnoses the **rate of chlorophyll production** as a function of mixed-layer light, the phytoplankton growth rate and nutrient availability. The structure is consistent with the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation that relaxes the chlorophyll-to-carbon ratio towards an optimal value that supports photosynthetic growth under prevailing light and nutrient conditions.
+This step diagnoses the **rate of chlorophyll synthesis** as a function of mixed-layer light, the phytoplankton growth rate and nutrient availability. The structure is consistent with the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation that relaxes the chlorophyll-to-carbon ratio towards an optimal value that supports photosynthetic growth under prevailing light and nutrient conditions.
 
 We first solve for the optimal chlorophyll-to-carbon ratio (`phy_chlc`, $Q_{np}^{*Chl:C}$, [mol C (mol C)<sup>-1</sup>]; `dia_chlc`, $Q_{mp}^{*Chl:C}$, [mol C (mol C)<sup>-1</sup>]), which is diagnosed as the ratio required to support maximal photosynthetic carbon fixation under the ambient mean light level in the mixed layer, while accounting for nutrient limitation of biosynthesis:
 
 $$
 \begin{align}
-Q_{np}^{*Chl:C} =& \quad \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }} \\
-Q_{mp}^{*Chl:C} =& \quad \dfrac{Q_{mp}^{+Chl:C}}{1 + \dfrac{\alpha_{mp} PAR_{MLD} Q_{mp}^{+Chl:C}}{2 \mu_{mp}^{max} \min \left(L_{mp}^{N}, L_{mp}^{Fe} \right) }}
+Q_{np}^{*Chl:C} =& \quad \dfrac{Q_{np}^{+Chl:C}}{1 + \dfrac{\alpha_{np} PAR_{MLD} Q_{np}^{+Chl:C}}{2 \cdot 86400 \cdot \mu_{np}^{max} \min \left(L_{np}^{N}, L_{np}^{Fe} \right) }} \\
+Q_{mp}^{*Chl:C} =& \quad \dfrac{Q_{mp}^{+Chl:C}}{1 + \dfrac{\alpha_{mp} PAR_{MLD} Q_{mp}^{+Chl:C}}{2 \cdot 86400 \cdot \mu_{mp}^{max} \min \left(L_{mp}^{N}, L_{mp}^{Fe} \right) }}
 \end{align}
 $$
 
@@ -587,7 +591,7 @@ Like chlorophyll and iron, the silicon content of micro-phytoplankton is explici
 $$
 \begin{align}
 (i) & \quad \dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}} \\
-(ii) & \quad \left(\max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}
+(ii) & \quad \left(1.0 - \max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}
 \end{align}
 $$
 
