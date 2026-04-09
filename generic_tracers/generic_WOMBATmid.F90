@@ -359,10 +359,6 @@ module generic_WOMBATmid
         alk_global, &
         no3_global, &
         nh4_global, &
-        dic_min, &
-        dic_max, &
-        alk_min, &
-        alk_max, &
         htotal_scale_lo, &
         htotal_scale_hi, &
         htotal_in, &
@@ -2479,22 +2475,6 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('htotal_scale_hi', wombat%htotal_scale_hi, 100.0)
 
-    ! Absolute minimum of dissolved inorganic carbon [mmol/m3] for co2 sys calcs
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('dic_min', wombat%dic_min, 100.0)
-
-    ! Absolute maximum of dissolved inorganic carbon [mmol/m3] for co2 sys calcs
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('dic_max', wombat%dic_max, 100000.0)
-
-    ! Absolute minimum of alkalinity [mmol/m3] for co2 sys calcs
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('alk_min', wombat%alk_min, 100.0)
-
-    ! Absolute maximum of alkalinity [mmol/m3] for co2 sys calcs
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('alk_max', wombat%alk_max, 100000.0)
-
     !=======================================================================
     ! NPZD parameters
     !=======================================================================
@@ -4267,10 +4247,10 @@ module generic_WOMBATmid
      if (k==1) then !{
        call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,k), &
            Temp(:,:,k), max(1.0, Salt(:,:,k)), &
-           min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%f_dic(:,:,k), wombat%dic_min*mmol_m3_to_mol_kg)), &
+           wombat%f_dic(:,:,k), &
            max(wombat%f_no3(:,:,k) / 16., 1e-9), &
            wombat%f_sil(:,:,k), &
-           min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%f_alk(:,:,k), wombat%alk_min*mmol_m3_to_mol_kg)), &
+           wombat%f_alk(:,:,k), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
            wombat%htotal(:,:,k), &
            co2_calc=trim(co2_calc), &
@@ -4287,10 +4267,10 @@ module generic_WOMBATmid
 
        call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,k), &
            Temp(:,:,k), max(1.0, Salt(:,:,k)), &
-           min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%f_dic(:,:,k), wombat%dic_min*mmol_m3_to_mol_kg)), &
+           wombat%f_dic(:,:,k), &
            max(wombat%f_no3(:,:,k) / 16., 1e-9), &
            wombat%f_sil(:,:,k), &
-           min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%f_alk(:,:,k), wombat%alk_min*mmol_m3_to_mol_kg)), &
+           wombat%f_alk(:,:,k), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
            wombat%htotal(:,:,k), &
            co2_calc=trim(co2_calc), zt=wombat%zw(:,:,k), &
@@ -6942,10 +6922,10 @@ module generic_WOMBATmid
 
     call FMS_ocmip2_co2calc(CO2_dope_vec, wombat%sedmask(:,:), &
         wombat%sedtemp(:,:), max(1.0, wombat%sedsalt(:,:)), &
-        min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%seddic(:,:), wombat%dic_min*mmol_m3_to_mol_kg)), &
+        wombat%seddic(:,:), &
         max(wombat%sedno3(:,:) / 16., 1e-9), &
         wombat%sedsil(:,:), &
-        min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%sedalk(:,:), wombat%alk_min*mmol_m3_to_mol_kg)), &
+        wombat%sedalk(:,:), &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_lo, &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_hi, &
         wombat%sedhtotal(:,:), &
@@ -8062,10 +8042,10 @@ module generic_WOMBATmid
 
       call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,1), &
           SST(:,:), max(1.0, SSS(:,:)), &
-          min(wombat%dic_max*mmol_m3_to_mol_kg, max(wombat%f_dic(:,:,1), wombat%dic_min*mmol_m3_to_mol_kg)), &
+          wombat%f_dic(:,:,1), &
           max(wombat%f_no3(:,:,1) / 16., 1e-9), &
           wombat%f_sil(:,:,1), &
-          min(wombat%alk_max*mmol_m3_to_mol_kg, max(wombat%f_alk(:,:,1), wombat%alk_min*mmol_m3_to_mol_kg)), &
+          wombat%f_alk(:,:,1), &
           wombat%htotallo(:,:), wombat%htotalhi(:,:), &
           wombat%htotal(:,:,1), &
           co2_calc=trim(co2_calc), &
