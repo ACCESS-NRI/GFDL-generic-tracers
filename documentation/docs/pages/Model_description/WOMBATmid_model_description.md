@@ -667,7 +667,7 @@ Next we **estimate the concentration of colloidal iron** in solution following [
 
 $$
 \begin{align}
-dFe_{col} =& \quad \max\left(0.1 dFe\, \ dFe - dFe_{sol} \right)
+dFe_{col} =& \quad \max\left(0.1 dFe, \ dFe - dFe_{sol} \right)
 \end{align}
 $$
 
@@ -690,7 +690,7 @@ The stability constant (`ligW_Keq(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup
 $$
 \begin{align}
 Fe_{Keq} =& \quad \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)  - 0.7 \dfrac{PAR}{PAR + 10} } \\
-& \quad 10^{-0.0002  \left(DOC\right)^{2} + 0.034 \cdot DOC - 1.67 \cdot pH + 24.36} \bigg) \times 10^{-9}
+& \quad 10^{\left(-0.0002  \left(DOC\right)^{2} + 0.034 \cdot DOC - 1.67 \cdot pH + 24.36\right)} \bigg) \times 10^{-9}
 \end{align}
 $$
 
@@ -717,37 +717,6 @@ dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dF
 \end{align}
 $$
 
-In the case of `do_two_ligands == .true.`, we solve for (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the iterative method. For this approach, we know that:
-
-$$
-\begin{align}
-dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right) \\    
-\end{align}
-$$
-
-and we seek to minimize the residual of free iron ($R(dFe_{free})$) to zero where:
-
-$$
-\begin{align}
-R(dFe_{free}) =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right)  - dFe_{free} \\    
-\end{align}
-$$
-
-To do so, we set initial bounds $F_{lo} = 0$ and $F_{hi} = dFe_{sFe}$ and iterate over $n = 1, ..., N_{iter}$. At each $n$ iteration, we evaluate:
-
-$$
-\begin{align}
-F_{mid} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
-\end{align}
-$$
-
-within the equation for $R(dFe_{free})$ above. If $R(dFe_{free}) > 0$, then we set $F_{hi}$ to equal $F_{mid}$. If $R(dFe_{free}) ≤ 0$, then we set $F_{lo}$ to equal $F_{mid}$. After $N_{iter}$ we achieve a final solution where:
-
-$$
-\begin{align}
-dFe_{free} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
-\end{align}
-$$
 and we seek to minimize the residual of free iron ($R(dFe_{free})$) to zero where:
 
 $$
@@ -883,10 +852,6 @@ D_{sA}^{\rightarrow dFe} =& \quad Fe_{sA} \gamma_{sA}^{diss} \\
 D_{lA}^{\rightarrow dFe} =& \quad Fe_{lA} \gamma_{lA}^{diss}
 \end{align}
 $$
-
-_where_ <br>
-- $\gamma_{sA}^{diss}$ is the constant dissolution rate of the small sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
-- $\gamma_{lA}^{diss}$ is the constant dissolution rate of the large sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
 
 _where_ <br>
 - $\gamma_{sA}^{diss}$ is the constant dissolution rate of the small sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
