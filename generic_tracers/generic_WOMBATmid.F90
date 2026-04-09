@@ -74,6 +74,14 @@
 !   If true, do dynamic CaCO3 precipitation, dissolution and ballasting
 !  </DATA>
 !
+!  <DATA NAME="do_colloidal_shunt" TYPE="logical">
+!   If true, do colloidal shunt and coagulation to authigenic pools
+!  </DATA>
+!
+!  <DATA NAME="do_two_ligands" TYPE="logical">
+!   If true, do two ligands (one strong, one weak) for iron complexation.
+!  </DATA>
+!
 !  <DATA NAME="do_burial" TYPE="logical">
 !   If true, permanently bury organics and CaCO3 in sediments
 !  </DATA>
@@ -162,6 +170,8 @@ module generic_WOMBATmid
   !=======================================================================
   character(len=10) :: co2_calc  = 'mocsy' ! other option is 'ocmip2'
   logical :: do_caco3_dynamics   = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
+  logical :: do_colloidal_shunt  = .true.  ! do colloidal shunt and coagulation to authigenic pools?
+  logical :: do_two_ligands      = .true. ! do two ligands (one strong, one weak) for iron complexation?
   logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
   logical :: do_nitrogen_fixation= .true.  ! N cycle has nitrogen fixation?
   logical :: do_anammox          = .true.  ! N cycle has anammox?
@@ -172,7 +182,7 @@ module generic_WOMBATmid
   logical :: do_check_c_conserve = .false.  ! check that the C fluxes balance in the ecosystem
   logical :: do_check_si_conserve = .false.  ! check that the Si fluxes balance in the ecosystem
 
-  namelist /generic_wombatmid_nml/ co2_calc, do_caco3_dynamics, do_burial, &
+  namelist /generic_wombatmid_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, do_two_ligands, do_burial, &
                                    do_nitrogen_fixation, do_anammox, do_wc_denitrification, do_benthic_denitrification, &
                                    do_viscous_sinking, do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
 
@@ -199,6 +209,7 @@ module generic_WOMBATmid
         bbioh, &
         phykn, &
         phykf, &
+        phyprefnh4, &
         phyminqc, &
         phymaxqc, &
         phyoptqf, &
@@ -208,6 +219,7 @@ module generic_WOMBATmid
         diakn, &
         diakf, &
         diaks, &
+        diaprefnh4, &
         diaminqc, &
         diamaxqc, &
         diaoptqf, &
@@ -292,7 +304,8 @@ module generic_WOMBATmid
         disscal, &
         dissara, &
         dissdet, &
-        ligand, &
+        ligW, &
+        ligS, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -518,6 +531,7 @@ module generic_WOMBATmid
         disssi, &
         bsidiss, &
         feIII, &
+        ligW_K, &
         felig, &
         fecol, &
         fescaven, &
@@ -748,6 +762,7 @@ module generic_WOMBATmid
         id_disssi = -1, &
         id_bsidiss = -1, &
         id_feIII = -1, &
+        id_ligW_K = -1, &
         id_felig = -1, &
         id_fecol = -1, &
         id_fescaven = -1, &
@@ -1017,6 +1032,16 @@ module generic_WOMBATmid
     if (do_caco3_dynamics) then
       write (stdoutunit,*) trim(note_header), &
           'Doing dynamic CaCO3 precipitation and dissolution'
+    endif
+
+    if (do_colloidal_shunt) then
+      write (stdoutunit,*) trim(note_header), &
+          'Doing colloidal shunt and coagulation to authigenic pools'
+    endif
+
+    if (do_two_ligands) then
+      write (stdoutunit,*) trim(note_header), &
+          'Using two ligands (one strong, one weak) for iron complexation'
     endif
 
     if (do_burial) then
@@ -1529,6 +1554,11 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'feIII', 'free iron (Fe3+)', 'h', 'L', 's', 'mol/kg', 'f')
     wombat%id_feIII = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'ligW_K', 'Weak ligand stability constant', 'h', 'L', 's', 'kg/mol', 'f')
+    wombat%id_ligW_K = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2548,6 +2578,10 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phykf', wombat%phykf, 1.0)
 
+    ! Nano-phytoplankton preference for ammonium over nitrate [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('phyprefnh4', wombat%phyprefnh4, 5.0)
+
     ! Phytoplankton minimum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.008)
@@ -2586,6 +2620,10 @@ module generic_WOMBATmid
     !  - We set 5.0 here as default due to recalculation of variable Ksi below
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaks', wombat%diaks, 6.7)
+
+    ! Micro-phytoplankton preference for ammonium over nitrate [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('diaprefnh4', wombat%diaprefnh4, 5.0)
 
     ! microphytoplankton minimum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
@@ -2969,45 +3007,49 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissdet', wombat%dissdet, 0.20)
 
-    ! Background concentration of iron-binding ligand [umol/m3]
+    ! Background concentration of weak iron-binding ligand [umol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ligand', wombat%ligand, 1.2)
+    call g_tracer_add_param('ligW', wombat%ligW, 1.0)
 
-    ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 d-1]
+    ! Background concentration of strong iron-binding ligand [umol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.4)
+    call g_tracer_add_param('ligS', wombat%ligS, 0.5)
 
-    ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 d-1]
+    ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 s-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.4/86400.0)
+
+    ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 s-1]
     !  1e-5 ---> coagulation at roughly 0.1 per day in productive surface waters
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 5e-8)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-7/86400.0)
 
-    ! Rate of aggregation of colloidal iron into authigenic Fe particles [d-1]
+    ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kagg_col', wombat%kagg_col, 0.1)
+    call g_tracer_add_param('kagg_col', wombat%kagg_col, 0.1/86400.0)
 
     ! Half-saturation coefficient modulating aggregation of colloidal iron [umolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kagg_kcol', wombat%kagg_kcol, 2.0)
 
-    ! Rate of dissolution of authigenic iron into dissolved Fe [d-1]
+    ! Rate of dissolution of authigenic iron into dissolved Fe [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kafe_dfe', wombat%kafe_dfe, 1e-4)
+    call g_tracer_add_param('kafe_dfe', wombat%kafe_dfe, 1e-4/86400.0)
 
-    ! Rate of dissolution of larger authigenic iron into dissolved Fe [d-1]
+    ! Rate of dissolution of larger authigenic iron into dissolved Fe [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kbafe_dfe', wombat%kbafe_dfe, 1e-4)
+    call g_tracer_add_param('kbafe_dfe', wombat%kbafe_dfe, 1e-4/86400.0)
 
     ! Sinking speed of authigenic iron (oxyhydroxide) [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wafe', wombat%wafe, 2.5/86400.0)
+    call g_tracer_add_param('wafe', wombat%wafe, 0.5/86400.0)
 
     ! Sinking speed of bigger authigenic iron (oxyhydroxide) [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wbafe', wombat%wbafe, 10.0/86400.0)
+    call g_tracer_add_param('wbafe', wombat%wbafe, 5.0/86400.0)
 
     ! Factor increase in biogenic silica dissolution caused by bacterial activity [ ]
     !-----------------------------------------------------------------------
@@ -3033,10 +3075,14 @@ module generic_WOMBATmid
     call g_tracer_add_param('aoa_poxy', wombat%aoa_poxy, 275.0/86400.0)
 
     ! Ammonia Oxidizing Archaea biomass yield per NH4 [mol NH4 / mol Biomass]
+    ! NOTE: in the WOMBAT-mid documentation, aoa_ynh4 is written as the inverse
+    !       of what it is here in the code, in units of mol Biomass per mol NH4
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_ynh4', wombat%aoa_ynh4, 11.0)
 
     ! Ammonia Oxidizing Archaea biomass yield per O2 [mol O2 / mol Biomass]
+    ! NOTE: in the WOMBAT-mid documentation, aoa_yoxy is written as the inverse
+    !       of what it is here in the code, in units of mol Biomass per mol O2
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5)
 
@@ -3070,11 +3116,11 @@ module generic_WOMBATmid
     !  Zakem et al., 2020 ISME make this assumption, following LaRowe & Van Cappellen 2011
     call g_tracer_add_param('bacanapen', wombat%bacanapen, 0.9)
 
-    ! Minimum possible biomass yield per mol of DON+NH4 [mol biomas per mol DON]
+    ! Minimum possible biomass yield per mol of DON+NH4 [mol Biomass per mol DON]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac_ydonmin', wombat%bac_ydonmin, 0.15)
 
-    ! Maximum possible biomass yield per mol of DON+NH4 [mol biomas per mol DON]
+    ! Maximum possible biomass yield per mol of DON+NH4 [mol Biomass per mol DON]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac_ydonmax', wombat%bac_ydonmax, 0.65)
 
@@ -4056,6 +4102,7 @@ module generic_WOMBATmid
     real                                    :: ztemk, I_ztemk, fe_keq, fe_sfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: feagg1, feagg2, feagg3, feagg4, feagg5
+    real                                    :: flo, fhi, fmid, FeL1_mid, FeL2_mid
     real                                    :: biof, zno3, zfermin, shear
     real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, mes_Fe2C, det_Fe2C, bdet_Fe2C
     real                                    :: dom_N2C, dia_Si2C
@@ -4065,7 +4112,7 @@ module generic_WOMBATmid
     real                                    :: zoo_slmor, mes_slmor
     real                                    :: hco3
     real                                    :: dzt_bot, dzt_bot_os
-    real                                    :: e_dom, e_bac, f_bac
+    real                                    :: e_dom, e_bac, f_ele
     real                                    :: bac1_yoxy, bac1_yana, bac1_yno3, bac2_yoxy, bac2_yana, bac2_yn2o
     real                                    :: bac1_ydonC, bac1_yoxyC, bac1_yanaC, bac1_yno3C
     real                                    :: bac2_ydonC, bac2_yoxyC, bac2_yanaC, bac2_yn2oC
@@ -4345,6 +4392,7 @@ module generic_WOMBATmid
     wombat%feIII(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
+    wombat%ligW_K(:,:,:) = 0.0
     wombat%fescaven(:,:,:) = 0.0
     wombat%fescaafe(:,:,:) = 0.0
     wombat%fescabafe(:,:,:) = 0.0
@@ -4632,7 +4680,7 @@ module generic_WOMBATmid
     !    4.  Light limitation of phytoplankton                              !
     !    5.  Realized growth rate of phytoplankton                          !
     !    6.  Dissolved organic carbon release by phytoplankton              !
-    !    7.  Growth of chlorophyll                                          !
+    !    7.  Synthesis of chlorophyll                                       !
     !    8.  Phytoplankton uptake of iron                                   !
     !    9.  Phytoplankton uptake of silicic acid                           !
     !    10. Iron chemistry (scavenging, coagulation, dissolution)          !
@@ -4845,8 +4893,8 @@ module generic_WOMBATmid
       phy_limnh4 = bionh4 / (bionh4 + wombat%phy_kni(i,j,k) + epsi)
       phy_limno3 = biono3 / (biono3 + wombat%phy_kni(i,j,k) + epsi)
       phy_limdin = (biono3 + bionh4) / (biono3 + bionh4 + wombat%phy_kni(i,j,k) + epsi)
-      wombat%phy_lnh4(i,j,k) = 5.0 * phy_limdin * phy_limnh4 / (phy_limno3 + 5.0 * phy_limnh4 + epsi)
-      wombat%phy_lno3(i,j,k) = phy_limdin * phy_limno3 / (phy_limno3 + 5.0 * phy_limnh4 + epsi)
+      wombat%phy_lnh4(i,j,k) = wombat%phyprefnh4 * phy_limdin * phy_limnh4 / (phy_limno3 + wombat%phyprefnh4 * phy_limnh4 + epsi)
+      wombat%phy_lno3(i,j,k) = phy_limdin * phy_limno3 / (phy_limno3 + wombat%phyprefnh4 * phy_limnh4 + epsi)
       wombat%phy_lnit(i,j,k) = wombat%phy_lno3(i,j,k) + wombat%phy_lnh4(i,j,k)
       ! Iron limitation (Quota model, constants from Flynn & Hipkin 1999)
       phy_minqfe = 0.00167 / 55.85 * max(wombat%phyminqc, phy_chlc)*12 + &
@@ -4863,8 +4911,8 @@ module generic_WOMBATmid
       dia_limnh4 = bionh4 / (bionh4 + wombat%dia_kni(i,j,k) + epsi)
       dia_limno3 = biono3 / (biono3 + wombat%dia_kni(i,j,k) + epsi)
       dia_limdin = (biono3 + bionh4) / (biono3 + bionh4 + wombat%dia_kni(i,j,k) + epsi)
-      wombat%dia_lnh4(i,j,k) = 5.0 * dia_limdin * phy_limnh4 / (dia_limno3 + 5.0 * dia_limnh4 + epsi)
-      wombat%dia_lno3(i,j,k) = dia_limdin * dia_limno3 / (dia_limno3 + 5.0 * dia_limnh4 + epsi)
+      wombat%dia_lnh4(i,j,k) = wombat%diaprefnh4 * dia_limdin * dia_limnh4 / (dia_limno3 + wombat%diaprefnh4 * dia_limnh4 + epsi)
+      wombat%dia_lno3(i,j,k) = dia_limdin * dia_limno3 / (dia_limno3 + wombat%diaprefnh4 * dia_limnh4 + epsi)
       wombat%dia_lnit(i,j,k) = wombat%dia_lno3(i,j,k) + wombat%dia_lnh4(i,j,k)
       ! Iron limitation (Quota model, constants from Flynn & Hipkin 1999)
       dia_minqfe = 0.00167 / 55.85 * max(wombat%diaminqc, dia_chlc)*12 + &
@@ -4981,7 +5029,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 7] Growth of chlorophyll                                       !
+      !  [Step 7] Synthesis of chlorophyll                                    !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5108,28 +5156,53 @@ module generic_WOMBATmid
       ! Estimate total colloidal iron following Tagliabue et al. (2023).
       ! Colloidal dFe is considered to be whatever exceeds the inorganic solubility
       ! ceiling, although there is always a hard lower limit of 10% of total dFe.
-      wombat%fecol(i,j,k) = max(0.1*biofer, biofer - fe3sol)
+      if (do_colloidal_shunt) then
+        wombat%fecol(i,j,k) = max(0.1*biofer, biofer - fe3sol)
+      else
+        wombat%fecol(i,j,k) = 0.0
+      endif
 
       ! Determine equilibriuim fractionation of the remaining dFe (non-colloidal)
-      ! between Fe' and ligand-bound iron (L-Fe). Below, temperature increases the
-      ! solubility constant (reducing free Fe) and light decreases the solubility
-      ! constant (increasing free Fe). The temperature-dependency comes from Volker
-      ! & Tagliabue (2015), while the light dependency is informed by Barbeau et al.
-      ! (2001) who saw a 0.7 log10 unit decrease in K in high light.
-      fe_keq = 1e-9 * 10.0**( (17.27 - 1565.7 * I_ztemk ) - 0.7 * &
-                              wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) )
+      ! between Fe' and ligand-bound iron (L-Fe). Below, temperature increases Keq
+      ! (reducing free Fe), light decreases Keq (increasing free Fe), pH decreases Keq
+      ! and DOC increases Keq. The temperature-dependency comes from Volker & Tagliabue 
+      ! (2015), while the light dependency is informed by Barbeau et al. (2001) who saw 
+      ! a 0.7 log10 unit decrease in K in high light. The pH and DOC dependency (3rd term) 
+      ! is informed by Ye et al. (2020).
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
-      zval = 1.0 + wombat%ligand * fe_keq - fe_sfe * fe_keq
-      wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*fe_keq*fe_sfe ) ) &
-                            / ( 2.*fe_keq + epsi )
-      wombat%feIII(i,j,k) = max(0.0, min(wombat%feIII(i,j,k), fe_sfe) )
+      wombat%ligW_K(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
+                             - 0.7 * wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) ) &
+                             + 10.0**( (-2e-4 * biodoc + 0.034)* biodoc - 1.67*(-log10(hp)) + 24.36 ) )
+      if (do_two_ligands) then
+        ! solve for the equilibrium concentration of ligand-bound and free Fe using iterative search
+        flo = 0.0
+        fhi = fe_sfe
+        do iter = 1,20
+          fmid = 0.5 * (flo + fhi)
+          FeL1_mid = wombat%ligW_K(i,j,k) * fmid * wombat%ligW / (1.0 + wombat%ligW_K(i,j,k) * fmid)
+          FeL2_mid = (wombat%ligW_K(i,j,k)+2.67) * fmid * wombat%ligS / (1.0 + (wombat%ligW_K(i,j,k)+2.67) * fmid)
+          zval = fmid + FeL1_mid + FeL2_mid - fe_sfe
+          if (zval > 0.0) then
+            fhi = fmid
+          else          
+            flo = fmid
+          endif
+        enddo
+        wombat%feIII(i,j,k) = max(0.0, min(0.5 * (flo + fhi), fe_sfe))
+      else
+        wombat%ligW_K(i,j,k) = wombat%ligW_K(i,j,k) + 1.0
+        zval = 1.0 + wombat%ligW * wombat%ligW_K(i,j,k) - fe_sfe * wombat%ligW_K(i,j,k)
+        wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*wombat%ligW_K(i,j,k)*fe_sfe ) ) &
+                              / ( 2.*wombat%ligW_K(i,j,k) + epsi )
+        wombat%feIII(i,j,k) = max(0.0, min(wombat%feIII(i,j,k), fe_sfe) )
+      endif
       wombat%felig(i,j,k) = fe_sfe - wombat%feIII(i,j,k)
 
       ! Scavenging of Fe` onto biogenic particles
       partic = (biodet*2 + biobdet*2 + biobdetsi*2 + biocaco3*8.3) ! total particle concentration [mmol/m3]
-      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
+      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic)
       wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet*2 + biocaco3*8.3) / (partic+epsi)
-      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 * biobdetsi*2) / (partic+epsi)
+      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 + biobdetsi*2) / (partic+epsi)
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
@@ -5141,21 +5214,22 @@ module generic_WOMBATmid
       feagg3 = 2.49
       feagg4 = 127.8 * 3 * 0.3 * biof
       feagg5 = 725.7
+      ! The following equation computes the transfer of colloidal iron to small authigenic iron particles:
+      !  The 1st term = coagulation of colloidal Fe due to interaction with organic material
+      !  The 2nd term = aggregation of colloidal Fe when concentration is high
       zval = ( shear*(feagg1*(biodoc+40.0) + feagg2*biodet) + feagg3*biodet &
-               + feagg4*(biodoc+40.0) + feagg5*biodet ) * wombat%kcoag_dfe
-      wombat%fecoag2afe(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
-      ! Include an aggregation of colloidal authigenic Fe when concentration of colloidal Fe is high
-      wombat%fecoag2afe(i,j,k) = wombat%fecoag2afe(i,j,k) + wombat%kagg_col / 86400.0 &
-                                 * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4)
+               + feagg4*(biodoc+40.0) + feagg5*biodet ) * wombat%kcoag_dfe & 
+             + wombat%kagg_col * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4)  
+      wombat%fecoag2afe(i,j,k) = wombat%fecol(i,j,k) * zval
       ! Colloidal shunt associated with big particles (Tagliabue et al., 2023)
       feagg1 = 1.37
       feagg2 = 1.94
       zval = (( shear*2.0 + feagg1)*biobdet + feagg2*biobdet ) * wombat%kcoag_dfe
-      wombat%fecoag2bafe(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
+      wombat%fecoag2bafe(i,j,k) = wombat%fecol(i,j,k) * zval
 
       ! dissolution of Fe from authigenic particles back to dissolved phase
-      wombat%afediss(i,j,k) = wombat%kafe_dfe * wombat%f_afe(i,j,k) / 86400.0
-      wombat%bafediss(i,j,k) = wombat%kbafe_dfe * wombat%f_bafe(i,j,k) / 86400.0
+      wombat%afediss(i,j,k) = wombat%kafe_dfe * wombat%f_afe(i,j,k)
+      wombat%bafediss(i,j,k) = wombat%kbafe_dfe * wombat%f_bafe(i,j,k)
 
       ! Convert the terms back to mol/kg
       wombat%fescaven(i,j,k) = wombat%fescaven(i,j,k) * umol_m3_to_mol_kg
@@ -5165,6 +5239,7 @@ module generic_WOMBATmid
       wombat%fecoag2bafe(i,j,k) = wombat%fecoag2bafe(i,j,k) * umol_m3_to_mol_kg
       wombat%feIII(i,j,k) = wombat%feIII(i,j,k) * umol_m3_to_mol_kg
       wombat%felig(i,j,k) = wombat%felig(i,j,k) * umol_m3_to_mol_kg
+      wombat%ligW_K(i,j,k) = wombat%ligW_K(i,j,k) * 1e9 ! PJB: convert back to L/mol
       wombat%fecol(i,j,k) = wombat%fecol(i,j,k) * umol_m3_to_mol_kg
 
 
@@ -5648,19 +5723,19 @@ module generic_WOMBATmid
       !  1. Find electron potential of the bacterial biomass and DOM
       e_dom = 4.0/dom_N2C + 10.9 - 2.0*2.6 - 3.0  ! [Anderson et al., 1995]
       e_bac = 4.0*wombat%bac1_C2N + 7.0 - 2.0*2.0 - 3.0  ! [Zimmerman et al., 2014]
-      f_bac = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
-      bac1_yoxy = (f_bac/e_bac) / ((1.0 - f_bac)/4.0) ! Yield of N biomass per mol oxygen
+      f_ele = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
+      bac1_yoxy = (f_ele/e_bac) / ((1.0 - f_ele)/4.0) ! Yield of N biomass per mol oxygen
       bac1_yana = wombat%bac_ydon(i,j,k) * wombat%bacanapen ! Yield of N biomass per mol DON during anaerobic growth
-      f_bac = bac1_yana * e_bac/e_dom ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
-      bac1_yno3 = (f_bac/e_bac) / ((1.0 - f_bac)/4.0) ! Yield of N biomass per mol nitrate
+      f_ele = bac1_yana * e_bac/e_dom ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
+      bac1_yno3 = (f_ele/e_bac) / ((1.0 - f_ele)/4.0) ! Yield of N biomass per mol nitrate
 
       e_dom = 4.0/dom_N2C + 10.9 - 2.0*2.6 - 3.0  ! [Anderson et al., 1995]
       e_bac = 4.0*wombat%bac2_C2N + 7.0 - 2.0*2.0 - 3.0  ! [Zimmerman et al., 2014]
-      f_bac = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom ) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
-      bac2_yoxy = (f_bac/e_bac) / ((1.0 - f_bac)/4.0) ! Yield of N biomass per mol oxygen
+      f_ele = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom ) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
+      bac2_yoxy = (f_ele/e_bac) / ((1.0 - f_ele)/4.0) ! Yield of N biomass per mol oxygen
       bac2_yana = wombat%bac_ydon(i,j,k) * wombat%bacanapen ! Yield of N biomass per mol DON during anaerobic growth
-      f_bac = bac2_yana * e_bac/e_dom ! The fraction of electrons used for N biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
-      bac2_yn2o = (f_bac/e_bac) / ((1.0 - f_bac)/1.0) ! Yield of N biomass per mol nitrous oxide
+      f_ele = bac2_yana * e_bac/e_dom ! The fraction of electrons used for N biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
+      bac2_yn2o = (f_ele/e_bac) / ((1.0 - f_ele)/1.0) ! Yield of N biomass per mol nitrous oxide
 
       ! Convert from units N of bacterial biomass to C of bacterial biomass
       wombat%bac1_ydoc(i,j,k) = min(wombat%bac_ydonmax*0.8, &
@@ -6641,11 +6716,12 @@ module generic_WOMBATmid
         if (wombat%zw(i,j,k) <= 200) wombat%f_fe(i,j,k)= umol_m3_to_mol_kg * 0.999 ! [mol/kg]
       endif
       do k = 1,nk
-        ! pjb: tune minimum dissolved iron concentration to detection limit...
-        !       this is essential for ensuring dFe is replenished in upper ocean and actually
-        !       looks to be the secret of PISCES ability to replicate dFe limitation in the right places
+        ! tune minimum dissolved iron concentration to modern detection limit of 5-30 pM (Worsfold et al., 2014 Mar. Chem.)
+        !  this is essential for ensuring dFe is replenished in upper ocean and actually
+        !  looks to be the secret of PISCES ability to replicate dFe limitation in the right places
         zno3 = wombat%f_no3(i,j,k) / mmol_m3_to_mol_kg
-        zfermin = min( max( 3e-2 * zno3 * zno3, 5e-2), 7e-2) * umol_m3_to_mol_kg
+        zfermin = max( 3e-2 / 1600 * zno3 * zno3, 5e-3) * umol_m3_to_mol_kg
+        zfermin = 5e-2 * umol_m3_to_mol_kg
         wombat%f_fe(i,j,k) = max(zfermin, wombat%f_fe(i,j,k)) * grid_tmask(i,j,k)
       enddo
     enddo; enddo
@@ -7263,6 +7339,10 @@ module generic_WOMBATmid
 
     if (wombat%id_bsidiss > 0) &
       used = g_send_data(wombat%id_bsidiss, wombat%bsidiss, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_ligW_K> 0) &
+      used = g_send_data(wombat%id_ligW_K, wombat%ligW_K, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_felig > 0) &
@@ -8358,6 +8438,7 @@ module generic_WOMBATmid
     allocate(wombat%sileqc(isd:ied, jsd:jed, 1:nk)); wombat%sileqc(:,:,:)=0.0
     allocate(wombat%disssi(isd:ied, jsd:jed, 1:nk)); wombat%disssi(:,:,:)=0.0
     allocate(wombat%bsidiss(isd:ied, jsd:jed, 1:nk)); wombat%bsidiss(:,:,:)=0.0
+    allocate(wombat%ligW_K(isd:ied, jsd:jed, 1:nk)); wombat%ligW_K(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
     allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
@@ -8668,6 +8749,7 @@ module generic_WOMBATmid
         wombat%sileqc, &
         wombat%disssi, &
         wombat%bsidiss, &
+        wombat%ligW_K, &
         wombat%felig, &
         wombat%fecol, &
         wombat%fescaven, &
