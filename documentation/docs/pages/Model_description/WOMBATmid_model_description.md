@@ -220,7 +220,7 @@ Note that although phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, as N
 
 $$
 \begin{align}
-Q_{np}^{-Fe:C} =& \quad 0.00167 / 55.85 \cdot Q_{np}^{Chl:C} \cdot 12 \\
+Q_{np}^{-Fe:C} =& \quad 0.00167 / 55.85 \cdot \max\left( Q_{np}^{Chl:C}, Q_{np}^{-Chl:C} \right) \cdot 12 \\
                 & + 1.21 \times 10^{-5} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot 1.5 \cdot L_{np}^{N} \\
                 & + 1.15 \times 10^{-4} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot L_{np}^{NO_3}
 \end{align}
@@ -717,6 +717,37 @@ dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dF
 \end{align}
 $$
 
+In the case of `do_two_ligands == .true.`, we solve for (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the iterative method. For this approach, we know that:
+
+$$
+\begin{align}
+dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right) \\    
+\end{align}
+$$
+
+and we seek to minimize the residual of free iron ($R(dFe_{free})$) to zero where:
+
+$$
+\begin{align}
+R(dFe_{free}) =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right)  - dFe_{free} \\    
+\end{align}
+$$
+
+To do so, we set initial bounds $F_{lo} = 0$ and $F_{hi} = dFe_{sFe}$ and iterate over $n = 1, ..., N_{iter}$. At each $n$ iteration, we evaluate:
+
+$$
+\begin{align}
+F_{mid} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
+\end{align}
+$$
+
+within the equation for $R(dFe_{free})$ above. If $R(dFe_{free}) > 0$, then we set $F_{hi}$ to equal $F_{mid}$. If $R(dFe_{free}) ≤ 0$, then we set $F_{lo}$ to equal $F_{mid}$. After $N_{iter}$ we achieve a final solution where:
+
+$$
+\begin{align}
+dFe_{free} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
+\end{align}
+$$
 and we seek to minimize the residual of free iron ($R(dFe_{free})$) to zero where:
 
 $$
@@ -824,6 +855,8 @@ _where_ <br>
 - $B_{sd}^{C}$ is the concentration of small organic detrital particles (`biodet`, [mmol C m<sup>-3</sup>]) <br>
 - $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
 - $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
+- $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
+- $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
 
 For large particle coagulation:
 
@@ -850,6 +883,10 @@ D_{sA}^{\rightarrow dFe} =& \quad Fe_{sA} \gamma_{sA}^{diss} \\
 D_{lA}^{\rightarrow dFe} =& \quad Fe_{lA} \gamma_{lA}^{diss}
 \end{align}
 $$
+
+_where_ <br>
+- $\gamma_{sA}^{diss}$ is the constant dissolution rate of the small sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
+- $\gamma_{lA}^{diss}$ is the constant dissolution rate of the large sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
 
 _where_ <br>
 - $\gamma_{sA}^{diss}$ is the constant dissolution rate of the small sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
@@ -920,7 +957,7 @@ _where_ <br>
 - $T_{K}$ is the in situ temperature of seawater ([`zval`, [ºK]]) <br>
 - $P$ is the in situ pressure [`zm(i,j,k) * 1.0e4`, [Pa]] <br>
 
-We obtain $\Delta V^{0}$ from [Willey, 1982](https://doi.org/10.1016/0016-7037(82)90015-1) and [Loucaides et al., 2012](https://doi.org/10.1016/j.marchem.2012.04.003) of roughly -9.0 [cm<sup>3</sup> mol<sup>-1</sup>], which we convert to [m<sup>3</sup> mol<sup>-1</sup>] by multiplying by $10^{6}$. The negative value of $\Delta V^{0}$ implies an increase in dissolution of silica at higher pressures. These value return equilibrium concentrations of silicic acid on the order of 1000 to 1800 mmol m<sup>-3</sup>. Temperature increases are the largest control, while pressure increases from the surface to the ocean bottom increase solubility by 15-20%. 
+We obtain $\Delta V^{0}$ from [Willey, 1982](https://doi.org/10.1016/0016-7037(82)90015-1) and [Loucaides et al., 2012](https://doi.org/10.1016/j.marchem.2012.04.003) of roughly -9.0 [cm<sup>3</sup> mol<sup>-1</sup>], which we convert to [m<sup>3</sup> mol<sup>-1</sup>] by multiplying by $10^{-6}$. The negative value of $\Delta V^{0}$ implies an increase in dissolution of silica at higher pressures. These value return equilibrium concentrations of silicic acid on the order of 1000 to 1800 mmol m<sup>-3</sup>. Temperature increases are the largest control, while pressure increases from the surface to the ocean bottom increase solubility by 15-20%. 
 
 
 **Biogenic silica dissolution**
@@ -995,7 +1032,7 @@ _where_ <br>
 
 ### 12. Mortality terms
 
-Mortality of ecological functional types are affected by both linear ($\gamma$) and quadratic ($\Gamma$) terms. Linear terms are per-capita losses associated with the costs of basal metabolism. Quadratic, and thus density-dependent losses, are associated with disease, aggregation and coagulation, viruses, infection and canabalism. None of these processes are represented explicitly within the model, so we represent them implicitly.
+Mortality of ecological functional types are affected by both linear ($\gamma$) and quadratic ($\Gamma$) terms. Linear terms are per-capita losses associated with the costs of basal metabolism. Quadratic, and thus density-dependent losses, are associated with disease, aggregation and coagulation, viruses, infection and cannibalism. None of these processes are represented explicitly within the model, so we represent them implicitly.
 
 **Linear losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
@@ -1028,8 +1065,8 @@ _where_ <br>
 - $B_{b1}^{C}$ is the concentration of facultative NO<sub>3</sub>-reducing bacteria carbon biomass (`f_bac1(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{b2}^{C}$ is the concentration of facultative N<sub>2</sub>O-reducing bacteria carbon biomass (`f_bac2(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{aoa}^{C}$ is the concentration of ammonia oxidizing archaea carbon biomass (`f_aoa(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
-- $S_{mz}^{\gamma}$ is a scaling factor that reduces micro-zooplankton linear mortality at low biomass (`zoo_slmor`, [dimenionless]) <br>
-- $S_{Mz}^{\gamma}$ is a scaling factor that reduces meso-zooplankton linear mortality at low biomass (`mes_slmor`, [dimenionless]) <br>
+- $F_{mz}^{\gamma}$ is a scaling factor that reduces micro-zooplankton linear mortality at low biomass (`zoo_slmor`, [dimenionless]) <br>
+- $F_{Mz}^{\gamma}$ is a scaling factor that reduces meso-zooplankton linear mortality at low biomass (`mes_slmor`, [dimenionless]) <br>
 
 In the above, we scale down **linear mortality** of micro- and meso-zooplannkton when their populations are very small small with
 
@@ -1051,13 +1088,13 @@ _where_ <br>
 
 $$
 \begin{align}
-\Gamma_{np}^{\rightarrow C} =& \quad \Gamma_{np}^{0ºC} (β_{hete})^{T} \left(B_{np}^{C}\right)^(2) \\
-\Gamma_{mp}^{\rightarrow C} =& \quad \Gamma_{mp}^{0ºC} (β_{hete})^{T} \left(B_{mp}^{C}\right)^(2) \\
-\Gamma_{mz}^{\rightarrow C} =& \quad \Gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} \left(B_{mz}^{C}\right)^(2) \\
-\Gamma_{Mz}^{\rightarrow C} =& \quad \Gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} \left(B_{Mz}^{C}\right)^(2) \\
-\Gamma_{b1}^{\rightarrow C} =& \quad \Gamma_{b1}^{0ºC} (β_{hete})^{T} \left(B_{b1}^{C}\right)^(2) \\
-\Gamma_{b2}^{\rightarrow C} =& \quad \Gamma_{b2}^{0ºC} (β_{hete})^{T} \left(B_{b2}^{C}\right)^(2) \\
-\Gamma_{aoa}^{\rightarrow C} =& \quad \Gamma_{aoa}^{0ºC} (β_{hete})^{T} \left(B_{aoa}^{C}\right)^(2)
+\Gamma_{np}^{\rightarrow C} =& \quad \Gamma_{np}^{0ºC} (β_{hete})^{T} \left(B_{np}^{C}\right)^{2} \\
+\Gamma_{mp}^{\rightarrow C} =& \quad \Gamma_{mp}^{0ºC} (β_{hete})^{T} \left(B_{mp}^{C}\right)^{2} \\
+\Gamma_{mz}^{\rightarrow C} =& \quad \Gamma_{mz}^{0ºC} (β_{hete})^{T} \left(B_{mz}^{C}\right)^{2} \\
+\Gamma_{Mz}^{\rightarrow C} =& \quad \Gamma_{Mz}^{0ºC} (β_{hete})^{T} \left(B_{Mz}^{C}\right)^{2} \\
+\Gamma_{b1}^{\rightarrow C} =& \quad \Gamma_{b1}^{0ºC} (β_{hete})^{T} \left(B_{b1}^{C}\right)^{2} \\
+\Gamma_{b2}^{\rightarrow C} =& \quad \Gamma_{b2}^{0ºC} (β_{hete})^{T} \left(B_{b2}^{C}\right)^{2} \\
+\Gamma_{aoa}^{\rightarrow C} =& \quad \Gamma_{aoa}^{0ºC} (β_{hete})^{T} \left(B_{aoa}^{C}\right)^{2}
 \end{align}
 $$
 
@@ -1088,7 +1125,7 @@ _where_ <br>
 
 $$
 \begin{align}
-g_{mz} =& \quad \dfrac{\mu_{mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{mz}^{i} \phi_{mz}^{i} (B_{i}^{C})^{2}\right)} \\
+g_{mz} =& \quad \dfrac{\mu_{mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{mz}^{i} \left(\phi_{mz}^{i} B_{i}^{C}\right)^{2}\right)} \\
 g_{Mz} =& \quad \dfrac{\mu_{Mz}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{Mz}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{Mz}^{i} \left(\phi_{Mz}^{i} B_{i}^{C}\right)^{2}\right)}
 \end{align}
 $$
@@ -1340,7 +1377,7 @@ $$
 
 _where_ <br>
 - $\Omega_{cal}$ is the saturation state of calcite (`omega_cal(i,j,k)`, [dimenionless]) <br>
-- $\Omega_{ara}$ is the saturation state of calcite (`omega_ara(i,j,k)`, [dimenionless]) <br>
+- $\Omega_{ara}$ is the saturation state of aragonite (`omega_ara(i,j,k)`, [dimenionless]) <br>
 - $d_{CaCO_3}^{\Omega_{cal}}$ is the reference dissolution rate constant for calcite (`disscal`, [s<sup>-1</sup>])  <br>
 - $d_{CaCO_3}^{\Omega_{ara}}$ is the reference dissolution rate constant for aragonite (`dissara`, [s<sup>-1</sup>])  <br>
 - $d_{CaCO_3}^{\Gamma_{sd}}$ is the reference dissolution rate constant per unit of small detrital organic carbon remineralised (`dissdet`, [(mmol C m<sup>-3</sup>)<sup>-1</sup>])  <br>
@@ -1424,7 +1461,7 @@ _where_ <br>
 
 ### 16. Facultative bacterial heterotrophy.
 
-We remineralise dissolved organic matter into inorganic consituents via the activity of two facultative bacterial heterotrophs. These bacterial heterotrophs oxidise dissolved organic carbon ($B_{DOM}^{C}$) and reduce dissolved oxygen (O<sub>2</sub>). However, we consider these bacterial types, which relfect the traits of the ubiquitous SAR11, to be faculatively anaerobic ([Zumft, 1997](https://doi.org/10.1128/mmbr.61.4.533-616.1997); [Tsementzi et al., 2016](https://doi.org/10.1038/nature19068)). This means that they can shift their metabolism to using either nitrate (NO<sub>3</sub>) or nitrous oxide (N<sub>2</sub>O) as alternative electron acceptors when O<sub>2</sub> is limiting. These populations of heterotrophic bacteria also assimilate dissolved organic nitrogen ($DON$) and ammonium (NH<sub>4</sub>) and dissolved iron ($dFe$) to support biosynthesis. By taking up NH<sub>4</sub> and $dFe$ bacteria compete directly with phytoplankton, consistent with prior observations ([Kirchman, 1994](https://www.jstor.org/stable/4251383); [Tortell et al., 1996](https://doi.org/10.1038/383330a0); [Kirchman & Wheeler, 1998](https://doi.org/10.1016/S0967-0637(97)00075-7); [Fourquez et al., 2015](https://doi.org/10.5194/bg-12-1893-2015); [Deng et al., 2021](https://doi.org/10.1002/lno.11883); [Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)).
+We remineralise dissolved organic matter into inorganic constituents via the activity of two facultative bacterial heterotrophs. These bacterial heterotrophs oxidise dissolved organic carbon ($B_{DOM}^{C}$) and reduce dissolved oxygen (O<sub>2</sub>). However, we consider these bacterial types, which we imbue with the traits of the ubiquitous SAR11, to be facultatively anaerobic ([Zumft, 1997](https://doi.org/10.1128/mmbr.61.4.533-616.1997); [Tsementzi et al., 2016](https://doi.org/10.1038/nature19068)). This means that they can shift their metabolism to using either nitrate (NO<sub>3</sub>) or nitrous oxide (N<sub>2</sub>O) as alternative electron acceptors when O<sub>2</sub> is limiting. These populations of heterotrophic bacteria also assimilate dissolved organic nitrogen ($B_{DOM}^{N}$) and ammonium (NH<sub>4</sub>) and dissolved iron ($dFe$) to support biosynthesis. By taking up NH<sub>4</sub> and $dFe$, bacteria compete directly with phytoplankton, consistent with prior observations ([Kirchman, 1994](https://www.jstor.org/stable/4251383); [Tortell et al., 1996](https://doi.org/10.1038/383330a0); [Kirchman & Wheeler, 1998](https://doi.org/10.1016/S0967-0637(97)00075-7); [Fourquez et al., 2015](https://doi.org/10.5194/bg-12-1893-2015); [Deng et al., 2021](https://doi.org/10.1002/lno.11883); [Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)).
 
 Our formulation of heterotrophic bacterial growth follows that developed by [Zakem et al. (2020)](https://doi.org/10.1038/s41396-019-0523-8) and subsequently expanded in [Sun et al. (2024)](https://doi.org/10.1073/pnas.2417421121) and [Buchanan et al. (2025)](https://www.science.org/doi/full/10.1126/science.ado0742). In these studies, the realized biomass growth rate (integration of carbon into biomass) of bacterial functional type $b$ (`bac1grow(i,j,k)`; `bac2grow(i,j,k)`, $\mu_{b}^{\leftarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is defined by:
 
@@ -1549,7 +1586,7 @@ _where_ <br>
 - $y_{b}^{max(DON)}$ is the maximum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmax`, [mol N biomass (mol DON)<sup>-1</sup>])  <br>
 - $DOM^{NOSC}$ is the in situ nominal oxidation state of dissolved organic carbon that is normalized to vary between 0 (most reduced) and 1 (most oxidised) (`f_nosdoc(i,j,k)`, [dimensionless]) <br>
 
-From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on O<sub>2</sub> [mol C biomass (mol DOC)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
+From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on O<sub>2</sub> [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
 
 $$
 \begin{align}
@@ -1572,11 +1609,11 @@ $$
 \end{align}
 $$
 
-Using these electron potentials ($\kappa$) we can solve for the fraction of electrons used for biomass synthesis in both aerobic (`f_bac`, $f_{b}^{aer(\kappa)}$, [dimenionless]) and anaerobic (`f_bac`, $f_{b}^{ana(\kappa)}$, [dimenionless]) growth with
+Using these electron potentials ($\kappa$) we can solve for the fraction of electrons used for biomass synthesis in both aerobic (`f_ele`, $f_{b}^{aer(\kappa)}$, [dimenionless]) and anaerobic (`f_ele`, $f_{b}^{ana(\kappa)}$, [dimenionless]) growth with
 
 $$
 \begin{align}
-f_{b}^{aer(\kappa)} =& \quad \min\left(0.8, y_{b}^{DON} \dfrac{\kappa_{b}}{\kappa_{DOM}} \right) \\
+f_{b}^{aer(\kappa)} =& \quad \min\left(0.9, y_{b}^{DON} \dfrac{\kappa_{b}}{\kappa_{DOM}} \right) \\
 f_{b}^{ana(\kappa)} =& \quad f_{b}^{aer(\kappa)} P_{ana}
 \end{align}
 $$
@@ -1866,7 +1903,7 @@ $$
 
 This characteristic describes how oxidized or reduced the average carbon atoms are within organic molecules. The NOSC acts as a measure of the energetic potential of organic matter oxidation, where the Gibbs energy released is correlated to the NOSC ([La Rowe & Van Cappellen, 2011](https://doi.org/10.1016/j.gca.2011.01.020)). The more reduced the molecule, the more negative the NOSC value and the more energy is held within the material. The scale varies from -4 to +4, with $CH_4$ representing fully reduced carbon and $CO_2$ representing fully oxidized carbon. 
 
-In WOMBAT-mid, we do not carry information of changes in the stoichiometry of marine organic matter, either dissolved or particulate. We therefore estimate how certian processes affect the NOSC of DOM ($DOM^{DOSC}$). To do so, we apply changes in $DOM^{NOSC}$ occur as a result of changes to the $B_{DOM}^{C}$ pool. Sources of $B_{DOM}^{C}$ alter $DOM^{NOSC}$ via:
+In WOMBAT-mid, we do not carry information of changes in the stoichiometry of marine organic matter, either dissolved or particulate. We therefore estimate how certian processes affect the NOSC of DOM ($DOM^{NOSC}$). To do so, we changes in $DOM^{NOSC}$ occur as a result of sources and sinks to the $B_{DOM}^{C}$ pool. Sources of $B_{DOM}^{C}$ alter $DOM^{NOSC}$ via:
 
 $$
 \begin{align}
@@ -1877,7 +1914,7 @@ $$
 _where_ <br>
 - $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`f_doc(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 - $DOM^{NOSC}$ is the in situ value of the normalized nominal oxidation state of carbon (`f_nosdoc(i,j,k)`, [dimensionless]) <br>
-- $DOM_{source}^{NOSC}$ is the source value of $DOM^{NOSC}$ added to the $B_{DOM}^{C}$ pool during a given process ([dimenionless]) <br>
+- $DOM_{source}^{NOSC}$ is the source value of $DOM^{NOSC}$ added to the $B_{DOM}^{C}$ pool during a given process ([dimensionless]) <br>
 
 Sources of $B_{DOM}^{C}$ include (1) phytoplankton overflow production (`nosdoc_overflow(i,j,k)`, $\Delta DOM_{overflow}^{NOSC}$, [NOSC s<sup>-1</sup>]), (2) excretion by zooplankton (`nosdoc_excretion(i,j,k)`, $\Delta DOM_{excretion}^{NOSC}$, [NOSC s<sup>-1</sup>]), (3) phytoplankton cell death and lysis (`nosdoc_phylysis(i,j,k)`, $\Delta DOM_{photolyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), (4) bacterial cell death and lysis (`nosdoc_baclysis(i,j,k)`, $\Delta DOM_{bacterlyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), and (5) hydrolysation of particulate organic matter (`nosdoc_dethydro(i,j,k)`, $\Delta DOM_{dethydro}^{NOSC}$, [NOSC s<sup>-1</sup>]). The equations describing the effect on $DOM^{NOSC}$ of each process are:
 
@@ -1886,7 +1923,7 @@ $$
 (1) & \Delta DOM_{overflow}^{NOSC} = \quad \left(\sum_{p} \mu_{p}^{\rightarrow DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}} \\
 (2) & \Delta DOM_{excretion}^{NOSC} = \quad \left(\sum_{z,i} \left( X_{z}^{\rightarrow i^{C}} \cdot f_{z}^{X \rightarrow DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}} \\
 (3) & \Delta DOM_{photolyse}^{NOSC} = \quad \left(\sum_{p} \gamma_{p}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(4) & \Delta DOM_{bacterlyse}^{NOSC} = \quad \left(\sum_{b} \gamma_{b}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
+(4) & \Delta DOM_{bacterlyse}^{NOSC} = \quad \left(\sum_{b} \gamma_{b}^{\rightarrow C} + \Gamma_{b}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
 (5) & \Delta DOM_{dethydro}^{NOSC} = \quad \left(\sum_{d} \Gamma_{d}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
 \end{align}
 $$
@@ -2143,8 +2180,8 @@ $$
 \begin{align}
 \dfrac{\Delta B_{mz}^{Fe}}{\Delta t} =& \quad A_{mz}^{\leftarrow Fe}
                                       - \bigg( \Gamma_{mz}^{\rightarrow C} 
-                                             - \gamma_{mz}^{\rightarrow C} 
-                                             - g_{Mz}^{\leftarrow B_{mz}^{C}} \bigg) \cdot Q_{mz}^{Fe:C}
+                                             + \gamma_{mz}^{\rightarrow C} 
+                                             + g_{Mz}^{\leftarrow B_{mz}^{C}} \bigg) \cdot Q_{mz}^{Fe:C}
 \end{align}
 $$
 
@@ -2164,7 +2201,7 @@ $$
 \begin{align}
 \dfrac{\Delta B_{Mz}^{Fe}}{\Delta t} =& \quad A_{Mz}^{\leftarrow Fe}
                                       - \bigg( \Gamma_{Mz}^{\rightarrow C} 
-                                             - \gamma_{Mz}^{\rightarrow C} \bigg) \cdot Q_{Mz}^{Fe:C}
+                                             + \gamma_{Mz}^{\rightarrow C} \bigg) \cdot Q_{Mz}^{Fe:C}
 \end{align}
 $$
 
@@ -2185,12 +2222,12 @@ $$
 
 $$
 \begin{align}
-$\dfrac{\Delta B_{sd}^{Fe}}{\Delta t} = \quad E_{mz}^{\leftarrow Fe}
+\dfrac{\Delta B_{sd}^{Fe}}{\Delta t} = \quad E_{mz}^{\leftarrow Fe}
                                       + \Gamma_{np}^{\rightarrow C} Q_{np}^{Fe:C} 
                                       + \Gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C}
                                       - \left( g_{mz}^{\leftarrow B_{sd}^{C}}
                                              + g_{Mz}^{\leftarrow B_{sd}^{C}}
-                                             + \Gamma_{sd}^{\rightarrow C} \right) Q_{sd}^{Fe:C}$ 
+                                             + \Gamma_{sd}^{\rightarrow C} \right) Q_{sd}^{Fe:C}
 \end{align}
 $$
 
@@ -2213,7 +2250,7 @@ $$
 \dfrac{\Delta B_{ld}^{Fe}}{\Delta t} =& \quad E_{Mz}^{\leftarrow Fe}
                                             + \Gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C} 
                                             + \Gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C}
-                                            - \bigg( g_{Mz}^{\rightarrow B_{ld}^{C}} + \Gamma_{ld}^{\rightarrow C} \bigg) Q_{ld}^{Fe:C}
+                                            - \bigg( g_{Mz}^{\leftarrow B_{ld}^{C}} + \Gamma_{ld}^{\rightarrow C} \bigg) Q_{ld}^{Fe:C}
 \end{align}
 $$
 
@@ -2309,7 +2346,7 @@ $$
 $$
 
 
-**Nominal oxidation state of dissolved organiccarbon** (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless])
+**Nominal oxidation state of dissolved organic carbon** (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless])
 
 $$
 \begin{align}
@@ -2426,18 +2463,15 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 **First**, dissolved iron concentrations are set to equal 1 nM everywhere where the depth of the water column is less than 200 metres deep. WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we universally set the dissolved iron concentration in these waters to 1 nM.
 
-**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits, we reset these concentrations to this minimum  (`zfermin`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
+**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)), we reset these concentrations to this minimum (`zfermin`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
 
 $$
 \begin{align}
-[dFe]^{min} =& \quad \max\left( 0.03 \cdot \left(\dfrac{[NO_3]}{40}\right)^{2}, 0.005 \right)
+[dFe]^{min} =& \quad 0.05
 \end{align}
 $$
 
-_where_ <br>
-- $[NO_3]$ is the ambient nitrate concentration in units of [mmol m<sup>-3</sup>] <br>
-
-This resetting of minimum dFe concentration comes directly from the PISCES ocean model and functions essentially as a constant source of dFe to the ocean when surface concentrations are drawn down to near zero values.
+This resetting of minimum dFe concentration essentially copies what is done in the PISCES ocean model and functions as a constant source of dFe to the ocean when surface concentrations are drawn down to near zero values. Ideally, complexation by ligands would function to maintain iron in dissolved, biologically available form without the need for an addition source at low concentrations.
 
 ---
 
@@ -2623,10 +2657,10 @@ WOMBAT-mid explicitly considers small organic carbon, large aggregates of organi
 
 $$
 \begin{align}
-M_{sd} =& \quad B_{sd}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
-M_{ld} =& \quad B_{ld}^{C} \cdot 1 \times 10{-6} \cdot \dfrac{12}{0.4} \\
-M_{CaCO_3} =& \quad B_{CaCO_3}^{C} \cdot 1 \times 10{-6} \cdot 100 \\
-M_{BSi} =& \quad B_{ld}^{Si} \cdot 1 \times 10{-6} \cdot 60
+M_{sd} =& \quad B_{sd}^{C} \cdot 1 \times 10^{-6} \cdot \dfrac{12}{0.4} \\
+M_{ld} =& \quad B_{ld}^{C} \cdot 1 \times 10^{-6} \cdot \dfrac{12}{0.4} \\
+M_{CaCO_3} =& \quad B_{CaCO_3}^{C} \cdot 1 \times 10^{-6} \cdot 100 \\
+M_{BSi} =& \quad B_{ld}^{Si} \cdot 1 \times 10^{-6} \cdot 60
 \end{align}
 $$
 
@@ -2674,7 +2708,7 @@ $$
 _where_ <br>
 - $p_{s}$ is the porosity of small particles (`detphi`, [dimensionless]) <br>
 - $p_{l}$ is the porosity of large particles (`bdetphi`, [dimensionless]) <br>
-- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-1</sup>) <br>
+- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-3</sup>) <br>
 
 
 **Rubey's equation**
@@ -2697,7 +2731,7 @@ _where_ <br>
 - $r_{s}$ and $r_{l}$ are the mean radii of small and large particles (`rad_det`; `rad_bdet`; [m]) <br>
 - $\eta_{sw}$ is the dynamic viscosity of seawater at in situ temperature, salinity and pressure (`dynvis_sw(i,j,k)`, [kg m<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\rho_{s}$ and $\rho_{l}$ are the harmonic mean densities of small and large particles (`rho_small`; `rho_large`, [kg m<sup>-3</sup>]) <br>
-- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-1</sup>) <br>
+- $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-3</sup>) <br>
 
 Our approach therefore considers mineral ballasting on particle excess density, particle size and the viscosity of fluid in determining sinking rates. This allows for "an environmentally dependent, space-varying $\omega_{s}$ and $\omega_{l}$" ([Dinauer et al., 2022](https://doi.org/10.1029/2021GB007131)).
 
@@ -2810,7 +2844,7 @@ $$
 \dfrac{\Delta Si}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow Si} \\
 \dfrac{\Delta dFe}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow dFe} \\
 \dfrac{\Delta DIC}{\Delta t} =& \quad D_{CaCO_{3},sed} \\
-\dfrac{\Delta Alk}{\Delta t} =& \quad 2 \cdot D_{CaCO_{3},sed}
+\dfrac{\Delta Alk}{\Delta t} =& \quad 2 \cdot D_{CaCO_{3},sed} - \dfrac{\Delta NO_3}{\Delta t} \\
 \end{align}
 $$
 
@@ -2835,7 +2869,7 @@ F_{bury} =& \quad 0.013 + 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2
 \end{align}
 $$
 
-where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>].
+where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> day<sup>-1</sup>].
 
 As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron, organic silicon and $CaCO_3$ that is buried increases.
 
