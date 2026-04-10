@@ -1957,7 +1957,7 @@ module generic_WOMBATlite
     real                                    :: ztemk, I_ztemk, fe_keq, fe_sfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: flo, fhi, fmid, FeL1_mid, FeL2_mid
-    real                                    :: biof, biodoc, zno3
+    real                                    :: biof, biodoc
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: zoo_slmor
