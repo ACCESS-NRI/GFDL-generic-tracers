@@ -201,6 +201,7 @@ module generic_WOMBATlite
         dissdet, &
         ligW, &
         ligS, &
+        dfefloor, &
         knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
@@ -1395,6 +1396,11 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('ligS', wombat%ligS, 0.5)
 
+    ! Set floor for dissolved iron concentration based on the measurement detection limit [umol/m3]
+    ! Worsford et al., 2014 Mar. Chem. says anywhere between 10 - 50 pM
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.05)
+
     ! Precipitation of Fe` as nanoparticles (in excess of solubility) [/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('knano_dfe', wombat%knano_dfe, 0.1/86400.0)
@@ -1951,7 +1957,7 @@ module generic_WOMBATlite
     real                                    :: ztemk, I_ztemk, fe_keq, fe_sfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: flo, fhi, fmid, FeL1_mid, FeL2_mid
-    real                                    :: biof, biodoc, zno3, zfermin
+    real                                    :: biof, biodoc, zno3
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: zoo_slmor
@@ -3117,10 +3123,8 @@ module generic_WOMBATlite
         ! pjb: tune minimum dissolved iron concentration to detection limit...
         !       this is essential for ensuring dFe is replenished in upper ocean and actually
         !       looks to be the secret of PISCES ability to replicate dFe limitation in the right places
-        zno3 = wombat%f_no3(i,j,k) / mmol_m3_to_mol_kg / 40.0
-        zfermin = max( 3e-2 * zno3 * zno3, 5e-3) * umol_m3_to_mol_kg
-        zfermin = 0.05 * umol_m3_to_mol_kg
-        wombat%f_fe(i,j,k) = max(zfermin, wombat%f_fe(i,j,k)) * grid_tmask(i,j,k)
+        wombat%f_fe(i,j,k) = max(wombat%dfefloor * umol_m3_to_mol_kg, &
+                                 wombat%f_fe(i,j,k)) * grid_tmask(i,j,k)
       enddo
     enddo; enddo
 
