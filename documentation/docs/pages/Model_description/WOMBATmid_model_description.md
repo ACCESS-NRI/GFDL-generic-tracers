@@ -653,7 +653,7 @@ Final Fe(III) solubility:
 
 $$
 \begin{align}
-Fe_{sol} =& \quad Fe_{sol1}\left([H^+]^3 + Fe_{sol2}[H^+]^2 + Fe_{sol3}[H^+] + Fe_{sol4} + \dfrac{Fe_{sol5}}{[H^+]}\right)\times10^{9}
+dFe_{sol} =& \quad Fe_{sol1}\left([H^+]^3 + Fe_{sol2}[H^+]^2 + Fe_{sol3}[H^+] + Fe_{sol4} + \dfrac{Fe_{sol5}}{[H^+]}\right)\times10^{9}
 \end{align}
 $$
 
@@ -661,7 +661,7 @@ _where_ <br>
 - $T_{K}$ is in situ water temperature (`ztemk`, [ºK]) <br>
 - $I_{S}$ is a salinity coefficient (`zval`, [dimenionless]) <br>
 - $[H^+]$ is in situ hydrogen ion concentration (`hp`, [mol L<sup>-1</sup>]) <br>
-- $Fe_{sol}$ is the final estimated solubility of dissolved iron in seawater (`fe3sol`, [nmol Fe kg<sup>-1</sup>]) <br>
+- $dFe_{sol}$ is the final estimated solubility of dissolved iron in seawater (`fe3sol`, [nmol Fe kg<sup>-1</sup>]) <br>
 
 Next we **estimate the concentration of colloidal iron** in solution following [Tagliabue et al. 2023](https://www.nature.com/articles/s41586-023-06210-5) in the case that `do_colloidal_shunt == .true.`. If `do_colloidal_shunt == .false.` we consider no dissolved Fe to be in colloidal form. Colloidal dissolved Fe (`fecol(i,j,k)`, $dFe_{col}$, [mmol Fe m<sup>-3</sup>]) is whatever exceeds the inorganic solubility ceiling (`fe3sol`, $dFe_{sol}$, [mmol Fe m<sup>-3</sup>]), but we enforce a hard minimum that colloids are at least 10% of total dissolved Fe (`biofer`, $dFe$, [mmol Fe m<sup>-3</sup>]).
 
@@ -683,37 +683,44 @@ Partitioning of iron between free and ligand-bound forms is done using one of tw
 
 When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative, bisectional root solver.
 
-In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a weak ligand (`ligW_Keq(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>) and then consider the stability constant of a strong ligand to be a constant positive offset equal to 2.67 log<sub>10</sub> units ([Ye et al., 2020](https://doi.org/10.1029/2019GB006425)). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a weak ligand but add a constant 1.0 log<sub>10</sub> units to it to accommodate the effect strong ligands. 
+In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a weak ligand (`ligW_K(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a strong ligand to be a constant positive offset equal to 2.67 log<sub>10</sub> units ([Ye et al., 2020](https://doi.org/10.1029/2019GB006425)). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a weak ligand but add a constant 1.0 log<sub>10</sub> units to it to accommodate the effect strong ligands. 
 
-The stability constant (`ligW_Keq(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligW_K(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
-Fe_{Keq} =& \quad \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)  - 0.7 \dfrac{PAR}{PAR + 10} } \\
-& \quad 10^{\left(-0.0002  \left(DOC\right)^{2} + 0.034 \cdot DOC - 1.67 \cdot pH + 24.36\right)} \bigg) \times 10^{-9}
+Lig_{w}^{K} =& \quad \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)  - 0.7 \dfrac{PAR}{PAR + 10} } \\
+& \quad 10^{\left(-0.0002  \left(B_{DOM}^{C}\right)^{2} + 0.034 \cdot B_{DOM}^{C} - 1.67 \cdot pH + 24.36\right)} \bigg) \times 10^{-9}
 \end{align}
 $$
 
-After finding $Lig_{w}^{K_{eq}}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
+_where_ <br>
+- $T_K$ is in situ water temperature (`ztemk`, [ºK]) <br>
+- $PAR$ is the total photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>]) <br>
+- pH is the in situ pH <br>
+- $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`biodoc`, [mmol m<sup>-3</sup>]) <br>
+
+
+After finding $Lig_{w}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
 $$
 \begin{align}
-z =& \quad 1.0 + [Ligand] \cdot Lig_{bulk}^{K_{eq}} - dFe_{sFe}\cdot Lig_{bulk}^{K_{eq}} \\
-Fe_{free} =& \quad \dfrac{-z + \sqrt{z^2 + 4.0 Lig_{bulk}^{K_{eq}} dFe_{sFe}}}{2 Lig_{bulk}^{K_{eq}} + \varepsilon} \\
-Fe_{free} =& \quad \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)
+z =& \quad 1.0 + [Ligand] \cdot Lig_{bulk}^{K} - dFe_{sFe}\cdot Lig_{bulk}^{K} \\
+dFe_{free} =& \quad \dfrac{-z + \sqrt{z^2 + 4.0 Lig_{bulk}^{K} dFe_{sFe}}}{2 Lig_{bulk}^{K} + \varepsilon} \\
+dFe_{free} =& \quad \max\left(0,\ \min(dFe_{free}, dFe_{sFe})\right)
 \end{align}
 $$
 
 _where_ <br>
 - $[Ligand]$ is the in situ concentration of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to the sum of weak and strong ligand concentrations (`ligW` + `ligS`, [nmol kg<sup>-1</sup>]) <br>
-- $Lig_{bulk}^{K_{eq}}$ is the conditional stability constant of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to $Lig_{w}^{K_{eq}}$ + 1 <br>
+- $Lig_{bulk}^{K}$ is the conditional stability constant of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to $Lig_{w}^{K}$ + 1 <br>
 
 
 In the case of `do_two_ligands == .true.`, we solve for (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the iterative method. For this approach, we know that:
 
 $$
 \begin{align}
-dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right) \\    
+dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K} dFe_{free}} \right) \\    
 \end{align}
 $$
 
@@ -721,7 +728,7 @@ and we seek to minimize the residual of free iron ($R(dFe_{free})$) to zero wher
 
 $$
 \begin{align}
-R(dFe_{free}) =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K_{eq}} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K_{eq}} dFe_{free}} \right)  - dFe_{free} \\    
+R(dFe_{free}) =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K} dFe_{free} [Lig_{i}]}{1 + Lig_{i}^{K} dFe_{free}} \right)  - dFe_{free} \\    
 \end{align}
 $$
 
@@ -756,7 +763,7 @@ Scavenging of dissolved iron specifically affects free iron, is accelerated by t
 
 $$
 \begin{align}
-Sc_{dFe}^{\rightarrow} =& \quad dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles} \right)
+Sc_{dFe}^{\rightarrow} =& \quad dFe_{free} \left(10^{-7} + \gamma_{dFe}^{scav} \cdot B_{particles}^{M} \right)
 \end{align}
 $$
 
@@ -1037,8 +1044,8 @@ In the above, we scale down **linear mortality** of micro- and meso-zooplannkton
 
 $$
 \begin{align}
-S_{mz}^{\gamma} =& \quad \dfrac{B_{mz}^{C}}{B_{mz}^{C} + K_{mz}^{\gamma}} \\
-S_{Mz}^{\gamma} =& \quad \dfrac{B_{Mz}^{C}}{B_{Mz}^{C} + K_{Mz}^{\gamma}}
+F_{mz}^{\gamma} =& \quad \dfrac{B_{mz}^{C}}{B_{mz}^{C} + K_{mz}^{\gamma}} \\
+F_{Mz}^{\gamma} =& \quad \dfrac{B_{Mz}^{C}}{B_{Mz}^{C} + K_{Mz}^{\gamma}}
 \end{align}
 $$
 
@@ -1302,7 +1309,7 @@ In the above, the $PIC:POC$ ratio is formulated as
 
 $$
 \begin{align}
-PIC:POC =& \quad \min \left( 0.3,  \left( f_{\text{inorg}} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)
+PIC:POC =& \quad \min \left( 0.3,  \left( f_{inorg} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)
 \end{align}
 $$
 
@@ -1330,7 +1337,7 @@ D_{CaCO_3} =& \quad D_{CaCO_3}^{\Omega_{cal}} + D_{CaCO_3}^{\Omega_{ara}} + D_{C
 \end{align}
 $$
 
-This formulation, at leas the first three terms, follows [Kwon et al. (2024)](https://www.science.org/doi/full/10.1126/sciadv.adl0779).
+The first three terms follow [Kwon et al. (2024)](https://www.science.org/doi/full/10.1126/sciadv.adl0779):
 
 $$
 \begin{align}
