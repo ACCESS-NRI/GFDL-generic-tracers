@@ -205,6 +205,8 @@ module generic_WOMBATlite
         knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
+        kagg_col, &
+        kagg_kcol, &
         dt_npzd, &
         sal_global, &
         dic_global, &
@@ -1418,6 +1420,14 @@ module generic_WOMBATlite
     ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-7/86400)
+
+    ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('kagg_col', wombat%kagg_col, 0.1/86400.0)
+
+    ! Half-saturation coefficient modulating aggregation of colloidal iron [umolFe/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('kagg_kcol', wombat%kagg_kcol, 2.0)
 
     ! Nested timestep for the ecosystem model [s]
     !-----------------------------------------------------------------------
@@ -2655,9 +2665,15 @@ module generic_WOMBATlite
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
       biof = max(1/3., biophy / (biophy + 0.03))
       if (wombat%zw(i,j,k)<=hblt_depth(i,j)) then
-        zval = (      (12.*biof*biodoc + 9.*biodet) + 2.5*biodet + 128.*biof*biodoc + 725.*biodet )*wombat%kcoag_dfe
+        zval = (      (12.*biof*biodoc + 9.05*biodet) &
+                + 2.49*biodet + 127.8*biof*biodoc + 725.7*biodet &
+                + wombat%kagg_col * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4) &
+               )*wombat%kcoag_dfe
       else
-        zval = ( 0.01*(12.*biof*biodoc + 9.*biodet) + 2.5*biodet + 128.*biof*biodoc + 725.*biodet )*wombat%kcoag_dfe
+        zval = ( 0.01 * (12.*biof*biodoc + 9.05*biodet) &
+                + 2.49*biodet + 127.8*biof*biodoc + 725.7*biodet &
+                + wombat%kagg_col * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4) &
+               )*wombat%kcoag_dfe
       endif
       wombat%fecoag2det(i,j,k) = wombat%fecol(i,j,k) * zval
 
