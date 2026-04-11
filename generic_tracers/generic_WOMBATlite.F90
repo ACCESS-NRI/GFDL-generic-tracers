@@ -2507,7 +2507,7 @@ module generic_WOMBATlite
       ! 1. Initial slope of Photosynthesis-Irradiance curve
       ! 2. Light limitation
 
-      phy_pisl  = max(wombat%alphabio * phy_chlc, wombat%alphabio * wombat%phyminqc)
+      phy_pisl  = max(phy_chlc, wombat%phyminqc) * wombat%alphabio
       wombat%phy_lpar(i,j,k) = (1. - exp(-phy_pisl * wombat%radbio(i,j,k)))
 
 
@@ -2799,8 +2799,8 @@ module generic_WOMBATlite
         ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
         !  concentration of POC, following Kwon et al., 2024, Science Advances; Table S1, and
         !  we account for the dissolution due to zooplankton grazing on particulates
-        wombat%dissratcal(i,j,k) = (wombat%disscal * max(0.0, 1.0 - wombat%omega_cal(i,j,k))**2.2) / 86400.0
-        wombat%dissratara(i,j,k) = (wombat%dissara * max(0.0, 1.0 - wombat%omega_ara(i,j,k))**1.5) / 86400.0
+        wombat%dissratcal(i,j,k) = (wombat%disscal * max(0.0, 1.0 - wombat%omega_cal(i,j,k))**2.2)
+        wombat%dissratara(i,j,k) = (wombat%dissara * max(0.0, 1.0 - wombat%omega_ara(i,j,k))**1.5)
         wombat%dissratpoc(i,j,k) = (wombat%dissdet * wombat%reminr(i,j,k) * biodet**2.0)
       else
         wombat%pic2poc(i,j,k) = wombat%f_inorg + 0.025
