@@ -47,58 +47,58 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 
 :::
 
-| Parameter        | Symbol in documentation         | Description                                                                 | Value              |
-|------------------|---------------------------------|-----------------------------------------------------------------------------|--------------------|
-| alphabio         | $$\alpha_{phy}^{Chl}$$          | Phytoplankton initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹ s⁻¹]           | 3.0                |
-| abioa            | $\mu_{phy}^{0ºC}$               | Autotrophy maximum growth rate parameter a [s⁻¹]                            | 1.0/86400.0        |
-| bbioa            | $β_{auto}$                      | Autotrophy maximum growth rate parameter b [1]                              | 1.050              |
-| bbioh            | $β_{hete}$                      | Heterotrophy maximum growth rate parameter b [1]                            | 1.060              |
-| phykn            | $K_{phy}^{N,0}$                 | Phytoplankton half saturation constant for nitrogen uptake [mmolN/m³]       | 2.0                |
-| phykf            | $K_{phy}^{Fe,0}$                | Phytoplankton half saturation constant for iron uptake [µmolFe/m³]          | 1.0                |
-| phyminqc         | $Q_{phy}^{-Chl:C}$              | Phytoplankton minimum chlorophyll:C quota [mg/mg]                           | 0.004              |
-| phymaxqc         | $Q_{phy}^{+Chl:C}$              | Phytoplankton maximum chlorophyll:C quota [mg/mg]                           | 0.060              |
-| phytauqc         | $\tau^{Chl}$                    | Phytoplankton timescale for chlorophyll:C adjustment [s]                    | 86400.0            |
-| phyoptqf         | $Q_{phy}^{*Fe:C}$               | Phytoplankton optimal Fe:C quota [mol/mol]                                  | 10e-6              |
-| phymaxqf         | $Q_{phy}^{+Fe:C}$               | Phytoplankton maximum Fe:C quota [mol/mol]                                  | 50e-6              |
-| phylmor          | $\gamma_{phy}^{0^{\circ}C}$     | Phytoplankton linear mortality rate constant [s⁻¹]                          | 0.005/86400.0      |
-| phyqmor          | $\Gamma_{phy}^{0^{\circ}C}$     | Phytoplankton quadratic mortality rate constant [(mmolC/m³)⁻¹ s⁻¹]          | 0.05/86400.0       |
-| phybiot          | $B_{phy}^{thresh}$              | Phytoplankton biomass threshold [mmolC/m³]                                  | 0.6                |
-| zooCingest       | $\lambda^{C}$                   | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.8                |
-| zooCassim        | $\eta^{C}$                      | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.3                |
-| zooFeingest      | $\lambda^{Fe}$                  | Zooplankton ingestion efficiency of iron [molFe/molFe]                      | 0.2                |
-| zooFeassim       | $\eta^{Fe}$                     | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.9                |
-| fgutdiss         | $F_{gut}$                       | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
-| zookz            | $K_{zoo}^{\gamma}$              | Half-saturation coefficient for zooplankton mortality [mmolC/m³]            | 0.25               |
-| zoogmax          | $\mu_{zoo}^{max}$               | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.0/86400.0        |
-| zooepsmin        | $\varepsilon_{\min}$            | Zooplankton minimum prey capture rate [m⁶/mmol²/s]                          | 0.005/86400.0      |
-| zooepsmax        | $\varepsilon_{\max}$            | Zooplankton maximum prey capture rate [m⁶/mmol²/s]                          | 0.25/86400.0       |
-| zooepsrat        | $\varepsilon_{shift}$           | Zooplankton transition rate of epsilon [(mmolC/m³)⁻¹]                       | 0.1                |
-| zoopreyswitch    | $s_{zoo}$                       | Zooplankton prey switching exponent [dimenionless]                          | 1.8                |
-| zprefphy         | $\phi_{zoo}^{phy}$              | Zooplankton preference for phytoplankton [dimensionless]                    | 1.0                |
-| zprefdet         | $\phi_{zoo}^{det}$              | Zooplankton preference for detritus [dimensionless]                         | 0.50               |
-| zoolmor          | $\gamma_{zoo}^{0^{\circ}C}$     | Zooplankton respiration rate [s⁻¹]                                          | 0.0025/86400.0     |
-| zooqmor          | $\Gamma_{zoo}^{0^{\circ}C}$     | Zooplankton quadratic mortality [(mmolC/m³)⁻¹ s⁻¹]                          | 0.8/86400.0        |
-| detlrem          | $\Gamma_{det}^{0^{\circ}C}$     | Detritus remineralisation rate [(mmolC/m³)⁻¹ s⁻¹]                           | 0.5/86400.0        |
-| wdetbio          | $\omega_{det}^{0}$              | Base detritus sinking rate [m/s]                                            | 25.0/86400.0       |
-| wdetmax          | $\omega_{det}^{max}$            | Maximum detritus sinking rate [m/s]                                         | 42.0/86400.0       |
-| wcaco3           | $\omega_{CaCO_3}^{0}$           | CaCO₃ sinking rate [m/s]                                                    | 12.5/86400.0       |
-| detlrem_sed      | $\gamma_{det,sed}^{0^{\circ}C}$ | Sediment detritus remineralisation [s⁻¹]                                    | 0.01/86400.0       |
-| caco3lrem        | $d_{cal}$                       | Base CaCO₃ remineralisation [s⁻¹]                                           | 0.01/86400.0       |
-| caco3lrem_sed    | $d_{cal,sed}$                   | Sediment CaCO₃ remineralisation [s⁻¹]                                       | 0.01/86400.0       |
-| omegamax_sed     | $\Omega_{cal,+sed}$             | Omega ceiling in sediments [dimenionless]                                   | 0.8                |
-| f_inorg          | $f_{inorg}$                     | Base inorganic fraction of CaCO₃ within detritus [molC/molC]                | 0.045              |
-| disscal          | $d_{CaCO_3}^{\Omega_{cal}}$     | Calcite dissolution factor [s⁻¹]                                            | 0.25/86400.0       |
-| dissara          | $d_{CaCO_3}^{\Omega_{ara}}$     | Aragonite dissolution factor [s⁻¹]                                          | 0.10/86400.0       |
-| dissdet          | $d_{CaCO_3}^{\Gamma_{det}}$     | Dissolution factor from detritus remineralisation [molC/molC]               | 0.200              |
-| ligW             |                                 | Weak ligand background concentration [µmol/m³]                              | 1.0                |
-| ligS             |                                 | Strong ligand background concentration [µmol/m³]                            | 0.5                |
-| dfefloor         | $[dFe]^{min}$                   | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
-| knano_dfe        | $\gamma_{Fe}^{nano}$            | Fe nanoparticle precipitation rate [s⁻¹]                                    | 0.1/86400.0        |
-| kscav_dfe        | $\gamma_{Fe}^{scav}$            | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
-| kcoag_dfe        | $\gamma_{dFe}^{coag}$           | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-7/86400         |
-| kagg_col         | $\gamma_{dFe}^{agg}$            | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
-| kagg_kcol        | $K_{dFe}^{agg}$                 | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
-| bottom_thickness |                                 | Bottom layer thickness [m]                                                  | 0.1                |
+| Parameter        | Description                                                                 | Value              |
+|------------------|-----------------------------------------------------------------------------|--------------------|
+| alphabio         | Phytoplankton initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹ s⁻¹]           | 3.0                |
+| abioa            | Autotrophy maximum growth rate parameter a [s⁻¹]                            | 1.0/86400.0        |
+| bbioa            | Autotrophy maximum growth rate parameter b [1]                              | 1.050              |
+| bbioh            | Heterotrophy maximum growth rate parameter b [1]                            | 1.060              |
+| phykn            | Phytoplankton half saturation constant for nitrogen uptake [mmolN/m³]       | 2.0                |
+| phykf            | Phytoplankton half saturation constant for iron uptake [µmolFe/m³]          | 1.0                |
+| phyminqc         | Phytoplankton minimum chlorophyll:C quota [mg/mg]                           | 0.004              |
+| phymaxqc         | Phytoplankton maximum chlorophyll:C quota [mg/mg]                           | 0.060              |
+| phytauqc         | Phytoplankton timescale for chlorophyll:C adjustment [s]                    | 86400.0            |
+| phyoptqf         | Phytoplankton optimal Fe:C quota [mol/mol]                                  | 10e-6              |
+| phymaxqf         | Phytoplankton maximum Fe:C quota [mol/mol]                                  | 50e-6              |
+| phylmor          | Phytoplankton linear mortality rate constant [s⁻¹]                          | 0.005/86400.0      |
+| phyqmor          | Phytoplankton quadratic mortality rate constant [(mmolC/m³)⁻¹ s⁻¹]          | 0.05/86400.0       |
+| phybiot          | Phytoplankton biomass threshold [mmolC/m³]                                  | 0.6                |
+| zooCingest       | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.8                |
+| zooCassim        | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.3                |
+| zooFeingest      | Zooplankton ingestion efficiency of iron [molFe/molFe]                      | 0.2                |
+| zooFeassim       | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.9                |
+| fgutdiss         | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
+| zookz            | Half-saturation coefficient for zooplankton mortality [mmolC/m³]            | 0.25               |
+| zoogmax          | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.0/86400.0        |
+| zooepsmin        | Zooplankton minimum prey capture rate [m⁶/mmol²/s]                          | 0.005/86400.0      |
+| zooepsmax        | Zooplankton maximum prey capture rate [m⁶/mmol²/s]                          | 0.25/86400.0       |
+| zooepsrat        | Zooplankton transition rate of epsilon [(mmolC/m³)⁻¹]                       | 0.1                |
+| zoopreyswitch    | Zooplankton prey switching exponent [dimenionless]                          | 1.8                |
+| zprefphy         | Zooplankton preference for phytoplankton [dimensionless]                    | 1.0                |
+| zprefdet         | Zooplankton preference for detritus [dimensionless]                         | 0.50               |
+| zoolmor          | Zooplankton respiration rate [s⁻¹]                                          | 0.0025/86400.0     |
+| zooqmor          | Zooplankton quadratic mortality [(mmolC/m³)⁻¹ s⁻¹]                          | 0.8/86400.0        |
+| detlrem          | Detritus remineralisation rate [(mmolC/m³)⁻¹ s⁻¹]                           | 0.5/86400.0        |
+| wdetbio          | Base detritus sinking rate [m/s]                                            | 25.0/86400.0       |
+| wdetmax          | Maximum detritus sinking rate [m/s]                                         | 42.0/86400.0       |
+| wcaco3           | CaCO₃ sinking rate [m/s]                                                    | 12.5/86400.0       |
+| detlrem_sed      | Sediment detritus remineralisation [s⁻¹]                                    | 0.01/86400.0       |
+| caco3lrem        | Base CaCO₃ remineralisation [s⁻¹]                                           | 0.01/86400.0       |
+| caco3lrem_sed    | Sediment CaCO₃ remineralisation [s⁻¹]                                       | 0.01/86400.0       |
+| omegamax_sed     | Omega ceiling in sediments [dimenionless]                                   | 0.8                |
+| f_inorg          | Base inorganic fraction of CaCO₃ within detritus [molC/molC]                | 0.045              |
+| disscal          | Calcite dissolution factor [s⁻¹]                                            | 0.25/86400.0       |
+| dissara          | Aragonite dissolution factor [s⁻¹]                                          | 0.10/86400.0       |
+| dissdet          | Dissolution factor from detritus remineralisation [molC/molC]               | 0.200              |
+| ligW             | Weak ligand background concentration [µmol/m³]                              | 1.0                |
+| ligS             | Strong ligand background concentration [µmol/m³]                            | 0.5                |
+| dfefloor         | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
+| knano_dfe        | Fe nanoparticle precipitation rate [s⁻¹]                                    | 0.1/86400.0        |
+| kscav_dfe        | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
+| kcoag_dfe        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-7/86400         |
+| kagg_col         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
+| kagg_kcol        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
+| bottom_thickness | Bottom layer thickness [m]                                                  | 0.1                |
 
 ---
 
