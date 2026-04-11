@@ -43,6 +43,62 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 
 ---
 
+### Parameter set and default values
+
+| Parameter        | Symbol in documentation         | Description                                                                 | Value              |
+|------------------|---------------------------------|-----------------------------------------------------------------------------|--------------------|
+| alphabio         | $\alpha_{phy}^{Chl}$            | Phytoplankton initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹ s⁻¹]           | 3.0                |
+| abioa            | $\mu_{phy}^{0ºC}$               | Autotrophy maximum growth rate parameter a [s⁻¹]                            | 1.0/86400.0        |
+| bbioa            | $β_{auto}$                      | Autotrophy maximum growth rate parameter b [1]                              | 1.050              |
+| bbioh            | $β_{hete}$                      | Heterotrophy maximum growth rate parameter b [1]                            | 1.060              |
+| phykn            | $K_{phy}^{N,0}$                 | Phytoplankton half saturation constant for nitrogen uptake [mmolN/m³]       | 2.0                |
+| phykf            | $K_{phy}^{Fe,0}$                | Phytoplankton half saturation constant for iron uptake [µmolFe/m³]          | 1.0                |
+| phyminqc         | $Q_{phy}^{-Chl:C}$              | Phytoplankton minimum chlorophyll:C quota [mg/mg]                           | 0.004              |
+| phymaxqc         | $Q_{phy}^{+Chl:C}$              | Phytoplankton maximum chlorophyll:C quota [mg/mg]                           | 0.060              |
+| phytauqc         | $\tau^{Chl}$                    | Phytoplankton timescale for chlorophyll:C adjustment [s]                    | 86400.0            |
+| phyoptqf         | $Q_{phy}^{*Fe:C}$               | Phytoplankton optimal Fe:C quota [mol/mol]                                  | 10e-6              |
+| phymaxqf         | $Q_{phy}^{+Fe:C}$               | Phytoplankton maximum Fe:C quota [mol/mol]                                  | 50e-6              |
+| phylmor          | $\gamma_{phy}^{0^{\circ}C}$     | Phytoplankton linear mortality rate constant [s⁻¹]                          | 0.005/86400.0      |
+| phyqmor          | $\Gamma_{phy}^{0^{\circ}C}$     | Phytoplankton quadratic mortality rate constant [(mmolC/m³)⁻¹ s⁻¹]          | 0.05/86400.0       |
+| phybiot          | $B_{phy}^{thresh}$              | Phytoplankton biomass threshold [mmolC/m³]                                  | 0.6                |
+| zooCingest       | $\lambda^{C}$                   | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.8                |
+| zooCassim        | $\eta^{C}$                      | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.3                |
+| zooFeingest      | $\lambda^{Fe}$                  | Zooplankton ingestion efficiency of iron [molFe/molFe]                      | 0.2                |
+| zooFeassim       | $\eta^{Fe}$                     | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.9                |
+| fgutdiss         | $F_{gut}$                       | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
+| zookz            | $K_{zoo}^{\gamma}$              | Half-saturation coefficient for zooplankton mortality [mmolC/m³]            | 0.25               |
+| zoogmax          | $\mu_{zoo}^{max}$               | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.0/86400.0        |
+| zooepsmin        | $\varepsilon_{\min}$            | Zooplankton minimum prey capture rate [m⁶/mmol²/s]                          | 0.005/86400.0      |
+| zooepsmax        | $\varepsilon_{\max}$            | Zooplankton maximum prey capture rate [m⁶/mmol²/s]                          | 0.25/86400.0       |
+| zooepsrat        | $\varepsilon_{shift}$           | Zooplankton transition rate of epsilon [(mmolC/m³)⁻¹]                       | 0.1                |
+| zoopreyswitch    | $s_{zoo}$                       | Zooplankton prey switching exponent [dimenionless]                          | 1.8                |
+| zprefphy         | $\phi_{zoo}^{phy}$              | Zooplankton preference for phytoplankton [dimensionless]                    | 1.0                |
+| zprefdet         | $\phi_{zoo}^{det}$              | Zooplankton preference for detritus [dimensionless]                         | 0.50               |
+| zoolmor          | $\gamma_{zoo}^{0^{\circ}C}$     | Zooplankton respiration rate [s⁻¹]                                          | 0.0025/86400.0     |
+| zooqmor          | $\Gamma_{zoo}^{0^{\circ}C}$     | Zooplankton quadratic mortality [(mmolC/m³)⁻¹ s⁻¹]                          | 0.8/86400.0        |
+| detlrem          | $\Gamma_{det}^{0^{\circ}C}$     | Detritus remineralisation rate [(mmolC/m³)⁻¹ s⁻¹]                           | 0.5/86400.0        |
+| wdetbio          | $\omega_{det}^{0}$              | Base detritus sinking rate [m/s]                                            | 25.0/86400.0       |
+| wdetmax          | $\omega_{det}^{max}$            | Maximum detritus sinking rate [m/s]                                         | 42.0/86400.0       |
+| wcaco3           | $\omega_{CaCO_3}^{0}$           | CaCO₃ sinking rate [m/s]                                                    | 12.5/86400.0       |
+| detlrem_sed      | $\gamma_{det,sed}^{0^{\circ}C}$ | Sediment detritus remineralisation [s⁻¹]                                    | 0.01/86400.0       |
+| caco3lrem        | $d_{cal}$                       | Base CaCO₃ remineralisation [s⁻¹]                                           | 0.01/86400.0       |
+| caco3lrem_sed    | $d_{cal,sed}$                   | Sediment CaCO₃ remineralisation [s⁻¹]                                       | 0.01/86400.0       |
+| omegamax_sed     | $\Omega_{cal,+sed}$             | Omega ceiling in sediments [dimenionless]                                   | 0.8                |
+| f_inorg          | $f_{inorg}$                     | Base inorganic fraction of CaCO₃ within detritus [molC/molC]                | 0.045              |
+| disscal          | $d_{CaCO_3}^{\Omega_{cal}}$     | Calcite dissolution factor [s⁻¹]                                            | 0.25/86400.0       |
+| dissara          | $d_{CaCO_3}^{\Omega_{ara}}$     | Aragonite dissolution factor [s⁻¹]                                          | 0.10/86400.0       |
+| dissdet          | $d_{CaCO_3}^{\Gamma_{det}}$     | Dissolution factor from detritus remineralisation [molC/molC]               | 0.200              |
+| ligW             |                                 | Weak ligand background concentration [µmol/m³]                              | 1.0                |
+| ligS             |                                 | Strong ligand background concentration [µmol/m³]                            | 0.5                |
+| dfefloor         | $[dFe]^{min}$                   | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
+| knano_dfe        | $\gamma_{Fe}^{nano}$            | Fe nanoparticle precipitation rate [s⁻¹]                                    | 0.1/86400.0        |
+| kscav_dfe        | $\gamma_{Fe}^{scav}$            | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
+| kcoag_dfe        | $\gamma_{dFe}^{coag}$           | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-7/86400         |
+| kagg_col         | $\gamma_{dFe}^{agg}$            | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
+| kagg_kcol        | $K_{dFe}^{agg}$                 | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
+| bottom_thickness |                                 | Bottom layer thickness [m]                                                  | 0.1                |
+
+---
 
 ### 1. Light attenuation through the water column.
 
@@ -156,17 +212,17 @@ _where _ <br>
 - $NO_3$ is the ambient nitrate concentration (`biono3`, $NO_3$, [mmol N m<sup>-3</sup>]) <br>
 - $K_{phy}^{N}$ is the michaelis-menten half-saturation coefficient (`phy_kni(i,j,k)`, [mmol N m<sup>-3</sup>]) <br>
 
-**Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{phy}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phy_optqfe`, $Q_{phy}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{phy}^{-Fe:C}$, is dependent on the chlorophyll content of the cell and the degree of nitrogen limitation according to
+**Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{phy}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phyoptqf`, $Q_{phy}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{phy}^{-Fe:C}$, is dependent on the chlorophyll content of the cell and the degree of nitrogen limitation according to
 
 $$
 \begin{align}
-Q_{phy}^{-Fe:C} =& \quad 0.00167 / 55.85 \cdot \max\left( Q_{phy}^{Chl:C}, Q_{phy}^{-Chl:C} \right) \cdot 12 \\
-& \quad + 1.21 \times 10^{-5} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot 1.5 \cdot L_{phy}^{N} \\
-& \quad + 1.15 \times 10^{-4} \cdot 14.0 / 55.85 / 7.625 \cdot 0.5 \cdot L_{phy}^{N}
+Q_{phy}^{-Fe:C} =& \quad \dfrac{0.00167}{55.85} \cdot \max\left( Q_{phy}^{Chl:C}, Q_{phy}^{-Chl:C} \right) \cdot 12 \\
+& \quad + 1.21 \times 10^{-5} \cdot \dfrac{14}{55.85 \cdot 7.625} \cdot 0.5 \cdot 1.5 \cdot L_{phy}^{N} \\
+& \quad + 1.15 \times 10^{-4} \cdot \dfrac{14}{55.85 \cdot 7.625} \cdot 0.5 \cdot L_{phy}^{N}
 \end{align}
 $$
 
-The first term reflects the amount of iron required for photosystems I and II. `0.00167/55.85` is equivalent to the grams of Fe per gram of chlorophyll divided by the grams of Fe per mol Fe, giving mol Fe per gram chlorophyll. This term is multipled by the chlorophyll to carbon ratio of the phytoplantkon cell (`phy_chlc`, $Q_{phy}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]), taking into account the minimum possible chlorophyll to carbon ratio ($Q_{phy}^{-Chl:C}$), and grams of C per mol C, returning mol Fe per mol C. At a healthy chlorophyll:C ratio of 0.03, this term returns an Fe:C ratio of roughly 10 µmol:mol, which reproduces well known requirements of phytoplankton cells ([Morel, Rueter & Price, 1991](https://www.jstor.org/stable/43924569)). The second term, representing the respiratory iron requirement, is derived from [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) who estimated 1.21 $\times 10^{-5}$ grams Fe per gram N assimilated into the cell, which is converted to mol Fe per mol C with 14 g N per mol N divided by 55.85 g Fe per mol Fe $\times$ 7.625 mol C per mol N. This second term assumes that respiration is reduced as growth becomes more limited by available nitrogen (`phy_lnit(i,j,k)`, $L_{phy}^{N}$, [dimensionless]). Finally, the third term represents the iron required by nitrate/nitrite reduction. Nitrate assimilation requires roughly 1.8$\times$ more iron than ammonia assimilation ([Raven, 1988](https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1988.tb04196.x)). [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) estimated a demand of 1.15 $\times 10^{-4}$ g Fe per mol $NO_3$ reduced, which is accounted for by the nitrogen limitation term. Note that the 1.5 in the equation for $Q_{phy}^{-Fe:C}$ is designed to account for dark respiration (i.e., respiration when the cells are not growing) and the 0.5 refers to the fact that during cell division the cell must reinstate half of its Fe reserves.
+The first term reflects the amount of iron required for photosystems I and II. $\dfrac{0.00167}{55.85}$ is equivalent to the grams of Fe per gram of chlorophyll divided by the grams of Fe per mol Fe, giving mol Fe per gram chlorophyll. This term is multipled by the chlorophyll to carbon ratio of the phytoplantkon cell (`phy_chlc`, $Q_{phy}^{Chl:C}$, [mol C (mol C)<sup>-1</sup>]), taking into account the minimum possible chlorophyll to carbon ratio ($Q_{phy}^{-Chl:C}$), and grams of C per mol C, returning mol Fe per mol C. At a healthy chlorophyll:C ratio of 0.03, this term returns an Fe:C ratio of roughly 10 µmol:mol, which reproduces well known requirements of phytoplankton cells ([Morel, Rueter & Price, 1991](https://www.jstor.org/stable/43924569)). The second term, representing the respiratory iron requirement, is derived from [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) who estimated 1.21 $\times 10^{-5}$ grams Fe per gram N assimilated into the cell, which is converted to mol Fe per mol C with 14 g N per mol N divided by 55.85 g Fe per mol Fe $\times$ 7.625 mol C per mol N. This second term assumes that respiration is reduced as growth becomes more limited by available nitrogen (`phy_lnit(i,j,k)`, $L_{phy}^{N}$, [dimensionless]). Finally, the third term represents the iron required by nitrate/nitrite reduction. Nitrate assimilation requires roughly 1.8$\times$ more iron than ammonia assimilation ([Raven, 1988](https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1988.tb04196.x)). [Flynn & Hipkin (1999)](https://onlinelibrary.wiley.com/doi/10.1046/j.1529-8817.1999.3561171.x) estimated a demand of 1.15 $\times 10^{-4}$ g Fe per mol $NO_3$ reduced, which is accounted for by the nitrogen limitation term. Note that the 1.5 in the equation for $Q_{phy}^{-Fe:C}$ is designed to account for dark respiration (i.e., respiration when the cells are not growing) and the 0.5 refers to the fact that during cell division the cell must reinstate half of its Fe reserves.
 
 The Fe limitation factor (`phy_lfer(i,j,k)`, $L_{phy}^{Fe}$) is then computed from the present Fe:C quota of the phytoplankton cells (`phy_Fe2C`, $Q_{phy}^{Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) relative to the minimum and optimal quotas.
 
@@ -227,7 +283,7 @@ First, The initial slope of the P–I curve, (`phy_pisl`, $\alpha_{phy}$, [s<sup
 
 $$
 \begin{align}
-\alpha_{phy} =& \quad \max\left(\alpha_{phy}^{Chl} \cdot Q_{phy}^{Chl:C}\ , \ \alpha_{phy}^{Chl} \cdot Q_{phy}^{-Chl:C} \right)
+\alpha_{phy} =& \quad \max\left( Q_{phy}^{Chl:C}\ , \ Q_{phy}^{-Chl:C} \right) \alpha_{phy}^{Chl}
 \end{align}
 $$
 
@@ -272,7 +328,7 @@ _where_ <br>
 
 We apply Liebig's law of the minimum ([Liebig, 1840](https://archive.org/details/organicchemistry00liebrich/mode/2up), [Blackman, 1905](https://doi.org/10.1093/oxfordjournals.aob.a089000)) to resources that are required for biomass synthesis (N and Fe), while light is considered multiplicative because it is an energy supply constraint that powers nutrient aquisition and biomass synthesis.
 
-Carbon fixation by phytoplankton (`phygrow(i,j,k)`, $\mu_{phy}^{C}$, [mmol C m<sup>-3</sup> s<sup>-1</sup>]) is then calculated as:
+Carbon fixation by phytoplankton (`phygrow(i,j,k)`, $\mu_{phy}^{\leftarrow C}$, [mmol C m<sup>-3</sup> s<sup>-1</sup>]) is then calculated as:
 
 $$
 \begin{align}
@@ -317,7 +373,7 @@ $$
 _where_ <br>
 - $Q_{phy}^{-Chl:C}$ is the minimum allowable chlorophyll-to-carbon ratio (`phyminqc`, [mol C (mol C)<sup>-1</sup>]) <br>
 
-Growth of chlorophyll is then calculated as:
+Growth of chlorophyll (`pchl_mu(i,j,k)`, $\mu_{phy}^{\leftarrow Chl}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
 $$
 \begin{align}
@@ -380,7 +436,7 @@ $$
 _where_ <br>
 - $L_{phy}^{PAR}$ is the growth limiter by light (`phy_lpar(i,j,k)`, [dimensionless]) <br>
 
-Under very low light, this fourth term reduces maximum potential Fe uptake by 10-fold than what it otherwise would be. All four terms are dimensionless and are designed to scale dissolved iron uptake either up or down. Dissolved iron uptake by phytoplankton (`phy_dfeupt(i,j,k)`, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
+Under very low light, this fourth term reduces maximum potential Fe uptake by 10-fold than what it otherwise would be. All four terms are dimensionless and are designed to scale dissolved iron uptake either up or down. Dissolved iron uptake by phytoplankton (`phy_dfeupt(i,j,k)`, $\mu_{phy}^{\leftarrow dFe}$, [mol Fe kg<sup>-1</sup> s<sup>-1</sup>]) is then calculated as:
 
 $$
 \begin{align}
@@ -398,20 +454,20 @@ _where_ <br>
 
 ### 8. Iron chemistry.
 
-Treatment of dissolved iron (`biofer`, $dFe$, [nmol Fe kg<sup>-1</sup>]) follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5). Our calculations involve:
-1. Solving for the distinct pools of dissolved iron: free iron, ligand-bound iron and colloidal iron.
-2. Computing precipitation of free iron into nanoparticles that are permanently lost.
-3. Computing scavenging of free iron onto sinking organic particles.
-4. Computing coagulation of colloidal iron onto sinking organic particles.
+Treatment of dissolved iron (`biofer`, $dFe$, [nmol Fe kg<sup>-1</sup>]) follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5). Our calculations involve: <br>
+1. Solving for the distinct pools of dissolved iron: free iron, ligand-bound iron and colloidal iron. <br>
+2. Computing precipitation of free iron into nanoparticles that are permanently lost. <br>
+3. Computing scavenging of free iron onto sinking organic particles. <br>
+4. Computing coagulation of colloidal iron onto sinking organic particles. <br>
 
-NOTE: WOMBAT-lite differs from WOMBAT-mid in that sinking authigenic pools of iron are not resolved.
+_NOTE: WOMBAT-lite differs from WOMBAT-mid in that sinking authigenic pools of iron are not resolved._
 
 We first estimate the **solubility of free Fe from Fe<sup>3+</sup>** in solution using temperature, pH and salinity using the thermodynamic equilibrium equations of [Liu & Millero (2002)](https://www.sciencedirect.com/science/article/abs/pii/S0304420301000743). 
 
 $$
 \begin{align}
-T_K =& \quad \max(5.0, T) + 273.15$ \\
-T_K^{-1} =& \quad \dfrac{1}{T_K}$ \\
+T_K =& \quad \max(5.0, T) + 273.15 \\
+(T_K)^{-1} =& \quad \dfrac{1}{T_K} \\
 I_{S} =& \quad \dfrac{19.924 S}{1000 - 1.005 S}
 \end{align}
 $$
@@ -420,11 +476,11 @@ Solubility constants:
 
 $$
 \begin{align}
-Fe_{sol1} =& \quad 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,T_K^{-1}\right)} \\
-Fe_{sol2} =& \quad 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,T_K^{-1}\right)} \\
-Fe_{sol3} =& \quad 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,T_K^{-1}\right)} \\
-Fe_{sol4} =& \quad 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,T_K^{-1}\right)} \\
-Fe_{sol5} =& \quad 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,T_K^{-1}\right)}
+Fe_{sol1} =& \quad 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\ (T_K)^{-1}\right)} \\
+Fe_{sol2} =& \quad 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\ (T_K)^{-1}\right)} \\
+Fe_{sol3} =& \quad 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\ (T_K)^{-1}\right)} \\
+Fe_{sol4} =& \quad 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\ (T_K)^{-1}\right)} \\
+Fe_{sol5} =& \quad 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\ (T_K)^{-1}\right)}
 \end{align}
 $$
 
@@ -465,12 +521,13 @@ When `do_two_ligands == .false.`, we use a single ligand class and solve for the
 
 In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a weak ligand (`ligW_K(i,j,k)`, $Lig_{w}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a strong ligand to be a constant positive offset equal to 2.67 log<sub>10</sub> units ([Ye et al., 2020](https://doi.org/10.1029/2019GB006425)). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a weak ligand but add a constant 1.0 log<sub>10</sub> units to it to accommodate the effect strong ligands. 
 
-The stability constant (`ligW_K(i,j,k)`, $Lig_{w}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligW_K(i,j,k)`, $Lig_{w}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-lite, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
-Lig_{w}^{K} =& \quad \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)  - 0.7 \dfrac{PAR}{PAR + 10} } \\
-             & \quad 10^{\left(-0.0002  \left(DOC\right)^{2} + 0.034 \cdot DOC - 1.67 \cdot pH + 24.36\right)} \bigg) \times 10^{-9}
+Lig_{w}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)} \\
+             & \qquad  10^{\left(-0.7 \dfrac{PAR}{PAR + 10}\right)} \\
+             & \qquad 10^{\left(-0.0002 [DOC]^{2} + 0.034 [DOC] - 1.67 \cdot pH + 24.36\right)} \bigg)
 \end{align}
 $$
 
@@ -478,7 +535,7 @@ _where_ <br>
 - $T_K$ is in situ water temperature (`ztemk`, [ºK]) <br>
 - $PAR$ is the total photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>]) <br>
 - pH is the in situ pH <br>
-- $DOC$ is an empirical concentration of DOC and is equal to $40 + 40 \left( 1 - \min\left(L_{phy}^{N} \ , \ L_{phy}^{Fe}\right) \right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
+- $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left( 1 - \min\left(L_{phy}^{N} \ , \ L_{phy}^{Fe}\right) \right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
 
 After finding $Lig_{w}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
@@ -581,7 +638,7 @@ _where_ <br>
 - $B_{det}^{C}$ is the concentration of particulate organic carbon (`biodet`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{CaCO_3}^{C}$ is the concentration of particulate calcium carbonate in units of carbon (`biocaco3`, [mmol C m<sup>-3</sup>]) <br>
 
-Total scavenging ($Sc_{dFe}^{\rightarrow}$) of free iron is broken into the part that attaches to organic detritus (`fescadet(i,j,k)`, [nmol Fe kg<sup>-1</sup> s<sup>-1</sup>]):
+Total scavenging ($Sc_{dFe}^{\rightarrow}$) of free iron is broken into the part that attaches to organic detritus (`fescadet(i,j,k)`, $Sc_{dFe}^{\rightarrow B_{det}^{Fe}}$, [nmol Fe kg<sup>-1</sup> s<sup>-1</sup>]):
 
 $$
 \begin{align}
@@ -610,8 +667,8 @@ The coagulation scaling coefficient is dependent on the concentrations of dissol
 $$
 \begin{align}
 S_{coag} =& \quad H_{mix} \left(12 \cdot F_{coag} [DOC] + 9.05 \cdot B_{det}^{C}\right) \\
-          & \quad + 2.49 \cdot B_{det}^{C} + 128 \cdot F_{coag} [DOC] + 725 \cdot B_{det}^{C} \\
-          & \quad \gamma_{dFe}^{agg} \cdot \dfrac{\left(dFe_{col}\right)^{4}}{\left(dFe_{col}\right)^{4} + \left(K_{dFe}^{agg}\right)^{4}} \\ 
+          & \quad + \left( 2.49 \cdot B_{det}^{C} + 128 \cdot F_{coag} [DOC] + 725 \cdot B_{det}^{C} \right) \\
+          & \quad + \left(\gamma_{dFe}^{agg} \cdot \dfrac{\left(dFe_{col}\right)^{4}}{\left(dFe_{col}\right)^{4} + \left(K_{dFe}^{agg}\right)^{4}} \right) \\ 
 F_{coag} =& \quad \dfrac{B_{phy}^{C}}{B_{phy}^{C} + 0.03}
 \end{align}
 $$
@@ -721,7 +778,7 @@ _where_ <br>
 - $B_{prey}^{C}$ is the concentration of prey biomass (`zooprey`, [mmol C m<sup>-3</sup>]) <br>
 - $\varepsilon$ is the prey capture rate coefficient (`zooeps(i,j,k)`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
 
-Total grazing of biomass by micro-zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
+Total grazing of biomass by zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
 $$
 \begin{align}
@@ -771,13 +828,13 @@ $$
 _where_ <br>
 - $\phi_{zoo}^{phy}$ and $\phi_{zoo}^{det}$ are the relative prey preference of zooplankton for phytoplankton and detritus (`zooprefphy(i,j,k)`; `zooprefdet(i,j,k)`, [dimensionless]) <br>
 - $B_{phy}^{C}$ and $B_{det}^{C}$ are the concentrations of phytoplankton and detritus in carbon biomass (`biophy`; `biodet`, [mmol C m<sup>-3</sup>])<br>
-- $s_{zoo}$ is the prey-switching exponent of zooplankton type $z$ (`zoopreyswitch`) <br>
+- $s_{zoo}$ is the prey-switching exponent of zooplankton (`zoopreyswitch`) <br>
 
 When $s_{zoo} < 1$, zooplankton feed equally across all prey items irrespective of availability  <br>
 When $s_{zoo} = 1$, zooplankton feed according to pre-defined dietary fractions  <br>
 When $s_{zoo} > 1$, zooplankton exhibit prey-switching and feed disproportionately on most abundant prey  <br>
 
-Again, prey preferences are normalized to ensure that $\phi_{zoo}^{phy} + \phi_{zoo}^{det} =& \quad 1$.
+Again, prey preferences are normalized to ensure that $\phi_{zoo}^{phy} + \phi_{zoo}^{det} = 1$.
 
 The prey capture rate coefficient, $\varepsilon$ (`zooeps(i,j,k)`, $\varepsilon$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]), is allowed to vary as a function of prey biomass, following the prey-dependent behaviour described by [Rohr et al. (2024)](doi.org/10.1029/2023GL107732). This reflects a transition from microzooplankton-like feeding with higher prey capture rate coefficients at low prey biomass to mesozooplankton-like feeding with lower prey capture rate coefficients at high prey biomass.
 
@@ -981,7 +1038,7 @@ Here we note that the processing of $CaCO_3$ by zooplankton grazing is treated d
 
 **Static $CaCO_3$ production and dissolution**
 
-When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model uses a static PIC:POC ratio (`f_inorg + 0.025`, [mol C (mol C)<sup>-1</sup>]) and $CaCO_3$ dissolution rate (`caco3lrem`, [s<sup>-1</sup>]). These are set as input parameters to the model.
+When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model uses a static PIC:POC ratio (`f_inorg + 0.025`, [mol C (mol C)<sup>-1</sup>]) and a constant linear $CaCO_3$ dissolution rate (`caco3lrem`, $d_{cal}$, [s<sup>-1</sup>]). These are set as input parameters to the model.
 
 ---
 
@@ -1253,6 +1310,7 @@ $$
 $$
 
 _where_ <br>
+- $\gamma_{det,sed}^{0^{\circ}C}$ is the base linear rate of remineralisation of sedimentary organic detritus (`detlrem_sed`, [s<sup>-1</sup>])
 - $\gamma_{det,sed}^{C}$ is the remineralisation rate of organic detrital carbon in the sediment pool (`det_sed_remin(i,j)`, [mol C m<sup>-2</sup> s<sup>-1</sup>]) <br>
 - $\gamma_{det,sed}^{N}$ is the production of nitrate due to organic detrital remineralisation in the sediment pool ([mol N m<sup>-2</sup> s<sup>-1</sup>]) <br>
 - $\gamma_{det,sed}^{O_2}$ is the consumption rate of oxygen during remineralisation of organics in the sediment pool ([mol $O_2$ m<sup>-2</sup> s<sup>-1</sup>]) <br>
