@@ -90,12 +90,12 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | disscal          | Calcite dissolution factor [s⁻¹]                                            | 0.25/86400.0       |
 | dissara          | Aragonite dissolution factor [s⁻¹]                                          | 0.10/86400.0       |
 | dissdet          | Dissolution factor from detritus remineralisation [molC/molC]               | 0.200              |
-| ligW             | Weak ligand background concentration [µmol/m³]                              | 1.0                |
-| ligS             | Strong ligand background concentration [µmol/m³]                            | 0.5                |
+| ligW             | Weak ligand background concentration [µmol/m³]                              | 1.7                |
+| ligS             | Strong ligand background concentration [µmol/m³]                            | 0.4                |
 | dfefloor         | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
 | knano_dfe        | Fe nanoparticle precipitation rate [s⁻¹]                                    | 0.1/86400.0        |
 | kscav_dfe        | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
-| kcoag_dfe        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-7/86400         |
+| kcoag_dfe        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-5/86400         |
 | kagg_col         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | kagg_kcol        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
 | bottom_thickness | Bottom layer thickness [m]                                                  | 0.1                |
@@ -521,13 +521,13 @@ Partitioning of iron between free and ligand-bound forms is done using one of tw
 
 When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative, bisectional root solver.
 
-In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a weak ligand (`ligW_K(i,j,k)`, $Lig_{w}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a strong ligand to be a constant positive offset equal to 2.67 log<sub>10</sub> units ([Ye et al., 2020](https://doi.org/10.1029/2019GB006425)). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a weak ligand but add a constant 1.0 log<sub>10</sub> units to it to accommodate the effect strong ligands. 
+In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a strong ligand but reduce it by a constant 0.5 log<sub>10</sub> units to it to accommodate the effect weak ligands. 
 
-The stability constant (`ligW_K(i,j,k)`, $Lig_{w}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-lite, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-lite, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
-Lig_{w}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)} \\
+Lig_{s}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)} \\
              & \qquad  10^{\left(-0.7 \dfrac{PAR}{PAR + 10}\right)} \\
              & \qquad 10^{\left(-0.0002 [DOC]^{2} + 0.034 [DOC] - 1.67 \cdot pH + 24.36\right)} \bigg)
 \end{align}
@@ -539,7 +539,7 @@ _where_ <br>
 - pH is the in situ pH <br>
 - $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left( 1 - \min\left(L_{phy}^{N} \ , \ L_{phy}^{Fe}\right) \right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
 
-After finding $Lig_{w}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
+After finding $Lig_{s}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
 $$
 \begin{align}
@@ -551,7 +551,7 @@ $$
 
 _where_ <br>
 - $[Ligand]$ is the in situ concentration of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to the sum of weak and strong ligand concentrations (`ligW` + `ligS`, [nmol kg<sup>-1</sup>]) <br>
-- $Lig_{bulk}^{K}$ is the conditional stability constant of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to $Lig_{w}^{K}$ + 1 <br>
+- $Lig_{bulk}^{K}$ is the conditional stability constant of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to $Lig_{s}^{K} \cdot 10^{-0.5}$ <br>
 
 In the case of `do_two_ligands == .true.`, we solve for (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the iterative method. For this approach, we know that:
 
@@ -598,7 +598,7 @@ Now that we have separated the dissolved Fe pool into its subcomponents of free,
 
 **Precipitation:**
 
-Precipitation of dissolved iron specifically affects free iron when the concentration is greater than that deemed soluble. This iron is permanently lost from the water column.
+Precipitation of dissolved iron specifically affects free iron when the concentration is greater than that deemed soluble. This iron is permanently lost from the water column. This only occurs when `do_colloidal_shunt == .false.`.
 
 $$
 \begin{align}
@@ -614,7 +614,7 @@ _where_ <br>
 
 **Scavenging:**
 
-Scavenging of dissolved iron specifically affects free iron, is accelerated by the presence of particles in the water column ([Ye et al., 2011](https://bg.copernicus.org/articles/8/2107/2011/); [Tagliabue et al., 2019](https://doi.org/10.1038/s41467-019-12775-5)) and we route this iron to sinking organic particles in WOMBAT-lite since we do not represent sinking authigenic particles.
+Scavenging of dissolved iron specifically affects free iron, is accelerated by the presence of particles in the water column ([Ye et al., 2011](https://bg.copernicus.org/articles/8/2107/2011/); [Tagliabue et al., 2019](https://doi.org/10.1038/s41467-019-12775-5)) and we route this iron to sinking organic particles in WOMBAT-lite since we do not represent sinking authigenic iron particles.
 
 $$
 \begin{align}

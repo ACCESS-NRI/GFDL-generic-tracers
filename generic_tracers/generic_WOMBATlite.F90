@@ -307,7 +307,7 @@ module generic_WOMBATlite
         phy_dfeupt, &
         feIII, &
         felig, &
-        ligW_K, &
+        ligS_K, &
         fecol, &
         feprecip, &
         fescaven, &
@@ -390,7 +390,7 @@ module generic_WOMBATlite
         id_phy_dfeupt = -1, &
         id_feIII = -1, &
         id_felig = -1, &
-        id_ligW_K = -1, &
+        id_ligS_K = -1, &
         id_fecol = -1, &
         id_feprecip = -1, &
         id_fescaven = -1, &
@@ -848,8 +848,8 @@ module generic_WOMBATlite
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'ligW_K', 'Weak ligand stability constant', 'h', 'L', 's', 'kg/mol', 'f')
-    wombat%id_ligW_K = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'ligS_K', 'Strong ligand stability constant', 'h', 'L', 's', 'L/mol', 'f')
+    wombat%id_ligS_K = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1380,7 +1380,7 @@ module generic_WOMBATlite
 
     ! CaCO3 dissolution factor due to calcite undersaturation
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('disscal', wombat%disscal, 0.250)
+    call g_tracer_add_param('disscal', wombat%disscal, 0.100)
 
     ! CaCO3 dissolution factor due to aragonite undersaturation
     !-----------------------------------------------------------------------
@@ -1392,11 +1392,11 @@ module generic_WOMBATlite
 
     ! Background concentration of weak iron-binding ligand [umol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ligW', wombat%ligW, 1.0)
+    call g_tracer_add_param('ligW', wombat%ligW, 1.7)
 
     ! Background concentration of strong iron-binding ligand [umol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ligS', wombat%ligS, 0.5)
+    call g_tracer_add_param('ligS', wombat%ligS, 0.4)
 
     ! Set floor for dissolved iron concentration based on the measurement detection limit [umol/m3]
     ! Worsford et al., 2014 Mar. Chem. says anywhere between 10 - 50 pM
@@ -1415,11 +1415,20 @@ module generic_WOMBATlite
     ! that half of marine organic particles are pure carbon by mass means
     ! that roughly 40,000 mmol C kg-1), this translates to scavenging rates
     ! of 0.001 to 0.02 (mmol mass particles / m3)-1 day-1.
+    ! NOTE that scavenging becomes less important when colloids dominate.
     call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.01/86400)
 
     ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-7/86400)
+    ! Colloigal coagulation rates are the principal way to remove dFe at high
+    ! concentrations. Effectively, when `do_colloidal_shunt == .true.`, the
+    ! `kcoag_dfe` parameter sets the maximum dFe concentration via:
+    !    [dFe remaining in solution] = dFe_sources / kcoag_dfe
+    !  1e-5 ---> coagulation at roughly 0.1 per day in productive surface waters
+    !            and 1/1000 per day in deep ocean
+    !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
+    !            and 1/10000 per day in deep ocean
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
@@ -1964,9 +1973,9 @@ module generic_WOMBATlite
     real, dimension(:), allocatable         :: wsink, wsinkcal
     real, dimension(4,61)                   :: zbgr
     real, dimension(3)                      :: dbgr, cbgr
-    real                                    :: ztemk, I_ztemk, fe_keq, fe_sfe, partic
+    real                                    :: ztemk, I_ztemk, fe_sfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
-    real                                    :: flo, fhi, fmid, FeL1_mid, FeL2_mid
+    real                                    :: flo, fhi, fmid, FeL1_mid, FeL2_mid, ligW_K
     real                                    :: biof, biodoc
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
@@ -2171,7 +2180,7 @@ module generic_WOMBATlite
     wombat%phy_lfer(:,:,:) = 0.0
     wombat%phy_dfeupt(:,:,:) = 0.0
     wombat%feIII(:,:,:) = 0.0
-    wombat%ligW_K(:,:,:) = 0.0
+    wombat%ligS_K(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
     wombat%feprecip(:,:,:) = 0.0
@@ -2625,17 +2634,18 @@ module generic_WOMBATlite
       ! a 0.7 log10 unit decrease in K in high light. The pH and DOC dependency (3rd term)
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
       biodoc = 40.0 + (1.0 - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) * 40.0 ! proxy of DOC (mmol/m3)
-      wombat%ligW_K(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
+      wombat%ligS_K(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
                                - 0.7 * wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) ) &
                                + 10.0**( (-2e-4*biodoc + 0.034)*biodoc  - 1.67*(-log10(hp)) + 24.36 ) )
+      ligW_K = wombat%ligS_K(i,j,k) * 10.0**(-1.5) ! ligand binding constant for weak ligands (assumed to be -1.5 log10 units weaker)
       if (do_two_ligands) then
         ! solve for the equilibrium concentration of ligand-bound and free Fe using iterative search
         flo = 0.0
         fhi = fe_sfe
-        do iter = 1,20
+        do iter = 1,30 ! Bisection error is ~ fe_sfe/2^(iter)
           fmid = 0.5 * (flo + fhi)
-          FeL1_mid = wombat%ligW_K(i,j,k) * fmid * wombat%ligW / (1.0 + wombat%ligW_K(i,j,k) * fmid)
-          FeL2_mid = (wombat%ligW_K(i,j,k)+2.67) * fmid * wombat%ligS / (1.0 + (wombat%ligW_K(i,j,k)+2.67) * fmid)
+          FeL1_mid = wombat%ligS_K(i,j,k) * fmid * wombat%ligS / (1.0 + wombat%ligS_K(i,j,k) * fmid)
+          FeL2_mid = ligW_K * fmid * wombat%ligW / (1.0 + ligW_K * fmid)
           zval = fmid + FeL1_mid + FeL2_mid - fe_sfe
           if (zval > 0.0) then
             fhi = fmid
@@ -2645,10 +2655,10 @@ module generic_WOMBATlite
         enddo
         wombat%feIII(i,j,k) = max(0.0, min(0.5 * (flo + fhi), fe_sfe))
       else
-        wombat%ligW_K(i,j,k) = wombat%ligW_K(i,j,k) + 1.0
-        zval = 1.0 + wombat%ligW * wombat%ligW_K(i,j,k) - fe_sfe * wombat%ligW_K(i,j,k)
-        wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*wombat%ligW_K(i,j,k)*fe_sfe ) ) &
-                              / ( 2.*wombat%ligW_K(i,j,k) + epsi )
+        wombat%ligS_K(i,j,k) = wombat%ligS_K(i,j,k) * 10.0**(-0.5)
+        zval = 1.0 + (wombat%ligS + wombat%ligW) * wombat%ligS_K(i,j,k) - fe_sfe * wombat%ligS_K(i,j,k)
+        wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*wombat%ligS_K(i,j,k)*fe_sfe ) ) &
+                              / ( 2.*wombat%ligS_K(i,j,k) + epsi )
         wombat%feIII(i,j,k) = max(0.0, min(wombat%feIII(i,j,k), fe_sfe) )
       endif
       wombat%felig(i,j,k) = max(0.0, fe_sfe - wombat%feIII(i,j,k))
@@ -2683,7 +2693,7 @@ module generic_WOMBATlite
       wombat%fescadet(i,j,k) = wombat%fescadet(i,j,k) * umol_m3_to_mol_kg
       wombat%fecoag2det(i,j,k) = wombat%fecoag2det(i,j,k) * umol_m3_to_mol_kg
       wombat%feIII(i,j,k) = wombat%feIII(i,j,k) * umol_m3_to_mol_kg
-      wombat%ligW_K(i,j,k) = wombat%ligW_K(i,j,k) * 1e9 ! PJB: convert back to L/mol
+      wombat%ligS_K(i,j,k) = wombat%ligS_K(i,j,k) * 1e9 ! PJB: convert back to L/mol
       wombat%felig(i,j,k) = wombat%felig(i,j,k) * umol_m3_to_mol_kg
       wombat%fecol(i,j,k) = wombat%fecol(i,j,k) * umol_m3_to_mol_kg
 
@@ -3092,8 +3102,8 @@ module generic_WOMBATlite
             print *, "       DIC (molC/kg) =", wombat%f_dic(i,j,k)
             print *, "       ALK (molC/kg) =", wombat%f_alk(i,j,k)
             print *, "       PHY (molC/kg) =", wombat%f_phy(i,j,k)
-            print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k)
-            print *, "       DET (molN/kg) =", wombat%f_det(i,j,k)
+            print *, "       ZOO (molC/kg) =", wombat%f_zoo(i,j,k)
+            print *, "       DET (molC/kg) =", wombat%f_det(i,j,k)
             print *, "       CaCO3 (molC/kg) =", wombat%f_caco3(i,j,k)
             print *, "       Temp =", Temp(i,j,k)
             print *, "       Salt =", Salt(i,j,k)
@@ -3423,8 +3433,8 @@ module generic_WOMBATlite
       used = g_send_data(wombat%id_felig, wombat%felig, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_ligW_K > 0) &
-      used = g_send_data(wombat%id_ligW_K, wombat%ligW_K, model_time, &
+    if (wombat%id_ligS_K > 0) &
+      used = g_send_data(wombat%id_ligS_K, wombat%ligS_K, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_fecol > 0) &
@@ -3928,7 +3938,7 @@ module generic_WOMBATlite
     allocate(wombat%phy_dfeupt(isd:ied, jsd:jed, 1:nk)); wombat%phy_dfeupt(:,:,:)=0.0
     allocate(wombat%feIII(isd:ied, jsd:jed, 1:nk)); wombat%feIII(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
-    allocate(wombat%ligW_K(isd:ied, jsd:jed, 1:nk)); wombat%ligW_K(:,:,:)=0.0
+    allocate(wombat%ligS_K(isd:ied, jsd:jed, 1:nk)); wombat%ligS_K(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
     allocate(wombat%feprecip(isd:ied, jsd:jed, 1:nk)); wombat%feprecip(:,:,:)=0.0
     allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
@@ -4055,7 +4065,7 @@ module generic_WOMBATlite
         wombat%phy_dfeupt, &
         wombat%feIII, &
         wombat%felig, &
-        wombat%ligW_K, &
+        wombat%ligS_K, &
         wombat%fecol, &
         wombat%feprecip, &
         wombat%fescaven, &
