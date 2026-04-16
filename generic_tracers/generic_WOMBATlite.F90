@@ -2750,8 +2750,8 @@ module generic_WOMBATlite
       ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
       wzphy = (wombat%zooprefphy(i,j,k) * biophy)**wombat%zoopreyswitch
       wzdet = (wombat%zooprefdet(i,j,k) * biodet)**wombat%zoopreyswitch
-      wombat%zooprefphy(i,j,k) = wzphy / (wzphy + wzdet + epsi) 
-      wombat%zooprefdet(i,j,k) = wzdet / (wzphy + wzdet + epsi) 
+      wombat%zooprefphy(i,j,k) = wzphy / (wzphy + wzdet + epsi)
+      wombat%zooprefdet(i,j,k) = wzdet / (wzphy + wzdet + epsi)
       ! Determine prey biomass after dynamic dietary fractions found
       zooprey = (wombat%zooprefphy(i,j,k) * biophy + wombat%zooprefdet(i,j,k) * biodet)
 
