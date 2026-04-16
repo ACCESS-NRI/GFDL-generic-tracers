@@ -1975,7 +1975,7 @@ module generic_WOMBATlite
     real, dimension(3)                      :: dbgr, cbgr
     real                                    :: ztemk, I_ztemk, fe_sfe, partic
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
-    real                                    :: flo, fhi, fmid, FeL1_mid, FeL2_mid, ligW_K
+    real                                    :: inv1, inv2, fe3, FeL1_mid, FeL2_mid, ligW_K
     real                                    :: biof, biodoc
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
@@ -2639,21 +2639,25 @@ module generic_WOMBATlite
                                + 10.0**( (-2e-4*biodoc + 0.034)*biodoc  - 1.67*(-log10(hp)) + 24.36 ) )
       ligW_K = wombat%ligS_K(i,j,k) * 10.0**(-1.5) ! ligand binding constant for weak ligands (assumed to be -1.5 log10 units weaker)
       if (do_two_ligands) then
-        ! solve for the equilibrium concentration of ligand-bound and free Fe using iterative search
-        flo = 0.0
-        fhi = fe_sfe
-        do iter = 1,30 ! Bisection error is ~ fe_sfe/2^(iter)
-          fmid = 0.5 * (flo + fhi)
-          FeL1_mid = wombat%ligS_K(i,j,k) * fmid * wombat%ligS / (1.0 + wombat%ligS_K(i,j,k) * fmid)
-          FeL2_mid = ligW_K * fmid * wombat%ligW / (1.0 + ligW_K * fmid)
-          zval = fmid + FeL1_mid + FeL2_mid - fe_sfe
-          if (zval > 0.0) then
-            fhi = fmid
-          else
-            flo = fmid
-          endif
+        ! Newton-Raphson to solve: x + K1*L1*x/(1+K1*x) + K2*L2*x/(1+K2*x) = fe_sfe
+        ! Initial guess is the max of two limiting-case approximations:
+        !   - low-Fe (ligand-unsaturated, K*x<<1): x ~ fe_sfe / (1 + K1*L1 + K2*L2)
+        !   - high-Fe (ligand-saturated, K*x>>1): x ~ fe_sfe - L1 - L2
+        ! Both underestimate x*, so max() picks whichever regime applies.
+        fe3 = max( fe_sfe / (1.0 + wombat%ligS_K(i,j,k)*wombat%ligS + ligW_K*wombat%ligW + epsi), &
+                    fe_sfe - wombat%ligS - wombat%ligW )
+        fe3 = max(0.0, min(fe3, fe_sfe))
+        do iter = 1, 8
+          inv1 = 1.0 / (1.0 + wombat%ligS_K(i,j,k) * fe3) ! 1/(1 + K1*x)
+          inv2 = 1.0 / (1.0 + ligW_K * fe3)               ! 1/(1 + K2*x)
+          FeL1_mid = wombat%ligS_K(i,j,k) * wombat%ligS * fe3 * inv1
+          FeL2_mid = ligW_K * wombat%ligW * fe3 * inv2
+          zval = fe3 + FeL1_mid + FeL2_mid - fe_sfe       ! f(x)
+          fe3 = fe3 - zval / &                            ! x - f(x)/f'(x)
+              (1.0 + wombat%ligS_K(i,j,k)*wombat%ligS*inv1*inv1 + ligW_K*wombat%ligW*inv2*inv2)
+          fe3 = max(0.0, min(fe3, fe_sfe))
         enddo
-        wombat%feIII(i,j,k) = max(0.0, min(0.5 * (flo + fhi), fe_sfe))
+        wombat%feIII(i,j,k) = fe3
       else
         wombat%ligS_K(i,j,k) = wombat%ligS_K(i,j,k) * 10.0**(-0.5)
         zval = 1.0 + (wombat%ligS + wombat%ligW) * wombat%ligS_K(i,j,k) - fe_sfe * wombat%ligS_K(i,j,k)
