@@ -171,7 +171,7 @@ module generic_WOMBATmid
   character(len=10) :: co2_calc  = 'mocsy' ! other option is 'ocmip2'
   logical :: do_caco3_dynamics   = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
   logical :: do_colloidal_shunt  = .true.  ! do colloidal shunt and coagulation to authigenic pools?
-  logical :: do_two_ligands      = .true.  ! do two ligands (one strong, one weak) for iron complexation?
+  logical :: do_two_ligands      = .false. ! do two ligands (one strong, one weak) for iron complexation?
   logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
   logical :: do_nitrogen_fixation= .true.  ! N cycle has nitrogen fixation?
   logical :: do_anammox          = .true.  ! N cycle has anammox?
