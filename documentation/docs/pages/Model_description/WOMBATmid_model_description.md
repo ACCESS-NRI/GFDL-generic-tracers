@@ -681,7 +681,7 @@ $$
 
 Partitioning of iron between free and ligand-bound forms is done using one of two approaches.
 
-When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative, bisectional root solver.
+When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative root solver.
 
 In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a weak ligand (`ligW_K(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a strong ligand to be a constant positive offset equal to 2.67 log<sub>10</sub> units ([Ye et al., 2020](https://doi.org/10.1029/2019GB006425)). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a weak ligand but add a constant 1.0 log<sub>10</sub> units to it to accommodate the effect strong ligands. 
 
@@ -724,7 +724,7 @@ dFe_{free} =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K} dFe_{fr
 \end{align}
 $$
 
-and we seek to minimize the residual of free iron ($R(dFe_{free})$) to zero where:
+and we seek the root of the residual of free iron ($R(dFe_{free})$) defined as:
 
 $$
 \begin{align}
@@ -732,21 +732,16 @@ R(dFe_{free}) =& \quad dFe_{sFe} - \sum_{i=1}^{2} \left( \dfrac{Lig_{i}^{K} dFe_
 \end{align}
 $$
 
-To do so, we set initial bounds $F_{lo} = 0$ and $F_{hi} = dFe_{sFe}$ and iterate over $n = 1, ..., N_{iter}$. At each $n$ iteration, we evaluate:
+To do so, we apply Newton-Raphson iteration using an initial guess that is the maximum of two limiting-case approximations — one accurate when ligands are unsaturated (low $dFe_{sFe}$) and one accurate when ligands are saturated (high $dFe_{sFe}$):
 
 $$
 \begin{align}
-F_{mid} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
+dFe_{free}^{0} =& \quad \max\left( \dfrac{dFe_{sFe}}{1 + Lig_{s}^{K}[Lig_{s}] + Lig_{w}^{K}[Lig_{w}]}, \quad dFe_{sFe} - [Lig_{s}] - [Lig_{w}] \right)
 \end{align}
 $$
 
-within the equation for $R(dFe_{free})$ above. If $R(dFe_{free}) > 0$, then we set $F_{hi}$ to equal $F_{mid}$. If $R(dFe_{free}) ≤ 0$, then we set $F_{lo}$ to equal $F_{mid}$. After $N_{iter}$ we achieve a final solution where:
+In the low-Fe regime the first term is close to the true $dFe_{free}$ while the second term is near zero or negative; in the high-Fe regime the second term is close to the true $dFe_{free}$ while the first term is very small. Taking the maximum selects the informative approximation in each regime. Both terms underestimate $dFe_{free}$ in their respective asymptotic regimes, and after clamping to $[0, dFe_{sFe}]$ the maximum provides a valid lower bound that ensures Newton–Raphson starts from a physically meaningful value.
 
-$$
-\begin{align}
-dFe_{free} =& \quad \dfrac{F_{lo} + F_{hi}}{2} \\    
-\end{align}
-$$
 Whatever soluble dissolved iron is not present as inorganic free iron is assigned to ligand-bound dissolved iron:
 
 $$
