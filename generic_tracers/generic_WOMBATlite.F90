@@ -848,7 +848,7 @@ module generic_WOMBATlite
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'ligS_K', 'Strong ligand stability constant', 'h', 'L', 's', 'L/mol', 'f')
+        'ligS_K', 'Ligand stability constant', 'h', 'L', 's', 'L/mol', 'f')
     wombat%id_ligS_K = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -1380,11 +1380,11 @@ module generic_WOMBATlite
 
     ! CaCO3 dissolution factor due to calcite undersaturation
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('disscal', wombat%disscal, 0.100)
+    call g_tracer_add_param('disscal', wombat%disscal, 0.100/86400.0)
 
     ! CaCO3 dissolution factor due to aragonite undersaturation
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dissara', wombat%dissara, 0.100)
+    call g_tracer_add_param('dissara', wombat%dissara, 0.100/86400)
 
     ! CaCO3 dissolution factor due to detritus remineralisation creating anoxic microenvironment
     !-----------------------------------------------------------------------
@@ -2632,6 +2632,8 @@ module generic_WOMBATlite
       ! and DOC increases Keq. The temperature-dependency comes from Volker & Tagliabue
       ! (2015), while the light dependency is informed by Barbeau et al. (2001) who saw
       ! a 0.7 log10 unit decrease in K in high light. The pH and DOC dependency (3rd term)
+      ! comes from Ye et al. (2020) and increases binding strength at lower pH and higher 
+      ! concentrations of DOC.
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
       biodoc = 40.0 + (1.0 - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) * 40.0 ! proxy of DOC (mmol/m3)
       wombat%ligS_K(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &

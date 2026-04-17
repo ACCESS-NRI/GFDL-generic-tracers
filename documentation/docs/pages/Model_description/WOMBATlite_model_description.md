@@ -87,7 +87,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | caco3lrem_sed    | Sediment CaCO₃ remineralisation [s⁻¹]                                       | 0.01/86400.0       |
 | omegamax_sed     | Omega ceiling in sediments [dimenionless]                                   | 0.8                |
 | f_inorg          | Base inorganic fraction of CaCO₃ within detritus [molC/molC]                | 0.045              |
-| disscal          | Calcite dissolution factor [s⁻¹]                                            | 0.25/86400.0       |
+| disscal          | Calcite dissolution factor [s⁻¹]                                            | 0.10/86400.0       |
 | dissara          | Aragonite dissolution factor [s⁻¹]                                          | 0.10/86400.0       |
 | dissdet          | Dissolution factor from detritus remineralisation [molC/molC]               | 0.200              |
 | ligW             | Weak ligand background concentration [µmol/m³]                              | 1.7                |
