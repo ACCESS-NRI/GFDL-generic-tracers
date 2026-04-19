@@ -99,6 +99,62 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | kagg_col         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | kagg_kcol        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
 | bottom_thickness | Bottom layer thickness [m]                                                  | 0.1                |
+|------------------|-----------------------------------------------------------------------------|--------------------|
+
+---
+
+
+### Logicals in input.nml
+
+The following are logical statements within the `input.nml` namelist file that can be switched to TRUE or FALSE at runtime. 
+
+:::
+
+| Logical             | Description                                                                 | Default setting  |
+|---------------------|-----------------------------------------------------------------------------|------------------|
+| do_caco3_dynamics   | Production and dissolution of CaCO3 depends on carbon system state          | .true.           |
+| do_colloidal_shunt  | Fraction of dissolved iron is colloids that coagulate onto sinking material | .true.           |
+| do_two_ligands      | Complex soluble iron using two ligands (weak + strong) rather than one      | .false.          |
+| do_burial           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
+| do_check_n_conserve | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
+| do_check_c_conserve | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
+|---------------------|-----------------------------------------------------------------------------|------------------|
+
+We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic variable reflects the binding strength of the strong ligand. However, when `do_two_ligands` is set to `.false.`, this diagnostic (`ligK`) reflects the binding strength of the bulk ligand pool.
+
+---
+
+### Tracers
+
+The following are the active tracers in WOMBAT-lite
+
+| Tracer        | Code name  | Description                                 | Units                     |
+|---------------|------------|---------------------------------------------|---------------------------|
+| O<sub>2</sub> | `f_o2`     | Dissolved oxygen                            | mol O2 kg<sup>-1</sup>    |
+|---------------|------------|---------------------------------------------|---------------------------|
+
+---
+
+### Diagnostic outputs
+
+The following are all 2D diagnostic output variables from WOMBAT-lite.
+
+:::
+
+| Diagnostic          | Description                                                                 | Units            |
+|---------------------|-----------------------------------------------------------------------------|------------------|
+| `pco2`              | Surface aqueous partial pressure of CO2                                     | µatm             |
+|---------------------|-----------------------------------------------------------------------------|------------------|
+
+
+The following are all 3D diagnostic output variables from WOMBAT-lite.
+
+:::
+
+| Diagnostic          | Description                                                                 | Units                 |
+|---------------------|-----------------------------------------------------------------------------|-----------------------|
+| `htotal`            | Concentration of H<sup>+</sup> ion                                          | mol kg<sup>-1</sup>   |
+|---------------------|-----------------------------------------------------------------------------|-----------------------|
 
 ---
 
@@ -521,9 +577,9 @@ Partitioning of iron between free and ligand-bound forms is done using one of tw
 
 When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative root solver.
 
-In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a strong ligand but reduce it by a constant 0.5 log<sub>10</sub> units to it to accommodate the effect weak ligands. 
+In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand (`ligW_K`) to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we solve for the stability constant of the strong (`ligK(i,j,k)`) and weak ligands (`ligW_K`), but take the concentration-weighted average binding strength to get the bulk ligand binding strength. 
 
-The stability constant (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-lite, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-lite, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}

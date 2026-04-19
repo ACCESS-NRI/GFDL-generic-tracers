@@ -307,7 +307,7 @@ module generic_WOMBATlite
         phy_dfeupt, &
         feIII, &
         felig, &
-        ligS_K, &
+        ligK, &
         fecol, &
         feprecip, &
         fescaven, &
@@ -390,7 +390,7 @@ module generic_WOMBATlite
         id_phy_dfeupt = -1, &
         id_feIII = -1, &
         id_felig = -1, &
-        id_ligS_K = -1, &
+        id_ligK = -1, &
         id_fecol = -1, &
         id_feprecip = -1, &
         id_fescaven = -1, &
@@ -848,8 +848,8 @@ module generic_WOMBATlite
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'ligS_K', 'Ligand stability constant', 'h', 'L', 's', 'L/mol', 'f')
-    wombat%id_ligS_K = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'ligK', 'Ligand stability constant', 'h', 'L', 's', 'L/mol', 'f')
+    wombat%id_ligK = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1378,15 +1378,16 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.045)
 
-    ! CaCO3 dissolution factor due to calcite undersaturation
+    ! CaCO3 dissolution factor due to calcite undersaturation (s-1)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('disscal', wombat%disscal, 0.100/86400.0)
 
-    ! CaCO3 dissolution factor due to aragonite undersaturation
+    ! CaCO3 dissolution factor due to aragonite undersaturation (s-1)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissara', wombat%dissara, 0.100/86400)
 
-    ! CaCO3 dissolution factor due to detritus remineralisation creating anoxic microenvironment
+    ! CaCO3 dissolution factor due to detritus remineralisation creating 
+    ! anoxic microenvironment (mol C in CaCO3 (mol C)-1)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissdet', wombat%dissdet, 0.200)
 
@@ -2180,7 +2181,7 @@ module generic_WOMBATlite
     wombat%phy_lfer(:,:,:) = 0.0
     wombat%phy_dfeupt(:,:,:) = 0.0
     wombat%feIII(:,:,:) = 0.0
-    wombat%ligS_K(:,:,:) = 0.0
+    wombat%ligK(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
     wombat%feprecip(:,:,:) = 0.0
@@ -2636,35 +2637,35 @@ module generic_WOMBATlite
       ! concentrations of DOC.
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
       biodoc = 40.0 + (1.0 - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) * 40.0 ! proxy of DOC (mmol/m3)
-      wombat%ligS_K(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
-                               - 0.7 * wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) ) &
-                               + 10.0**( (-2e-4*biodoc + 0.034)*biodoc  - 1.67*(-log10(hp)) + 24.36 ) )
-      ligW_K = wombat%ligS_K(i,j,k) * 10.0**(-1.5) ! ligand binding constant for weak ligands (assumed to be -1.5 log10 units weaker)
+      wombat%ligK(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
+                                  - 0.7 * wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) ) &
+                                  + 10.0**( (-2e-4*biodoc + 0.034)*biodoc  - 1.67*(-log10(hp)) + 24.36 ) )
+      ligW_K = wombat%ligK(i,j,k) * 10.0**(-1.5) ! ligand binding constant for weak ligands (assumed to be -1.5 log10 units weaker)
       if (do_two_ligands) then
         ! Newton-Raphson to solve: x + K1*L1*x/(1+K1*x) + K2*L2*x/(1+K2*x) = fe_sfe
         ! Initial guess is the max of two limiting-case approximations:
         !   - low-Fe (ligand-unsaturated, K*x<<1): x ~ fe_sfe / (1 + K1*L1 + K2*L2)
         !   - high-Fe (ligand-saturated, K*x>>1): x ~ fe_sfe - L1 - L2
         ! Both underestimate x*, so max() picks whichever regime applies.
-        fe3 = max( fe_sfe / (1.0 + wombat%ligS_K(i,j,k)*wombat%ligS + ligW_K*wombat%ligW + epsi), &
+        fe3 = max( fe_sfe / (1.0 + wombat%ligK(i,j,k)*wombat%ligS + ligW_K*wombat%ligW + epsi), &
                     fe_sfe - wombat%ligS - wombat%ligW )
         fe3 = max(0.0, min(fe3, fe_sfe))
         do iter = 1, 8
-          inv1 = 1.0 / (1.0 + wombat%ligS_K(i,j,k) * fe3) ! 1/(1 + K1*x)
+          inv1 = 1.0 / (1.0 + wombat%ligK(i,j,k) * fe3) ! 1/(1 + K1*x)
           inv2 = 1.0 / (1.0 + ligW_K * fe3)               ! 1/(1 + K2*x)
-          FeL1_mid = wombat%ligS_K(i,j,k) * wombat%ligS * fe3 * inv1
+          FeL1_mid = wombat%ligK(i,j,k) * wombat%ligS * fe3 * inv1
           FeL2_mid = ligW_K * wombat%ligW * fe3 * inv2
           zval = fe3 + FeL1_mid + FeL2_mid - fe_sfe       ! f(x)
           fe3 = fe3 - zval / &                            ! x - f(x)/f'(x)
-              (1.0 + wombat%ligS_K(i,j,k)*wombat%ligS*inv1*inv1 + ligW_K*wombat%ligW*inv2*inv2)
+              (1.0 + wombat%ligK(i,j,k)*wombat%ligS*inv1*inv1 + ligW_K*wombat%ligW*inv2*inv2)
           fe3 = max(0.0, min(fe3, fe_sfe))
         enddo
         wombat%feIII(i,j,k) = fe3
       else
-        wombat%ligS_K(i,j,k) = wombat%ligS_K(i,j,k) * 10.0**(-0.5)
-        zval = 1.0 + (wombat%ligS + wombat%ligW) * wombat%ligS_K(i,j,k) - fe_sfe * wombat%ligS_K(i,j,k)
-        wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*wombat%ligS_K(i,j,k)*fe_sfe ) ) &
-                              / ( 2.*wombat%ligS_K(i,j,k) + epsi )
+        wombat%ligK(i,j,k) = (wombat%ligK(i,j,k)*wombat%ligS + ligW_K*wombat%ligW) / (wombat%ligS + wombat%ligW)
+        zval = 1.0 + (wombat%ligS + wombat%ligW) * wombat%ligK(i,j,k) - fe_sfe * wombat%ligK(i,j,k)
+        wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*wombat%ligK(i,j,k)*fe_sfe ) ) &
+                              / ( 2.*wombat%ligK(i,j,k) + epsi )
         wombat%feIII(i,j,k) = max(0.0, min(wombat%feIII(i,j,k), fe_sfe) )
       endif
       wombat%felig(i,j,k) = max(0.0, fe_sfe - wombat%feIII(i,j,k))
@@ -2699,7 +2700,7 @@ module generic_WOMBATlite
       wombat%fescadet(i,j,k) = wombat%fescadet(i,j,k) * umol_m3_to_mol_kg
       wombat%fecoag2det(i,j,k) = wombat%fecoag2det(i,j,k) * umol_m3_to_mol_kg
       wombat%feIII(i,j,k) = wombat%feIII(i,j,k) * umol_m3_to_mol_kg
-      wombat%ligS_K(i,j,k) = wombat%ligS_K(i,j,k) * 1e9 ! PJB: convert back to L/mol
+      wombat%ligK(i,j,k) = wombat%ligK(i,j,k) * 1e9 ! PJB: convert back to L/mol
       wombat%felig(i,j,k) = wombat%felig(i,j,k) * umol_m3_to_mol_kg
       wombat%fecol(i,j,k) = wombat%fecol(i,j,k) * umol_m3_to_mol_kg
 
@@ -3439,8 +3440,8 @@ module generic_WOMBATlite
       used = g_send_data(wombat%id_felig, wombat%felig, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_ligS_K > 0) &
-      used = g_send_data(wombat%id_ligS_K, wombat%ligS_K, model_time, &
+    if (wombat%id_ligK > 0) &
+      used = g_send_data(wombat%id_ligK, wombat%ligK, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_fecol > 0) &
@@ -3944,7 +3945,7 @@ module generic_WOMBATlite
     allocate(wombat%phy_dfeupt(isd:ied, jsd:jed, 1:nk)); wombat%phy_dfeupt(:,:,:)=0.0
     allocate(wombat%feIII(isd:ied, jsd:jed, 1:nk)); wombat%feIII(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
-    allocate(wombat%ligS_K(isd:ied, jsd:jed, 1:nk)); wombat%ligS_K(:,:,:)=0.0
+    allocate(wombat%ligK(isd:ied, jsd:jed, 1:nk)); wombat%ligK(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
     allocate(wombat%feprecip(isd:ied, jsd:jed, 1:nk)); wombat%feprecip(:,:,:)=0.0
     allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
@@ -4071,7 +4072,7 @@ module generic_WOMBATlite
         wombat%phy_dfeupt, &
         wombat%feIII, &
         wombat%felig, &
-        wombat%ligS_K, &
+        wombat%ligK, &
         wombat%fecol, &
         wombat%feprecip, &
         wombat%fescaven, &
