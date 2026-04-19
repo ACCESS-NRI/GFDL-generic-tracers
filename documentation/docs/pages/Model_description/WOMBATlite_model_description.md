@@ -16,6 +16,142 @@ _Pearse.Buchanan@csiro.au_
 
 ---
 
+## Tracers
+
+The following are the active tracers in WOMBAT-lite
+
+| Tracer           | Code name  | Description                                 | Units                     | Default on? |
+|------------------|------------|---------------------------------------------|---------------------------|-------------|
+| O<sub>2</sub>    | `f_o2`     | Dissolved oxygen                            | mol O2 kg<sup>-1</sup>    | Yes         |
+| NO<sub>3</sub>   | `f_no3`    | Nitrate                                     | mol N kg<sup>-1</sup>     | Yes         |
+| dFe              | `f_fe`     | Dissolved iron                              | mol Fe kg<sup>-1</sup>    | Yes         |
+| Phy              | `f_phy`    | Phytoplankton                               | mol C kg<sup>-1</sup>     | Yes         |
+| Zoo              | `f_zoo`    | Zooplankton                                 | mol C kg<sup>-1</sup>     | Yes         |
+| Det              | `f_det`    | Detritus                                    | mol C kg<sup>-1</sup>     | Yes         |
+| Chl              | `f_pchl`   | Phytoplankton chlorophyll content           | mol C kg<sup>-1</sup>     | Yes         |
+| PhyFe            | `f_phyfe`  | Phytoplankton iron content                  | mol Fe kg<sup>-1</sup>    | Yes         |
+| ZooFe            | `f_zoofe`  | Zoooplankton iron content                   | mol Fe kg<sup>-1</sup>    | Yes         |
+| DetFe            | `f_detfe`  | Detritus iron content                       | mol Fe kg<sup>-1</sup>    | Yes         |
+| DIC              | `f_dic`    | Dissolved inorganic carbon                  | mol C kg<sup>-1</sup>     | Yes         |
+| Alk              | `f_alk`    | Dissolved alkalinity                        | mol Eq kg<sup>-1</sup>    | Yes         |
+| CaCO<sub>3</sub> | `f_caco3`  | Calcium carbonate                           | mol C kg<sup>-1</sup>     | Yes         |
+| DICp             | `f_dicp`   | Preformed dissolved inorganic carbon        | mol C kg<sup>-1</sup>     | No          |
+| DICr             | `f_dicr`   | Remineralised dissolved inorganic carbon    | mol C kg<sup>-1</sup>     | No          |
+
+---
+
+## Diagnostic outputs
+
+The following are all **2D** diagnostic output variables from WOMBAT-lite.
+
+| Diagnostic        | Description                                                                                          | Units                                |
+| ----------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `pco2`            | Surface aqueous partial pressure of CO₂                                                              | µatm                                 |
+| `det_sed_remin`   | Rate of remineralisation of detritus in accumulated sediment                                         | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `det_sed_depst`   | Rate of deposition of detritus to sediment at base of water column                                   | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `fbury`           | Fraction of deposited detritus permanently buried beneath sediment                                   | dimensionless                        |
+| `detfe_sed_remin` | Rate of remineralisation of detrital iron in accumulated sediment                                    | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `detfe_sed_depst` | Rate of deposition of detrital iron to sediment at base of water column                              | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
+| `caco3_sed_remin` | Rate of remineralisation of CaCO₃ in accumulated sediment                                            | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `caco3_sed_depst` | Rate of deposition of CaCO₃ to sediment at base of water column                                      | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `zeuphot`         | Depth of the euphotic zone (1% incident light)                                                       | m                                    |
+| `seddep`          | Depth of the bottom layer                                                                            | m                                    |
+| `sedmask`         | Mask of active sediment points                                                                       | dimensionless                        |
+| `sedtemp`         | Temperature in the bottom layer                                                                      | °C                                   |
+| `sedsalt`         | Salinity in the bottom layer                                                                         | psu                                  |
+| `sedno3`          | Nitrate concentration in the bottom layer                                                            | mol kg<sup>-1</sup>                  |
+| `seddic`          | Dissolved inorganic carbon concentration in the bottom layer                                         | mol kg<sup>-1</sup>                  |
+| `sedalk`          | Alkalinity concentration in the bottom layer                                                         | mol kg<sup>-1</sup>                  |
+| `sedhtotal`       | H<sup>+</sup> ion concentration in the bottom layer                                                  | mol kg<sup>-1</sup>                  |
+| `sedco3`          | CO₃<sup>2−</sup> ion concentration in the bottom layer                                               | mol kg<sup>-1</sup>                  |
+| `sedomega_cal`    | Calcite saturation state in the bottom layer                                                         | dimensionless                        |
+| `o2_stf`          | Surface flux of dissolved oxygen into ocean                                                          | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `no3_stf`         | Surface flux of nitrate into ocean                                                                   | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `fe_stf`          | Surface flux of dissolved iron into ocean                                                            | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `det_stf`         | Surface flux of detritus into ocean                                                                  | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `dic_stf`         | Surface flux of dissolved inorganic carbon into ocean                                                | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `dicp_stf`        | Surface flux of preformed dissolved inorganic carbon into ocean                                      | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `alk_stf`         | Surface flux of alkalinity into ocean                                                                | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `no3_vstf`        | Virtual flux of nitrate into ocean due to salinity restoring/correction                              | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `dic_vstf`        | Virtual flux of dissolved inorganic carbon into ocean due to salinity restoring/correction           | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `dicp_vstf`       | Virtual flux of preformed dissolved inorganic carbon into ocean due to salinity restoring/correction | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `alk_vstf`        | Virtual flux of alkalinity into ocean due to salinity restoring/correction                           | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `o2_btf`          | Bottom flux of dissolved oxygen into ocean                                                           | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `no3_btf`         | Bottom flux of nitrate into ocean                                                                    | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `fe_btf`          | Bottom flux of dissolved iron into ocean                                                             | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `dic_btf`         | Bottom flux of dissolved inorganic carbon into ocean                                                 | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `dicr_btf`        | Bottom flux of preformed dissolved inorganic carbon into ocean                                       | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `alk_btf`         | Bottom flux of alkalinity into ocean                                                                 | mol m<sup>-2</sup> s<sup>-1</sup>    |
+
+
+The following are all **3D** diagnostic output variables from WOMBAT-lite.
+
+
+| Diagnostic    | Description                                                            | Units                                            |
+| ------------- | ---------------------------------------------------------------------- | ------------------------------------------------ |
+| `htotal`      | Concentration of H<sup>+</sup> ion                                     | mol kg<sup>-1</sup>                              |
+| `omega_ara`   | Saturation state of aragonite                                          | dimensionless                                    |
+| `omega_cal`   | Saturation state of calcite                                            | dimensionless                                    |
+| `co3`         | Carbonate ion concentration                                            | mol kg<sup>-1</sup>                              |
+| `co2_star`    | CO2* (CO2(g) + H2CO3)) concentration                                   | mol kg<sup>-1</sup>                              |
+| `radbio`      | Photosynthetically active radiation available for phytoplankton growth | W m<sup>-2</sup>                                 |
+| `radmid`      | Photosynthetically active radiation at centre point of grid cell       | W m<sup>-2</sup>                                 |
+| `radmld`      | Photosynthetically active radiation averaged in mixed layer            | W m<sup>-2</sup>                                 |
+| `npp3d`       | Net primary productivity                                               | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `zsp3d`       | Zooplankton secondary productivity                                     | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `phy_mumax`   | Maximum growth rate of phytoplankton                                   | s<sup>-1</sup>                                   |
+| `phy_mu`      | Realised growth rate of phytoplankton                                  | s<sup>-1</sup>                                   |
+| `pchl_mu`     | Realised growth rate of phytoplankton chlorophyll                      | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `phy_lpar`    | Limitation of phytoplankton by light                                   | dimensionless                                    |
+| `phy_kni`     | Half-saturation coefficient of nitrogen uptake by phytoplankton        | mmol m<sup>-3</sup>                              |
+| `phy_kfe`     | Half-saturation coefficient of iron uptake by phytoplankton            | µmol m<sup>-3</sup>                              |
+| `phy_lnit`    | Limitation of phytoplankton by nitrogen                                | dimensionless                                    |
+| `phy_lfer`    | Limitation of phytoplankton by iron                                    | dimensionless                                    |
+| `phy_dfeupt`  | Uptake of dFe by phytoplankton                                         | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `feIII`       | Free iron (Fe<sup>3+</sup>)                                            | mol kg<sup>-1</sup>                              |
+| `ligK`        | Ligand stability constant                                              | L mol<sup>-1</sup>                               |
+| `felig`       | Ligand-bound dissolved iron                                            | mol kg<sup>-1</sup>                              |
+| `fecol`       | Colloidal dissolved iron                                               | mol kg<sup>-1</sup>                              |
+| `feprecip`    | Precipitation of free Fe onto nanoparticles                            | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `fescaven`    | Scavenging of free Fe onto detritus (organic + inorganic)              | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `fescadet`    | Scavenging of free Fe onto organic detritus                            | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `fecoag2det`  | Coagulation of colloidal dFe onto detritus                             | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `fesources`   | Total source of dFe in water column                                    | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `fesinks`     | Total sink of dFe in water column                                      | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `phy_feupreg` | Factor up regulation of dFe uptake by phytoplankton                    | dimensionless                                    |
+| `phy_fedoreg` | Factor down regulation of dFe uptake by phytoplankton                  | dimensionless                                    |
+| `phygrow`     | Growth of phytoplankton                                                | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `phymorl`     | Linear mortality of phytoplankton                                      | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `phymorq`     | Quadratic mortality of phytoplankton                                   | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zooeps`      | Zooplankton prey capture rate coefficient                              | (mmol C m<sup>-3</sup>)<sup>-2</sup> s<sup>-1</sup> |
+| `zooprefphy`  | Dietary fraction of phytoplankton in zooplankton grazing               | dimensionless                                    |
+| `zooprefdet`  | Dietary fraction of detritus in zooplankton grazing                    | dimensionless                                    |
+| `zoograzphy`  | Grazing rate of zooplankton on phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zoograzdet`  | Grazing rate of zooplankton on detritus                                | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zoomorl`     | Linear mortality of zooplankton                                        | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zoomorq`     | Quadratic mortality of zooplankton                                     | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zooexcrphy`  | Excretion rate of zooplankton eating phytoplankton                     | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zooexcrdet`  | Excretion rate of zooplankton eating detritus                          | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zooassiphy`  | Assimilation into biomass of zooplankton feeding on phytoplankton      | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zooassidet`  | Assimilation into biomass of zooplankton feeding on detritus           | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zooegesphy`  | Egestion of zooplankton feeding on phytoplankton                       | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `zooegesdet`  | Egestion of zooplankton feeding on detritus                            | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `reminr`      | Rate of remineralisation                                               | s<sup>-1</sup>                                   |
+| `detremi`     | Remineralisation of detritus                                           | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
+| `pic2poc`     | Inorganic (CaCO3) to organic carbon ratio                              | dimensionless                                    |
+| `dissratcal`  | Dissolution rate of calcite CaCO3                                      | s<sup>-1</sup>                                   |
+| `dissratara`  | Dissolution rate of aragonite CaCO3                                    | s<sup>-1</sup>                                   |
+| `dissratpoc`  | Dissolution rate of CaCO3 due to POC remin                             | s<sup>-1</sup>                                   |
+| `zoodiss`     | Dissolution of CaCO3 due to zooplankton grazing                        | mol CaCO3 kg<sup>-1</sup> s<sup>-1</sup>         |
+| `caldiss`     | Dissolution of calcite CaCO3                                           | mol CaCO3 kg<sup>-1</sup> s<sup>-1</sup>         |
+| `aradiss`     | Dissolution of aragonite CaCO3                                         | mol CaCO3 kg<sup>-1</sup> s<sup>-1</sup>         |
+| `pocdiss`     | Dissolution of CaCO3 due to POC remin                                  | mol CaCO3 kg<sup>-1</sup> s<sup>-1</sup>         |
+| `det_vmove`   | Sinking rate of detritus                                               | m s<sup>-1</sup>                                 |
+| `detfe_vmove` | Sinking rate of detrital iron                                          | m s<sup>-1</sup>                                 |
+| `caco3_vmove` | Sinking rate of CaCO3                                                  | m s<sup>-1</sup>                                 |
+
+---
+
 ## Subroutine - "update_from_source"
 
 The subroutine `generic_WOMBATlite_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics. Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, detritus, iron and carbon pools) at each tracer time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
@@ -44,8 +180,6 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 ---
 
 ### Parameter set and default values
-
-:::
 
 | Parameter        | Description                                                                 | Value              |
 |------------------|-----------------------------------------------------------------------------|--------------------|
@@ -99,7 +233,6 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | kagg_col         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | kagg_kcol        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
 | bottom_thickness | Bottom layer thickness [m]                                                  | 0.1                |
-|------------------|-----------------------------------------------------------------------------|--------------------|
 
 ---
 
@@ -107,8 +240,6 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 ### Logicals in input.nml
 
 The following are logical statements within the `input.nml` namelist file that can be switched to TRUE or FALSE at runtime. 
-
-:::
 
 | Logical             | Description                                                                 | Default setting  |
 |---------------------|-----------------------------------------------------------------------------|------------------|
@@ -118,45 +249,11 @@ The following are logical statements within the `input.nml` namelist file that c
 | do_burial           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
 | do_check_n_conserve | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
 | do_check_c_conserve | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
-|---------------------|-----------------------------------------------------------------------------|------------------|
 
 We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic variable reflects the binding strength of the strong ligand. However, when `do_two_ligands` is set to `.false.`, this diagnostic (`ligK`) reflects the binding strength of the bulk ligand pool.
 
 ---
 
-### Tracers
-
-The following are the active tracers in WOMBAT-lite
-
-| Tracer        | Code name  | Description                                 | Units                     |
-|---------------|------------|---------------------------------------------|---------------------------|
-| O<sub>2</sub> | `f_o2`     | Dissolved oxygen                            | mol O2 kg<sup>-1</sup>    |
-|---------------|------------|---------------------------------------------|---------------------------|
-
----
-
-### Diagnostic outputs
-
-The following are all 2D diagnostic output variables from WOMBAT-lite.
-
-:::
-
-| Diagnostic          | Description                                                                 | Units            |
-|---------------------|-----------------------------------------------------------------------------|------------------|
-| `pco2`              | Surface aqueous partial pressure of CO2                                     | µatm             |
-|---------------------|-----------------------------------------------------------------------------|------------------|
-
-
-The following are all 3D diagnostic output variables from WOMBAT-lite.
-
-:::
-
-| Diagnostic          | Description                                                                 | Units                 |
-|---------------------|-----------------------------------------------------------------------------|-----------------------|
-| `htotal`            | Concentration of H<sup>+</sup> ion                                          | mol kg<sup>-1</sup>   |
-|---------------------|-----------------------------------------------------------------------------|-----------------------|
-
----
 
 ### 1. Light attenuation through the water column.
 
