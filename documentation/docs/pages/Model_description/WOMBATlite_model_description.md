@@ -249,7 +249,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | kcoag_dfe        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-5/86400         |
 | kagg_col         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | kagg_kcol        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
-| bottom_thickness | Bottom layer thickness [m]                                                  | 0.1                |
+| bottom_thickness | Bottom layer thickness [m]                                                  | 1.0                |
 
 ---
 
