@@ -102,6 +102,10 @@
 !   If true, do benthic denitrification
 !  </DATA>
 !
+!  <DATA NAME="do_tracer_nosdoc" TYPE="logical">
+!   If true, do carry the nominal oxidation state of carbon in DOM (NOSDOC) as a tracer
+!  </DATA>
+!
 !  <DATA NAME="do_viscous_sinking" TYPE="logical">
 !   If true, do computation of dynamic viscosity
 !  </DATA>
@@ -169,22 +173,24 @@ module generic_WOMBATmid
   ! Namelist Options
   !=======================================================================
   character(len=10) :: co2_calc  = 'mocsy' ! other option is 'ocmip2'
-  logical :: do_caco3_dynamics   = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
-  logical :: do_colloidal_shunt  = .true.  ! do colloidal shunt and coagulation to authigenic pools?
-  logical :: do_two_ligands      = .false. ! do two ligands (one strong, one weak) for iron complexation?
-  logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
-  logical :: do_nitrogen_fixation= .true.  ! N cycle has nitrogen fixation?
-  logical :: do_anammox          = .true.  ! N cycle has anammox?
-  logical :: do_wc_denitrification = .true.  ! N cycle has water column denitrification?
+  logical :: do_caco3_dynamics          = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
+  logical :: do_colloidal_shunt         = .true.  ! do colloidal shunt and coagulation to authigenic pools?
+  logical :: do_two_ligands             = .false. ! do two ligands (one strong, one weak) for iron complexation?
+  logical :: do_burial                  = .false. ! permanently bury organics and CaCO3 in sediments?
+  logical :: do_nitrogen_fixation       = .true.  ! N cycle has nitrogen fixation?
+  logical :: do_anammox                 = .true.  ! N cycle has anammox?
+  logical :: do_wc_denitrification      = .true.  ! N cycle has water column denitrification?
   logical :: do_benthic_denitrification = .true.  ! N cycle has N loss in sediments?
-  logical :: do_viscous_sinking  = .true.  ! Rubey's formula uses a non-constant dynamic viscosity?
-  logical :: do_check_n_conserve = .false. ! check that the N fluxes balance in the ecosystem
-  logical :: do_check_c_conserve = .false.  ! check that the C fluxes balance in the ecosystem
-  logical :: do_check_si_conserve = .false.  ! check that the Si fluxes balance in the ecosystem
+  logical :: do_tracer_nosdoc           = .false. ! Carry the nominal oxidation state of carbon in DOM (NOSDOC) as a tracer?
+  logical :: do_viscous_sinking         = .true.  ! Rubey's formula uses a non-constant dynamic viscosity?
+  logical :: do_check_n_conserve        = .false. ! check that the N fluxes balance in the ecosystem
+  logical :: do_check_c_conserve        = .false. ! check that the C fluxes balance in the ecosystem
+  logical :: do_check_si_conserve       = .false. ! check that the Si fluxes balance in the ecosystem
 
   namelist /generic_wombatmid_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, do_two_ligands, do_burial, &
                                    do_nitrogen_fixation, do_anammox, do_wc_denitrification, do_benthic_denitrification, &
-                                   do_viscous_sinking, do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
+                                   do_tracer_nosdoc, do_viscous_sinking, &
+                                   do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
@@ -529,7 +535,7 @@ module generic_WOMBATmid
         bsidiss, &
         feIII, &
         felig, &
-        ligS_K, &
+        ligK, &
         fecol, &
         fescaven, &
         fescaafe, &
@@ -760,7 +766,7 @@ module generic_WOMBATmid
         id_bsidiss = -1, &
         id_feIII = -1, &
         id_felig = -1, &
-        id_ligS_K = -1, &
+        id_ligK = -1, &
         id_fecol = -1, &
         id_fescaven = -1, &
         id_fescaafe = -1, &
@@ -1072,6 +1078,11 @@ module generic_WOMBATmid
     if (do_benthic_denitrification) then
       write (stdoutunit,*) trim(note_header), &
           'Doing benthic denitrification'
+    endif
+
+    if (do_tracer_nosdoc) then
+      write (stdoutunit,*) trim(note_header), &
+          'Carrying the nominal oxidation state of carbon in DOM (NOSDOC) as a tracer'
     endif
 
     if (do_viscous_sinking) then
@@ -1559,8 +1570,8 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'ligS_K', 'Strong ligand stability constant', 'h', 'L', 's', 'L/mol', 'f')
-    wombat%id_ligS_K = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'ligK', 'Ligand stability constant', 'h', 'L', 's', 'L/mol', 'f')
+    wombat%id_ligK = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2976,15 +2987,16 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.04)
 
-    ! CaCO3 dissolution factor due to calcite undersaturation
+    ! CaCO3 dissolution factor due to calcite undersaturation (s-1)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('disscal', wombat%disscal, 0.10)
+    call g_tracer_add_param('disscal', wombat%disscal, 0.10/86400.0)
 
-    ! CaCO3 dissolution factor due to aragonite undersaturation
+    ! CaCO3 dissolution factor due to aragonite undersaturation (s-1)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dissara', wombat%dissara, 0.10)
+    call g_tracer_add_param('dissara', wombat%dissara, 0.10/86400.0)
 
-    ! CaCO3 dissolution factor due to detritus remineralisation creating anoxic microenvironment
+    ! CaCO3 dissolution factor due to detritus remineralisation creating 
+    !  anoxic microenvironment (mol C in CaCO3 per mol C remineralised)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissdet', wombat%dissdet, 0.20)
 
@@ -3612,6 +3624,7 @@ module generic_WOMBATmid
         flux_bottom = .true., &
         prog = .true.)
 
+    if (do_tracer_nosdoc) then
     ! Nominal oxidation state of dissolved organic carbon
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
@@ -3619,6 +3632,7 @@ module generic_WOMBATmid
         longname = 'Nominal oxidation state of dissolved organic carbon', &
         units = 'none', &
         prog = .true.)
+    endif
 
     ! Facultative heterotrophic bacteria #1
     !-----------------------------------------------------------------------
@@ -4387,7 +4401,7 @@ module generic_WOMBATmid
     wombat%bsidiss(:,:,:) = 0.0
     wombat%feIII(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
-    wombat%ligS_K(:,:,:) = 0.0
+    wombat%ligK(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
     wombat%fescaven(:,:,:) = 0.0
     wombat%fescaafe(:,:,:) = 0.0
@@ -4631,6 +4645,7 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
+    if (do_tracer_nosdoc) &
     call g_tracer_get_values(tracer_list, 'nosdoc', 'field', wombat%f_nosdoc, isd, jsd, ntau=tau, &
         positive=.false.) ! [unitless]
     call g_tracer_get_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau, &
@@ -5046,7 +5061,7 @@ module generic_WOMBATmid
                     * max(0.01, min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) ) )
       theta_opt = max(wombat%phyminqc, theta_opt)
       wombat%pchl_mu(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_pchl(i,j,k) &
-                            + (theta_opt - phy_chlc) / wombat%chltau * wombat%f_phy(i,j,k)
+                            + max(0.0, (theta_opt - phy_chlc)) / wombat%chltau * wombat%f_phy(i,j,k)
 
       !!!~~~ Microphytoplankton ~~~!!!
       theta_opt = wombat%diamaxqc / (1.0 + &
@@ -5055,7 +5070,7 @@ module generic_WOMBATmid
                     * max(0.01, min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k))) ) )
       theta_opt = max(wombat%diaminqc, theta_opt)
       wombat%dchl_mu(i,j,k) = wombat%dia_mu(i,j,k) * wombat%f_dchl(i,j,k) &
-                            + (theta_opt - dia_chlc) / wombat%chltau * wombat%f_dia(i,j,k)
+                            + max(0.0, (theta_opt - dia_chlc)) / wombat%chltau * wombat%f_dia(i,j,k)
 
 
       !-----------------------------------------------------------------------!
@@ -5164,43 +5179,45 @@ module generic_WOMBATmid
       ! and DOC increases Keq. The temperature-dependency comes from Volker & Tagliabue
       ! (2015), while the light dependency is informed by Barbeau et al. (2001) who saw
       ! a 0.7 log10 unit decrease in K in high light. The pH and DOC dependency (3rd term)
+      ! comes from Ye et al. (2020) and increases binding strength at lower pH and higher
+      ! concentrations of DOC.
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
-      wombat%ligS_K(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
+      wombat%ligK(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
                                - 0.7 * wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) ) &
                                + 10.0**( (-2e-4*biodoc + 0.034)*biodoc  - 1.67*(-log10(hp)) + 24.36 ) )
-      ligW_K = wombat%ligS_K(i,j,k) * 10.0**(-1.5) ! ligand binding constant for weak ligands (assumed to be -1.5 log10 units weaker)
+      ligW_K = wombat%ligK(i,j,k) * 10.0**(-1.5) ! ligand binding constant for weak ligands (assumed to be -1.5 log10 units weaker)
       if (do_two_ligands) then
         ! Newton-Raphson to solve: x + K1*L1*x/(1+K1*x) + K2*L2*x/(1+K2*x) = fe_sfe
         ! Initial guess is the max of two limiting-case approximations:
         !   - low-Fe (ligand-unsaturated, K*x<<1): x ~ fe_sfe / (1 + K1*L1 + K2*L2)
         !   - high-Fe (ligand-saturated, K*x>>1): x ~ fe_sfe - L1 - L2
         ! Both underestimate x*, so max() picks whichever regime applies.
-        fe3 = max( fe_sfe / (1.0 + wombat%ligS_K(i,j,k)*wombat%ligS + ligW_K*wombat%ligW + epsi), &
+        fe3 = max( fe_sfe / (1.0 + wombat%ligK(i,j,k)*wombat%ligS + ligW_K*wombat%ligW + epsi), &
                     fe_sfe - wombat%ligS - wombat%ligW )
         fe3 = max(0.0, min(fe3, fe_sfe))
         do iter = 1, 8
-          inv1 = 1.0 / (1.0 + wombat%ligS_K(i,j,k) * fe3) ! 1/(1 + K1*x)
+          inv1 = 1.0 / (1.0 + wombat%ligK(i,j,k) * fe3) ! 1/(1 + K1*x)
           inv2 = 1.0 / (1.0 + ligW_K * fe3)               ! 1/(1 + K2*x)
-          FeL1_mid = wombat%ligS_K(i,j,k) * wombat%ligS * fe3 * inv1
+          FeL1_mid = wombat%ligK(i,j,k) * wombat%ligS * fe3 * inv1
           FeL2_mid = ligW_K * wombat%ligW * fe3 * inv2
           zval = fe3 + FeL1_mid + FeL2_mid - fe_sfe       ! f(x)
           fe3 = fe3 - zval / &                            ! x - f(x)/f'(x)
-              (1.0 + wombat%ligS_K(i,j,k)*wombat%ligS*inv1*inv1 + ligW_K*wombat%ligW*inv2*inv2)
+              (1.0 + wombat%ligK(i,j,k)*wombat%ligS*inv1*inv1 + ligW_K*wombat%ligW*inv2*inv2)
           fe3 = max(0.0, min(fe3, fe_sfe))
         enddo
         wombat%feIII(i,j,k) = fe3
       else
-        wombat%ligS_K(i,j,k) = wombat%ligS_K(i,j,k) * 10.0**(-0.5)
-        zval = 1.0 + (wombat%ligS + wombat%ligW) * wombat%ligS_K(i,j,k) - fe_sfe * wombat%ligS_K(i,j,k)
-        wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*wombat%ligS_K(i,j,k)*fe_sfe ) ) &
-                              / ( 2.*wombat%ligS_K(i,j,k) + epsi )
+        wombat%ligK(i,j,k) = (wombat%ligK(i,j,k)*wombat%ligS + ligW_K*wombat%ligW) / (wombat%ligS + wombat%ligW)
+        zval = 1.0 + (wombat%ligS + wombat%ligW) * wombat%ligK(i,j,k) - fe_sfe * wombat%ligK(i,j,k)
+        wombat%feIII(i,j,k) = ( -zval + SQRT( zval*zval + 4.0*wombat%ligK(i,j,k)*fe_sfe ) ) &
+                              / ( 2.*wombat%ligK(i,j,k) + epsi )
         wombat%feIII(i,j,k) = max(0.0, min(wombat%feIII(i,j,k), fe_sfe) )
       endif
       wombat%felig(i,j,k) = max(0.0, fe_sfe - wombat%feIII(i,j,k))
 
       ! Scavenging of Fe` onto biogenic particles
       partic = (biodet*2 + biobdet*2 + biobdetsi*2 + biocaco3*8.3) ! total particle concentration [mmol/m3]
-      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic) / 86400.0
+      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic)
       wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet*2 + biocaco3*8.3) / (partic+epsi)
       wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 + biobdetsi*2) / (partic+epsi)
 
@@ -5216,19 +5233,19 @@ module generic_WOMBATmid
       feagg5 = 725.7
       zval = ( shear*(feagg1*(biodoc+40.0) + feagg2*biodet) + feagg3*biodet &
                + feagg4*(biodoc+40.0) + feagg5*biodet ) * wombat%kcoag_dfe
-      wombat%fecoag2afe(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
+      wombat%fecoag2afe(i,j,k) = wombat%fecol(i,j,k) * zval
       ! Include an aggregation of colloidal authigenic Fe when concentration of colloidal Fe is high
-      wombat%fecoag2afe(i,j,k) = wombat%fecoag2afe(i,j,k) + wombat%kagg_col / 86400.0 &
+      wombat%fecoag2afe(i,j,k) = wombat%fecoag2afe(i,j,k) + wombat%kagg_col &
                                  * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4)
       ! Colloidal shunt associated with big particles (Tagliabue et al., 2023)
       feagg1 = 1.37
       feagg2 = 1.94
       zval = (( shear*2.0 + feagg1)*biobdet + feagg2*biobdet ) * wombat%kcoag_dfe
-      wombat%fecoag2bafe(i,j,k) = wombat%fecol(i,j,k) * zval / 86400.0
+      wombat%fecoag2bafe(i,j,k) = wombat%fecol(i,j,k) * zval 
 
       ! dissolution of Fe from authigenic particles back to dissolved phase
-      wombat%afediss(i,j,k) = wombat%kafe_dfe * wombat%f_afe(i,j,k) / 86400.0
-      wombat%bafediss(i,j,k) = wombat%kbafe_dfe * wombat%f_bafe(i,j,k) / 86400.0
+      wombat%afediss(i,j,k) = wombat%kafe_dfe * wombat%f_afe(i,j,k)
+      wombat%bafediss(i,j,k) = wombat%kbafe_dfe * wombat%f_bafe(i,j,k)
 
       ! Convert the terms back to mol/kg
       wombat%fescaven(i,j,k) = wombat%fescaven(i,j,k) * umol_m3_to_mol_kg
@@ -5238,7 +5255,7 @@ module generic_WOMBATmid
       wombat%fecoag2bafe(i,j,k) = wombat%fecoag2bafe(i,j,k) * umol_m3_to_mol_kg
       wombat%feIII(i,j,k) = wombat%feIII(i,j,k) * umol_m3_to_mol_kg
       wombat%felig(i,j,k) = wombat%felig(i,j,k) * umol_m3_to_mol_kg
-      wombat%ligS_K(i,j,k) = wombat%ligS_K(i,j,k) * 1e9 ! PJB: convert back to L/mol
+      wombat%ligK(i,j,k) = wombat%ligK(i,j,k) * 1e9 ! PJB: convert back to L/mol
       wombat%fecol(i,j,k) = wombat%fecol(i,j,k) * umol_m3_to_mol_kg
 
 
@@ -5652,8 +5669,8 @@ module generic_WOMBATmid
         ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
         !  concentration of POC, following Kwon et al., 2024, Science Advances; Table S1, and
         !  we account for the dissolution due to zooplankton grazing on particulates
-        wombat%dissratcal(i,j,k) = (wombat%disscal * max(0.0, 1.0 - wombat%omega_cal(i,j,k))**2.2) / 86400.0
-        wombat%dissratara(i,j,k) = (wombat%dissara * max(0.0, 1.0 - wombat%omega_ara(i,j,k))**1.5) / 86400.0
+        wombat%dissratcal(i,j,k) = (wombat%disscal * max(0.0, 1.0 - wombat%omega_cal(i,j,k))**2.2)
+        wombat%dissratara(i,j,k) = (wombat%dissara * max(0.0, 1.0 - wombat%omega_ara(i,j,k))**1.5)
         wombat%dissratpoc(i,j,k) = (wombat%dissdet * wombat%reminr(i,j,k) * biodet**2.0)
       else
         wombat%pic2poc(i,j,k) = wombat%f_inorg + 0.025
@@ -5714,8 +5731,12 @@ module generic_WOMBATmid
       !  - We chose to vary the yield (here in terms of N) from a minimum of 0.1 (10 mol DON+NH4 per mol Biomass)
       !    to a max of 0.80 (1.25 mol DON+NH4 per mol Biomass)
       zval = wombat%bac_ydonmax - wombat%bac_ydonmin
-      wombat%bac_ydon(i,j,k) = max(wombat%bac_ydonmin, min(wombat%bac_ydonmax, &
-                               wombat%bac_ydonmin + wombat%f_nosdoc(i,j,k)*(zval) ))
+      if (do_tracer_nosdoc) then
+        wombat%bac_ydon(i,j,k) = max(wombat%bac_ydonmin, min(wombat%bac_ydonmax, &
+                                 wombat%bac_ydonmin + wombat%f_nosdoc(i,j,k)*(zval) ))
+      else
+        wombat%bac_ydon(i,j,k) = wombat%bac_ydonmin + 0.5*zval
+      endif
 
       ! From this base biomass yield on N, compute yields for O2 and anaerobic growth on alternative electron acceptors and DOC
       !  [ Zakem et al., 2020 ISME; Buchanan et al., 2025 Science]
@@ -5894,6 +5915,7 @@ module generic_WOMBATmid
       ! The change in NOSC occurs via:
       !  dNOSC/dt = dDOC(source)/dt * ( NOSC(source) - NOSC(in situ)) / [DOC]
 
+      if (do_tracer_nosdoc) then
       if (wombat%f_doc(i,j,k) > epsi) then
         zval = 1.0 / wombat%f_doc(i,j,k)
         wombat%nosdoc_overflow(i,j,k) = ( wombat%phydoc(i,j,k) &
@@ -5937,6 +5959,7 @@ module generic_WOMBATmid
         wombat%nosdoc_baclysis(i,j,k) = 0.0
         wombat%nosdoc_dethydro(i,j,k) = 0.0
         wombat%nosdoc_docconsu(i,j,k) = 0.0
+      endif
       endif
 
 
@@ -6283,6 +6306,7 @@ module generic_WOMBATmid
 
       ! Nominal oxidation state of dissolved organic carbon equation ! [unitless]
       !-----------------------------------------------------------------------
+      if (do_tracer_nosdoc) then
       wombat%f_nosdoc(i,j,k) = wombat%f_nosdoc(i,j,k) + dtsb * ( &
                                wombat%nosdoc_overflow(i,j,k) &
                              + wombat%nosdoc_excretion(i,j,k) &
@@ -6290,6 +6314,7 @@ module generic_WOMBATmid
                              + wombat%nosdoc_baclysis(i,j,k) &
                              + wombat%nosdoc_dethydro(i,j,k) &
                              + wombat%nosdoc_docconsu(i,j,k) )
+      endif
 
       ! Heterotrophic bacteria #1 ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -6744,7 +6769,8 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'bdetsi', 'field', wombat%f_bdetsi, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'doc', 'field', wombat%f_doc, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau)
-    call g_tracer_set_values(tracer_list, 'nosdoc', 'field', wombat%f_nosdoc, isd, jsd, ntau=tau)
+    if (do_tracer_nosdoc) &
+      call g_tracer_set_values(tracer_list, 'nosdoc', 'field', wombat%f_nosdoc, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau)
@@ -7340,8 +7366,8 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_felig, wombat%felig, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_ligS_K > 0) &
-      used = g_send_data(wombat%id_ligS_K, wombat%ligS_K, model_time, &
+    if (wombat%id_ligK > 0) &
+      used = g_send_data(wombat%id_ligK, wombat%ligK, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_fecol > 0) &
@@ -7939,7 +7965,7 @@ module generic_WOMBATmid
     if (wombat%id_nosdoc_docconsu > 0) &
       used = g_send_data(wombat%id_nosdoc_docconsu, wombat%nosdoc_docconsu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
+    
     if (wombat%id_det_density > 0) &
       used = g_send_data(wombat%id_det_density, wombat%det_density, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -8434,7 +8460,7 @@ module generic_WOMBATmid
     allocate(wombat%disssi(isd:ied, jsd:jed, 1:nk)); wombat%disssi(:,:,:)=0.0
     allocate(wombat%bsidiss(isd:ied, jsd:jed, 1:nk)); wombat%bsidiss(:,:,:)=0.0
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
-    allocate(wombat%ligS_K(isd:ied, jsd:jed, 1:nk)); wombat%ligS_K(:,:,:)=0.0
+    allocate(wombat%ligK(isd:ied, jsd:jed, 1:nk)); wombat%ligK(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
     allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
     allocate(wombat%fescaafe(isd:ied, jsd:jed, 1:nk)); wombat%fescaafe(:,:,:)=0.0
@@ -8745,7 +8771,7 @@ module generic_WOMBATmid
         wombat%disssi, &
         wombat%bsidiss, &
         wombat%felig, &
-        wombat%ligS_K, &
+        wombat%ligK, &
         wombat%fecol, &
         wombat%fescaven, &
         wombat%fescaafe, &
