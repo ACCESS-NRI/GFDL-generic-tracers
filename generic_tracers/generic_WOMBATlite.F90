@@ -1386,7 +1386,7 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissara', wombat%dissara, 0.100/86400)
 
-    ! CaCO3 dissolution factor due to detritus remineralisation creating 
+    ! CaCO3 dissolution factor due to detritus remineralisation creating
     ! anoxic microenvironment (mol C in CaCO3 (mol C)-1)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissdet', wombat%dissdet, 0.200)
@@ -2633,7 +2633,7 @@ module generic_WOMBATlite
       ! and DOC increases Keq. The temperature-dependency comes from Volker & Tagliabue
       ! (2015), while the light dependency is informed by Barbeau et al. (2001) who saw
       ! a 0.7 log10 unit decrease in K in high light. The pH and DOC dependency (3rd term)
-      ! comes from Ye et al. (2020) and increases binding strength at lower pH and higher 
+      ! comes from Ye et al. (2020) and increases binding strength at lower pH and higher
       ! concentrations of DOC.
       fe_sfe = max(0.0, biofer - wombat%fecol(i,j,k))
       biodoc = 40.0 + (1.0 - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) * 40.0 ! proxy of DOC (mmol/m3)
