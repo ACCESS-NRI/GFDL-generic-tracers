@@ -40,6 +40,23 @@ The following are the active tracers in WOMBAT-lite
 
 ---
 
+## Logical controls
+
+The following are logical statements within the `input.nml` namelist file that can be switched to TRUE or FALSE at runtime. 
+
+| Logical             | Description                                                                 | Default setting  |
+|---------------------|-----------------------------------------------------------------------------|------------------|
+| do_caco3_dynamics   | Production and dissolution of CaCO3 depends on carbon system state          | .true.           |
+| do_colloidal_shunt  | Fraction of dissolved iron is colloids that coagulate onto sinking material | .true.           |
+| do_two_ligands      | Complex soluble iron using two ligands (weak + strong) rather than one      | .false.          |
+| do_burial           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
+| do_check_n_conserve | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
+| do_check_c_conserve | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
+
+We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic variable reflects the binding strength of the strong ligand. However, when `do_two_ligands` is set to `.false.`, this diagnostic (`ligK`) reflects the binding strength of the bulk ligand pool.
+
+---
+
 ## Diagnostic outputs
 
 The following are all **2D** diagnostic output variables from WOMBAT-lite.
@@ -233,24 +250,6 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | kagg_col         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | kagg_kcol        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
 | bottom_thickness | Bottom layer thickness [m]                                                  | 0.1                |
-
----
-
-
-### Logicals in input.nml
-
-The following are logical statements within the `input.nml` namelist file that can be switched to TRUE or FALSE at runtime. 
-
-| Logical             | Description                                                                 | Default setting  |
-|---------------------|-----------------------------------------------------------------------------|------------------|
-| do_caco3_dynamics   | Production and dissolution of CaCO3 depends on carbon system state          | .true.           |
-| do_colloidal_shunt  | Fraction of dissolved iron is colloids that coagulate onto sinking material | .true.           |
-| do_two_ligands      | Complex soluble iron using two ligands (weak + strong) rather than one      | .false.          |
-| do_burial           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
-| do_check_n_conserve | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
-| do_check_c_conserve | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
-
-We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic variable reflects the binding strength of the strong ligand. However, when `do_two_ligands` is set to `.false.`, this diagnostic (`ligK`) reflects the binding strength of the bulk ligand pool.
 
 ---
 
