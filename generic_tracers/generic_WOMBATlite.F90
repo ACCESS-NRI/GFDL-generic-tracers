@@ -76,6 +76,14 @@
 !   If true, permanently bury organics and CaCO3 in sediments
 !  </DATA>
 !
+!  <DATA NAME="do_tracer_dicp" TYPE="logical">
+!   If true, do carry preformed dissolved inorganic carbon (dicp) as a tracer
+!  </DATA>
+!
+!  <DATA NAME="do_tracer_dicr" TYPE="logical">
+!   If true, do carry remineralised dissolved inorganic carbon (dicr) as a tracer
+!  </DATA>
+!
 !  <DATA NAME="do_check_n_conserve" TYPE="logical">
 !   If true, check that the ecosystem model conserves nitrogen. NOTE:
 !   not appropriate if dentirification, anammox and nitrogen fixation are on.
@@ -138,6 +146,8 @@ module generic_WOMBATlite
   logical :: do_colloidal_shunt  = .true.  ! do colloidal shunt and coagulation to authigenic pools?
   logical :: do_two_ligands      = .false. ! do two ligands (one strong, one weak) for iron complexation?
   logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
+  logical :: do_tracer_dicp      = .false.  ! enable preformed dissolved inorganic carbon tracer, dicp?
+  logical :: do_tracer_dicr      = .false.  ! enable remineralised dissolved inorganic carbon tracer dicr?
   logical :: do_check_n_conserve = .true.  ! check that the N fluxes balance in the ecosystem
   logical :: do_check_c_conserve = .true.  ! check that the C fluxes balance in the ecosystem
 
@@ -542,6 +552,16 @@ module generic_WOMBATlite
           'Permanently burying organics and CaCO3 in sediments'
     endif
 
+    if (do_tracer_dicp) then
+      write (stdoutunit,*) trim(note_header), &
+          'Including preformed dissolved inorganic carbon tracer, dicp'
+    endif
+
+    if (do_tracer_dicr) then
+      write (stdoutunit,*) trim(note_header), &
+          'Including remineralised dissolved inorganic carbon tracer, dicr'
+    endif
+
     if (do_check_n_conserve) then
       write (stdoutunit,*) trim(note_header), &
           'Checking that the ecosystem model conserves nitrogen'
@@ -710,11 +730,13 @@ module generic_WOMBATlite
     wombat%id_dic_vstf = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
-    vardesc_temp = vardesc( &
-        'dicp_vstf', 'Virtual flux of preformed dissolved inorganic carbon into ocean due to '// &
-        'salinity restoring/correction', 'h', '1', 's', 'mol/m^2/s', 'f')
-    wombat%id_dicp_vstf = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+    if (do_tracer_dicp) then
+      vardesc_temp = vardesc( &
+          'dicp_vstf', 'Virtual flux of preformed dissolved inorganic carbon into ocean due to '// &
+          'salinity restoring/correction', 'h', '1', 's', 'mol/m^2/s', 'f')
+      wombat%id_dicp_vstf = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+          init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+    endif
 
     vardesc_temp = vardesc( &
         'alk_vstf', 'Virtual flux of alkalinity into ocean due to salinity restoring/correction', &
@@ -1623,21 +1645,25 @@ module generic_WOMBATlite
     ! dts: Note, we use flux_virtual=.true. only to ensure that an stf array is allocated for dicp.
     ! The dicp stf is set to equal the dic stf in update_from_coupler.
     !-----------------------------------------------------------------------
-    call g_tracer_add(tracer_list, package_name, &
-        name = 'dicp', &
-        longname = 'preformed Dissolved Inorganic Carbon', &
-        units = 'mol/kg', &
-        prog = .true., &
-        flux_virtual = .true.)
+    if (do_tracer_dicp) then
+      call g_tracer_add(tracer_list, package_name, &
+          name = 'dicp', &
+          longname = 'preformed Dissolved Inorganic Carbon', &
+          units = 'mol/kg', &
+          prog = .true., &
+          flux_virtual = .true.)
+    endif
 
     ! DICr (remineralised dissolved inorganic carbon)
     !-----------------------------------------------------------------------
-    call g_tracer_add(tracer_list, package_name, &
-        name = 'dicr', &
-        longname = 'remineralised Dissolved Inorganic Carbon', &
-        units = 'mol/kg', &
-        prog = .true., &
-        flux_bottom = .true.)
+    if (do_tracer_dicr) then
+      call g_tracer_add(tracer_list, package_name, &
+          name = 'dicr', &
+          longname = 'remineralised Dissolved Inorganic Carbon', &
+          units = 'mol/kg', &
+          prog = .true., &
+          flux_bottom = .true.)
+    endif
 
     ! Alk (Total carbonate alkalinity)
     !-----------------------------------------------------------------------
@@ -1749,8 +1775,10 @@ module generic_WOMBATlite
     wombat%alk_vstf(:,:) = (wombat%alk_global / wombat%sal_global) * salt_flux_added(:,:) ! [mol/m2/s]
     wombat%p_alk_stf(:,:) = wombat%p_alk_stf(:,:) + wombat%alk_vstf(:,:) ! [mol/m2/s]
 
-    ! Set dicp stf equal to dic stf
-    call g_tracer_set_values(tracer_list, 'dicp', 'stf', wombat%p_dic_stf, isd, jsd)
+    if (do_tracer_dicp) then
+      ! Set dicp stf equal to dic stf
+      call g_tracer_set_values(tracer_list, 'dicp', 'stf', wombat%p_dic_stf, isd, jsd)
+    endif
 
   end subroutine generic_WOMBATlite_update_from_coupler
 
@@ -1964,7 +1992,7 @@ module generic_WOMBATlite
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: zoo_slmor
-    real                                    :: hco3
+    real                                    :: hco3, ddic
     real                                    :: dzt_bot, dzt_bot_os
     real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools
     logical                                 :: used
@@ -2254,8 +2282,8 @@ module generic_WOMBATlite
     call g_tracer_get_pointer(tracer_list, 'caco3', 'field', wombat%p_caco3) ! [mol/kg]
     call g_tracer_get_pointer(tracer_list, 'fe', 'field', wombat%p_fe) ! [mol/kg]
     call g_tracer_get_pointer(tracer_list, 'dic', 'field', wombat%p_dic) ! [mol/kg]
-    call g_tracer_get_pointer(tracer_list, 'dicr', 'field', wombat%p_dicr) ! [mol/kg]
     call g_tracer_get_pointer(tracer_list, 'alk', 'field', wombat%p_alk) ! [mol/kg]
+    if (do_tracer_dicr) call g_tracer_get_pointer(tracer_list, 'dicr', 'field', wombat%p_dicr) ! [mol/kg]
 
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------!
@@ -2980,33 +3008,19 @@ module generic_WOMBATlite
 
       ! Equation for DIC ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_dic(i,j,k,tau) = wombat%p_dic(i,j,k,tau) + dtsb * ( &
-                              wombat%detremi(i,j,k) + &
-                              wombat%zoomorl(i,j,k) + &
-                              wombat%zooexcrphy(i,j,k) + &
-                              wombat%zooexcrdet(i,j,k) + &
-                              wombat%phymorl(i,j,k) - &
-                              wombat%phygrow(i,j,k) - &
-                              wombat%zoograzphy(i,j,k) * (1.0-wombat%fgutdiss) * wombat%pic2poc(i,j,k) - &
-                              wombat%phymorq(i,j,k) * wombat%pic2poc(i,j,k) - &
-                              wombat%zoomorq(i,j,k) * wombat%pic2poc(i,j,k) + &
-                              wombat%zoodiss(i,j,k) + wombat%caldiss(i,j,k) + &
-                              wombat%aradiss(i,j,k) + wombat%pocdiss(i,j,k) )
+      ddic = wombat%detremi(i,j,k) + wombat%zoomorl(i,j,k) + &
+          wombat%zooexcrphy(i,j,k) + wombat%zooexcrdet(i,j,k) + &
+          wombat%phymorl(i,j,k) - wombat%phygrow(i,j,k) - &
+          wombat%zoograzphy(i,j,k) * (1.0-wombat%fgutdiss) * wombat%pic2poc(i,j,k) - &
+          wombat%phymorq(i,j,k) * wombat%pic2poc(i,j,k) - &
+          wombat%zoomorq(i,j,k) * wombat%pic2poc(i,j,k) + &
+          wombat%zoodiss(i,j,k) + wombat%caldiss(i,j,k) + &
+          wombat%aradiss(i,j,k) + wombat%pocdiss(i,j,k)
+      wombat%p_dic(i,j,k,tau) = wombat%p_dic(i,j,k,tau) + dtsb * ddic
 
       ! Equation for DICr ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_dicr(i,j,k,tau) = wombat%p_dicr(i,j,k,tau) + dtsb * ( &
-                               wombat%detremi(i,j,k) + &
-                               wombat%zoomorl(i,j,k) + &
-                               wombat%zooexcrphy(i,j,k) + &
-                               wombat%zooexcrdet(i,j,k) + &
-                               wombat%phymorl(i,j,k) - &
-                               wombat%phygrow(i,j,k) - &
-                               wombat%zoograzphy(i,j,k) * (1.0-wombat%fgutdiss) * wombat%pic2poc(i,j,k) - &
-                               wombat%phymorq(i,j,k) * wombat%pic2poc(i,j,k) - &
-                               wombat%zoomorq(i,j,k) * wombat%pic2poc(i,j,k) + &
-                               wombat%zoodiss(i,j,k) + wombat%caldiss(i,j,k) + &
-                               wombat%aradiss(i,j,k) + wombat%pocdiss(i,j,k) )
+      if (do_tracer_dicr) wombat%p_dicr(i,j,k,tau) = wombat%p_dicr(i,j,k,tau) + dtsb * ddic
 
       ! Equation for ALK ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -3294,9 +3308,9 @@ module generic_WOMBATlite
       wombat%b_no3(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_o2(i,j) = -172./16. * wombat%b_no3(i,j) ! [mol/m2/s]
       wombat%b_dic(i,j) = 122./16. * wombat%b_no3(i,j) - wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
-      wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
       wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
+      if (do_tracer_dicr) wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
     enddo; enddo
 
 
@@ -3314,9 +3328,9 @@ module generic_WOMBATlite
     call g_tracer_set_values(tracer_list, 'no3', 'btf', wombat%b_no3, isd, jsd)
     call g_tracer_set_values(tracer_list, 'o2', 'btf', wombat%b_o2, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'btf', wombat%b_dic, isd, jsd)
-    call g_tracer_set_values(tracer_list, 'dicr', 'btf', wombat%b_dicr, isd, jsd)
     call g_tracer_set_values(tracer_list, 'fe', 'btf', wombat%b_fe, isd, jsd)
     call g_tracer_set_values(tracer_list, 'alk', 'btf', wombat%b_alk, isd, jsd)
+    if (do_tracer_dicr) call g_tracer_set_values(tracer_list, 'dicr', 'btf', wombat%b_dicr, isd, jsd)
 
 
     !=======================================================================
@@ -3893,9 +3907,12 @@ module generic_WOMBATlite
     allocate(wombat%b_no3(isd:ied, jsd:jed)); wombat%b_no3(:,:)=0.0
     allocate(wombat%b_o2(isd:ied, jsd:jed)); wombat%b_o2(:,:)=0.0
     allocate(wombat%b_dic(isd:ied, jsd:jed)); wombat%b_dic(:,:)=0.0
-    allocate(wombat%b_dicr(isd:ied, jsd:jed)); wombat%b_dicr(:,:)=0.0
     allocate(wombat%b_fe(isd:ied, jsd:jed)); wombat%b_fe(:,:)=0.0
     allocate(wombat%b_alk(isd:ied, jsd:jed)); wombat%b_alk(:,:)=0.0
+    if (do_tracer_dicr) then
+        allocate(wombat%b_dicr(isd:ied, jsd:jed))
+        wombat%b_dicr(:,:)=0.0
+    endif
 
     allocate(wombat%radbio(isd:ied, jsd:jed, 1:nk)); wombat%radbio(:,:,:)=0.0
     allocate(wombat%radmid(isd:ied, jsd:jed, 1:nk)); wombat%radmid(:,:,:)=0.0
@@ -4008,9 +4025,9 @@ module generic_WOMBATlite
         wombat%b_no3, &
         wombat%b_o2, &
         wombat%b_dic, &
-        wombat%b_dicr, &
         wombat%b_fe, &
         wombat%b_alk)
+    if (do_tracer_dicr) deallocate(wombat%b_dicr)
 
     deallocate( &
         wombat%radbio, &
