@@ -3191,7 +3191,12 @@ contains
 
           ! Sinking of tracer into a sediment reservoir?
           if (_ALLOCATED(g_tracer%btm_reservoir)) then
-             sink(nz+1) = sink_dist(nz) !PJB [13th Nov 2024] to allow sinking into bottom reservoir
+             ! Don't sink negative tracers into sediment
+             if (g_tracer%field(i,j,nz,tau) <= 0.0) then
+               sink(nz+1) = 0.0
+             else
+               sink(nz+1) = sink_dist(nz) !PJB [13th Nov 2024] to allow sinking into bottom reservoir
+             endif
           else
              sink(nz+1) = 0.0 
           endif
@@ -3209,14 +3214,15 @@ contains
                 sink(k) = sink_dist(k)
                 h_minus_dsink(k) = (h_old(i,j,k) + sink(k+1)) - sink(k)
              endif
+
+             ! Don't sink negative tracers
+             if (g_tracer%field(i,j,k-1,tau) <= 0.0) then
+               h_minus_dsink(k) = h_minus_dsink(k) + sink(k)
+               sink(k) = 0.0
+             endif
           enddo
 
           sink(1) = 0.0 ; h_minus_dsink(1) = (h_old(i,j,1) + sink(2))
-
-          !Avoid sinking tracers with negative concentrations
-          do k=2,nz+1
-             if(g_tracer%field(i,j,k-1,tau) <= 0.0) sink(k) = 0.0
-          enddo
 
           ! Now solve the tridiagonal equation for the tracer concentrations.
 
