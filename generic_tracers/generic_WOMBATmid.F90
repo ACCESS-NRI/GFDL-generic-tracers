@@ -3001,7 +3001,7 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.05)
 
-    ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 d-1]
+    ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
     ! Ye et al., 2011 (Biogeosciences) find scavenging rates of 30 - 750
     ! (kg/m3)-1 day-1 in mesocosm experiments. Assuming that there are
@@ -3012,7 +3012,7 @@ module generic_WOMBATmid
     ! NOTE that scavenging becomes less important when colloids dominate.
     call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.01/86400.0)
 
-    ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 d-1]
+    ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
     ! Colloigal coagulation rates are the principal way to remove dFe at high
     ! concentrations. Effectively, when `do_colloidal_shunt == .true.`, the
@@ -3024,7 +3024,7 @@ module generic_WOMBATmid
     !            and 1/10000 per day in deep ocean
     call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
 
-    ! Rate of aggregation of colloidal iron into authigenic Fe particles [d-1]
+    ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kagg_col', wombat%kagg_col, 0.1/86400.0)
 
@@ -3032,11 +3032,11 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kagg_kcol', wombat%kagg_kcol, 2.0)
 
-    ! Rate of dissolution of authigenic iron into dissolved Fe [d-1]
+    ! Rate of dissolution of authigenic iron into dissolved Fe [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kafe_dfe', wombat%kafe_dfe, 1e-4/86400)
 
-    ! Rate of dissolution of larger authigenic iron into dissolved Fe [d-1]
+    ! Rate of dissolution of larger authigenic iron into dissolved Fe [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kbafe_dfe', wombat%kbafe_dfe, 1e-4/86400)
 
@@ -5728,7 +5728,6 @@ module generic_WOMBATmid
       f_ele = bac1_yana * e_bac/e_dom ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
       bac1_yno3 = (f_ele/e_bac) / ((1.0 - f_ele)/4.0) ! Yield of N biomass per mol nitrate
 
-      e_dom = 4.0/dom_N2C + 10.9 - 2.0*2.6 - 3.0  ! [Anderson et al., 1995]
       e_bac = 4.0*wombat%bac2_C2N + 7.0 - 2.0*2.0 - 3.0  ! [Zimmerman et al., 2014]
       f_ele = min(0.9, wombat%bac_ydon(i,j,k) * e_bac/e_dom ) ! The fraction of electrons used for biomass synthesis (Eq A9 in Zakem et al. 2020 ISME)
       bac2_yoxy = (f_ele/e_bac) / ((1.0 - f_ele)/4.0) ! Yield of N biomass per mol oxygen
