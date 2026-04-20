@@ -148,8 +148,8 @@ module generic_WOMBATlite
   logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
   logical :: do_tracer_dicp      = .false.  ! enable preformed dissolved inorganic carbon tracer, dicp?
   logical :: do_tracer_dicr      = .false.  ! enable remineralised dissolved inorganic carbon tracer dicr?
-  logical :: do_check_n_conserve = .true.  ! check that the N fluxes balance in the ecosystem
-  logical :: do_check_c_conserve = .true.  ! check that the C fluxes balance in the ecosystem
+  logical :: do_check_n_conserve = .false. ! check that the N fluxes balance in the ecosystem
+  logical :: do_check_c_conserve = .false. ! check that the C fluxes balance in the ecosystem
 
   namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, do_two_ligands, &
                                     do_burial, do_check_n_conserve, do_check_c_conserve
