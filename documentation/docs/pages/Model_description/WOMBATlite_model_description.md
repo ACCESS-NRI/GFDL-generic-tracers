@@ -46,12 +46,12 @@ The following are logical statements within the `input.nml` namelist file that c
 
 | Logical             | Description                                                                 | Default setting  |
 |---------------------|-----------------------------------------------------------------------------|------------------|
-| do_caco3_dynamics   | Production and dissolution of CaCO3 depends on carbon system state          | .true.           |
-| do_colloidal_shunt  | Fraction of dissolved iron is colloids that coagulate onto sinking material | .true.           |
-| do_two_ligands      | Complex soluble iron using two ligands (weak + strong) rather than one      | .false.          |
-| do_burial           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
-| do_check_n_conserve | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
-| do_check_c_conserve | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
+| `do_caco3_dynamics`   | Production and dissolution of CaCO3 depends on carbon system state          | .true.           |
+| `do_colloidal_shunt`  | Fraction of dissolved iron is colloids that coagulate onto sinking material | .true.           |
+| `do_two_ligands`      | Complex soluble iron using two ligands (weak + strong) rather than one      | .false.          |
+| `do_burial`           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
+| `do_check_n_conserve` | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
+| `do_check_c_conserve` | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
 
 We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic variable reflects the binding strength of the strong ligand. However, when `do_two_ligands` is set to `.false.`, this diagnostic (`ligK`) reflects the binding strength of the bulk ligand pool.
 
