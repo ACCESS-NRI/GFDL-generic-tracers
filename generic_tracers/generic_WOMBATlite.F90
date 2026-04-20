@@ -1,16 +1,23 @@
 !-----------------------------------------------------------------------
 !
+!                       PRIMARY DEVELOPERS
+!
+! <CONTACT EMAIL="Pearse.Buchanan@csiro.au"> Pearse Buchanan
+! </CONTACT>
+!
+! <CONTACT EMAIL="Dougie.Squire@anu.edu.au"> Dougie Squire
+! </CONTACT>
+!
+!
+!                         OTHER CONTACTS
+!
 ! <CONTACT EMAIL="Richard.Matear@csiro.au"> Richard Matear
 ! </CONTACT>
 !
 ! <CONTACT EMAIL="Matthew.Chamberlain@csiro.au"> Matt Chamberlain
 ! </CONTACT>
 !
-! <CONTACT EMAIL="Dougal.Squire@anu.edu.au"> Dougie Squire
-! </CONTACT>
 !
-! <CONTACT EMAIL="Pearse.Buchanan@csiro.au"> Pearse Buchanan
-! </CONTACT>
 !
 ! <OVERVIEW>
 !  This module contains the generic version of WOMBATlite.
