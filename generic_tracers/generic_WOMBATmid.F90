@@ -2995,7 +2995,7 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissara', wombat%dissara, 0.10/86400.0)
 
-    ! CaCO3 dissolution factor due to detritus remineralisation creating 
+    ! CaCO3 dissolution factor due to detritus remineralisation creating
     !  anoxic microenvironment (mol C in CaCO3 per mol C remineralised)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissdet', wombat%dissdet, 0.20)
@@ -5241,7 +5241,7 @@ module generic_WOMBATmid
       feagg1 = 1.37
       feagg2 = 1.94
       zval = (( shear*2.0 + feagg1)*biobdet + feagg2*biobdet ) * wombat%kcoag_dfe
-      wombat%fecoag2bafe(i,j,k) = wombat%fecol(i,j,k) * zval 
+      wombat%fecoag2bafe(i,j,k) = wombat%fecol(i,j,k) * zval
 
       ! dissolution of Fe from authigenic particles back to dissolved phase
       wombat%afediss(i,j,k) = wombat%kafe_dfe * wombat%f_afe(i,j,k)
@@ -7965,7 +7965,7 @@ module generic_WOMBATmid
     if (wombat%id_nosdoc_docconsu > 0) &
       used = g_send_data(wombat%id_nosdoc_docconsu, wombat%nosdoc_docconsu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-    
+
     if (wombat%id_det_density > 0) &
       used = g_send_data(wombat%id_det_density, wombat%det_density, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
