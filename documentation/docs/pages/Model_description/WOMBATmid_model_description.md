@@ -406,7 +406,7 @@ _where_ <br>
 - $L_{np}^{PAR}$ is the growth limiter by light of nano-phytoplankton (`phy_lpar(i,j,k)`, [dimensionless]) <br>
 - $L_{np}^{N}$ is the growth limiter by nitrogen of nano-phytoplankton (`phy_lnit(i,j,k)`, [dimensionless]) <br>
 - $L_{np}^{Fe}$ is the growth limiter by iron of nano-phytoplankton (`phy_lfer(i,j,k)`, [dimensionless]) <br>
-- $\mu_{np}^{max}$ is the maximum potential rate of carbon fixation by micro-phytoplankton (`dia_mumax`, [s<sup>-1</sup>]) <br>
+- $\mu_{mp}^{max}$ is the maximum potential rate of carbon fixation by micro-phytoplankton (`dia_mumax`, [s<sup>-1</sup>]) <br>
 - $L_{mp}^{PAR}$ is the growth limiter by light of micro-phytoplankton (`dia_lpar(i,j,k)`, [dimensionless]) <br>
 - $L_{mp}^{N}$ is the growth limiter by nitrogen of micro-phytoplankton (`dia_lnit(i,j,k)`, [dimensionless]) <br>
 - $L_{mp}^{Fe}$ is the growth limiter by iron of micro-phytoplankton (`dia_lfer(i,j,k)`, [dimensionless]) <br>
@@ -683,14 +683,15 @@ Partitioning of iron between free and ligand-bound forms is done using one of tw
 
 When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative root solver.
 
-In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a weak ligand (`ligW_K(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a strong ligand to be a constant positive offset equal to 2.67 log<sub>10</sub> units ([Ye et al., 2020](https://doi.org/10.1029/2019GB006425)). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a weak ligand but add a constant 1.0 log<sub>10</sub> units to it to accommodate the effect strong ligands. 
+In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a strong ligand but reduce it by a constant 0.5 log<sub>10</sub> units to it to accommodate the effect weak ligands.
 
-The stability constant (`ligW_K(i,j,k)`, $Lig_{w}^{K_eq}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
-Lig_{w}^{K} =& \quad \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)  - 0.7 \dfrac{PAR}{PAR + 10} } \\
-& \quad 10^{\left(-0.0002  \left(B_{DOM}^{C}\right)^{2} + 0.034 \cdot B_{DOM}^{C} - 1.67 \cdot pH + 24.36\right)} \bigg) \times 10^{-9}
+Lig_{s}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right)} \\
+             & \qquad  10^{\left(-0.7 \dfrac{PAR}{PAR + 10}\right)} \\
+             & \qquad 10^{\left(-0.0002 \left(B_{DOM}^{C}\right)^{2} + 0.034 \cdot B_{DOM}^{C} - 1.67 \cdot pH + 24.36\right)} \bigg)
 \end{align}
 $$
 
@@ -701,7 +702,7 @@ _where_ <br>
 - $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`biodoc`, [mmol m<sup>-3</sup>]) <br>
 
 
-After finding $Lig_{w}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
+After finding $Lig_{s}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
 $$
 \begin{align}
@@ -713,7 +714,7 @@ $$
 
 _where_ <br>
 - $[Ligand]$ is the in situ concentration of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to the sum of weak and strong ligand concentrations (`ligW` + `ligS`, [nmol kg<sup>-1</sup>]) <br>
-- $Lig_{bulk}^{K}$ is the conditional stability constant of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to $Lig_{w}^{K}$ + 1 <br>
+- $Lig_{bulk}^{K}$ is the conditional stability constant of bulk ligands and in this case, where `do_two_ligands == .false.`, is equal to $Lig_{s}^{K} \cdot 10^{-0.5}$ <br>
 
 
 In the case of `do_two_ligands == .true.`, we solve for (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the iterative method. For this approach, we know that:
@@ -764,7 +765,7 @@ $$
 
 _where_ <br>
 - $dFe_{free}$ is the in situ concentration of dissolved free iron (`feIII(i,j,k)`, [nmol Fe kg<sup>-1</sup>]) <br>
-- $\gamma_{dFe}^{scav}$ is the rate constant of scavenging (`kscav_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> day<sup>-1</sup>]) <br>
+- $\gamma_{dFe}^{scav}$ is the rate constant of scavenging (`kscav_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $B_{particles}^{M}$ is the in situ concentration of detrital particles in the water column (`partic`, [mmol m<sup>-3</sup>]) <br>
 
 $$
@@ -804,16 +805,16 @@ $$
 
 _where_ <br>
 - $dFe_{col}$ is the in situ concentration of dissolved colloidal iron (`fecol(i,j,k)`, [mol Fe kg<sup>-1</sup>]) <br>
-- $\gamma_{dFe}^{coag}$ is the iron coagulation rate constant (`kcoag_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> day<sup>-1</sup>]) <br>
+- $\gamma_{dFe}^{coag}$ is the iron coagulation rate constant (`kcoag_dfe`, [(mmol m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $S_{coag}^{sA}$ and $S_{coag}^{lA}$ are scaling coefficients to decelerate or accelerate coagulation of small and large particles (`zval`, [mmol C m<sup>-3</sup>]) <br>
 
 The coagulation scaling coefficients are themselves dependent on the concentrations of dissolved organic carbon, particulate organic carbon, phytoplankton biomass and the rate of mixing. For small particle coagulation:
 
 $$
 \begin{align}
-S_{coag}^{sA} =& \quad H_{mix} \left(12 \cdot F_{coag} B_{DOM}^{C} + 9.05 \cdot B_{sd}^{C}\right) \\
-& \quad + 2.49 \cdot B_{sd}^{C} + 128 \cdot F_{coag} \left(B_{DOC}^{C} + 40\right) + 725 \cdot B_{sd}^{C} \\
-& \quad \gamma_{dFe}^{agg} \cdot \dfrac{\left(dFe_{col}\right)^{4}}{\left(dFe_{col}\right)^{4} + \left(K_{dFe}^{agg}\right)^{4}} \\ 
+S_{coag}^{sA} =& \quad H_{mix} \left(10.8 \cdot F_{coag} \left(B_{DOM}^{C} + 40\right) + 9.05 \cdot B_{sd}^{C}\right) \\
+& \quad + 2.49 \cdot B_{sd}^{C} + 115.02 \cdot F_{coag} \left(B_{DOC}^{C} + 40\right) + 725.7 \cdot B_{sd}^{C} \\
+& \quad + \gamma_{dFe}^{agg} \cdot \dfrac{\left(dFe_{col}\right)^{4}}{\left(dFe_{col}\right)^{4} + \left(K_{dFe}^{agg}\right)^{4}} \\ 
 F_{coag} =& \quad \dfrac{B_{np}^{C} + B_{mp}^{C}}{B_{np}^{C} + B_{mp}^{C} + 0.03}
 \end{align}
 $$
@@ -824,8 +825,6 @@ _where_ <br>
 - $B_{np}^{C}$ and $B_{mp}^{C}$ are the concentrations of nano- and micro-phytoplankton biomass (`biophy`; `biodia`, [mmol C m<sup>-3</sup>])  <br>
 - $B_{DOM}^{C}$ is the concentration of dissolved organic matter in carbon (`biodoc`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{sd}^{C}$ is the concentration of small organic detrital particles (`biodet`, [mmol C m<sup>-3</sup>]) <br>
-- $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
-- $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
 - $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
 - $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
 
@@ -857,7 +856,7 @@ $$
 
 _where_ <br>
 - $\gamma_{sA}^{diss}$ is the constant dissolution rate of the small sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
-- $\gamma_{lA}^{diss}$ is the constant dissolution rate of the large sinking authigenic iron (`kafe_dfe`, [s<sup>-1</sup>]) <br>
+- $\gamma_{lA}^{diss}$ is the constant dissolution rate of the large sinking authigenic iron (`kbafe_dfe`, [s<sup>-1</sup>]) <br>
 
 ---
 
@@ -991,7 +990,7 @@ $$
 
 _where_ <br>
 - $F_{B_{ld}^{Si}}^{bac}$ is the factor increase in dissolution caused by peak bacterial biomass (`bsi_fbac`, [dimenionless]) <br>
-- $K_{B_{ld}^{Si}}^{bac}$ is the half-saturation coefficient for stimulation of silica dissolution in the presence of bacterial biomass (`bsi_kbac`, [mmol C m<sup>-1</sup>]) <br>
+- $K_{B_{ld}^{Si}}^{bac}$ is the half-saturation coefficient for stimulation of silica dissolution in the presence of bacterial biomass (`bsi_kbac`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{bac}^{C}$ is the in situ concentration of bacterial biomass (`biobac1` + `biobac2`, [mmol C m<sup>-1</sup>]) <br>
 
 ---
