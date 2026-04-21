@@ -22,21 +22,21 @@ The following are the active tracers in WOMBAT-lite
 
 | Tracer           | Code name  | Description                                 | Units                     | Default on? |
 |------------------|------------|---------------------------------------------|---------------------------|-------------|
-| O<sub>2</sub>    | `f_o2`     | Dissolved oxygen                            | mol O2 kg<sup>-1</sup>    | Yes         |
-| NO<sub>3</sub>   | `f_no3`    | Nitrate                                     | mol N kg<sup>-1</sup>     | Yes         |
-| dFe              | `f_fe`     | Dissolved iron                              | mol Fe kg<sup>-1</sup>    | Yes         |
-| Phy              | `f_phy`    | Phytoplankton                               | mol C kg<sup>-1</sup>     | Yes         |
-| Zoo              | `f_zoo`    | Zooplankton                                 | mol C kg<sup>-1</sup>     | Yes         |
-| Det              | `f_det`    | Detritus                                    | mol C kg<sup>-1</sup>     | Yes         |
-| Chl              | `f_pchl`   | Phytoplankton chlorophyll content           | mol C kg<sup>-1</sup>     | Yes         |
-| PhyFe            | `f_phyfe`  | Phytoplankton iron content                  | mol Fe kg<sup>-1</sup>    | Yes         |
-| ZooFe            | `f_zoofe`  | Zoooplankton iron content                   | mol Fe kg<sup>-1</sup>    | Yes         |
-| DetFe            | `f_detfe`  | Detritus iron content                       | mol Fe kg<sup>-1</sup>    | Yes         |
-| DIC              | `f_dic`    | Dissolved inorganic carbon                  | mol C kg<sup>-1</sup>     | Yes         |
-| Alk              | `f_alk`    | Dissolved alkalinity                        | mol Eq kg<sup>-1</sup>    | Yes         |
-| CaCO<sub>3</sub> | `f_caco3`  | Calcium carbonate                           | mol C kg<sup>-1</sup>     | Yes         |
-| DICp             | `f_dicp`   | Preformed dissolved inorganic carbon        | mol C kg<sup>-1</sup>     | No          |
-| DICr             | `f_dicr`   | Remineralised dissolved inorganic carbon    | mol C kg<sup>-1</sup>     | No          |
+| O<sub>2</sub>    | `p_o2`     | Dissolved oxygen                            | mol O2 kg<sup>-1</sup>    | Yes         |
+| NO<sub>3</sub>   | `p_no3`    | Nitrate                                     | mol N kg<sup>-1</sup>     | Yes         |
+| dFe              | `p_fe`     | Dissolved iron                              | mol Fe kg<sup>-1</sup>    | Yes         |
+| Phy              | `p_phy`    | Phytoplankton                               | mol C kg<sup>-1</sup>     | Yes         |
+| Zoo              | `p_zoo`    | Zooplankton                                 | mol C kg<sup>-1</sup>     | Yes         |
+| Det              | `p_det`    | Detritus                                    | mol C kg<sup>-1</sup>     | Yes         |
+| Chl              | `p_pchl`   | Phytoplankton chlorophyll content           | mol C kg<sup>-1</sup>     | Yes         |
+| PhyFe            | `p_phyfe`  | Phytoplankton iron content                  | mol Fe kg<sup>-1</sup>    | Yes         |
+| ZooFe            | `p_zoofe`  | Zoooplankton iron content                   | mol Fe kg<sup>-1</sup>    | Yes         |
+| DetFe            | `p_detfe`  | Detritus iron content                       | mol Fe kg<sup>-1</sup>    | Yes         |
+| DIC              | `p_dic`    | Dissolved inorganic carbon                  | mol C kg<sup>-1</sup>     | Yes         |
+| Alk              | `p_alk`    | Dissolved alkalinity                        | mol Eq kg<sup>-1</sup>    | Yes         |
+| CaCO<sub>3</sub> | `p_caco3`  | Calcium carbonate                           | mol C kg<sup>-1</sup>     | Yes         |
+| DICp             | -          | Preformed dissolved inorganic carbon        | mol C kg<sup>-1</sup>     | No          |
+| DICr             | `p_dicr`   | Remineralised dissolved inorganic carbon    | mol C kg<sup>-1</sup>     | No          |
 
 ---
 
@@ -50,6 +50,8 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_colloidal_shunt`  | Fraction of dissolved iron is colloids that coagulate onto sinking material | .true.           |
 | `do_two_ligands`      | Complex soluble iron using two ligands (weak + strong) rather than one      | .false.          |
 | `do_burial`           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
+| `do_tracer_dicp`      | Carry preformed dissolved inorganic carbon (dicp) as a tracer               | .false.          |
+| `do_tracer_dicr`      | Carry remineralised dissolved inorganic carbon (dicr) as a tracer           | .false.          |
 | `do_check_n_conserve` | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
 | `do_check_c_conserve` | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
 
@@ -321,7 +323,7 @@ The euphotic depth (`zeuphot(i,j)`, [m]) is defined as the depth where `radbio` 
 
 ### 2. Nutrient limitation of phytoplankton.
 
-At the start of each vertical loop the code computes biomass of phytoplankton (`biophy`, $B_{phy}^{C}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how both nitrate (`biono3`, $NO_{3}$, [mmol NO<sub>3</sub> m<sup>-3</sup>]) and dissolved iron (`biofer`, $dFe$, [µmol Fe m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $\mathit{aff}$, of a phytoplankton cell is related to its volume, $V$, via
+At the start of each vertical loop the code computes biomass of phytoplankton (`phy_mmolm3`, $B_{phy}^{C}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how both nitrate (`no3_mmolm3`, $NO_{3}$, [mmol NO<sub>3</sub> m<sup>-3</sup>]) and dissolved iron (`fe_umolm3`, $dFe$, [µmol Fe m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $\mathit{aff}$, of a phytoplankton cell is related to its volume, $V$, via
 
 $$
 \begin{align}
@@ -363,7 +365,7 @@ L_{phy}^{N} =& \quad \dfrac{NO_3}{NO_3 + K_{phy}^{N}}
 $$
  
 _where _ <br>
-- $NO_3$ is the ambient nitrate concentration (`biono3`, $NO_3$, [mmol N m<sup>-3</sup>]) <br>
+- $NO_3$ is the ambient nitrate concentration (`no3_mmolm3`, $NO_3$, [mmol N m<sup>-3</sup>]) <br>
 - $K_{phy}^{N}$ is the michaelis-menten half-saturation coefficient (`phy_kni(i,j,k)`, [mmol N m<sup>-3</sup>]) <br>
 
 **Limitation of phytoplankton growth by iron** follows an internal quota approach ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)). Phytoplankton have a minimum iron quota (`phy_minqfe`, $Q_{phy}^{-Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]) and an optimal quota for growth (`phyoptqf`, $Q_{phy}^{*Fe:C}$, [mol Fe (mol C)<sup>-1</sup>]). The minimum iron quota, $Q_{phy}^{-Fe:C}$, is dependent on the chlorophyll content of the cell and the degree of nitrogen limitation according to
@@ -492,7 +494,7 @@ $$
 
 _where_ <br>
 - $\mu_{phy}^{\leftarrow C}$ is the realized rate of carbon biomass growth by phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $B_{phy}^{C}$ is the carbon concentration of phytoplankton (`biophy`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{phy}^{C}$ is the carbon concentration of phytoplankton (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 ---
 
@@ -537,10 +539,10 @@ $$
 
 _where_ <br>
 - $Q_{phy}^{Chl:C}$ is the in-situ chlorophyll-to-carbon ratio (`phy_chlc`, [mol C (mol C)<sup>-1</sup>]) <br>
-- $B_{phy}^{Chl}$ is the in-situ concentation of phytoplankton chlorophyll (`f_pchl(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{phy}^{Chl}$ is the in-situ concentation of phytoplankton chlorophyll (`p_pchl(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
 - $\mu_{phy}$ is the realized growth rate of phytoplankton (`phy_mu(i,j,k)`, [s<sup>-1</sup>]) <br>
 - $\tau^{Chl}$ is the timescale over which chlorophyll synthesis occurs within the cell (`chltau`, [s]) <br>
-- $B_{phy}^{C}$ is the in-situ concentation of phytoplankton carbon (`f_phy(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{phy}^{C}$ is the in-situ concentation of phytoplankton carbon (`p_phy(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
 
 This formulation elevates chlorophyll-to-carbon ratios in low light and supresses synthesis when nutrients are low. $\tau_{phy}^{Chl}$ is an input parameter at run time and should ideally be less than the doubling time of phytplankton given that phytoplankton can internally regulate their chlorophyll stores at rates greater than their overall growth.
 
@@ -560,7 +562,7 @@ $$
 _where_ <br>
 - $B_{phy}^{+Fe}$ is the maximum Fe quota of the cell (`phy_maxqfe`, [mmol Fe m<sup>-3</sup>]) <br>
 - $Q_{phy}^{+Fe:C}$ is the maximum Fe:C ratio of the cell (`phymaxqf`, [mol Fe (mol C)<sup>-1</sup>]) <br>
-- $B_{phy}^{C}$ is the in-situ concentation of phytoplankton carbon (`f_phy(i,j,k)`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{phy}^{C}$ is the in-situ concentation of phytoplankton carbon (`p_phy(i,j,k,tau)`, [mmol C m<sup>-3</sup>]) <br>
 
 Following [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/), this rate is scaled by three terms relating to (i) the michaelis-menten type affinity for dFe, (ii) up-regulation of dFe uptake representing investment in transporters when cell quotas are limiting to growth, and (iii) down regulation of dFe uptake associated with enriched cellular quotas:
 
@@ -573,10 +575,10 @@ $$
 $$
 
 _where_ <br>
-- $dFe$ is the in situ dissolved iron concentation (`biofer`, [µmol Fe m<sup>-3</sup>]) <br>
+- $dFe$ is the in situ dissolved iron concentation (`fe_umolm3`, [µmol Fe m<sup>-3</sup>]) <br>
 - $K_{phy}^{Fe}$ is the half-saturation coefficient for dFe uptake by phytoplankton (`phy_kfe(i,j,k)`, [µmol Fe m<sup>-3</sup>]) <br>
 - $L_{phy}^{Fe}$ is the growth limiter by iron (`phy_lfer(i,j,k)`, [dimensionless]) <br>
-- $B_{phy}^{Fe}$ is the in situ Fe quota of the cell (`biophyfe`, [mmol Fe m<sup>-3</sup>]) <br>
+- $B_{phy}^{Fe}$ is the in situ Fe quota of the cell (`phyfe_mmolm3`, [mmol Fe m<sup>-3</sup>]) <br>
 - $B_{phy}^{+Fe}$ is the maximum Fe quota of the cell (`phy_maxqfe`, [mmol Fe m<sup>-3</sup>]) <br>
 
 Note that we additionally include a fourth term that decreases the maximum dFe uptake of a cell under light limitation. This is informed by slower uptake of Fe by cells grown in darkness compared to those grown in light by roughly 10-fold ([Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)), which may be due to physiological stimulation of Fe uptake machinery or photoreduction of ligand-bound iron complexes ([Kong et al., 2023](https://doi.org/10.1002/lno.12331); [Maldonado et al., 2005](https://doi.org/10.1029/2005GB002481)), or possibly a combination of both. To obtain a 10-fold relative increase in Fe uptake rates under light, we applied the following term:
@@ -608,7 +610,7 @@ _where_ <br>
 
 ### 8. Iron chemistry.
 
-Treatment of dissolved iron (`biofer`, $dFe$, [nmol Fe kg<sup>-1</sup>]) follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5). Our calculations involve: <br>
+Treatment of dissolved iron (`fe_umolm3`, $dFe$, [nmol Fe kg<sup>-1</sup>]) follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5). Our calculations involve: <br>
 1. Solving for the distinct pools of dissolved iron: free iron, ligand-bound iron and colloidal iron. <br>
 2. Computing precipitation of free iron into nanoparticles that are permanently lost. <br>
 3. Computing scavenging of free iron onto sinking organic particles. <br>
@@ -653,7 +655,7 @@ _where_ <br>
 - $\times10^{9}$ converts [mol Fe kg<sup>-1</sup>] to [nmol Fe kg<sup>-1</sup>] <br>
 - $dFe_{sol}$ is the final estimated solubility of dissolve iron in seawater (`fe3sol`, [nmol Fe kg<sup>-1</sup>]). <br>
 
-Next we **estimate the concentration of colloidal iron** in solution following [Tagliabue et al. 2023](https://www.nature.com/articles/s41586-023-06210-5) in the case that `do_colloidal_shunt == .true.`. If `do_colloidal_shunt == .false.` we consider no dissolved Fe to be in colloidal form. Colloidal dissolved Fe (`fecol(i,j,k)`, $dFe_{col}$, [mmol Fe m<sup>-3</sup>]) is whatever exceeds the inorganic solubility ceiling (`fe3sol`, $dFe_{sol}$, [mmol Fe m<sup>-3</sup>]), but we enforce a hard minimum that colloids are at least 10% of total dissolved Fe (`biofer`, $dFe$, [mmol Fe m<sup>-3</sup>]).
+Next we **estimate the concentration of colloidal iron** in solution following [Tagliabue et al. 2023](https://www.nature.com/articles/s41586-023-06210-5) in the case that `do_colloidal_shunt == .true.`. If `do_colloidal_shunt == .false.` we consider no dissolved Fe to be in colloidal form. Colloidal dissolved Fe (`fecol(i,j,k)`, $dFe_{col}$, [mmol Fe m<sup>-3</sup>]) is whatever exceeds the inorganic solubility ceiling (`fe3sol`, $dFe_{sol}$, [mmol Fe m<sup>-3</sup>]), but we enforce a hard minimum that colloids are at least 10% of total dissolved Fe (`fe_umolm3`, $dFe$, [mmol Fe m<sup>-3</sup>]).
 
 $$
 \begin{align}
@@ -783,8 +785,8 @@ B_{particles}^{M} =& \quad 2 \cdot B_{det}^{C} + 8.3 \cdot B_{CaCO_3}^{C}
 $$
 
 _where_ <br>
-- $B_{det}^{C}$ is the concentration of particulate organic carbon (`biodet`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{CaCO_3}^{C}$ is the concentration of particulate calcium carbonate in units of carbon (`biocaco3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{det}^{C}$ is the concentration of particulate organic carbon (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{CaCO_3}^{C}$ is the concentration of particulate calcium carbonate in units of carbon (`caco3_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 Total scavenging ($Sc_{dFe}^{\rightarrow}$) of free iron is broken into the part that attaches to organic detritus (`fescadet(i,j,k)`, $Sc_{dFe}^{\rightarrow B_{det}^{Fe}}$, [nmol Fe kg<sup>-1</sup> s<sup>-1</sup>]):
 
@@ -824,9 +826,9 @@ $$
 _where_ <br>
 - $H_{mix}$ is a Heaviside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless]) <br>
 - $F_{coag}$ is a phytoplankton concentration dependent coagulation factor (`biof`, [dimensionless])  <br>
-- $B_{phy}^{C}$ is the concentrations of phytoplankton biomass (`biophy`, [mmol C m<sup>-3</sup>])  <br>
+- $B_{phy}^{C}$ is the concentrations of phytoplankton biomass (`phy_mmolm3`, [mmol C m<sup>-3</sup>])  <br>
 - $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left( 1 - \min\left(L_{phy}^{N} \ , \ L_{phy}^{Fe}\right) \right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
-- $B_{det}^{C}$ is the concentration of organic detrital particles (`biodet`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{det}^{C}$ is the concentration of organic detrital particles (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
 - $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
 
@@ -864,8 +866,8 @@ _where_ <br>
 - $\gamma_{zoo}^{0^{\circ}C}$ is the linear loss rate of zooplankton biomass at 0ºC (`zoolmor`, [s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $B_{phy}^{C}$ is the concentration of phytoplankton carbon biomass (`biophy`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass (`biozoo`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{phy}^{C}$ is the concentration of phytoplankton carbon biomass (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass (`zoo_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $K_{zoo}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses (`zookz`, [mmolC m <sup>-3</sup>]) <br>
 
 
@@ -885,8 +887,8 @@ _where_ <br>
 - $\Gamma_{zoo}^{0^{\circ}C}$ is the quadratic (density-dependent) loss rate of zooplankton biomass at 0ºC (`zooqmor`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $B_{phy}^{C}$ is the concentration of phytoplankton carbon biomass (`biophy`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass (`biozoo`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{phy}^{C}$ is the concentration of phytoplankton carbon biomass (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass (`zoo_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 
 **Remineralisation** of detritus is only affected by a quadratic, density-dependent loss term,
@@ -902,7 +904,7 @@ _where_ <br>
 - $\Gamma_{det}^{0^{\circ}C}$ is the quadratic (density-dependent) loss rate of particulate organic detritus at 0ºC (`detlrem`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $B_{det}^{C}$ is the concentration of particulate organic detritus (`biodet`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{det}^{C}$ is the concentration of particulate organic detritus (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 since hydrolyzation of organic detritus is performed by an heterotrophic bacterial population that is not explicitly resolved in the model and their acitivity is density-dependent.
 
@@ -936,7 +938,7 @@ $$
 
 _where_ <br>
 - $g_{zoo}$ is the total specific rate of grazing of zooplankton (`g_zoo`, [s<sup>-1</sup>]) <br>
-- $B_{zoo}^{C}$ is the in situ concentration of zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{zoo}^{C}$ is the in situ concentration of zooplankton carbon biomass (`p_zoo(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
 
 This formulation suppresses grazing at very low prey biomass ($B_{prey}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
 
@@ -951,8 +953,8 @@ B_{prey}^{C} =& \quad \phi_{zoo}^{phy} B_{phy}^{C} + \phi_{zoo}^{det} B_{det}^{C
 $$
 
 _where_ <br>
-- $B_{phy}^{C}$ is the concentration of phytoplankton biomass (`biophy`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{det}^{C}$ is the concentration of particulate organic detritus (`biodet`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{phy}^{C}$ is the concentration of phytoplankton biomass (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{det}^{C}$ is the concentration of particulate organic detritus (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $\phi_{zoo}^{phy}$ is the relative preference of zooplankton grazing on phytoplankton (`zooprefphy(i,j,k)`, [dimensionless]) <br>
 - $\phi_{zoo}^{det}$ is the relative preference of zooplankton grazing on particulate detritus (`zooprefdet(i,j,k)`, [dimensionless]) <br>
 
@@ -975,7 +977,7 @@ $$
 
 _where_ <br>
 - $\phi_{zoo}^{phy}$ and $\phi_{zoo}^{det}$ are the relative prey preference of zooplankton for phytoplankton and detritus (`zooprefphy(i,j,k)`; `zooprefdet(i,j,k)`, [dimensionless]) <br>
-- $B_{phy}^{C}$ and $B_{det}^{C}$ are the concentrations of phytoplankton and detritus in carbon biomass (`biophy`; `biodet`, [mmol C m<sup>-3</sup>])<br>
+- $B_{phy}^{C}$ and $B_{det}^{C}$ are the concentrations of phytoplankton and detritus in carbon biomass (`phy_mmolm3`; `det_mmolm3`, [mmol C m<sup>-3</sup>])<br>
 - $s_{zoo}$ is the prey-switching exponent of zooplankton (`zoopreyswitch`) <br>
 
 When $s_{zoo} < 1$, zooplankton feed equally across all prey items irrespective of availability  <br>
@@ -1164,7 +1166,7 @@ _where_ <br>
 - $d_{CaCO_3}^{\Omega_{ara}}$ is the reference dissolution rate constant for aragonite (`dissara`, [s<sup>-1</sup>])  <br>
 - $d_{CaCO_3}^{\Gamma_{det}}$ is the reference dissolution rate constant per unit of small detrital organic carbon remineralised (`dissdet`, [(mmol C m<sup>-3</sup>)<sup>-1</sup>])  <br>
 - $\Gamma_{det}^{\rightarrow C}$ is the in situ remineralisation rate of small detrital organic carbon (`detremi(i,j,k)`, [mmol C m<sup>-3</sup> s<sup>-1</sup>]) <br>
-- $B_{CaCO_3}^{C}$ is the in situ concentration of $CaCO_3$ in carbon units (`f_caco3(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{CaCO_3}^{C}$ is the in situ concentration of $CaCO_3$ in carbon units (`p_caco3(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
 
 For $D_{CaCO_3}^{\Omega_{cal}}$ and $D_{CaCO_3}^{\Omega_{ara}}$, dissolution is activated only under undersaturated conditions ($\Omega_{cal} < 1$; $\Omega_{ara} < 1$) and increases nonlinearly with increasing undersaturation. In contrast, $D_{CaCO_3}^{\Gamma_{det}^{\rightarrow C}}$ represents shallow water dissolution due to reducing microenvironments. In this scenario, $\Omega_{cal}$ and $\Omega_{ara}$ tend to be > 1 ([Sulpis et al., 2021](https://doi.org/10.1038/s41561-021-00743-y)) but dissolution nonetheless occurs in microenvironments enriched in $CO_{2}^{*}$ due to heterotrophic activity ([Borer et al., 2026](https://doi.org/10.1073/pnas.2510025123)).
 
@@ -1179,7 +1181,7 @@ $$
 _where_ <br>
 - $g_{zoo}^{\leftarrow B_{det}^{C}}$ is the grazing rate of particulate detritus by zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $F_{gut}$ is the fraction of $CaCO_3$ that is dissolved within zooplankton guts (`fgutdiss`, [mol C (mol C)<sup>-1</sup>]) <br>
-- $\dfrac{B_{CaCO_3}^{C}}{B_{det}^{C}}$ is the in situ ratio of $CaCO_3$ to organic carbon detritus (`biocaco3/biodet`, [mol C (mol C)<sup>-1</sup>]) <br>
+- $\dfrac{B_{CaCO_3}^{C}}{B_{det}^{C}}$ is the in situ ratio of $CaCO_3$ to organic carbon detritus (`caco3_mmolm3/det_mmolm3`, [mol C (mol C)<sup>-1</sup>]) <br>
 
 Here we note that the processing of $CaCO_3$ by zooplankton grazing is treated differently to processing of organic carbon. For organic carbon, we route the biomass between zooplankton biomass (assimilation), inorganic nutrients (excretion) and particulate detritus (egestion). For $CaCO_3$ consumption by zooplankton the $CaCO_3$ is not assimilated since it does not contain nitrogen or other key elements for biosynthesis, and so is only routed between excretion to DIC and alkalinity or goes undissolved and remains $CaCO_3$ that sinks through the water column. This is supported by the fact that micro- and meso-zooplankton may dissolve 92±7% and 38-73% of coccolithophore calcite during feeding, respectively ([Smith et al., 2024](https://www.science.org/doi/10.1126/sciadv.adr5453); [White et al., 2018](https://www.nature.com/articles/s41598-018-28073-x); [Harris 1994](https://link.springer.com/article/10.1007/BF00347540)), and that the remainder is excreted and not assimilated ([Mayers et al., 2020](https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2020.569896/full)).
 
@@ -1193,7 +1195,7 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 
 ### 12. Tracer tendencies.
 
-**Nitrate** (`f_no3(i,j,k)`, $NO_3$, [mol N kg<sup>-1</sup>])
+**Nitrate** (`p_no3(i,j,k,tau)`, $NO_3$, [mol N kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1203,7 +1205,7 @@ $$
 \end{align}
 $$
 
-**Oxygen** (`f_o2(i,j,k)`, $O_2$, [mol O<sub>2</sub> kg<sup>-1</sup>])
+**Oxygen** (`p_o2(i,j,k,tau)`, $O_2$, [mol O<sub>2</sub> kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1212,7 +1214,7 @@ $$
 \end{align}
 $$
 
-**Dissolved iron** (`f_fe(i,j,k)`, $dFe$, [mol Fe kg<sup>-1</sup>])
+**Dissolved iron** (`p_fe(i,j,k,tau)`, $dFe$, [mol Fe kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1224,16 +1226,16 @@ $$
 \end{align}
 $$
 
-**Phytoplankton** (`f_phy(i,j,k)`, $B_{phy}^{C}$, [mol C kg<sup>-1</sup>])
+**Phytoplankton** (`p_phy(i,j,k,tau)`, $B_{phy}^{C}$, [mol C kg<sup>-1</sup>])
 
 $$
 \begin{align}
-\dfrac{\Delta pB_{phy}^{C}y}{\Delta t} =& \quad \mu_{phy}^{\leftarrow C} \\
+\dfrac{\Delta B_{phy}^{C}}{\Delta t} =& \quad \mu_{phy}^{\leftarrow C} \\
                                         & - \left( \Gamma_{phy}^{\rightarrow C} + \gamma_{phy}^{\rightarrow C} + g_{zoo}^{\leftarrow B_{phy}^{C}} \right)
 \end{align}
 $$
 
-**Phytoplankton chlorophyll** (`f_pchl(i,j,k)`, $B_{phy}^{Chl}$, [mol Chl kg<sup>-1</sup>])
+**Phytoplankton chlorophyll** (`p_pchl(i,j,k,tau)`, $B_{phy}^{Chl}$, [mol Chl kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1242,7 +1244,7 @@ $$
 \end{align}
 $$
 
-**Phytoplankton iron** (`f_phyfe(i,j,k)`, $B_{phy}^{Fe}$, [mol Fe kg<sup>-1</sup>])
+**Phytoplankton iron** (`p_phyfe(i,j,k,tau)`, $B_{phy}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1251,7 +1253,7 @@ $$
 \end{align}
 $$
 
-**Zoooplankton** (`f_zoo(i,j,k)`, $B_{zoo}^{C}$, [mol C kg<sup>-1</sup>])
+**Zoooplankton** (`p_zoo(i,j,k,tau)`, $B_{zoo}^{C}$, [mol C kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1259,7 +1261,7 @@ $$
 \end{align}
 $$
 
-**Zoooplankton iron** (`f_zoofe(i,j,k)`, $B_{zoo}^{Fe}$, [mol Fe kg<sup>-1</sup>])
+**Zoooplankton iron** (`p_zoofe(i,j,k,tau)`, $B_{zoo}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1268,7 +1270,7 @@ $$
 \end{align}
 $$
 
-**Detritus** (`f_det(i,j,k)`, $B_{det}^{C}$, [mol C kg<sup>-1</sup>])
+**Detritus** (`p_det(i,j,k,tau)`, $B_{det}^{C}$, [mol C kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1277,7 +1279,7 @@ $$
 \end{align}
 $$
 
-**Detritus iron** (`f_detfe(i,j,k)`, $B_{det}^{Fe}$, [mol Fe kg<sup>-1</sup>])
+**Detritus iron** (`p_detfe(i,j,k,tau)`, $B_{det}^{Fe}$, [mol Fe kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1289,7 +1291,7 @@ $$
 \end{align}
 $$
 
-**Calcium Carbonate** (`f_caco3(i,j,k)`, $B_{CaCO_3}^{C}$, [mol C kg<sup>-1</sup>])
+**Calcium Carbonate** (`p_caco3(i,j,k,tau)`, $B_{CaCO_3}^{C}$, [mol C kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1304,7 +1306,7 @@ $$
 \end{align}
 $$
 
-**Dissolved Inorganic Carbon** (`f_dic(i,j,k)`, $DIC$, [mol C kg<sup>-1</sup>])
+**Dissolved Inorganic Carbon** (`p_dic(i,j,k,tau)`, $DIC$, [mol C kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1313,7 +1315,7 @@ $$
 \end{align}
 $$
 
-**Alkalinity** (`f_alk(i,j,k)`, $Alk$, [mol Eq kg<sup>-1</sup>])
+**Alkalinity** (`p_alk(i,j,k,tau)`, $Alk$, [mol Eq kg<sup>-1</sup>])
 
 $$
 \begin{align}
@@ -1336,7 +1338,7 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 **First**, dissolved iron concentrations are set to equal 1 nM everywhere where the depth of the water column is less than 200 metres deep. WOMBAT-lite is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we universally set the dissolved iron concentration in these waters to 1 nM.
 
-**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits, we reset these concentrations to this minimum  (`dfefloor`, $[dFe]^{min}$, [nmol Fe kg<sup>-1</sup>]). $[dFe]^{min}$ is set in the parameter list and is configurable at run time.
+**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits in waters deeper than 200 m, we reset these concentrations to this minimum  (`dfefloor`, $[dFe]^{min}$, [nmol Fe kg<sup>-1</sup>]). $[dFe]^{min}$ is set in the parameter list and is configurable at run time.
 
 ---
 
@@ -1375,7 +1377,7 @@ $$
 
 _where_ <br>
 - $\omega_{det}^{0}$ is the sinking speed of organic detritus produced by a surface phytoplankton concentration of 1 mmol C m<sup>-3</sup> (`wdetbio`, [m s<sup>-1</sup>]) <br>
-- $B_{phy}^{C}$ is the concentration of phytoplankton biomass (`biophy`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{phy}^{C}$ is the concentration of phytoplankton biomass (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 This formula is identical to that presented by [Cael et al. (2021)](https://doi.org/10.1029/2020GL091771) in their Eq. (3), with the exception that we have related sinking rates to the biomass concentration of phytoplankton ($B_{phy}^{C}$) by assuming that $V = (B_{phy}^{C})^{0.65}$ based on marine phytoplankton data [(Wickman et al., 2024)](https://doi.org/10.1126/science.adk6901).
 
@@ -1396,10 +1398,10 @@ $$
 $$
 
 _where_ <br>
-- $B_{phy}^{C,k=1}$ is the concentration of phytoplankton biomass at the surface (`biophy1`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{phy}^{C,k=1}$ is the concentration of phytoplankton biomass at the surface (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{phy}^{thresh}$ is the phytoplankton biomass threshold above which the community cell size begins to increase (`phybiot`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{CaCO_3}^{C}$ is the in situ concentration of $CaCO_3$ biomass (`f_caco3(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
-- $B_{det}^{C}$ is the in situ concentration of organic detrital biomass (`f_det(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{CaCO_3}^{C}$ is the in situ concentration of $CaCO_3$ biomass (`p_caco3(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{det}^{C}$ is the in situ concentration of organic detrital biomass (`p_det(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
 
 
 and where we chose a maximum increase of 10 metres per day based on the more modest effect observed in mesocosm experiments ([Bach et al., 2016](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2016GB005372).
