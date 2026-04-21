@@ -2797,7 +2797,7 @@ module generic_WOMBATlite
       !  - the idea is to enrich fecal pellets in iron compared to carbon
       !  1. zooplankton ingest C and Fe (the rest is egested)
       !  2. zooplankton assimilate the ingested C and Fe (the rest is excreted)
-      if (zooprey>1e-3) then
+      if (zooprey > 1e-10) then
         wombat%zoograzphy(i,j,k) = g_npz * zoo_p * (wombat%zooprefphy(i,j,k) * phy_mmolm3) / zooprey ! [molC/kg/s]
         wombat%zoograzdet(i,j,k) = g_npz * zoo_p * (wombat%zooprefdet(i,j,k) * det_mmolm3) / zooprey ! [molC/kg/s]
       else
@@ -2868,7 +2868,7 @@ module generic_WOMBATlite
       P_expl = wombat%phygrow(i,j,k) - &
                 wombat%phymorl(i,j,k) - &
                 wombat%zoograzphy(i,j,k)
-      if (phy_mmolm3 > 1e-3) then
+      if (phy_mmolm3 > 1e-10) then
         ! Treat phymorq semi-implicitly
         k_loss = wombat%phyqmor / mmol_m3_to_mol_kg * wombat%p_phy(i,j,k,tau)
         wombat%p_phy(i,j,k,tau) = (wombat%p_phy(i,j,k,tau) + dtsb * P_expl) / (1.0 + dtsb * k_loss)
@@ -2906,7 +2906,7 @@ module generic_WOMBATlite
       P_expl = wombat%zooassiphy(i,j,k) + &
                 wombat%zooassidet(i,j,k) - &
                 wombat%zoomorl(i,j,k)
-      if (zoo_mmolm3 > 1e-3) then
+      if (zoo_mmolm3 > 1e-10) then
         ! Treat zoomorq semi-implicitly
         k_loss = wombat%zooqmor / mmol_m3_to_mol_kg * wombat%p_zoo(i,j,k,tau)
         wombat%p_zoo(i,j,k,tau) = (wombat%p_zoo(i,j,k,tau) + dtsb * P_expl) / (1.0 + dtsb * k_loss)
