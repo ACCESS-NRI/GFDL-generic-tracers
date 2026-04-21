@@ -10,9 +10,54 @@
  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT)
 ```
 
-_Contact Pearse J. Buchanan for any questions_
+_Contact Pearse J. Buchanan and/or Dougal Squire for any questions_
 
 _Pearse.Buchanan@csiro.au_
+_Dougie.Squire@anu.edu.au_
+
+---
+
+## Tracers
+
+The following are the active tracers in WOMBAT-lite
+
+| #    | Tracer                        | Code name  | Description                                         | Units                     | Default on? |
+|------|-------------------------------|------------|-----------------------------------------------------|---------------------------|-------------|
+| 1    | O<sub>2</sub>                 | `p_o2`     | Dissolved oxygen                                    | mol O2 kg<sup>-1</sup>    | Yes         |
+| 2    | NH<sub>4</sub>                | `p_nh4`    | Ammonium                                            | mol N kg<sup>-1</sup>     | Yes         |
+| 3    | NO<sub>3</sub>                | `p_no3`    | Nitrate                                             | mol N kg<sup>-1</sup>     | Yes         |
+| 4    | Si(OH)<sub>4</sub>            | `p_sil`    | Silicic acid                                        | mol Si kg<sup>-1</sup>    | Yes         |
+| 5    | N<sub>2</sub>O                | `p_n2o`    | Nitrous oxide                                       | mol N kg<sup>-1</sup>     | Yes         |
+| 6    | dFe                           | `p_fe`     | Dissolved iron                                      | mol Fe kg<sup>-1</sup>    | Yes         |
+| 7    | Fe<sub>sA</sub>               | `p_afe`    | Small sinking authigenic iron                       | mol Fe kg<sup>-1</sup>    | Yes         |
+| 8    | Fe<sub>lA</sub>               | `p_bafe`   | Large sinking authigenic iron                       | mol Fe kg<sup>-1</sup>    | Yes         |
+| 9    | B<sub>np</sub><sup>C</sup>    | `p_phy`    | Nano-phytoplankton                                  | mol C kg<sup>-1</sup>     | Yes         |
+| 10   | B<sub>mp</sub><sup>C</sup>    | `p_dia`    | Micro-phytoplankton                                 | mol C kg<sup>-1</sup>     | Yes         |
+| 11   | B<sub>mz</sub><sup>C</sup>    | `p_zoo`    | Micro-zooplankton                                   | mol C kg<sup>-1</sup>     | Yes         |
+| 12   | B<sub>Mz</sub><sup>C</sup>    | `p_mes`    | Meso-zooplankton                                    | mol C kg<sup>-1</sup>     | Yes         |
+| 13   | B<sub>sd</sub><sup>C</sup>    | `p_det`    | Small sinking detritus                              | mol C kg<sup>-1</sup>     | Yes         |
+| 14   | B<sub>ld</sub><sup>C</sup>    | `p_bdet`   | Large sinking detritus                              | mol C kg<sup>-1</sup>     | Yes         |
+| 15   | B<sub>np</sub><sup>Chl</sup>  | `p_pchl`   | Nano-phytoplankton chlorophyll content              | mol C kg<sup>-1</sup>     | Yes         |
+| 16   | B<sub>mp</sub><sup>Chl</sup>  | `p_dchl`   | Micro-phytoplankton chlorophyll content             | mol C kg<sup>-1</sup>     | Yes         |
+| 17   | B<sub>np</sub><sup>Fe</sup>   | `p_phyfe`  | Nano-phytoplankton iron content                     | mol Fe kg<sup>-1</sup>    | Yes         |
+| 18   | B<sub>mp</sub><sup>Fe</sup>   | `p_diafe`  | Micro-phytoplankton iron content                    | mol Fe kg<sup>-1</sup>    | Yes         |
+| 19   | B<sub>mp</sub><sup>Si</sup>   | `p_diasi`  | Micro-phytoplankton silicon content                 | mol Fe kg<sup>-1</sup>    | Yes         |
+| 20   | B<sub>mz</sub><sup>Fe</sup>   | `p_zoofe`  | Micro-zooplankton iron content                      | mol Fe kg<sup>-1</sup>    | Yes         |
+| 21   | B<sub>Mz</sub><sup>Fe</sup>   | `p_mesfe`  | Meso-zooplankton iron content                       | mol Fe kg<sup>-1</sup>    | Yes         |
+| 22   | B<sub>sd</sub><sup>Fe</sup>   | `p_detfe`  | Small sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
+| 23   | B<sub>ld</sub><sup>Fe</sup>   | `p_bdetfe` | Large sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
+| 24   | B<sub>ld</sub><sup>Si</sup>   | `p_bdetsi` | Large sinking detritus silicon content              | mol Si kg<sup>-1</sup>    | Yes         |
+| 25   | B<sub>DOM</sub><sup>C</sup>   | `p_doc`    | Dissolved organic carbon                            | mol C kg<sup>-1</sup>     | Yes         |
+| 26   | B<sub>DOM</sub><sup>N</sup>   | `p_doc`    | Dissolved organic carbon                            | mol C kg<sup>-1</sup>     | Yes         |
+| 27   | B<sub>aoa</sub><sup>C</sup>   | `p_aoa`    | Ammonia oxidizing archaea                           | mol C kg<sup>-1</sup>     | Yes         |
+| 28   | B<sub>b1</sub><sup>C</sup>    | `p_bac1`   | Faculative heterotrophic bacterial type 1           | mol C kg<sup>-1</sup>     | Yes         |
+| 29   | B<sub>b2</sub><sup>C</sup>    | `p_bac2`   | Faculative heterotrophic bacterial type 2           | mol C kg<sup>-1</sup>     | Yes         |
+| 30   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
+| 31   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
+| 32   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
+| 33   | DOM<sup>NOSC</sup>            | `p_nosdoc` | Nominal oxidation state of dissolved organic carbon | [0-1]                     | No          |
+| 34   | DICp                          | -          | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
+| 35   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
 
 ---
 
@@ -296,7 +341,7 @@ _where_ <br>
 - $\mu_{np}^{0^{\circ}}C$ is the rate of nano-phytoplankton growth at 0ºC (`abioa_phy`, [s<sup>-1</sup>]) <br>
 - $β_{np}$ is the base temperature-sensitivity coefficient for autotrophy by nano-phytoplankton (`bbioa_phy`, [dimenionless]) <br>
 - $\mu_{mp}^{0^{\circ}}C$ is the rate of micro-phytoplankton growth at 0ºC (`abioa_dia`, [s<sup>-1</sup>]) <br>
-- $β_{np}$ is the base temperature-sensitivity coefficient for autotrophy by micro-phytoplankton (`bbioa_dia`, [dimenionless]) <br>
+- $β_{mp}$ is the base temperature-sensitivity coefficient for autotrophy by micro-phytoplankton (`bbioa_dia`, [dimenionless]) <br>
 - $T$ is in situ water temperature (`Temp(i,j,k)`, [ºC])
 
 In the above, $\mu_{np}^{0ºC}$, $\mu_{mp}^{0ºC}$, $β_{np}$ and $β_{mp}$ are reference values input to the model at run time. This allows the user to configure nano-phytoplankton and micro-phytoplankton with different maximum potential growth rates and different sensitivities to temperature ([Anderson et al., 2021](https://www.nature.com/articles/s41467-021-26651-8)).
@@ -683,9 +728,9 @@ Partitioning of iron between free and ligand-bound forms is done using one of tw
 
 When `do_two_ligands == .false.`, we use a single ligand class and solve for the equilibrium fractionation between ligand-bound and free iron using a standard quadratic form. When `do_two_ligands == .true.`, we assume complexation of iron by a weak and a strong ligand and therefore solve for the equilibrium fractionation between free iron, weakly ligand-bound iron and strongly ligand-bound iron via an iterative root solver.
 
-In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we again solve for the stability constant of a strong ligand but reduce it by a constant 0.5 log<sub>10</sub> units to it to accommodate the effect weak ligands.
+In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we solve for the stability constant of the strong (`ligK(i,j,k)`) and weak ligands (`ligW_K`), but take the concentration-weighted average binding strength to get the bulk ligand binding stregnth.
 
-The stability constant (`ligS_K(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
@@ -991,7 +1036,7 @@ $$
 _where_ <br>
 - $F_{B_{ld}^{Si}}^{bac}$ is the factor increase in dissolution caused by peak bacterial biomass (`bsi_fbac`, [dimenionless]) <br>
 - $K_{B_{ld}^{Si}}^{bac}$ is the half-saturation coefficient for stimulation of silica dissolution in the presence of bacterial biomass (`bsi_kbac`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{bac}^{C}$ is the in situ concentration of bacterial biomass (`biobac1` + `biobac2`, [mmol C m<sup>-1</sup>]) <br>
+- $B_{bac}^{C}$ is the in situ concentration of bacterial biomass (`biobac1` + `biobac2`, [mmol C m<sup>-3</sup>]) <br>
 
 ---
 
