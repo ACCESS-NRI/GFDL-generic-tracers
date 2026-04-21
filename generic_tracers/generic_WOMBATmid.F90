@@ -1551,7 +1551,7 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'tri_lfer', 'Limitation of trichodesmium by light', 'h', 'L', 's', '[0-1]', 'f')
+        'tri_lfer', 'Limitation of trichodesmium by iron', 'h', 'L', 's', '[0-1]', 'f')
     wombat%id_tri_lfer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
