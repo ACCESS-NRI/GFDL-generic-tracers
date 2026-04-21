@@ -158,8 +158,9 @@ module generic_WOMBATlite
   logical :: do_check_n_conserve = .false. ! check that the N fluxes balance in the ecosystem
   logical :: do_check_c_conserve = .false. ! check that the C fluxes balance in the ecosystem
 
-  namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, do_two_ligands, &
-                                    do_burial, do_check_n_conserve, do_check_c_conserve
+  namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, &
+                                    do_two_ligands, do_burial, do_tracer_dicp, do_tracer_dicr, &
+                                    do_check_n_conserve, do_check_c_conserve
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
