@@ -135,6 +135,7 @@ module g_tracer_utils
   !   logical :: flux_wetdep = .false. !Is there a wet deposition?
   !   logical :: flux_drydep = .false. !Is there a dry deposition?
   !   logical :: flux_bottom = .false. !Is there a flux through bottom?
+  !   logical :: flux_virtual = .false. !Is there a virtual flux to be applid to the surface flux?
   !
   !   ! Flux identifiers to be set by aof_set_coupler_flux()
   !   integer :: flux_gas_ind    = -1  
@@ -256,6 +257,7 @@ module g_tracer_utils
      logical :: flux_wetdep = .false. !Is there a wet deposition?
      logical :: flux_drydep = .false. !Is there a dry deposition?
      logical :: flux_bottom = .false. !Is there a flux through bottom?
+     logical :: flux_virtual = .false. !Is there a virtual flux to be applid to the surface flux?
      logical :: has_btm_reservoir = .false. !Is there a flux bottom reservoir?
      logical :: runoff_added_to_stf = .false. ! Has flux in from runoff been added to stf?
 
@@ -724,6 +726,9 @@ contains
   !  <IN NAME="flux_bottom" TYPE="logical">
   !   .true. if there is bottom flux.
   !  </IN>
+  !  <IN NAME="flux_virtual" TYPE="logical">
+  !   .true. to ensure that stf is allocated so that a surface virtual flux can be applied
+  !  </IN>
   !  <IN NAME="btm_reservoir" TYPE="logical">
   !   .true. if there is bottom reservoir.
   !  </IN>
@@ -757,7 +762,8 @@ contains
   subroutine g_tracer_add(node_ptr, package, name, longname, units,  prog, const_init_value,init_value,&
        flux_gas, flux_gas_name, flux_runoff, flux_wetdep, flux_drydep, flux_gas_molwt, flux_gas_param, &
        flux_param, flux_bottom, btm_reservoir, move_vertical, diff_vertical, sink_rate, flux_gas_restart_file, &
-       flux_gas_type,requires_src_info,standard_name,diag_name,diag_field_units,diag_field_scaling_factor,implementation) 
+       flux_gas_type,requires_src_info,standard_name,diag_name,diag_field_units,diag_field_scaling_factor, &
+       implementation, flux_virtual)
 
     type(g_tracer_type), pointer :: node_ptr 
     character(len=*),   intent(in) :: package,name,longname,units
@@ -770,6 +776,7 @@ contains
     logical,            intent(in), optional :: flux_wetdep
     logical,            intent(in), optional :: flux_drydep
     logical,            intent(in), optional :: flux_bottom
+    logical,            intent(in), optional :: flux_virtual
     logical,            intent(in), optional :: btm_reservoir
     logical,            intent(in), optional :: move_vertical
     logical,            intent(in), optional :: diff_vertical
@@ -918,6 +925,8 @@ contains
 
     if(present(flux_bottom))  g_tracer%flux_bottom = flux_bottom
 
+    if(present(flux_virtual))  g_tracer%flux_virtual = flux_virtual
+
     if(present(btm_reservoir)) g_tracer%has_btm_reservoir = btm_reservoir
 
     if(present(move_vertical)) g_tracer%move_vertical = move_vertical
@@ -932,7 +941,9 @@ contains
        g_tracer%requires_src_info = requires_src_info 
     elseif(trim(g_tracer%package_name) .eq. 'generic_cobalt' .or. &
            trim(g_tracer%package_name) .eq. 'generic_abiotic' .or. &
-           trim(g_tracer%package_name) .eq. 'generic_bling') then !Niki: later we can make this just else
+           trim(g_tracer%package_name) .eq. 'generic_bling' .or. &
+           trim(g_tracer%package_name) .eq. 'generic_wombatlite' .or. &
+           trim(g_tracer%package_name) .eq. 'generic_wombatmid') then !Niki: later we can make this just else
        call  g_tracer_add_param('enforce_src_info', g_tracer%requires_src_info ,  .true.) 
     endif
        
@@ -1035,7 +1046,8 @@ contains
     endif
     !Surface flux %stf exists if one of the following fluxes were requested:
 
-    if(g_tracer%flux_gas .or. g_tracer%flux_runoff .or. g_tracer%flux_wetdep .or. g_tracer%flux_drydep) then
+    if(g_tracer%flux_gas .or. g_tracer%flux_runoff .or. g_tracer%flux_wetdep .or. g_tracer%flux_drydep &
+       .or. g_tracer%flux_virtual) then
        allocate(g_tracer%stf(isd:ied,jsd:jed)); g_tracer%stf(:,:) = 0.0 
     endif
     
@@ -1536,7 +1548,8 @@ contains
        !runoff contributes to %stf in GOLD but not in MOM, 
        !so it will be added later in the model-dependent driver code (GOLD_generic_tracer.F90)
 
-       if(g_tracer%flux_gas .or. g_tracer%flux_drydep .or. g_tracer%flux_wetdep .or. g_tracer%flux_runoff ) then
+       if(g_tracer%flux_gas .or. g_tracer%flux_drydep .or. g_tracer%flux_wetdep .or. g_tracer%flux_runoff &
+         .or. g_tracer%flux_virtual) then
           call g_tracer_set_values(g_tracer,g_tracer%name,'stf',stf_array,&
                g_tracer_com%isd,g_tracer_com%jsd, weight)
        endif
@@ -3134,6 +3147,8 @@ contains
     integer :: i, j, k, nz
     logical :: do_diagnostic
 
+    character(len=fm_string_len), parameter :: sub_name = 'g_tracer_vertdiff_G'
+
     !
     !   Save the current state for calculation of the implicit vertical diffusion term
     !
@@ -3168,43 +3183,46 @@ contains
 
           nz=g_tracer_com%grid_kmt(i,j)
 
+          ! Note, sink_rate is ignored when using move_vertical
           if (g_tracer%move_vertical) then
 	    do k=2,nz; sink_dist(k) = (dt*g_tracer%vmove(i,j,k)) * m_to_H; enddo
 	  endif
           sfc_src = 0.0 ; btm_src = 0.0 
 
-          ! Find the sinking rates at all interfaces, limiting them if necesary
-          ! so that the characteristics do not cross within a timestep.
-          !   If a non-constant sinking rate were used, that would be incorprated
-          ! here.
+          ! Sinking of tracer into a sediment reservoir?
           if (_ALLOCATED(g_tracer%btm_reservoir)) then
-             do k=2,nz 
-                sink(k) = sink_dist(k) ; h_minus_dsink(k) = h_old(i,j,k)
-             enddo
-             sink(nz+1) = sink_dist(nz+1) 
+             ! Don't sink negative tracers into sediment
+             if (g_tracer%field(i,j,nz,tau) <= 0.0) then
+               sink(nz+1) = 0.0
+             else
+               sink(nz+1) = sink_dist(nz) !PJB [13th Nov 2024] to allow sinking into bottom reservoir
+             endif
           else
              sink(nz+1) = 0.0 
-             ! Find the limited sinking distance at the interfaces.
-             do k=nz,2,-1
-                if (sink(k+1) >= sink_dist(k)) then
-                   sink(k) = sink_dist(k)
-                   h_minus_dsink(k) = h_old(i,j,k) + (sink(k+1) - sink(k))
-                elseif (sink(k+1) + h_old(i,j,k) < sink_dist(k)) then
-                   sink(k) = sink(k+1) + h_old(i,j,k)
-                   h_minus_dsink(k) = 0.0
-                else
-                   sink(k) = sink_dist(k)
-                   h_minus_dsink(k) = (h_old(i,j,k) + sink(k+1)) - sink(k)
-                endif
-             enddo
           endif
 
-          sink(1) = 0.0 ; h_minus_dsink(1) = (h_old(i,j,1) + sink(2))
+          ! Find the sinking rates at all interfaces, limiting them if necesary
+          ! so that the characteristics do not cross within a timestep.
+          do k=nz,2,-1
+             if (sink(k+1) >= sink_dist(k)) then
+                sink(k) = sink_dist(k)
+                h_minus_dsink(k) = h_old(i,j,k) + (sink(k+1) - sink(k))
+             elseif (sink(k+1) + h_old(i,j,k) < sink_dist(k)) then
+                sink(k) = sink(k+1) + h_old(i,j,k)
+                h_minus_dsink(k) = 0.0
+             else
+                sink(k) = sink_dist(k)
+                h_minus_dsink(k) = (h_old(i,j,k) + sink(k+1)) - sink(k)
+             endif
 
-          !Avoid sinking tracers with negative concentrations
-          do k=2,nz+1
-             if(g_tracer%field(i,j,k-1,tau) <= 0.0) sink(k) = 0.0
+             ! Don't sink negative tracers
+             if (g_tracer%field(i,j,k-1,tau) <= 0.0) then
+               h_minus_dsink(k) = h_minus_dsink(k) + sink(k)
+               sink(k) = 0.0
+             endif
           enddo
+
+          sink(1) = 0.0 ; h_minus_dsink(1) = (h_old(i,j,1) + sink(2))
 
           ! Now solve the tridiagonal equation for the tracer concentrations.
 
@@ -3219,6 +3237,9 @@ contains
           do k=2,nz-1 
              c1(k) = eb(i,j,k-1) * b1
              b_denom_1 = h_minus_dsink(k) + d1 * (ea(i,j,k) + sink(k))
+             if (b_denom_1.le.0.0) then
+               call mpp_error(FATAL, trim(sub_name)//": Diagonal value b_denom_1 must be > 0.0")
+             endif
              b1 = 1.0 / (b_denom_1 + eb(i,j,k))
              d1 = b_denom_1 * b1
 
@@ -3303,10 +3324,11 @@ contains
     
     GOLDtridiag = .true.
     IOWtridiag  = .false.
-    if (g_tracer%move_vertical) then
-       GOLDtridiag = .false.
-       IOWtridiag  = .true.
-    endif
+    ! PJB [1st Dec 2024] Commenting out since GOLDtridiag now works with move_vertical==.true.
+    !if (g_tracer%move_vertical) then
+    !   GOLDtridiag = .false.
+    !   IOWtridiag  = .true.
+    !endif
     
     eps = 1.e-30
 
@@ -3412,6 +3434,11 @@ contains
 		wabsl       = abs(g_tracer%vmove(i,j,k))
 		wposl(i,k)  = fact2*(g_tracer%vmove(i,j,k  ) + wabsl)*g_tracer_com%grid_tmask(i,j,kp1)
 		wnegl(i,k)  = fact2*(g_tracer%vmove(i,j,k  ) - wabsl)*g_tracer_com%grid_tmask(i,j,kp1)
+                if (k.eq.g_tracer_com%grid_kmt(i,j) .and. _ALLOCATED(g_tracer%btm_reservoir)) then  ! PJB [14th Nov 2024]
+                  wnegl(i,k)  = fact2*(g_tracer%vmove(i,j,k  ) - wabsl)*g_tracer_com%grid_tmask(i,j,k)
+                  g_tracer%btm_reservoir(i,j) = g_tracer%btm_reservoir(i,j) - &
+                                                wnegl(i,k)*g_tracer%field(i,j,k,tau)*dh(i,j,k)
+                endif
                 a1(i,k) = dcb(i,j,km1)*factu*g_tracer_com%grid_tmask(i,j,k)  
                 c1(i,k) = dcb(i,j,k)  *factl*g_tracer_com%grid_tmask(i,j,kp1)
                 a(i,k) = -(a1(i,k) - wnegu(i,k))
@@ -3421,12 +3448,14 @@ contains
              enddo
           enddo
 
+          ! Set boundary conditions (zero flow out the top and bottom of the water column)
           do i=g_tracer_com%isc,g_tracer_com%iec
              a1(i,1)  = 0.0
 	     wnegu(i,1) = 0.0; wposu(i,1) = 0.0
 	     a(i,1)  = 0.0
              c1(i,g_tracer_com%nk) = 0.0
-	     wposl(i,g_tracer_com%nk) = 0.0; wnegl(i,g_tracer_com%nk) = 0.0 
+             wposl(i,g_tracer_com%nk) = 0.0
+             if (.not. _ALLOCATED(g_tracer%btm_reservoir)) wnegl(i,g_tracer_com%nk) = 0.0  !PJB [14th Nov 2024]
              c(i,g_tracer_com%nk) = 0.0
              b(i,1)  = 1.0 + a1(i,1) + c1(i,1) - wnegl(i,1) + wposu(i,1)
              b(i,g_tracer_com%nk) = 1.0 + a1(i,g_tracer_com%nk) + c1(i,g_tracer_com%nk) &
@@ -3701,9 +3730,23 @@ contains
                 g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
              case('do14c')
                 g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
+             case('no3')
+                g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
+             case('o2')
+                g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
+             case('adic')
+                g_tracer%src_var_unit_conversion = 1.0 / 1.0e6
              case default
                 write(errorstring, '(a)') trim(g_tracer%name)//' : cannot determine src_var_unit_conversion'
                 call mpp_error(FATAL, trim(sub_name) //': '//  trim(errorstring)) 
+             end select
+          elseif(g_tracer%src_var_unit .eq. 'moles_per_liter') then
+             select case (trim(g_tracer%name))
+             case('fe')
+                g_tracer%src_var_unit_conversion = 1000.0 / 1035.0
+             case default
+                write(errorstring, '(a)') trim(g_tracer%name)//' : cannot determine src_var_unit_conversion'
+                call mpp_error(FATAL, trim(sub_name) //': '//  trim(errorstring))
              end select
           else 
               write(errorstring, '(a)') trim(g_tracer%name)//' : src_var_unit is set in the field_table to '//&

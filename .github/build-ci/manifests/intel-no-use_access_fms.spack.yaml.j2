@@ -1,0 +1,18 @@
+spack:
+  specs:
+  # *_compiler is defined in the .github/build-ci/data/standard.json file
+  - access-generic-tracers@git.{{ ref }} ~use_access_fms
+  packages:
+    fms:
+      require:
+        - '@{{ fms_version }} ~openmp precision=64'
+    intel-oneapi-compilers-classic:
+      require:
+      - '@{{ intel_compiler_version }}'
+    all:
+      require:
+      - '%access_intel'
+      - target=x86_64
+  concretizer:
+    unify: false
+  view: false

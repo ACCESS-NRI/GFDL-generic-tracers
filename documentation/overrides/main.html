@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+  {{ super() }}
+  <!-- Expose mkdocs configuration within the javascript environment -->
+  <script>
+    window.siteUrl = "{{ config.site_url }}";
+  </script>
+{% endblock %}

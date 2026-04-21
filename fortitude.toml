@@ -1,0 +1,20 @@
+[check]
+exclude = [
+  "generic_tracers/FMS_coupler_util.F90",
+  "generic_tracers/FMS_ocmip2_co2calc.F90",
+  "generic_tracers/generic_BLING.F90",
+  "generic_tracers/generic_CFC.F90",
+  "generic_tracers/generic_COBALT.F90",
+  "generic_tracers/generic_ERGOM.F90",
+  "generic_tracers/generic_SF6.F90",
+  "generic_tracers/generic_TOPAZ.F90",
+  "generic_tracers/generic_abiotic.F90",
+  "generic_tracers/generic_age.F90",
+  "generic_tracers/generic_argon.F90",
+  "generic_tracers/generic_blres.F90",
+  "generic_tracers/generic_miniBLING.F90",
+  "generic_tracers/generic_tracer.F90",
+  "generic_tracers/generic_tracer_utils.F90"
+]
+ignore = ["C003"]
+line-length = 132
