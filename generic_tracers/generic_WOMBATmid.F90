@@ -3646,13 +3646,13 @@ module generic_WOMBATmid
         prog = .true.)
 
     if (do_tracer_nosdoc) then
-    ! Nominal oxidation state of dissolved organic carbon
-    !-----------------------------------------------------------------------
-    call g_tracer_add(tracer_list, package_name, &
-        name = 'nosdoc', &
-        longname = 'Nominal oxidation state of dissolved organic carbon', &
-        units = 'none', &
-        prog = .true.)
+      ! Nominal oxidation state of dissolved organic carbon
+      !-----------------------------------------------------------------------
+      call g_tracer_add(tracer_list, package_name, &
+          name = 'nosdoc', &
+          longname = 'Nominal oxidation state of dissolved organic carbon', &
+          units = 'none', &
+          prog = .true.)
     endif
 
     ! Facultative heterotrophic bacteria #1
