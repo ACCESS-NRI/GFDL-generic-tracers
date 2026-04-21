@@ -404,176 +404,176 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 
 ### Parameter set and default values
 
-| Parameter          | Description                                | Value         | Units                                                                |
-| ------------------ | ------------------------------------------ | ------------- | -------------------------------------------------------------------- |
-| `alphabio_phy`     | Initial slope of P–I curve (phytoplankton) | 1.5           | (mg Chl m<sup>-3</sup>)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup> |
-| `abioa_phy`        | Max growth rate parameter a (phyto)        | 0.7/86400.0   | s<sup>-1</sup>                                                       |
-| `bbioa_phy`        | Max growth rate parameter b (phyto)        | 1.055         | dimensionless                                                        |
-| `phyprefnh4`       | NH<sub>4</sub> preference (phyto)          | 5.0           | dimensionless                                                        |
-| `phykn`            | Half-sat N uptake (phyto)                  | 1.0           | mmol N m<sup>-3</sup>                                                |
-| `phykf`            | Half-sat Fe uptake (phyto)                 | 1.0           | µmol Fe m<sup>-3</sup>                                               |
-| `phyminqc`         | Min Chl:C (phyto)                          | 0.008         | mg mg<sup>-1</sup>                                                   |
-| `phymaxqc`         | Max Chl:C (phyto)                          | 0.065         | mg mg<sup>-1</sup>                                                   |
-| `phyoptqf`         | Optimal Fe:C (phyto)                       | 10e-6         | mol mol<sup>-1</sup>                                                 |
-| `phymaxqf`         | Max Fe:C (phyto)                           | 50e-6         | mol mol<sup>-1</sup>                                                 |
-| `phylmor`          | Linear mortality (phyto)                   | 0.001/86400.0 | s<sup>-1</sup>                                                       |
-| `phyqmor`          | Quadratic mortality (phyto)                | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `phybiot`          | Biomass threshold (phyto)                  | 1.0           | mmol C m<sup>-3</sup>                                                |
-| `alphabio_dia`     | Initial slope of P–I curve (diatoms)       | 2.5           | (mg Chl m<sup>-3</sup>)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup> |
-| `abioa_dia`        | Max growth rate parameter a (diatoms)      | 1.0/86400.0   | s<sup>-1</sup>                                                       |
-| `bbioa_dia`        | Max growth rate parameter b (diatoms)      | 1.070         | dimensionless                                                        |
-| `diaprefnh4`       | NH<sub>4</sub> preference (diatoms)        | 5.0           | dimensionless                                                        |
-| `diakn`            | Half-sat N uptake (diatoms)                | 2.4           | mmol N m<sup>-3</sup>                                                |
-| `diakf`            | Half-sat Fe uptake (diatoms)               | 2.7           | µmol Fe m<sup>-3</sup>                                               |
-| `diaks`            | Half-sat Si uptake (diatoms)               | 6.7           | mmol Si m<sup>-3</sup>                                               |
-| `diaminqc`         | Min Chl:C (diatoms)                        | 0.004         | mg mg<sup>-1</sup>                                                   |
-| `diamaxqc`         | Max Chl:C (diatoms)                        | 0.060         | mg mg<sup>-1</sup>                                                   |
-| `diaoptqf`         | Optimal Fe:C (diatoms)                     | 10e-6         | mol mol<sup>-1</sup>                                                 |
-| `diamaxqf`         | Max Fe:C (diatoms)                         | 65e-6         | mol mol<sup>-1</sup>                                                 |
-| `diaminqs`         | Min Si:C                                   | 0.04          | mol mol<sup>-1</sup>                                                 |
-| `diaoptqs`         | Optimal Si:C                               | 0.13          | mol mol<sup>-1</sup>                                                 |
-| `diamaxqs`         | Max Si:C                                   | 0.60          | mol mol<sup>-1</sup>                                                 |
-| `diaVmaxs`         | Max Si uptake                              | 0.1/86400.0   | s<sup>-1</sup>                                                       |
-| `dialmor`          | Linear mortality (diatoms)                 | 0.001/86400.0 | s<sup>-1</sup>                                                       |
-| `diaqmor`          | Quadratic mortality (diatoms)              | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `diabiot`          | Biomass threshold (diatoms)                | 0.5           | mmol C m<sup>-3</sup>                                                |
-| `alphabio_tri`     | Initial slope of P–I curve (trichodesmium) | 1.8           | (mg Chl m<sup>-3</sup>)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup> |
-| `trikf`            | Fe half-sat (trichodesmium)                | 0.125         | µmol Fe m<sup>-3</sup>                                               |
-| `trichlc`          | Chl:C (trichodesmium)                      | 0.01          | mg mg<sup>-1</sup>                                                   |
-| `trin2c`           | N:C (trichodesmium)                        | 50/300        | mol mol<sup>-1</sup>                                                 |
-| `chltau`           | Chlorophyll adjustment timescale           | 86400         | s                                                                    |
-| `overflow`         | Max DOC exudation fraction                 | 0.75          | dimensionless                                                        |
-| `bbioh`            | Heterotrophic growth scaling               | 1.072         | dimensionless                                                        |
-| `zooCingest`       | Zooplankton C ingestion efficiency         | 0.70          | mol mol<sup>-1</sup>                                                 |
-| `zooCassim`        | Zooplankton C assimilation efficiency      | 0.40          | mol mol<sup>-1</sup>                                                 |
-| `zooFeingest`      | Zooplankton Fe ingestion efficiency        | 0.06          | mol mol<sup>-1</sup>                                                 |
-| `zooFeassim`       | Zooplankton Fe assimilation efficiency     | 0.60          | mol mol<sup>-1</sup>                                                 |
-| `zooexcrdom`       | Zooplankton excretion to DOM               | 0.70          | dimensionless                                                        |
-| `zookz`            | Mortality half-saturation                  | 0.25          | mmol C m<sup>-3</sup>                                                |
-| `zoogmax`          | Max grazing rate                           | 3.3/86400.0   | s<sup>-1</sup>                                                       |
-| `zooepsbac1`       | Prey capture (bac1)                        | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `zooepsbac2`       | Prey capture (bac2)                        | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `zooepsaoa`        | Prey capture (AOA)                         | 0.25/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `zooepsphy`        | Prey capture (phyto)                       | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `zooepsdia`        | Prey capture (diatoms)                     | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `zooepsdet`        | Prey capture (detritus)                    | 0.25/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `zprefbac1`        | Preference (bac1)                          | 0.25          | dimensionless                                                        |
-| `zprefbac2`        | Preference (bac2)                          | 0.25          | dimensionless                                                        |
-| `zprefaoa`         | Preference (AOA)                           | 0.40          | dimensionless                                                        |
-| `zprefphy`         | Preference (phyto)                         | 1.0           | dimensionless                                                        |
-| `zprefdia`         | Preference (diatoms)                       | 0.25          | dimensionless                                                        |
-| `zprefdet`         | Preference (detritus)                      | 0.80          | dimensionless                                                        |
-| `zoolmor`          | Zooplankton respiration                    | 0.002/86400.0 | s<sup>-1</sup>                                                       |
-| `zooqmor`          | Quadratic mortality (zoo)                  | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `zoopreyswitch`    | Prey switching exponent                    | 1.8           | dimensionless                                                        |
-| `mesCingest`       | Mesozooplankton C ingestion                | 0.75          | mol mol<sup>-1</sup>                                                 |
-| `mesCassim`        | Mesozooplankton C assimilation             | 0.30          | mol mol<sup>-1</sup>                                                 |
-| `mesFeingest`      | Mesozooplankton Fe ingestion               | 0.43          | mol mol<sup>-1</sup>                                                 |
-| `mesFeassim`       | Mesozooplankton Fe assimilation            | 0.75          | mol mol<sup>-1</sup>                                                 |
-| `mesexcrdom`       | Mesozooplankton excretion to DOM           | 0.35          | dimensionless                                                        |
-| `meskz`            | Mortality half-sat (meso)                  | 0.30          | mmol C m<sup>-3</sup>                                                |
-| `mesgmax`          | Max grazing (meso)                         | 0.30/86400.0  | s<sup>-1</sup>                                                       |
-| `mesepsbac1`       | Prey capture bac1 (meso)                   | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsbac2`       | Prey capture bac2 (meso)                   | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsaoa`        | Prey capture AOA (meso)                    | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsphy`        | Prey capture phy (meso)                    | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsdia`        | Prey capture dia (meso)                    | 0.20/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsdet`        | Prey capture det (meso)                    | 0.05/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsbdet`       | Prey capture big det                       | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepszoo`        | Prey capture zoo (meso)                    | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mprefbac1`        | Preference bac1 (meso)                     | 0.25          | dimensionless                                                        |
-| `mprefbac2`        | Preference bac2 (meso)                     | 0.25          | dimensionless                                                        |
-| `mprefaoa`         | Preference AOA (meso)                      | 0.4           | dimensionless                                                        |
-| `mprefphy`         | Preference phy (meso)                      | 0.1           | dimensionless                                                        |
-| `mprefdia`         | Preference dia (meso)                      | 0.85          | dimensionless                                                        |
-| `mprefdet`         | Preference det (meso)                      | 0.80          | dimensionless                                                        |
-| `mprefbdet`        | Preference big det (meso)                  | 0.80          | dimensionless                                                        |
-| `mprefzoo`         | Preference zoo (meso)                      | 0.85          | dimensionless                                                        |
-| `meslmor`          | Meso respiration                           | 0.002/86400.0 | s<sup>-1</sup>                                                       |
-| `mesqmor`          | Quadratic mortality (meso)                 | 0.75/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `mespreyswitch`    | Prey switching exponent (meso)             | 1.8           | dimensionless                                                        |
-| `detlrem`          | Detritus remineralisation                  | 0.7/86400.0   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `detlrem_sed`      | Sediment remineralisation                  | 0.005/86400.0 | s<sup>-1</sup>                                                       |
-| `detphi`           | Porosity (small detritus)                  | 0.25          | dimensionless                                                        |
-| `bdetphi`          | Porosity (large detritus)                  | 0.75          | dimensionless                                                        |
-| `detrho`           | Detritus density                           | 1375          | kg m<sup>-3</sup>                                                    |
-| `caco3rho`         | CaCO3 density                              | 2710          | kg m<sup>-3</sup>                                                    |
-| `bsirho`           | Opal density                               | 2000          | kg m<sup>-3</sup>                                                    |
-| `phyrad0`          | Nano radius                                | 10            | µm                                                                   |
-| `diarad0`          | Microphyto radius                          | 50            | µm                                                                   |
-| `zoorad0`          | Microzoo radius                            | 30            | µm                                                                   |
-| `mesrad0`          | Meso radius                                | 1000          | µm                                                                   |
-| `caco3lrem`        | CaCO<sub>3</sub> remineralisation          | 0.01/86400.0  | s<sup>-1</sup>                                                       |
-| `caco3lrem_sed`    | Sediment CaCO<sub>3</sub> remin            | 0.01/86400.0  | s<sup>-1</sup>                                                       |
-| `f_inorg`          | Inorganic fraction                         | 0.04          | dimensionless                                                        |
-| `disscal`          | Calcite dissolution                        | 0.10/86400.0  | s<sup>-1</sup>                                                       |
-| `dissara`          | Aragonite dissolution                      | 0.10/86400.0  | s<sup>-1</sup>                                                       |
-| `dissdet`          | Dissolution from remin                     | 0.20          | mol mol<sup>-1</sup>                                                 |
-| `fgutdiss`         | Gut dissolution efficiency                 | 0.80          | dimensionless                                                        |
-| `ligW`             | Weak ligand                                | 1.7           | µmol m<sup>-3</sup>                                                  |
-| `ligS`             | Strong ligand                              | 0.4           | µmol m<sup>-3</sup>                                                  |
-| `dfefloor`         | Fe floor                                   | 0.05          | µmol m<sup>-3</sup>                                                  |
-| `kscav_dfe`        | Fe scavenging                              | 0.01/86400.0  | (mmol m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                    |
-| `kcoag_dfe`        | Fe coagulation                             | 1e-6/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `kagg_col`         | Fe aggregation                             | 0.1/86400.0   | s<sup>-1</sup>                                                       |
-| `kagg_kcol`        | Half-sat aggregation                       | 2.0           | µmol m<sup>-3</sup>                                                  |
-| `kafe_dfe`         | Fe dissolution (small)                     | 1e-4/86400    | s<sup>-1</sup>                                                       |
-| `kbafe_dfe`        | Fe dissolution (large)                     | 1e-4/86400    | s<sup>-1</sup>                                                       |
-| `wafe`             | Fe sinking (small)                         | 0.5/86400     | m s<sup>-1</sup>                                                     |
-| `wbafe`            | Fe sinking (large)                         | 5.0/86400     | m s<sup>-1</sup>                                                     |
-| `bsi_fbac`         | Bacterial enhancement                      | 20            | dimensionless                                                        |
-| `bsi_kbac`         | Half-sat enhancement                       | 0.5           | mmol C m<sup>-3</sup>                                                |
-| `bsilrem_sed`      | Sediment Si dissolution                    | 2.8e-8        | s<sup>-1</sup>                                                       |
-| `aoa_knh4`         | AOA NH<sub>4</sub> half-sat                | 0.1           | mmol N m<sup>-3</sup>                                                |
-| `aoa_poxy`         | O<sub>2</sub> uptake limit                 | 275/86400     | m<sup>3</sup> mmol<sup>-1</sup> s<sup>-1</sup>                       |
-| `aoa_ynh4`         | NH<sub>4</sub> yield                       | 11            | mol mol<sup>-1</sup>                                                 |
-| `aoa_yoxy`         | O<sub>2</sub> yield                        | 15.5          | mol mol<sup>-1</sup>                                                 |
-| `aoa_en2omin`      | Min N<sub>2</sub>O yield                   | 0.0008        | mol mol<sup>-1</sup>                                                 |
-| `aoa_C2N`          | C:N                                        | 5             | mol mol<sup>-1</sup>                                                 |
-| `aoa_C2Fe`         | C:Fe                                       | 1/(20e-6)     | mol mol<sup>-1</sup>                                                 |
-| `aoalmor`          | AOA linear mortality                       | 0.005/86400   | s<sup>-1</sup>                                                       |
-| `aoaqmor`          | AOA quadratic mortality                    | 0.001/86400   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `bacanapen`        | Anaerobic penalty                          | 0.9           | dimensionless                                                        |
-| `bac_ydonmin`      | Min yield                                  | 0.15          | mol mol<sup>-1</sup>                                                 |
-| `bac_ydonmax`      | Max yield                                  | 0.65          | mol mol<sup>-1</sup>                                                 |
-| `bac1_Vmax_doc`    | DOC uptake max                             | 6.7/86400     | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac1_Vmax_don`    | DON uptake max                             | 1.0/86400     | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac1_Vmax_nh4`    | NH<sub>4</sub> uptake max                  | 1.0/86400     | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac1_Vmax_no3`    | NO<sub>3</sub> uptake max                  | 7.2/86400     | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac1_Vmax_dFe`    | Fe uptake max                              | 0.0001/86400  | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac1_poxy`        | O<sub>2</sub> limit                        | 450/86400     | m<sup>3</sup> mmol<sup>-1</sup> s<sup>-1</sup>                       |
-| `bac1_kno3`        | NO<sub>3</sub> half-sat                    | 15            | mmol N m<sup>-3</sup>                                                |
-| `bac1_kdoc`        | DOC half-sat                               | 60            | mmol m<sup>-3</sup>                                                  |
-| `bac1_kdon`        | DON half-sat                               | 5             | mmol m<sup>-3</sup>                                                  |
-| `bac1_knh4`        | NH<sub>4</sub> half-sat                    | 0.1           | mmol N m<sup>-3</sup>                                                |
-| `bac1_kfer`        | Fe half-sat                                | 0.35          | µmol m<sup>-3</sup>                                                  |
-| `bac1_C2N`         | C:N                                        | 5             | mol mol<sup>-1</sup>                                                 |
-| `bac1_C2Fe`        | C:Fe                                       | 1/(40e-6)     | mol mol<sup>-1</sup>                                                 |
-| `bac1lmor`         | Linear mortality (bac1)                    | 0.005/86400   | s<sup>-1</sup>                                                       |
-| `bac1qmor`         | Quadratic mortality (bac1)                 | 0.05/86400    | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `bac2_Vmax_doc`    | DOC uptake max                             | 6.7/86400     | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac2_Vmax_don`    | DON uptake max                             | 1.0/86400     | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac2_Vmax_nh4`    | NH<sub>4</sub> uptake max                  | 1.0/86400     | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac2_Vmax_dFe`    | Fe uptake max                              | 0.0001/86400  | mmol m<sup>-3</sup> s<sup>-1</sup>                                   |
-| `bac2_poxy`        | O<sub>2</sub> limit                        | 450/86400     | m<sup>3</sup> mmol<sup>-1</sup> s<sup>-1</sup>                       |
-| `bac2_pn2o`        | N<sub>2</sub>O limit                       | 452/86400     | m<sup>3</sup> mmol<sup>-1</sup> s<sup>-1</sup>                       |
-| `bac2_kdoc`        | DOC half-sat                               | 60            | mmol m<sup>-3</sup>                                                  |
-| `bac2_kdon`        | DON half-sat                               | 5             | mmol m<sup>-3</sup>                                                  |
-| `bac2_knh4`        | NH<sub>4</sub> half-sat                    | 0.1           | mmol N m<sup>-3</sup>                                                |
-| `bac2_kfer`        | Fe half-sat                                | 0.35          | µmol m<sup>-3</sup>                                                  |
-| `bac2_C2N`         | C:N                                        | 5             | mol mol<sup>-1</sup>                                                 |
-| `bac2_C2Fe`        | C:Fe                                       | 1/(40e-6)     | mol mol<sup>-1</sup>                                                 |
-| `bac2lmor`         | Linear mortality (bac2)                    | 0.005/86400   | s<sup>-1</sup>                                                       |
-| `bac2qmor`         | Quadratic mortality (bac2)                 | 0.05/86400    | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `aoxkn`            | Anammox NH<sub>4</sub> half-sat            | 0.5           | mmol N m<sup>-3</sup>                                                |
-| `aoxmumax`         | Anammox max growth                         | 0.0025/86400  | s<sup>-1</sup>                                                       |
-| `noscphyover`      | NOSC phy overflow                          | 1.0 - 0.0     | dimensionless                                                        |
-| `nosczooexcr`      | NOSC zoo excretion                         | 1.0 - 0.20    | dimensionless                                                        |
-| `noscphylyse`      | NOSC phy lysis                             | 1.0 - 0.35    | dimensionless                                                        |
-| `noscbaclyse`      | NOSC bacterial lysis                       | 1.0 - 0.03    | dimensionless                                                        |
-| `noscdethydr`      | NOSC detritus hydrolysis                   | 1.0 - 0.40    | dimensionless                                                        |
-| `noscdocproc`      | NOSC consumption offset                    | 0.9           | dimensionless                                                        |
-| `bottom_thickness` | Bottom layer thickness                     | 1.0           | m                                                                    |
+| Parameter          | Description                                                                 | Value         | Units                                                                |
+| ------------------ | --------------------------------------------------------------------------- | ------------- | -------------------------------------------------------------------- |
+| `alphabio_phy`     | Initial slope of P–I curve (nano-phytoplankton)                             | 1.5           | mol C (mol Chl)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>         |
+| `abioa_phy`        | Max growth rate parameter a (nano-phytoplankton)                            | 0.7/86400.0   | s<sup>-1</sup>                                                       |
+| `bbioa_phy`        | Max growth rate parameter b (nano-phytoplankton) (Q10 = b^(10))             | 1.055         | dimensionless                                                        |
+| `phyprefnh4`       | NH<sub>4</sub> preference over NO<sub>3</sub> (nano-phytoplankton)          | 5.0           | dimensionless                                                        |
+| `phykn`            | Half-saturation coefficient N uptake (nano-phytoplankton)                   | 1.0           | mmol N m<sup>-3</sup>                                                |
+| `phykf`            | Half-saturation coefficient Fe uptake (nano-phytoplankton)                  | 1.0           | µmol Fe m<sup>-3</sup>                                               |
+| `phyminqc`         | Min Chl:C (nano-phytoplankton)                                              | 0.008         | mol Chl (mol C)<sup>-1</sup>                                         |
+| `phymaxqc`         | Max Chl:C (nano-phytoplankton)                                              | 0.065         | mol Chl (mol C)<sup>-1</sup>                                         |
+| `phyoptqf`         | Optimal Fe:C (nano-phytoplankton)                                           | 10e-6         | mol Fe (mol C)<sup>-1</sup>                                          |
+| `phymaxqf`         | Max Fe:C (nano-phytoplankton)                                               | 50e-6         | mol Fe (mol C)<sup>-1</sup>                                          |
+| `phylmor`          | Linear mortality rate (nano-phytoplankton)                                  | 0.001/86400.0 | s<sup>-1</sup>                                                       |
+| `phyqmor`          | Quadratic mortality rate (nano-phytoplankton)                               | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `phybiot`          | Biomass threshold (nano-phytoplankton)                                      | 1.0           | mmol C m<sup>-3</sup>                                                |
+| `alphabio_dia`     | Initial slope of P–I curve (micro-phytoplankton)                            | 2.5           | mol C (mol Chl)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>         |
+| `abioa_dia`        | Max growth rate parameter a (micro-phytoplankton)                           | 1.0/86400.0   | s<sup>-1</sup>                                                       |
+| `bbioa_dia`        | Max growth rate parameter b (micro-phytoplankton) (Q10 = b^(10))            | 1.070         | dimensionless                                                        |
+| `diaprefnh4`       | NH<sub>4</sub> preference over NO<sub>3</sub> (micro-phytoplankton)         | 5.0           | dimensionless                                                        |
+| `diakn`            | Half-saturation coefficient N uptake (micro-phytoplankton)                  | 2.4           | mmol N m<sup>-3</sup>                                                |
+| `diakf`            | Half-saturation coefficient Fe uptake (micro-phytoplankton)                 | 2.7           | µmol Fe m<sup>-3</sup>                                               |
+| `diaks`            | Half-saturation coefficient Si uptake (micro-phytoplankton)                 | 6.7           | mmol Si m<sup>-3</sup>                                               |
+| `diaminqc`         | Min Chl:C (micro-phytoplankton)                                             | 0.004         | mol Chl (mol C)<sup>-1</sup>                                         |
+| `diamaxqc`         | Max Chl:C (micro-phytoplankton)                                             | 0.060         | mol Chl (mol C)<sup>-1</sup>                                         |
+| `diaoptqf`         | Optimal Fe:C (micro-phytoplankton)                                          | 10e-6         | mol Fe (mol C)<sup>-1</sup>                                          |
+| `diamaxqf`         | Max Fe:C (micro-phytoplankton)                                              | 65e-6         | mol Fe (mol C)<sup>-1</sup>                                          |
+| `diaminqs`         | Min Si:C (micro-phytoplankton)                                              | 0.04          | mol Si (mol C)<sup>-1</sup>                                          |
+| `diaoptqs`         | Optimal Si:C (micro-phytoplankton)                                          | 0.13          | mol Si (mol C)<sup>-1</sup>                                          |
+| `diamaxqs`         | Max Si:C (micro-phytoplankton)                                              | 0.60          | mol Si (mol C)<sup>-1</sup>                                          |
+| `diaVmaxs`         | Max Si uptake (micro-phytoplankton)                                         | 0.1/86400.0   | mol Si (mol C)<sup>-1</sup> s<sup>-1</sup>                           |
+| `dialmor`          | Linear mortality rate (micro-phytoplankton)                                 | 0.001/86400.0 | s<sup>-1</sup>                                                       |
+| `diaqmor`          | Quadratic mortality rate (micro-phytoplankton)                              | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `diabiot`          | Biomass threshold (micro-phytoplankton)                                     | 0.5           | mmol C m<sup>-3</sup>                                                |
+| `alphabio_tri`     | Initial slope of P–I curve (trichodesmium)                                  | 1.8           | mol C (mol Chl)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>         |
+| `trikf`            | Fe half-saturation coefficient (trichodesmium)                              | 0.125         | µmol Fe m<sup>-3</sup>                                               |
+| `trichlc`          | Chl:C (trichodesmium)                                                       | 0.01          | mol Chl (mol C)<sup>-1</sup>                                         |
+| `trin2c`           | N:C (trichodesmium)                                                         | 50/300        | mol N (mol C)<sup>-1</sup>                                           |
+| `chltau`           | Chlorophyll adjustment timescale                                            | 86400         | s                                                                    |
+| `overflow`         | Max DOC exudation fraction by phytoplankton                                 | 0.75          | dimensionless                                                        |
+| `bbioh`            | Heterotrophic growth scaling parameter b (Q10 = b^(10))                     | 1.072         | dimensionless                                                        |
+| `zooCingest`       | Micro-zooplankton C ingestion efficiency                                    | 0.70          | mol C (mol C)<sup>-1</sup>                                           |
+| `zooCassim`        | Micro-zooplankton C assimilation efficiency                                 | 0.40          | mol C (mol C)<sup>-1</sup>                                           |
+| `zooFeingest`      | Micro-zooplankton Fe ingestion efficiency                                   | 0.06          | mol Fe (mol Fe)<sup>-1</sup>                                         |
+| `zooFeassim`       | Micro-zooplankton Fe assimilation efficiency                                | 0.60          | mol Fe (mol Fe)<sup>-1</sup>                                         |
+| `zooexcrdom`       | Micro-zooplankton excretion fraction routed to DOM                          | 0.70          | dimensionless                                                        |
+| `zookz`            | Micro-zooplankton mortality half-saturation coefficient                     | 0.25          | mmol C m<sup>-3</sup>                                                |
+| `zoogmax`          | Micro-zooplankton max grazing rate                                          | 3.3/86400.0   | s<sup>-1</sup>                                                       |
+| `zooepsbac1`       | Micro-zooplankton prey capture efficiency (bac1)                            | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepsbac2`       | Micro-zooplankton prey capture efficiency (bac2)                            | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepsaoa`        | Micro-zooplankton prey capture efficiency (AOA)                             | 0.25/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepsphy`        | Micro-zooplankton prey capture efficiency (nano-phytoplankton)              | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepsdia`        | Micro-zooplankton prey capture efficiency (micro-phytoplankton)             | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepsdet`        | Micro-zooplankton prey capture efficiency (small detritus)                  | 0.25/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zprefbac1`        | Micro-zooplankton preference (bac1)                                         | 0.25          | dimensionless                                                        |
+| `zprefbac2`        | Micro-zooplankton preference (bac2)                                         | 0.25          | dimensionless                                                        |
+| `zprefaoa`         | Micro-zooplankton preference (AOA)                                          | 0.40          | dimensionless                                                        |
+| `zprefphy`         | Micro-zooplankton preference (nano-phytoplankton)                           | 1.0           | dimensionless                                                        |
+| `zprefdia`         | Micro-zooplankton preference (micro-phytoplankton)                          | 0.25          | dimensionless                                                        |
+| `zprefdet`         | Micro-zooplankton preference (small detritus)                               | 0.80          | dimensionless                                                        |
+| `zoolmor`          | Micro-zooplankton linear mortality rate                                     | 0.002/86400.0 | s<sup>-1</sup>                                                       |
+| `zooqmor`          | Micro-zooplankton quadratic mortality rate                                  | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `zoopreyswitch`    | Micro-zooplankton prey switching exponent                                   | 1.8           | dimensionless                                                        |
+| `mesCingest`       | Meso-zooplankton C ingestion                                                | 0.75          | mol C (mol C)<sup>-1</sup>                                           |
+| `mesCassim`        | Meso-zooplankton C assimilation                                             | 0.30          | mol C (mol C)<sup>-1</sup>                                           |
+| `mesFeingest`      | Meso-zooplankton Fe ingestion                                               | 0.43          | mol Fe (mol Fe)<sup>-1</sup>                                         |
+| `mesFeassim`       | Meso-zooplankton Fe assimilation                                            | 0.75          | mol Fe (mol Fe)<sup>-1</sup>                                         |
+| `mesexcrdom`       | Meso-zooplankton excretion fraction routed to DOM                           | 0.35          | dimensionless                                                        |
+| `meskz`            | Meso-zooplankton mortality half-saturation coefficient                      | 0.30          | mmol C m<sup>-3</sup>                                                |
+| `mesgmax`          | Meso-zooplankton maximum grazing rate                                       | 0.30/86400.0  | s<sup>-1</sup>                                                       |
+| `mesepsbac1`       | Meso-zooplankton prey capture efficiency (bac1)                             | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsbac2`       | Meso-zooplankton prey capture efficiency (bac2)                             | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsaoa`        | Meso-zooplankton prey capture efficiency (AOA)                              | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsphy`        | Meso-zooplankton prey capture efficiency (nano-phytoplankton)               | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsdia`        | Meso-zooplankton prey capture efficiency (micro-phytoplankton)              | 0.20/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsdet`        | Meso-zooplankton prey capture efficiency (small detritus)                   | 0.05/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsbdet`       | Meso-zooplankton prey capture efficiency (large detritus)                   | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepszoo`        | Meso-zooplankton prey capture efficiency (micro-zooplankton)                | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mprefbac1`        | Meso-zooplankton preference (bac1)                                          | 0.25          | dimensionless                                                        |
+| `mprefbac2`        | Meso-zooplankton preference (bac2)                                          | 0.25          | dimensionless                                                        |
+| `mprefaoa`         | Meso-zooplankton preference (AOA)                                           | 0.4           | dimensionless                                                        |
+| `mprefphy`         | Meso-zooplankton preference (nano-phytoplankton)                            | 0.1           | dimensionless                                                        |
+| `mprefdia`         | Meso-zooplankton preference (micro-phytoplankton)                           | 0.85          | dimensionless                                                        |
+| `mprefdet`         | Meso-zooplankton preference (small detritus)                                | 0.80          | dimensionless                                                        |
+| `mprefbdet`        | Meso-zooplankton preference (large detritus)                                | 0.80          | dimensionless                                                        |
+| `mprefzoo`         | Meso-zooplankton preference (micro-zooplankton)                             | 0.85          | dimensionless                                                        |
+| `meslmor`          | Meso-zooplankton linear mortality rate                                      | 0.002/86400.0 | s<sup>-1</sup>                                                       |
+| `mesqmor`          | Meso-zooplankton quadratic mortality rate                                   | 0.75/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `mespreyswitch`    | Meso-zooplankton prey switching exponent                                    | 1.8           | dimensionless                                                        |
+| `detlrem`          | Detritus hydrolysation rate                                                 | 0.7/86400.0   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `detlrem_sed`      | Sediment detritus hydrolysation rate                                        | 0.005/86400.0 | s<sup>-1</sup>                                                       |
+| `detphi`           | Porosity (small detritus)                                                   | 0.25          | dimensionless                                                        |
+| `bdetphi`          | Porosity (large detritus)                                                   | 0.75          | dimensionless                                                        |
+| `detrho`           | Detritus density                                                            | 1375          | kg m<sup>-3</sup>                                                    |
+| `caco3rho`         | CaCO3 density                                                               | 2710          | kg m<sup>-3</sup>                                                    |
+| `bsirho`           | Opal density                                                                | 2000          | kg m<sup>-3</sup>                                                    |
+| `phyrad0`          | Nano-phytoplankton mean radius                                              | 10            | µm                                                                   |
+| `diarad0`          | Micro-phytoplankton mean radius                                             | 50            | µm                                                                   |
+| `zoorad0`          | Micro-zooplankton mean radius                                               | 30            | µm                                                                   |
+| `mesrad0`          | Meso-zooplankton mean radius                                                | 1000          | µm                                                                   |
+| `caco3lrem`        | CaCO<sub>3</sub> dissolution rate                                           | 0.01/86400.0  | s<sup>-1</sup>                                                       |
+| `caco3lrem_sed`    | Sediment CaCO<sub>3</sub> dissolution rate                                  | 0.01/86400.0  | s<sup>-1</sup>                                                       |
+| `f_inorg`          | Base inorganic fraction (PIC:POC ratio)                                     | 0.04          | mol CaCO3 (mol C)<sup>-1</sup>                                       |
+| `disscal`          | Calcite dissolution rate                                                    | 0.10/86400.0  | s<sup>-1</sup>                                                       |
+| `dissara`          | Aragonite dissolution rate                                                  | 0.10/86400.0  | s<sup>-1</sup>                                                       |
+| `dissdet`          | Fraction CaCO3 dissolved per detritus hydrolyzed                            | 0.20          | mol CaCO3 (mol C)<sup>-1</sup>                                       |
+| `fgutdiss`         | Zooplankton gut CaCO3 dissolution efficiency                                | 0.80          | dimensionless                                                        |
+| `ligW`             | Weak ligand concentration                                                   | 1.7           | µmol m<sup>-3</sup>                                                  |
+| `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
+| `dfefloor`         | Minimum open water concentration of dissolved iron (detection limit)        | 0.025         | µmol Fe m<sup>-3</sup>                                               |
+| `kscav_dfe`        | Free dissolved iron scavenging rate                                         | 0.01/86400.0  | (mmol mass of particle m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>   |
+| `kcoag_dfe`        | Colloidal dissolved iron coagulation rate                                   | 1e-6/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `kagg_col`         | Colloidal dissolved iron aggregation rate                                   | 0.1/86400.0   | s<sup>-1</sup>                                                       |
+| `kagg_kcol`        | Half-saturation coefficient for colloidal iron aggregation                  | 2.0           | µmol Fe m<sup>-3</sup>                                               |
+| `kafe_dfe`         | Authigenic iron dissolution rate (small)                                    | 1e-4/86400    | s<sup>-1</sup>                                                       |
+| `kbafe_dfe`        | Authigenic iron dissolution rate (large)                                    | 1e-4/86400    | s<sup>-1</sup>                                                       |
+| `wafe`             | Authigenic iron sinking rate (small)                                        | 0.5/86400     | m s<sup>-1</sup>                                                     |
+| `wbafe`            | Authigenic iron sinking rate (large)                                        | 5.0/86400     | m s<sup>-1</sup>                                                     |
+| `bsi_fbac`         | Bacterial enhancement factor for silica dissolution                         | 20            | dimensionless                                                        |
+| `bsi_kbac`         | Half-saturation coefficient for bacterial enhancement of silica dissolution | 0.5           | mmol C m<sup>-3</sup>                                                |
+| `bsilrem_sed`      | Base sediment biogenic silica dissolution rate                              | 2.8e-8        | s<sup>-1</sup>                                                       |
+| `aoa_knh4`         | AOA NH<sub>4</sub> half-saturation coefficient                              | 0.1           | mmol N m<sup>-3</sup>                                                |
+| `aoa_poxy`         | AOA O<sub>2</sub> diffusive uptake limit                                    | 275/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
+| `aoa_ynh4`         | AOA NH<sub>4</sub> growth requirement                                       | 11            | mol NH<sub>4</sub> (mol C biomass)<sup>-1</sup>                      |
+| `aoa_yoxy`         | AOA O<sub>2</sub> growth requirement                                        | 15.5          | mol O2 (mol C biomass)<sup>-1</sup>                                  |
+| `aoa_en2omin`      | AOA minimum N<sub>2</sub>O yield per mol NH<sub>4</sub>                     | 0.0008        | mol N<sub>2</sub>O (mol NH<sub>4</sub>)<sup>-1</sup>                 |
+| `aoa_C2N`          | AOA C:N ratio                                                               | 5             | mol C (mol N)<sup>-1</sup>                                           |
+| `aoa_C2Fe`         | AOA C:Fe ratio                                                              | 1/(20e-6)     | mol C (mol Fe)<sup>-1</sup>                                          |
+| `aoalmor`          | AOA linear mortality rate                                                   | 0.005/86400   | s<sup>-1</sup>                                                       |
+| `aoaqmor`          | AOA quadratic mortality rate                                                | 0.001/86400   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `bacanapen`        | Anaerobic penalty for heterotrophic bacteria                                | 0.9           | dimensionless                                                        |
+| `bac_ydonmin`      | Minimum bacterial biomass yield (N units)                                   | 0.15          | mol N biomass (mol N)<sup>-1</sup>                                   |
+| `bac_ydonmax`      | Maximum bacterial biomass yield (N units)                                   | 0.65          | mol N biomass (mol N)<sup>-1</sup>                                   |
+| `bac1_Vmax_doc`    | Bacteria type #1 DOC uptake maximum                                         | 6.7/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                                 |
+| `bac1_Vmax_don`    | Bacteria type #1 DON uptake maximum                                         | 1.0/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                                 |
+| `bac1_Vmax_nh4`    | Bacteria type #1 NH<sub>4</sub> uptake maximum                              | 1.0/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                                 |
+| `bac1_Vmax_no3`    | Bacteria type #1 NO<sub>3</sub> uptake maximum                              | 7.2/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                                 |
+| `bac1_Vmax_dFe`    | Bacteria type #1 dFe uptake maximum                                         | 0.1/86400     | µmol Fe m<sup>-3</sup> s<sup>-1</sup>                                |
+| `bac1_poxy`        | Bacteria type #1 O<sub>2</sub> diffusive uptake limit                       | 450/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
+| `bac1_kno3`        | Bacteria type #1 NO<sub>3</sub> half-saturation coefficient                 | 15            | mmol N m<sup>-3</sup>                                                |
+| `bac1_kdoc`        | Bacteria type #1 DOC half-saturation coefficient                            | 60            | mmol C m<sup>-3</sup>                                                |
+| `bac1_kdon`        | Bacteria type #1 DON half-saturation coefficient                            | 5             | mmol N m<sup>-3</sup>                                                |
+| `bac1_knh4`        | Bacteria type #1 NH<sub>4</sub> half-saturation coefficient                 | 0.1           | mmol N N m<sup>-3</sup>                                              |
+| `bac1_kfer`        | Bacteria type #1 dFe half-saturation coefficient                            | 0.35          | µmol Fe m<sup>-3</sup>                                               |
+| `bac1_C2N`         | Bacteria type #1 C:N                                                        | 5             | mol C (mol N)<sup>-1</sup>                                           |
+| `bac1_C2Fe`        | Bacteria type #1 C:Fe                                                       | 1/(40e-6)     | mol C (mol Fe)<sup>-1</sup>                                          |
+| `bac1lmor`         | Bacteria type #1 linear mortality rate                                      | 0.005/86400   | s<sup>-1</sup>                                                       |
+| `bac1qmor`         | Bacteria type #1 quadratic mortality rate                                   | 0.05/86400    | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `bac2_Vmax_doc`    | Bacteria type #2 DOC uptake maximum                                         | 6.7/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                                 |
+| `bac2_Vmax_don`    | Bacteria type #2 DON uptake maximum                                         | 1.0/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                                 |
+| `bac2_Vmax_nh4`    | Bacteria type #2 NH<sub>4</sub> uptake maximum                              | 1.0/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                                 |
+| `bac2_Vmax_dFe`    | Bacteria type #2 dFe uptake maximum                                         | 0.1/86400     | µmol Fe m<sup>-3</sup> s<sup>-1</sup>                                |
+| `bac2_poxy`        | Bacteria type #2 O<sub>2</sub> diffusive uptake limit                       | 450/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
+| `bac2_pn2o`        | Bacteria type #2 N<sub>2</sub>O diffusive uptake limit                      | 452/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
+| `bac2_kdoc`        | Bacteria type #2 DOC half-saturation coefficient                            | 60            | mmol C m<sup>-3</sup>                                                |
+| `bac2_kdon`        | Bacteria type #2 DON half-saturation coefficient                            | 5             | mmol N m<sup>-3</sup>                                                |
+| `bac2_knh4`        | Bacteria type #2 NH<sub>4</sub> half-saturation coefficient                 | 0.1           | mmol N m<sup>-3</sup>                                                |
+| `bac2_kfer`        | Bacteria type #2 dFe half-saturation coefficient                            | 0.35          | µmol Fe m<sup>-3</sup>                                               |
+| `bac2_C2N`         | Bacteria type #2 C:N                                                        | 5             | mol C (mol N)<sup>-1</sup>                                           |
+| `bac2_C2Fe`        | Bacteria type #2 C:Fe                                                       | 1/(40e-6)     | mol C (mol Fe)<sup>-1</sup>                                          |
+| `bac2lmor`         | Bacteria type #2 linear mortality rate                                      | 0.005/86400   | s<sup>-1</sup>                                                       |
+| `bac2qmor`         | Bacteria type #2 quadratic mortality rate                                   | 0.05/86400    | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `aoxkn`            | Anammox NH<sub>4</sub> half-saturation coefficient                          | 0.5           | mmol N m<sup>-3</sup>                                                |
+| `aoxmumax`         | Anammox maximum growth rate                                                 | 0.0025/86400  | s<sup>-1</sup>                                                       |
+| `noscphyover`      | NOSC value of phytoplankton overflow production                             | 1.0 - 0.0     | dimensionless                                                        |
+| `nosczooexcr`      | NOSC value of zooplankton excretion                                         | 1.0 - 0.20    | dimensionless                                                        |
+| `noscphylyse`      | NOSC value of phytoplankton lysis                                           | 1.0 - 0.35    | dimensionless                                                        |
+| `noscbaclyse`      | NOSC value of bacterial lysis                                               | 1.0 - 0.03    | dimensionless                                                        |
+| `noscdethydr`      | NOSC value of detritus hydrolysis                                           | 1.0 - 0.40    | dimensionless                                                        |
+| `noscdocproc`      | NOSC bacterial processing offset                                            | 0.9           | dimensionless                                                        |
+| `bottom_thickness` | Bottom layer thickness                                                      | 1.0           | m                                                                    |
 
 
 ---
