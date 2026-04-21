@@ -4673,8 +4673,8 @@ module generic_WOMBATmid
     call g_tracer_get_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     if (do_tracer_nosdoc) &
-    call g_tracer_get_values(tracer_list, 'nosdoc', 'field', wombat%f_nosdoc, isd, jsd, ntau=tau, &
-        positive=.false.) ! [unitless]
+      call g_tracer_get_values(tracer_list, 'nosdoc', 'field', wombat%f_nosdoc, isd, jsd, ntau=tau, &
+          positive=.false.) ! [unitless]
     call g_tracer_get_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau, &
