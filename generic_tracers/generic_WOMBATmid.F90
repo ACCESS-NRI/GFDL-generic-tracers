@@ -5244,7 +5244,7 @@ module generic_WOMBATmid
 
       ! Scavenging of Fe` onto biogenic particles
       partic = (biodet*2 + biobdet*2 + biobdetsi*2 + biocaco3*8.3) ! total particle concentration [mmol/m3]
-      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic)
+      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7/86400.0 + wombat%kscav_dfe * partic)
       wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet*2 + biocaco3*8.3) / (partic+epsi)
       wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 + biobdetsi*2) / (partic+epsi)
 
