@@ -14,7 +14,8 @@ exclude = [
   "generic_tracers/generic_blres.F90",
   "generic_tracers/generic_miniBLING.F90",
   "generic_tracers/generic_tracer.F90",
-  "generic_tracers/generic_tracer_utils.F90"
+  "generic_tracers/generic_tracer_utils.F90",
+  "generic_tracers/MOM_generic_tracer.F90"
 ]
 ignore = ["C003"]
 line-length = 132
