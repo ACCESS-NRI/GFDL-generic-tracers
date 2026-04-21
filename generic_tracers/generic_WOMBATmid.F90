@@ -5944,50 +5944,50 @@ module generic_WOMBATmid
       !  dNOSC/dt = dDOC(source)/dt * ( NOSC(source) - NOSC(in situ)) / [DOC]
 
       if (do_tracer_nosdoc) then
-      if (wombat%f_doc(i,j,k) > epsi) then
-        zval = 1.0 / wombat%f_doc(i,j,k)
-        wombat%nosdoc_overflow(i,j,k) = ( wombat%phydoc(i,j,k) &
-                                        + wombat%diadoc(i,j,k) ) &
-                                        * ( wombat%noscphyover - wombat%f_nosdoc(i,j,k) ) * zval
-        wombat%nosdoc_excretion(i,j,k) = ( wombat%zooexcrbac1(i,j,k)*wombat%zooexcrdom &
-                                         + wombat%zooexcrbac2(i,j,k)*wombat%zooexcrdom &
-                                         + wombat%zooexcraoa(i,j,k)*wombat%zooexcrdom &
-                                         + wombat%zooexcrphy(i,j,k)*wombat%zooexcrdom &
-                                         + wombat%zooexcrdia(i,j,k)*wombat%zooexcrdom &
-                                         + wombat%zooexcrdet(i,j,k)*wombat%zooexcrdom &
-                                         + wombat%mesexcrbac1(i,j,k)*wombat%mesexcrdom &
-                                         + wombat%mesexcrbac2(i,j,k)*wombat%mesexcrdom &
-                                         + wombat%mesexcraoa(i,j,k)*wombat%mesexcrdom &
-                                         + wombat%mesexcrphy(i,j,k)*wombat%mesexcrdom &
-                                         + wombat%mesexcrdia(i,j,k)*wombat%mesexcrdom &
-                                         + wombat%mesexcrdet(i,j,k)*wombat%mesexcrdom &
-                                         + wombat%mesexcrbdet(i,j,k)*wombat%mesexcrdom &
-                                         + wombat%mesexcrzoo(i,j,k)*wombat%mesexcrdom ) &
-                                         * ( wombat%nosczooexcr - wombat%f_nosdoc(i,j,k) ) * zval
-        wombat%nosdoc_phylysis(i,j,k) = ( wombat%phymorl(i,j,k) &
-                                        + wombat%diamorl(i,j,k) ) &
-                                        * ( wombat%noscphylyse - wombat%f_nosdoc(i,j,k) ) * zval
-        wombat%nosdoc_baclysis(i,j,k) = ( wombat%bac1morl(i,j,k) &
-                                        + wombat%bac1morq(i,j,k) &
-                                        + wombat%bac2morl(i,j,k) &
-                                        + wombat%bac2morq(i,j,k) &
-                                        + wombat%aoamorl(i,j,k) &
-                                        + wombat%aoamorq(i,j,k) ) &
-                                        * ( wombat%noscbaclyse - wombat%f_nosdoc(i,j,k) ) * zval
-        wombat%nosdoc_dethydro(i,j,k) = ( wombat%detremi(i,j,k) &
-                                        + wombat%bdetremi(i,j,k) ) &
-                                        * ( wombat%noscdethydr - wombat%f_nosdoc(i,j,k) ) * zval
-        wombat%nosdoc_docconsu(i,j,k) = ( wombat%doc1remi(i,j,k) &
-                                        + wombat%doc2remi(i,j,k) ) &
-                                        * ( wombat%f_nosdoc(i,j,k) - (wombat%f_nosdoc(i,j,k)+wombat%noscdocproc) ) * zval
-      else
-        wombat%nosdoc_overflow(i,j,k) = 0.0
-        wombat%nosdoc_excretion(i,j,k) = 0.0
-        wombat%nosdoc_phylysis(i,j,k) = 0.0
-        wombat%nosdoc_baclysis(i,j,k) = 0.0
-        wombat%nosdoc_dethydro(i,j,k) = 0.0
-        wombat%nosdoc_docconsu(i,j,k) = 0.0
-      endif
+        if (wombat%f_doc(i,j,k) > epsi) then
+          zval = 1.0 / wombat%f_doc(i,j,k)
+          wombat%nosdoc_overflow(i,j,k) = ( wombat%phydoc(i,j,k) &
+                                          + wombat%diadoc(i,j,k) ) &
+                                          * ( wombat%noscphyover - wombat%f_nosdoc(i,j,k) ) * zval
+          wombat%nosdoc_excretion(i,j,k) = ( wombat%zooexcrbac1(i,j,k)*wombat%zooexcrdom &
+                                           + wombat%zooexcrbac2(i,j,k)*wombat%zooexcrdom &
+                                           + wombat%zooexcraoa(i,j,k)*wombat%zooexcrdom &
+                                           + wombat%zooexcrphy(i,j,k)*wombat%zooexcrdom &
+                                           + wombat%zooexcrdia(i,j,k)*wombat%zooexcrdom &
+                                           + wombat%zooexcrdet(i,j,k)*wombat%zooexcrdom &
+                                           + wombat%mesexcrbac1(i,j,k)*wombat%mesexcrdom &
+                                           + wombat%mesexcrbac2(i,j,k)*wombat%mesexcrdom &
+                                           + wombat%mesexcraoa(i,j,k)*wombat%mesexcrdom &
+                                           + wombat%mesexcrphy(i,j,k)*wombat%mesexcrdom &
+                                           + wombat%mesexcrdia(i,j,k)*wombat%mesexcrdom &
+                                           + wombat%mesexcrdet(i,j,k)*wombat%mesexcrdom &
+                                           + wombat%mesexcrbdet(i,j,k)*wombat%mesexcrdom &
+                                           + wombat%mesexcrzoo(i,j,k)*wombat%mesexcrdom ) &
+                                           * ( wombat%nosczooexcr - wombat%f_nosdoc(i,j,k) ) * zval
+          wombat%nosdoc_phylysis(i,j,k) = ( wombat%phymorl(i,j,k) &
+                                          + wombat%diamorl(i,j,k) ) &
+                                          * ( wombat%noscphylyse - wombat%f_nosdoc(i,j,k) ) * zval
+          wombat%nosdoc_baclysis(i,j,k) = ( wombat%bac1morl(i,j,k) &
+                                          + wombat%bac1morq(i,j,k) &
+                                          + wombat%bac2morl(i,j,k) &
+                                          + wombat%bac2morq(i,j,k) &
+                                          + wombat%aoamorl(i,j,k) &
+                                          + wombat%aoamorq(i,j,k) ) &
+                                          * ( wombat%noscbaclyse - wombat%f_nosdoc(i,j,k) ) * zval
+          wombat%nosdoc_dethydro(i,j,k) = ( wombat%detremi(i,j,k) &
+                                          + wombat%bdetremi(i,j,k) ) &
+                                          * ( wombat%noscdethydr - wombat%f_nosdoc(i,j,k) ) * zval
+          wombat%nosdoc_docconsu(i,j,k) = ( wombat%doc1remi(i,j,k) &
+                                          + wombat%doc2remi(i,j,k) ) &
+                                          * ( wombat%f_nosdoc(i,j,k) - (wombat%f_nosdoc(i,j,k)+wombat%noscdocproc) ) * zval
+        else
+          wombat%nosdoc_overflow(i,j,k) = 0.0
+          wombat%nosdoc_excretion(i,j,k) = 0.0
+          wombat%nosdoc_phylysis(i,j,k) = 0.0
+          wombat%nosdoc_baclysis(i,j,k) = 0.0
+          wombat%nosdoc_dethydro(i,j,k) = 0.0
+          wombat%nosdoc_docconsu(i,j,k) = 0.0
+        endif
       endif
 
 
