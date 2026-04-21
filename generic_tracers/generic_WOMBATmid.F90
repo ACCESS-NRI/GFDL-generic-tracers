@@ -6335,13 +6335,13 @@ module generic_WOMBATmid
       ! Nominal oxidation state of dissolved organic carbon equation ! [unitless]
       !-----------------------------------------------------------------------
       if (do_tracer_nosdoc) then
-      wombat%f_nosdoc(i,j,k) = wombat%f_nosdoc(i,j,k) + dtsb * ( &
-                               wombat%nosdoc_overflow(i,j,k) &
-                             + wombat%nosdoc_excretion(i,j,k) &
-                             + wombat%nosdoc_phylysis(i,j,k) &
-                             + wombat%nosdoc_baclysis(i,j,k) &
-                             + wombat%nosdoc_dethydro(i,j,k) &
-                             + wombat%nosdoc_docconsu(i,j,k) )
+        wombat%f_nosdoc(i,j,k) = wombat%f_nosdoc(i,j,k) + dtsb * ( &
+                                 wombat%nosdoc_overflow(i,j,k) &
+                               + wombat%nosdoc_excretion(i,j,k) &
+                               + wombat%nosdoc_phylysis(i,j,k) &
+                               + wombat%nosdoc_baclysis(i,j,k) &
+                               + wombat%nosdoc_dethydro(i,j,k) &
+                               + wombat%nosdoc_docconsu(i,j,k) )
       endif
 
       ! Heterotrophic bacteria #1 ! [molC/kg]
