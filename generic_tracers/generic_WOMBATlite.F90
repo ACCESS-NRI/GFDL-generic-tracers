@@ -1975,7 +1975,7 @@ module generic_WOMBATlite
     real                                    :: rdtts ! 1 / dt
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
-    real                                    :: g_npz, g_peffect, wzphy, wzdet, zooprey
+    real                                    :: g_zoo, g_peffect, wzphy, wzdet, zooprey
     real                                    :: zooegesphyfe, zooegesdetfe
     real                                    :: zooassiphyfe, zooassidetfe
     real                                    :: zooexcrphyfe, zooexcrdetfe
@@ -1999,8 +1999,8 @@ module generic_WOMBATlite
     real                                    :: biof, biodoc
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
-    real                                    :: zoo_slmor
-    real                                    :: hco3, ddic
+    real                                    :: zoo_slmor, zoo_o2lim
+    real                                    :: hco3, ddic, do2_sink
     real                                    :: dzt_bot, dzt_bot_os
     real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools
     logical                                 :: used
@@ -2790,8 +2790,13 @@ module generic_WOMBATlite
       !  - scales towards lower values (mesozooplankton) as prey biomass increases
       g_peffect = exp(-zooprey * wombat%zooepsrat)
       wombat%zooeps(i,j,k) = wombat%zooepsmin + (wombat%zooepsmax - wombat%zooepsmin) * g_peffect
-      g_npz = wombat%zoogmax * fbc * (wombat%zooeps(i,j,k) * zooprey*zooprey) / &
-              (wombat%zoogmax * fbc + (wombat%zooeps(i,j,k) * zooprey*zooprey))
+
+      ! Oxygen limitation term reducing zooplankton grazing pressure in low-oxygen waters (following Buchanan et al., 2025; Science)
+      zoo_o2lim = max(0.0, min(1.0, 1.0 - exp(-wombat%p_o2(i,j,k,tau) / (10.0 * mmol_m3_to_mol_kg))))
+
+      ! Grazing rate [s-1]
+      zval = wombat%zooeps(i,j,k) * zooprey*zooprey
+      g_zoo = wombat%zoogmax * fbc * zoo_o2lim * zval / (wombat%zoogmax * fbc + zval)
 
       ! We follow Le Mezo & Galbraith (2021) L&O - The fecal iron pump: ...
       !  - egestion, assimilation and excretion of carbon and iron by zooplankton are calculated separately
@@ -2799,8 +2804,8 @@ module generic_WOMBATlite
       !  1. zooplankton ingest C and Fe (the rest is egested)
       !  2. zooplankton assimilate the ingested C and Fe (the rest is excreted)
       if (zooprey > 1e-10) then
-        wombat%zoograzphy(i,j,k) = g_npz * zoo_p * (wombat%zooprefphy(i,j,k) * phy_mmolm3) / zooprey ! [molC/kg/s]
-        wombat%zoograzdet(i,j,k) = g_npz * zoo_p * (wombat%zooprefdet(i,j,k) * det_mmolm3) / zooprey ! [molC/kg/s]
+        wombat%zoograzphy(i,j,k) = g_zoo * zoo_p * (wombat%zooprefphy(i,j,k) * phy_mmolm3) / zooprey ! [molC/kg/s]
+        wombat%zoograzdet(i,j,k) = g_zoo * zoo_p * (wombat%zooprefdet(i,j,k) * det_mmolm3) / zooprey ! [molC/kg/s]
       else
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdet(i,j,k) = 0.0
@@ -2977,14 +2982,13 @@ module generic_WOMBATlite
 
       ! Oxygen equation ! [molO2/kg]
       !-----------------------------------------------------------------------
-      if (wombat%p_o2(i,j,k,tau) > epsi) &
-        wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) - 172./122. * dtsb * ( &
-                               wombat%detremi(i,j,k) + &
-                               wombat%zoomorl(i,j,k) + &
-                               wombat%zooexcrphy(i,j,k) + &
-                               wombat%zooexcrdet(i,j,k) + &
-                               wombat%phymorl(i,j,k) - &
-                               wombat%phygrow(i,j,k) )
+      wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) - 172./122. * dtsb * ( &
+                             wombat%detremi(i,j,k) + &
+                             wombat%zoomorl(i,j,k) + &
+                             wombat%zooexcrphy(i,j,k) + &
+                             wombat%zooexcrdet(i,j,k) + &
+                             wombat%phymorl(i,j,k) - &
+                             wombat%phygrow(i,j,k) )
 
       ! Equation for CaCO3 ! [molCaCO3/kg]
       !-----------------------------------------------------------------------

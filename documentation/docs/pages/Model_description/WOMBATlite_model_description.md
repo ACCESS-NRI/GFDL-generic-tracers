@@ -913,11 +913,11 @@ since hydrolyzation of organic detritus is performed by an heterotrophic bacteri
 
 ### 10. Zooplankton grazing, egestion, excretion and assimilation.
 
-**Grazing by zooplankton** (`g_npz`, $g_{zoo}$, [s<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7):
+**Grazing by zooplankton** (`g_zoo`, $g_{zoo}$, [s<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7):
 
 $$
 \begin{align}
-g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} \varepsilon \left(B_{prey}^{C}\right)^{2}}{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} + \varepsilon \left(B_{prey}^{C}\right)^{2}}
+g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} \cdot L_{zoo}^{O_2} \varepsilon \left(B_{prey}^{C}\right)^{2}}{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} + \varepsilon \left(B_{prey}^{C}\right)^{2}}
 \end{align}
 $$
 
@@ -925,8 +925,17 @@ _where_ <br>
 - $\mu_{zoo}^{max}$ is the maximum rate of zooplankton grazing at 0ºC (`zoogmax`, [s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
+- $L_{zoo}^{O_2}$ is a limiter of grazing in low oxygen conditions (`zoo_o2lim`, [dimensionless]) <br>
 - $B_{prey}^{C}$ is the concentration of prey biomass (`zooprey`, [mmol C m<sup>-3</sup>]) <br>
 - $\varepsilon$ is the prey capture rate coefficient (`zooeps(i,j,k)`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
+
+We apply an oxygen limitation to grazing at low oxygen concentrations (`zoo_o2lim`, $L_{zoo}^{O_2}$, [dimensionless]) based on the review of [Medina et al. (2017)](https://doi.org/10.3389/fmars.2017.00105) who found that from 5 µM to undetectable concentrations of oxygen, protist consumption of a bacterial population decreased from 28% to 13% of the population. Although they still see some consumption at undetectable oxygen concentrations, we scale grazing down to zero at an oxygen concentration of zero to avoid unrealistic negative oxygen concentrationsdue to grazing at zero oxygen:
+
+$$
+\begin{align}
+L_{zoo}^{O_2} =& \quad \left(1 - e^{\left(-\dfrac{O_2}{10}\right)}\right)
+\end{align}
+$$
 
 Total grazing of biomass by zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
