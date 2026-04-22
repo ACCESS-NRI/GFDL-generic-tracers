@@ -608,9 +608,9 @@ ex_{bgr}(k-1,1) =& \quad ex_{chl}(k-1,1) + ex_{det}(k-1,1) + ex_{CaCO_3}(k-1,1)
 $$
 
 _where_ <br>
-- $ex_{chl}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to chlorophyll (`zbgr(2,ichl)`, [m<sup>-1</sup>]) <br>
-- $ex_{det}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to detritus (`ndet * dbgr(1)`, [m<sup>-1</sup>]) <br>
-- $ex_{CaCO_3}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k=k-1`) due to calcium carbonate (`carb * cbgr(1)`, [m<sup>-1</sup>]) <br>
+- $ex_{chl}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k-1`) due to chlorophyll (`zbgr(2,ichl)`, [m<sup>-1</sup>]) <br>
+- $ex_{det}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k-1`) due to detritus (`ndet * dbgr(1)`, [m<sup>-1</sup>]) <br>
+- $ex_{CaCO_3}(k-1,1)$ is the attenuation rate of blue light (`b=1`) in the overlying grid cell (`k-1`) due to calcium carbonate (`carb * cbgr(1)`, [m<sup>-1</sup>]) <br>
 
 The irradiance in the red band (`b=3`) at the mid point of layer `k`, in contrast, is equal to 
 
@@ -1901,7 +1901,7 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 
 ### 15. Implicit nitrogen fixation.
 
-Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability. The equation for new nitrogen (specifically NH<sub>4</sub>) added via diazotrophy is:
+Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability when `do_nitrogen_fixation == .true.`. The equation for new nitrogen (specifically NH<sub>4</sub>) added via diazotrophy is:
 
 $$
 \begin{align}
@@ -1966,7 +1966,7 @@ _where_ <br>
 - $(β_{hete})^{T}$ is the temperature-dependent scaling on heterotrophic metabolism (`fbc`, [dimensionless]) <br>
 - $B_{b}^{C}$ is the in situ concentration of bacterial functional type $b$ (`f_bac1(i,j,k)`; `f_bac2(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
-Thus, whichever of aerobic and anaerobic metabolism offers the greatest growth rate will be chosen as the means by which bacteria grow. We must define what controls aerobic ($\mu_{b}^{aer}$) and anaerobic ($\mu_{b}^{ana}$) growth. In the case of both aerobic and anaerobic metabolisms we compute these growth rates as the minimum of three rates associated with four essential resources: dissolved organic carbon ($B_{DOM}^{C}$), nitrogen ($N$), dissolved iron ($dFe$) and the electron acceptor ($EA$).
+Thus, when `do_wc_denitrification == .true.`, whichever of aerobic and anaerobic metabolism offers the greatest growth rate will be chosen as the means by which bacteria grow. We must define what controls aerobic ($\mu_{b}^{aer}$) and anaerobic ($\mu_{b}^{ana}$) growth. In the case of both aerobic and anaerobic metabolisms we compute these growth rates as the minimum of three rates associated with four essential resources: dissolved organic carbon ($B_{DOM}^{C}$), nitrogen ($N$), dissolved iron ($dFe$) and the electron acceptor ($EA$).
 
 $$
 \begin{align}
@@ -1974,6 +1974,8 @@ $$
 \mu_{b}^{ana} =& \quad \min \left(\mu_{b}^{ana(DOC)}, \mu_{b}^{ana(N)}, \mu_{b}^{ana(dFe)}, \mu_{b}^{ana(EA)} \right)
 \end{align}
 $$
+
+When `do_wc_denitrification == .true.`, $\mu_{b}^{ana}$ ≥ 0.0. However, when `do_wc_denitrification == .false.`, $\mu_{b}^{ana}$ = 0.0. 
 
 For aerobic growth, these resource-specific growth rates are calculated as:
 
@@ -2054,13 +2056,13 @@ _where_ <br>
 - NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`bionh4`, [mmol N m<sup>-3</sup>]) <br>
 - $dFe$ is the in situ concentration of $dFe$ (`biofer`, [µmol Fe m<sup>-3</sup>]) <br>
 - NO<sub>3</sub> is the in situ concentration of nitrate (`biono3`, [mmol N m<sup>-3</sup>]) <br>
-- O<sub>2</sub> is the in situ concentration of O<sub>2</sub>$ (`biooxy`, [mmol O<sub>2</sub> m<sup>-3</sup>]) <br>
+- O<sub>2</sub> is the in situ concentration of O<sub>2</sub> (`biooxy`, [mmol O<sub>2</sub> m<sup>-3</sup>]) <br>
 - N<sub>2</sub>O is the in situ concentration of N<sub>2</sub>O (`bion2o`, [mmol N<sub>2</sub>O m<sup>-3</sup>]) <br>
 
 
 **Biomass yields**
 
-We further expand on bacterial heterotrophic dynamics by also integrating the findings of [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) to solve for biomass yields as a function of the nominal oxidation state of carbon (NOSC) of DOM (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimensionless]). [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) conceptually link the carbon use efficiency (i.e., yield) of bacteria to the NOSC. They identify a theoretical positive relationship between yield and NOSC and suggest that more oxidized compounds offer a greater energy of content per carbon atom because more reduced compounds require greater processing costs. To account for this dynamic, we scale the biomass yield of heterotrophic bacteria (`bac_ydon(i,j,k)`, $y_{b}^{DON}$, [mol N biomass (mol DON)<sup>-1</sup>]) as:
+If `do_tracer_nosdoc == .true.`, we further expand on bacterial heterotrophic dynamics by also integrating the findings of [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) to solve for biomass yields as a function of the nominal oxidation state of carbon (NOSC) of DOM (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimensionless]). [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) conceptually link the carbon use efficiency (i.e., yield) of bacteria to the NOSC. They identify a theoretical positive relationship between yield and NOSC and suggest that more oxidized compounds offer a greater energy of content per carbon atom because more reduced compounds require greater processing costs. To account for this dynamic, we scale the biomass yield of heterotrophic bacteria (`bac_ydon(i,j,k)`, $y_{b}^{DON}$, [mol N biomass (mol DON)<sup>-1</sup>]) as:
 
 $$
 \begin{align}
@@ -2074,6 +2076,16 @@ _where_ <br>
 - $y_{b}^{min(DON)}$ is the minimum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmin`, [mol N biomass (mol DON)<sup>-1</sup>])  <br>
 - $y_{b}^{max(DON)}$ is the maximum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmax`, [mol N biomass (mol DON)<sup>-1</sup>])  <br>
 - $DOM^{NOSC}$ is the in situ nominal oxidation state of dissolved organic carbon that is normalized to vary between 0 (most reduced) and 1 (most oxidised) (`f_nosdoc(i,j,k)`, [dimensionless]) <br>
+
+If `do_tracer_nosdoc == .false.`, then the biomass yield of heterotrophic bacteria remains constant and is equal to
+
+$$
+\begin{align}
+y_{b}^{DON} =& \quad y_{b}^{min(DON)} + 0.5 \cdot \left(y_{b}^{max(DON)} - y_{b}^{min(DON)} \right)
+\end{align}
+$$
+
+meaning that the yield can be controlled through the input parameters `bac_ydonmin` and `bac_ydonmax`.
 
 From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on O<sub>2</sub> [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
 
@@ -2242,7 +2254,7 @@ $$
 
 ### 17. Chemoautotrophy.
 
-We consider two forms of chemoautotrophy carried out by two distinct forms of microbes: ammonia oxidizing archaea and anaerobic ammonia oxidizing (anammox) bacteria. Ammonia oxidizing archaea are considered explicitly within WOMBAT-mid (`f_aoa(i,j,k)`, [mol C kg<sup>-1</sup>]), while anammox bacteria are considered implicitly and therefore do not have varying biomasses (i.e., we only compute rates of anammox).
+We consider two forms of chemoautotrophy carried out by two distinct forms of microbes: ammonia oxidizing archaea and anaerobic ammonia oxidizing (anammox) bacteria. Ammonia oxidizing archaea are considered explicitly within WOMBAT-mid (`f_aoa(i,j,k)`, [mol C kg<sup>-1</sup>]), while anammox bacteria are considered implicitly (when `do_anammox == .true.`) and therefore do not have varying biomasses (i.e., we only compute rates of anammox).
 
 **Ammonia oxidizing archaea**
 
@@ -2351,7 +2363,7 @@ $$
 
 **Anaerobic ammonia oxidizing (Anammox) bacteria**
 
-Anammox bacteria are considered to be an implicit population within WOMBAT-mid and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. As with N<sub>2</sub>O-reducing heterotrophic bacteria, this nitrogen is then permanently lost from the ocean. When `do_anammox = .true.`, we perform this metabolism as:
+Anammox bacteria are considered to be an implicit population within WOMBAT-mid when `do_anammox == .true.` and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. As with N<sub>2</sub>O-reducing heterotrophic bacteria, this nitrogen is then permanently lost from the ocean. We perform this metabolism as:
 
 $$
 \begin{align}
@@ -2382,7 +2394,7 @@ _where_ <br>
 
 ### 18. Nominal oxidation state of dissolved organic carbon.
 
-In addition to DOC and DON, dissolved organic matter is also affected by changes to the nominal oxidation state of carbon, which we carry as a tracer (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless]). The nominal oxidation state of carbon (NOSC) is estimated by [La Rowe & Van Cappellen (2011)](https://doi.org/10.1016/j.gca.2011.01.020) from stoichiometry:
+In addition to DOC and DON, dissolved organic matter is also affected by changes to the nominal oxidation state of carbon, which we carry as a tracer (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless]) when `do_tracer_nosdoc == .true.`. The nominal oxidation state of carbon (NOSC) is estimated by [La Rowe & Van Cappellen (2011)](https://doi.org/10.1016/j.gca.2011.01.020) from stoichiometry:
 
 $$
 \begin{align}
