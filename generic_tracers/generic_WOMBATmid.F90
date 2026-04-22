@@ -189,7 +189,7 @@ module generic_WOMBATmid
   logical :: do_wc_denitrification      = .true.  ! N cycle has water column denitrification?
   logical :: do_benthic_denitrification = .true.  ! N cycle has N loss in sediments?
   logical :: do_tracer_dicp             = .false. ! Enable preformed dissolved inorganic carbon tracer, dicp?
-  logical :: do_tracer_dicr             = .false. ! enable remineralized dissolved inorganic carbon tracer, dicr?
+  logical :: do_tracer_dicr             = .false. ! Enable remineralized dissolved inorganic carbon tracer, dicr?
   logical :: do_tracer_nosdoc           = .false. ! Enable nominal oxidation state of carbon in DOM tracer, nosdoc?
   logical :: do_viscous_sinking         = .true.  ! Rubey's formula uses a non-constant dynamic viscosity?
   logical :: do_check_n_conserve        = .false. ! check that the N fluxes balance in the ecosystem
@@ -6456,40 +6456,40 @@ module generic_WOMBATmid
       ! Equation for DICr ! [molC/kg]
       !-----------------------------------------------------------------------
       if (do_tracer_dicr) then
-      wombat%f_dicr(i,j,k) = wombat%f_dicr(i,j,k) + dtsb * ( &
-                            ( wombat%zooexcrbac1(i,j,k) &
-                            + wombat%zooexcrbac2(i,j,k) &
-                            + wombat%zooexcraoa(i,j,k) &
-                            + wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                          + ( wombat%mesexcrbac1(i,j,k) &
-                            + wombat%mesexcrbac2(i,j,k) &
-                            + wombat%mesexcraoa(i,j,k) &
-                            + wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrdet(i,j,k) &
-                            + wombat%mesexcrbdet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
-                          + wombat%zoomorl(i,j,k) &
-                          + wombat%mesmorl(i,j,k) &
-                          + (wombat%doc1remi(i,j,k) - wombat%bac1grow(i,j,k)) &
-                          + (wombat%doc2remi(i,j,k) - wombat%bac2grow(i,j,k)) &
-                          + wombat%zoodiss(i,j,k) &
-                          + wombat%mesdiss(i,j,k) &
-                          + wombat%caldiss(i,j,k) &
-                          + wombat%aradiss(i,j,k) &
-                          + wombat%pocdiss(i,j,k) &
-                          - wombat%phygrow(i,j,k) &
-                          - wombat%diagrow(i,j,k) &
-                          - wombat%aoagrow(i,j,k) &
-                          - wombat%phydoc(i,j,k) &
-                          - wombat%diadoc(i,j,k) &
-                          - ( ( wombat%zoograzphy(i,j,k) &
-                              + wombat%mesgrazphy(i,j,k) &
-                              + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
-                              + wombat%phymorq(i,j,k) &
-                              + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) )
+        wombat%f_dicr(i,j,k) = wombat%f_dicr(i,j,k) + dtsb * ( &
+                                ( wombat%zooexcrbac1(i,j,k) &
+                                + wombat%zooexcrbac2(i,j,k) &
+                                + wombat%zooexcraoa(i,j,k) &
+                                + wombat%zooexcrphy(i,j,k) &
+                                + wombat%zooexcrdia(i,j,k) &
+                                + wombat%zooexcrdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
+                            + ( wombat%mesexcrbac1(i,j,k) &
+                                + wombat%mesexcrbac2(i,j,k) &
+                                + wombat%mesexcraoa(i,j,k) &
+                                + wombat%mesexcrphy(i,j,k) &
+                                + wombat%mesexcrdia(i,j,k) &
+                                + wombat%mesexcrdet(i,j,k) &
+                                + wombat%mesexcrbdet(i,j,k) &
+                                + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                            + wombat%zoomorl(i,j,k) &
+                            + wombat%mesmorl(i,j,k) &
+                            + (wombat%doc1remi(i,j,k) - wombat%bac1grow(i,j,k)) &
+                            + (wombat%doc2remi(i,j,k) - wombat%bac2grow(i,j,k)) &
+                            + wombat%zoodiss(i,j,k) &
+                            + wombat%mesdiss(i,j,k) &
+                            + wombat%caldiss(i,j,k) &
+                            + wombat%aradiss(i,j,k) &
+                            + wombat%pocdiss(i,j,k) &
+                            - wombat%phygrow(i,j,k) &
+                            - wombat%diagrow(i,j,k) &
+                            - wombat%aoagrow(i,j,k) &
+                            - wombat%phydoc(i,j,k) &
+                            - wombat%diadoc(i,j,k) &
+                            - ( ( wombat%zoograzphy(i,j,k) &
+                                + wombat%mesgrazphy(i,j,k) &
+                                + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
+                                + wombat%phymorq(i,j,k) &
+                                + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) )
       endif
 
 
@@ -8447,7 +8447,7 @@ module generic_WOMBATmid
     allocate(wombat%b_o2(isd:ied, jsd:jed)); wombat%b_o2(:,:)=0.0
     allocate(wombat%b_dic(isd:ied, jsd:jed)); wombat%b_dic(:,:)=0.0
     if (do_tracer_dicr) then
-        allocate(wombat%b_dicr(isd:ied, jsd:jed)); wombat%b_dicr(:,:)=0.0
+      allocate(wombat%b_dicr(isd:ied, jsd:jed)); wombat%b_dicr(:,:)=0.0
     endif
     allocate(wombat%b_fe(isd:ied, jsd:jed)); wombat%b_fe(:,:)=0.0
     allocate(wombat%b_sil(isd:ied, jsd:jed)); wombat%b_sil(:,:)=0.0
