@@ -2546,19 +2546,20 @@ module generic_WOMBATmid
     ! internally to account for the different units carried in this generic
     ! version of WOMBATmid.
 
-    ! Initial slope of P-I curve for phytoplankton [(mg Chl m-3)-1 (W m-2)-1]
+    ! Initial slope of P-I curve for phytoplankton [mol Chl (mol C)-1 (W m-2)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('alphabio_phy', wombat%alphabio_phy, 1.5)
 
-    ! Autotrophy maximum growth rate parameter a for phytoplankton [1/s]
+    ! Autotrophy maximum growth rate parameter a for phytoplankton [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('abioa_phy', wombat%abioa_phy, 0.7/86400.0)
 
-    ! Autotrophy maximum growth rate parameter b for phytoplankton [1]
+    ! Autotrophy maximum growth rate parameter b for phytoplankton [dimensionless]
+    ! Q10 = b^(10)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bbioa_phy', wombat%bbioa_phy, 1.055)
 
-    ! Initial slope of P-I curve for microphytoplankton [(mg Chl m-3)-1 (W m-2)-1]
+    ! Initial slope of P-I curve for microphytoplankton [mol Chl (mol C)-1 (W m-2)-1]
     ! "When diatoms are compared to other groups of phytoplankton, they tend to differ
     !  in their light-related traits and appear to have high α and high μmax (Edwards et al., 2015)."
     !  [quote from Litchman (2022): Trait-based diatom ecology, in "The Molecular Life of Diatoms"]
@@ -2566,20 +2567,22 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('alphabio_dia', wombat%alphabio_dia, 2.5)
 
-    ! Initial slope of P-I curve for trichodesmium [(mg Chl m-3)-1 (W m-2)-1]
+    ! Initial slope of P-I curve for trichodesmium [mol Chl (mol C)-1 (W m-2)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('alphabio_tri', wombat%alphabio_tri, 1.8)
 
-    ! Autotrophy maximum growth rate parameter a for microphytoplankton [1/s]
+    ! Autotrophy maximum growth rate parameter a for microphytoplankton [s-1]
     ! [Anderson et al., 2021 Nat Communications]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('abioa_dia', wombat%abioa_dia, 1.0/86400.0)
 
-    ! Autotrophy maximum growth rate parameter b for microphytoplankton [1]
+    ! Autotrophy maximum growth rate parameter b for microphytoplankton [dimensionless]
+    ! Q10 = b^(10)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bbioa_dia', wombat%bbioa_dia, 1.070)
 
-    ! Heterotrophy maximum growth rate parameter b [1]
+    ! Heterotrophy maximum growth rate parameter b [dimensionless]
+    ! Q10 = b^(10)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bbioh', wombat%bbioh, 1.072)
 
@@ -2595,27 +2598,27 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyprefnh4', wombat%phyprefnh4, 5.0)
 
-    ! Phytoplankton minimum quota of chlorophyll to carbon [mg/mg]
+    ! Phytoplankton minimum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.008)
 
-    ! Phytoplankton maximum quota of chlorophyll to carbon [mg/mg]
+    ! Phytoplankton maximum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.065)
 
-    ! Phytoplankton optimal quota of iron to carbon [mol/mol]
+    ! Phytoplankton optimal quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyoptqf', wombat%phyoptqf, 10e-6)
 
-    ! Phytoplankton maximum quota of iron to carbon [mol/mol]
+    ! Phytoplankton maximum quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phymaxqf', wombat%phymaxqf, 50e-6)
 
-    ! Phytoplankton linear mortality rate constant [1/s]
+    ! Phytoplankton linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phylmor', wombat%phylmor, 0.001/86400.0)
 
-    ! Phytoplankton quadratic mortality rate constant [m3/mmolN/s]
+    ! Phytoplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyqmor', wombat%phyqmor, 0.05/86400.0)
 
@@ -2638,38 +2641,38 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaprefnh4', wombat%diaprefnh4, 5.0)
 
-    ! microphytoplankton minimum quota of chlorophyll to carbon [mg/mg]
+    ! microphytoplankton minimum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaminqc', wombat%diaminqc, 0.004)
 
-    ! microphytoplankton maximum quota of chlorophyll to carbon [mg/mg]
+    ! microphytoplankton maximum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diamaxqc', wombat%diamaxqc, 0.060)
 
-    ! microphytoplankton optimal quota of iron to carbon [mol/mol]
+    ! microphytoplankton optimal quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaoptqf', wombat%diaoptqf, 10e-6)
 
-    ! microphytoplankton maximum quota of iron to carbon [mol/mol]
+    ! microphytoplankton maximum quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diamaxqf', wombat%diamaxqf, 65e-6)
 
-    ! microphytoplankton minimal quota of silicon to carbon to build a valve [mol/mol]
+    ! microphytoplankton minimal quota of silicon to carbon to build a valve [mol Si (mol C)-1]
     !   Brzezinksi (1985) J. Phycology, 21, 347-357
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaminqs', wombat%diaminqs, 0.04)
 
-    ! microphytoplankton optimal quota of silicon to carbon [mol/mol]
+    ! microphytoplankton optimal quota of silicon to carbon [mol Si (mol C)-1]
     !   Brzezinksi (1985) J. Phycology, 21, 347-357
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaoptqs', wombat%diaoptqs, 0.13)
 
-    ! microphytoplankton maximum quota of silicon to carbon [mol/mol]
+    ! microphytoplankton maximum quota of silicon to carbon [mol Si (mol C)-1]
     !  Brzezinski et al., (2003) Deep-Sea Research II, 50, 619-633
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diamaxqs', wombat%diamaxqs, 0.60)
 
-    ! microphytoplankton maximum uptake rate of silicon to carbon [/s]
+    ! microphytoplankton maximum uptake rate of silicon to carbon [mol Si (mol C)-1 s-1]
     !  1.2 - 950 fmol Si cell h-1 [Kolbe & Brunner 2022, in "Molecular Life of Diatoms"]
     !  We take a constrained range of 10-100 fmol Si cell h-1
     !  for a 100 pg C cell (8.3 pmol), this maps to roughly 0.0012 - 0.012 mol Si/mol C h-1
@@ -2677,11 +2680,11 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaVmaxs', wombat%diaVmaxs, 0.1/86400.0)
 
-    ! microphytoplankton linear mortality rate constant [1/s]
+    ! microphytoplankton linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dialmor', wombat%dialmor, 0.001/86400.0)
 
-    ! microphytoplankton quadratic mortality rate constant [m3/mmolN/s]
+    ! microphytoplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diaqmor', wombat%diaqmor, 0.05/86400.0)
 
@@ -2689,239 +2692,239 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('chltau', wombat%chltau, 86400.0)
 
-    ! Maximum fraction of NPP that can be routed to DOC exudation by phytoplankton [0-1]
+    ! Maximum fraction of NPP that can be routed to DOC exudation by phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('overflow', wombat%overflow, 0.75)
 
-    ! Trichodesmium half saturation constant for iron uptake [umolFe/m3]
+    ! Trichodesmium half saturation constant for iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('trikf', wombat%trikf, 0.125)
 
-    ! Trichodesmium typical chlorophyll to carbon ratio [mg/mg]
+    ! Trichodesmium typical chlorophyll to carbon ratio [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('trichlc', wombat%trichlc, 0.01)
 
-    ! Trichodesmium typical nitrogen to carbon ratio [mol/mol]
+    ! Trichodesmium typical nitrogen to carbon ratio [mol N (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('trin2c', wombat%trin2c, 50.0/300.0)
 
-    ! Zooplankton carbon bulk ingestion efficiency [0-1]
+    ! Zooplankton carbon bulk ingestion efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooCingest', wombat%zooCingest, 0.70)
 
-    ! Zooplankton carbon assimilation efficiency [0-1]
+    ! Zooplankton carbon assimilation efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.40)
 
-    ! Zooplankton iron bulk ingestion efficiency [0-1]
+    ! Zooplankton iron bulk ingestion efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooFeingest', wombat%zooFeingest, 0.06)
 
-    ! Zooplankton iron assimilation efficiency [0-1]
+    ! Zooplankton iron assimilation efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.60)
 
-    ! Zooplankton fraction of excretion to DOM [0-1]
+    ! Zooplankton fraction of excretion to DOM [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooexcrdom', wombat%zooexcrdom, 0.70)
 
-    ! Zooplankton half saturation coefficient for linear mortality
+    ! Zooplankton half saturation coefficient for linear mortality [mmol C m-3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zookz', wombat%zookz, 0.25)
 
-    ! Zooplankton maximum grazing rate constant [1/s]
+    ! Zooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zoogmax', wombat%zoogmax, 3.3/86400.0)
 
-    ! Zooplankton prey capture rate constant for bacteria 1 [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for bacteria 1 [(mmol C m-3)-2 s-1]
     !  - e.g., protozoans feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsbac1', wombat%zooepsbac1, 0.10/86400.0)
 
-    ! Zooplankton prey capture rate constant for bacteria 2 [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for bacteria 2 [(mmol C m-3)-2 s-1]
     !  - e.g., protozoans feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsbac2', wombat%zooepsbac2, 0.10/86400.0)
 
-    ! Zooplankton prey capture rate constant for ammonia oxidizing archaea [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for ammonia oxidizing archaea [(mmol C m-3)-2 s-1]
     !  - e.g., ciliates feeding on ammonia oxidizing archaea (similar size or larger than pico)
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsaoa', wombat%zooepsaoa, 0.25/86400.0)
 
-    ! Zooplankton prey capture rate constant for nanophytoplankton [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for nanophytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., ciliates feeding on small (nano/pico)phytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.40/86400.0)
 
-    ! Zooplankton prey capture rate constant for microphytoplankton [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for microphytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., larger ciliates feeding on smaller diatoms and other microphytoplankton
     !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsdia', wombat%zooepsdia, 0.40/86400.0)
 
-    ! Zooplankton prey capture rate constant for small detritus [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., protozoa grazing on slowly sinking detrital particles
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooepsdet', wombat%zooepsdet, 0.25/86400.0)
 
-    ! Zooplankton preference for bacteria 1 [0-1]
+    ! Zooplankton preference for bacteria 1 [dimensionless]
     ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
     !  of microzooplankton grazing/biomass gain comes from bacterivory
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefbac1', wombat%zprefbac1, 0.25)
 
-    ! Zooplankton preference for bacteria 2 [0-1]
+    ! Zooplankton preference for bacteria 2 [dimensionless]
     ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
     !  of microzooplankton grazing/biomass gain comes from bacterivory
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefbac2', wombat%zprefbac2, 0.25)
 
-    ! Zooplankton preference for ammonia oxidizing archaea [0-1]
+    ! Zooplankton preference for ammonia oxidizing archaea [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefaoa', wombat%zprefaoa, 0.40)
 
-    ! Zooplankton preference for phytoplankton [0-1]
+    ! Zooplankton preference for nano-phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefphy', wombat%zprefphy, 1.0)
 
-    ! Zooplankton preference for microphytoplankton [0-1]
+    ! Zooplankton preference for microphytoplankton [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefdia', wombat%zprefdia, 0.25)
 
-    ! Zooplankton preference for detritus [0-1]
+    ! Zooplankton preference for small detritus [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zprefdet', wombat%zprefdet, 0.80)
 
-    ! Zooplankton respiration rate constant [1/s]
+    ! Zooplankton respiration rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zoolmor', wombat%zoolmor, 0.002/86400.0)
 
-    ! Zooplankton quadratic mortality rate constant [m3/mmolN/s]
+    ! Zooplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooqmor', wombat%zooqmor, 0.05/86400.0)
 
-    ! Mesozooplankton carbon bulk ingestion efficiency [0-1]
+    ! Mesozooplankton carbon bulk ingestion efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesCingest', wombat%mesCingest, 0.75)
 
-    ! Mesozooplankton carbon assimilation efficiency [0-1]
+    ! Mesozooplankton carbon assimilation efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesCassim', wombat%mesCassim, 0.30)
 
-    ! Mesozooplankton iron bulk ingestion efficiency [0-1]
+    ! Mesozooplankton iron bulk ingestion efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesFeingest', wombat%mesFeingest, 0.43)
 
-    ! Mesozooplankton iron assimilation efficiency [0-1]
+    ! Mesozooplankton iron assimilation efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesFeassim', wombat%mesFeassim, 0.75)
 
-    ! Mesozooplankton fraction of excretion to DOM [0-1]
+    ! Mesozooplankton fraction of excretion to DOM [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesexcrdom', wombat%mesexcrdom, 0.35)
 
-    ! Zooplankton dissolution efficiency of CaCO3 within guts [1]
+    ! Zooplankton dissolution efficiency of CaCO3 within guts [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('fgutdiss', wombat%fgutdiss, 0.80)
 
-    ! Mesozooplankton half saturation coefficient for linear mortality
+    ! Mesozooplankton half saturation coefficient for linear mortality [mmol C m-3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('meskz', wombat%meskz, 0.30)
 
-    ! Mesozooplankton maximum grazing rate constant [1/s]
+    ! Mesozooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesgmax', wombat%mesgmax, 0.30/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for bacteria 1 [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for bacteria 1 [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepsbac1', wombat%mesepsbac1, 0.11/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for bacteria 2 [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for bacteria 2 [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepsbac2', wombat%mesepsbac2, 0.11/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for ammonia oxidizing archaea [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for ammonia oxidizing archaea [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on ammonia oxidizing archaea
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepsaoa', wombat%mesepsaoa, 0.11/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for nanophytoplankton [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for nanophytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on small phytoplankton
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepsphy', wombat%mesepsphy, 0.11/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for microphytoplankton [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for microphytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., copepods preying on diatoms and other microphytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.20/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for small detritus [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on fine detritus
     !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepsdet', wombat%mesepsdet, 0.05/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for large detritus [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for large detritus [(mmol C m-3)-2 s-1]
     !  - e.g., copepods consuming sinking aggregates of marine snow
     !  - aim for half-saturation coefficent B1/2 = 10.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepsbdet', wombat%mesepsbdet, 0.10/86400.0)
 
-    ! Mesozooplankton prey capture rate constant for microzooplankton [m6/mmol2/s]
+    ! Mesozooplankton prey capture rate constant for microzooplankton [(mmol C m-3)-2 s-1]
     !  - e.g., chaetognaths preying on copepods; copepods consuming ciliates
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.10/86400.0)
 
-    ! Mesozooplankton preference for bacteria 1 [0-1]
+    ! Mesozooplankton preference for bacteria 1 [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefbac1', wombat%mprefbac1, 0.25)
 
-    ! Mesozooplankton preference for bacteria 2 [0-1]
+    ! Mesozooplankton preference for bacteria 2 [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefbac2', wombat%mprefbac2, 0.25)
 
-    ! Mesozooplankton preference for ammonia oxidizing archaea [0-1]
+    ! Mesozooplankton preference for ammonia oxidizing archaea [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefaoa', wombat%mprefaoa, 0.4)
 
-    ! Mesozooplankton preference for phytoplankton [0-1]
+    ! Mesozooplankton preference for phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.1)
 
-    ! Mesozooplankton preference for microphytoplankton [0-1]
+    ! Mesozooplankton preference for microphytoplankton [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefdia', wombat%mprefdia, 0.85)
 
-    ! Mesozooplankton preference for detritus [0-1]
+    ! Mesozooplankton preference for small detritus [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefdet', wombat%mprefdet, 0.80)
 
-    ! Mesozooplankton preference for large detritus (aggregates) [0-1]
+    ! Mesozooplankton preference for large detritus (aggregates) [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefbdet', wombat%mprefbdet, 0.80)
 
-    ! Mesozooplankton preference for zooplankton [0-1]
+    ! Mesozooplankton preference for micro-zooplankton [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mprefzoo', wombat%mprefzoo, 0.85)
 
-    ! Mesozooplankton respiration rate constant [1/s]
+    ! Mesozooplankton respiration rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('meslmor', wombat%meslmor, 0.002/86400.0)
 
-    ! Mesozooplankton quadratic mortality rate constant [m3/mmolN/s]
+    ! Mesozooplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesqmor', wombat%mesqmor, 0.75/86400.0)
 
@@ -2939,19 +2942,19 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mespreyswitch', wombat%mespreyswitch, 1.8)
 
-    ! Detritus remineralisation rate constant [m3/mmolC/s]
+    ! Detritus hydrolyzation rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('detlrem', wombat%detlrem, 0.7/86400.0)
 
-    ! Detritus remineralisation rate constant in sediments [1/s]
+    ! Detritus hydrolyzation rate constant in sediments [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('detlrem_sed', wombat%detlrem_sed, 0.005/86400.0)
 
-    ! Porosity of sinking small detritus [0-1]
+    ! Porosity of sinking small detritus [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('detphi', wombat%detphi, 0.25)
 
-    ! Porosity of sinking large aggregated detritus [0-1]
+    ! Porosity of sinking large aggregated detritus [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bdetphi', wombat%bdetphi, 0.75)
 
@@ -2996,15 +2999,15 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('diabiot', wombat%diabiot, 0.5)
 
-    ! CaCO3 remineralisation rate constant [1/s]
+    ! CaCO3 dissolution rate constant (base rate) [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('caco3lrem', wombat%caco3lrem, 0.01/86400.0)
 
-    ! CaCO3 remineralization rate constant in sediments [1/s]
+    ! CaCO3 dissolution rate constant in sediments [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('caco3lrem_sed', wombat%caco3lrem_sed, 0.01/86400.0)
 
-    ! CaCO3 inorganic fraction [1]
+    ! CaCO3 inorganic fraction (PIC:POC) [mol C (mol C)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.04)
 
@@ -3021,18 +3024,18 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dissdet', wombat%dissdet, 0.20)
 
-    ! Background concentration of weak iron-binding ligand [umol/m3]
+    ! Background concentration of weak iron-binding ligand [µmol/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('ligW', wombat%ligW, 1.7)
 
-    ! Background concentration of strong iron-binding ligand [umol/m3]
+    ! Background concentration of strong iron-binding ligand [µmol/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('ligS', wombat%ligS, 0.4)
 
-    ! Set floor for dissolved iron concentration based on the measurement detection limit [umol/m3]
+    ! Set floor for dissolved iron concentration based on the measurement detection limit [µmol/m3]
     ! Worsford et al., 2014 Mar. Chem. says anywhere between 10 - 50 pM
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.05)
+    call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.025)
 
     ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -3055,13 +3058,13 @@ module generic_WOMBATmid
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kagg_col', wombat%kagg_col, 0.1/86400.0)
 
-    ! Half-saturation coefficient modulating aggregation of colloidal iron [umolFe/m3]
+    ! Half-saturation coefficient modulating aggregation of colloidal iron [µmolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kagg_kcol', wombat%kagg_kcol, 2.0)
 
@@ -3081,7 +3084,7 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('wbafe', wombat%wbafe, 5.0/86400.0)
 
-    ! Factor increase in biogenic silica dissolution caused by bacterial activity [ ]
+    ! Factor increase in biogenic silica dissolution caused by bacterial activity [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bsi_fbac', wombat%bsi_fbac, 20.0)
 
@@ -3089,7 +3092,7 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bsi_kbac', wombat%bsi_kbac, 0.5)
 
-    ! Rate of biogenic silica dissolution in the sediments when at near-total undersaturation [/s]
+    ! Rate of biogenic silica dissolution in the sediments when at near-total undersaturation [s-1]
     !-----------------------------------------------------------------------
     !  Maximum rate of ~1.0 nmol/g biogenic silica s-1 at 0 degrees and 0 cm sediment depth at near-total
     !  undersaturation, equivalent to 2.8e-8 /s dissolution rate [Fig. 11 in Van Cappellen & Qiu, 1997]
@@ -3100,23 +3103,23 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_knh4', wombat%aoa_knh4, 0.1)
 
-    ! Ammonia Oxidizing Archaea diffusive uptake limit for oxygen [m3/mmolC/s]
+    ! Ammonia Oxidizing Archaea diffusive uptake limit for oxygen [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_poxy', wombat%aoa_poxy, 275.0/86400.0)
 
-    ! Ammonia Oxidizing Archaea biomass yield per NH4 [mol NH4 / mol Biomass]
+    ! Ammonia Oxidizing Archaea biomass yield per NH4 [mol NH4 (mol C biomass)-1]
     !-----------------------------------------------------------------------
     ! NOTE: in the WOMBAT-mid documentation, aoa_ynh4 is written as the inverse
     !       of what it is here in the code, in units of mol Biomass per mol NH4
     call g_tracer_add_param('aoa_ynh4', wombat%aoa_ynh4, 11.0)
 
-    ! Ammonia Oxidizing Archaea biomass yield per O2 [mol O2 / mol Biomass]
+    ! Ammonia Oxidizing Archaea biomass yield per O2 [mol O2 (mol C biomass)-1]
     !-----------------------------------------------------------------------
     ! NOTE: in the WOMBAT-mid documentation, aoa_yoxy is written as the inverse
     !       of what it is here in the code, in units of mol Biomass per mol O2
     call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5)
 
-    ! Ammonia Oxidizing Archaea minimum biomass yield of N2O [mol N2O / mol Biomass]
+    ! Ammonia Oxidizing Archaea minimum biomass yield of N2O [mol N2O (mol NH4 oxidized)-1]
     !  Frey et al. (2023) find a baseline yield of ~0.5% in oxic conditions
     !  (i.e., when O2 is not limiting), which we note here is in excess of the baseline
     !  yields of other studies (Ji et al., 2018; Santoro et al., 2011; Qin et al., 2017;
@@ -3125,59 +3128,59 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_en2omin', wombat%aoa_en2omin, 0.0008)
 
-    ! Ammonia Oxidizing Archaea biomass carbon to nitrogen ratio [mol C / mol N]
+    ! Ammonia Oxidizing Archaea biomass carbon to nitrogen ratio [mol C (mol N)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_C2N', wombat%aoa_C2N, 5.0)
 
-    ! Ammonia Oxidizing Archaea biomass carbon to iron ratio [mol C / mol Fe]
+    ! Ammonia Oxidizing Archaea biomass carbon to iron ratio [mol C (mol Fe)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_C2Fe', wombat%aoa_C2Fe, 1.0/20e-6)
 
-    ! Ammonia Oxidizing Archaea linear mortality rate constant [1/s]
+    ! Ammonia Oxidizing Archaea linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoalmor', wombat%aoalmor, 0.005/86400.0)
 
-    ! Ammonia Oxidizing Archaea quadratic mortality rate constant [m3/mmolN/s]
+    ! Ammonia Oxidizing Archaea quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoaqmor', wombat%aoaqmor, 0.001/86400.0)
 
-    ! Penalty to heterotrophic bacterial growth yield due to anaerobic growth
+    ! Penalty to heterotrophic bacterial growth yield due to anaerobic growth [dimensionless]
     !-----------------------------------------------------------------------
     !  Zakem et al., 2020 ISME make this assumption, following LaRowe & Van Cappellen 2011
     call g_tracer_add_param('bacanapen', wombat%bacanapen, 0.9)
 
-    ! Minimum possible biomass yield per mol of DON+NH4 [mol biomas per mol DON]
+    ! Minimum possible biomass yield per mol of DON+NH4 [mol N biomass (mol DON)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac_ydonmin', wombat%bac_ydonmin, 0.15)
 
-    ! Maximum possible biomass yield per mol of DON+NH4 [mol biomas per mol DON]
+    ! Maximum possible biomass yield per mol of DON+NH4 [mol N biomass (mol DON)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac_ydonmax', wombat%bac_ydonmax, 0.65)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of DOC [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of DOC [mmol C m-3 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_Vmax_doc', wombat%bac1_Vmax_doc, 6.7/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of DON [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of DON [mmol N m-3 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_Vmax_don', wombat%bac1_Vmax_don, 1.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of NH4 [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of NH4 [mmol N m-3 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_Vmax_nh4', wombat%bac1_Vmax_nh4, 1.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of NO3 [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of NO3 [mmol N m-3 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_Vmax_no3', wombat%bac1_Vmax_no3, 7.2/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of dFe [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of dFe [mmol Fe m-3 s-1]
     !-----------------------------------------------------------------------
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
     ! in unfiltered seawater when they added Fe+C
-    call g_tracer_add_param('bac1_Vmax_dFe', wombat%bac1_Vmax_dFe, 0.0001/86400.0)
+    call g_tracer_add_param('bac1_Vmax_dFe', wombat%bac1_Vmax_dFe, 0.00010/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 diffusive uptake limit of O2 [m3/mmolC/s]
+    ! Facultative heterotrophic bacteria #1 diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_poxy', wombat%bac1_poxy, 450.0/86400.0)
 
@@ -3185,13 +3188,13 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_kno3', wombat%bac1_kno3, 15.0)
 
-    ! Facultative heterotrophic bacteria #1 half saturation constant for DOC uptake [mmol/m3]
+    ! Facultative heterotrophic bacteria #1 half saturation constant for DOC uptake [mmolC/m3]
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
     call g_tracer_add_param('bac1_kdoc', wombat%bac1_kdoc, 60.0)
 
-    ! Facultative heterotrophic bacteria #1 half saturation constant for DON uptake [mmol/m3]
+    ! Facultative heterotrophic bacteria #1 half saturation constant for DON uptake [mmolN/m3]
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
@@ -3201,62 +3204,62 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_knh4', wombat%bac1_knh4, 0.1)
 
-    ! Facultative heterotrophic bacteria #1 half saturation constant for dissolved iron uptake [umolFe/m3]
+    ! Facultative heterotrophic bacteria #1 half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_kfer', wombat%bac1_kfer, 0.35)
 
-    ! Facultative heterotrophic bacteria #1 biomass carbon to nitrogen ratio [mol C / mol N]
+    ! Facultative heterotrophic bacteria #1 biomass carbon to nitrogen ratio [mol C (mol N)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1_C2N', wombat%bac1_C2N, 5.0)
 
-    ! Facultative heterotrophic bacteria #1 biomass carbon to iron ratio [mol C / mol Fe]
+    ! Facultative heterotrophic bacteria #1 biomass carbon to iron ratio [mol C (mol Fe)-1]
     !-----------------------------------------------------------------------
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! measured 20 - 50 µmol Fe per mol C in unfiltered seawater samples
     call g_tracer_add_param('bac1_C2Fe', wombat%bac1_C2Fe, 1.0/40e-6)
 
-    ! Facultative heterotrophic bacteria #1 linear mortality rate constant [1/s]
+    ! Facultative heterotrophic bacteria #1 linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1lmor', wombat%bac1lmor, 0.005/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 quadratic mortality rate constant [m3/mmolN/s]
+    ! Facultative heterotrophic bacteria #1 quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac1qmor', wombat%bac1qmor, 0.05/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of DOC [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of DOC [mmolC/m3/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_Vmax_doc', wombat%bac2_Vmax_doc, 6.7/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of DON [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of DON [mmolN/m3/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_Vmax_don', wombat%bac2_Vmax_don, 1.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of NH4 [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of NH4 [mmolN/m3/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_Vmax_nh4', wombat%bac2_Vmax_nh4, 1.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of dFe [mmol/m3/s]
+    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of dFe [mmolFe/m3/s]
     !-----------------------------------------------------------------------
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
     ! in unfiltered seawater when they added Fe+C
-    call g_tracer_add_param('bac2_Vmax_dFe', wombat%bac2_Vmax_dFe, 0.0001/86400.0)
+    call g_tracer_add_param('bac2_Vmax_dFe', wombat%bac2_Vmax_dFe, 0.00010/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 diffusive uptake limit of O2 [m3/mmolC/s]
+    ! Facultative heterotrophic bacteria #2 diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_poxy', wombat%bac2_poxy, 450.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 diffusive uptake limit of N2O [m3/mmolC/s]
+    ! Facultative heterotrophic bacteria #2 diffusive uptake limit of N2O [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_pn2o', wombat%bac2_pn2o, 452.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 half saturation constant for DOC uptake [mmol/m3]
+    ! Facultative heterotrophic bacteria #2 half saturation constant for DOC uptake [mmolC/m3]
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
     call g_tracer_add_param('bac2_kdoc', wombat%bac2_kdoc, 60.0)
 
-    ! Facultative heterotrophic bacteria #2 half saturation constant for DON uptake [mmol/m3]
+    ! Facultative heterotrophic bacteria #2 half saturation constant for DON uptake [mmolN/m3]
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
@@ -3266,25 +3269,25 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_knh4', wombat%bac2_knh4, 0.1)
 
-    ! Facultative heterotrophic bacteria #2 half saturation constant for dissolved iron uptake [umolFe/m3]
+    ! Facultative heterotrophic bacteria #2 half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_kfer', wombat%bac2_kfer, 0.35)
 
-    ! Facultative heterotrophic bacteria #2 biomass carbon to nitrogen ratio [mol C / mol N]
+    ! Facultative heterotrophic bacteria #2 biomass carbon to nitrogen ratio [mol C (mol N)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2_C2N', wombat%bac2_C2N, 5.0)
 
-    ! Facultative heterotrophic bacteria #2 biomass carbon to iron ratio [mol C / mol Fe]
+    ! Facultative heterotrophic bacteria #2 biomass carbon to iron ratio [mol C (mol Fe)-1]
     !-----------------------------------------------------------------------
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! measured 20 - 50 µmol Fe per mol C in unfiltered seawater samples
     call g_tracer_add_param('bac2_C2Fe', wombat%bac2_C2Fe, 1.0/40e-6)
 
-    ! Facultative heterotrophic bacteria #2 linear mortality rate constant [1/s]
+    ! Facultative heterotrophic bacteria #2 linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2lmor', wombat%bac2lmor, 0.005/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 quadratic mortality rate constant [m3/mmolN/s]
+    ! Facultative heterotrophic bacteria #2 quadratic mortality rate constant [(mmol C m-3)-1 s-1])]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bac2qmor', wombat%bac2qmor, 0.05/86400.0)
 
@@ -3292,16 +3295,16 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoxkn', wombat%aoxkn, 0.5)
 
-    ! Anammox bacteria maximum growth * biomass rate [/s]
+    ! Anammox bacteria maximum growth * biomass rate [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoxmumax', wombat%aoxmumax, 0.0025/86400.0)
 
-    ! Nominal oxidation state of carbon of phytoplankton overflow exudation of DOC
+    ! Nominal oxidation state of carbon of phytoplankton overflow exudation of DOC [dimensionless]
     !-----------------------------------------------------------------------
     !  We assume very simple sugars and amino acids
     call g_tracer_add_param('noscphyover', wombat%noscphyover, 1.0 -0.0)
 
-    ! Nominal oxidation state of carbon of zooplankton excretion of DOC
+    ! Nominal oxidation state of carbon of zooplankton excretion of DOC [dimensionless]
     !-----------------------------------------------------------------------
     ! Composition of copepod excreta [Maas et al., 2020 Frontiers in Marine Science]
     !  - ~40% proteins, with a NOSC of -0.15  [Fig. 5 of Dick 2024 J. Royal Society]
@@ -3311,7 +3314,7 @@ module generic_WOMBATmid
     ! This gives an overal NOSC of  of roughly -0.20
     call g_tracer_add_param('nosczooexcr', wombat%nosczooexcr, 1.0 -0.20)
 
-    ! Nominal oxidation state of carbon of phytoplankton lysis producing DOC
+    ! Nominal oxidation state of carbon of phytoplankton lysis producing DOC [dimensionless]
     !-----------------------------------------------------------------------
     ! Composition of phytoplankton cells by dry weight [Hedges et al., 2002; Inomura et al., 2020]
     !  - ~61% protein, with a NOSC of -0.15  [Fig. 5 of Dick 2024 J. Royal Society]
@@ -3322,7 +3325,7 @@ module generic_WOMBATmid
     ! This gives an overal NOSC of lysed phytoplankton cells of roughly -0.35
     call g_tracer_add_param('noscphylyse', wombat%noscphylyse, 1.0 -0.35)
 
-    ! Nominal oxidation state of carbon of bacterial lysis producing DOC
+    ! Nominal oxidation state of carbon of bacterial lysis producing DOC [dimensionless]
     !-----------------------------------------------------------------------
     ! Composition of E. coli cells by dry weight [Schonheit et al., 2016 Trends in Microbiology; their Table 1]
     !  - ~55% protein, with a NOSC of -0.15  [Fig. 5 of Dick 2024 J. Royal Society]
@@ -3332,7 +3335,7 @@ module generic_WOMBATmid
     ! This gives an overal NOSC of lysed bacterial cells of roughly -0.03
     call g_tracer_add_param('noscbaclyse', wombat%noscbaclyse, 1.0 -0.03)
 
-    ! Nominal oxidation state of carbon of sinking marine detritus producing DOC
+    ! Nominal oxidation state of carbon of sinking marine detritus producing DOC [dimensionless]
     !-----------------------------------------------------------------------
     ! Composition of marine organic detritus by dry weight
     !  [Minor et al. 2003 Geochim. et Cosmochim. Acta; Lopez-Fernandez et al., 2013 Progress in Oceanography]
@@ -3344,7 +3347,7 @@ module generic_WOMBATmid
     ! This gives an overal NOSC of sinking organic detritus of roughly -0.40
     call g_tracer_add_param('noscdethydr', wombat%noscdethydr, 1.0 -0.40)
 
-    ! Offset to the in-situ nominal oxidation state of carbon targetted by bacteria
+    ! Offset to the in-situ nominal oxidation state of carbon targetted by bacteria [dimensionless]
     !-----------------------------------------------------------------------
     !  i.e., bacteria consume DOM at a NOSC x units ABOVE the in situ NOSC
     !        and therefore shift the NOSC down if this number is positive
