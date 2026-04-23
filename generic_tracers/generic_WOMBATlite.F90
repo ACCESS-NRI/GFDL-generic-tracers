@@ -2795,7 +2795,7 @@ module generic_WOMBATlite
 
       ! Scavenging of Fe` onto biogenic particles
       partic = (det_mmolm3*2 + caco3_mmolm3*8.3)
-      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic)
+      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7/86400.0 + wombat%kscav_dfe * partic)
       wombat%fescadet(i,j,k) = wombat%fescaven(i,j,k) * det_mmolm3*2 / (partic+epsi)
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
