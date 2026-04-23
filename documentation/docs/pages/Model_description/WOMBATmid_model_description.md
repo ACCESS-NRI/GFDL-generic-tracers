@@ -19,7 +19,7 @@ _Dougie.Squire@anu.edu.au_
 
 ## Tracers
 
-The following are the active tracers in WOMBAT-lite
+The following are the active tracers in WOMBAT-mid
 
 | #    | Tracer                        | Code name  | Description                                         | Units                     | Default on? |
 |------|-------------------------------|------------|-----------------------------------------------------|---------------------------|-------------|
@@ -41,14 +41,14 @@ The following are the active tracers in WOMBAT-lite
 | 16   | B<sub>mp</sub><sup>Chl</sup>  | `p_dchl`   | Micro-phytoplankton chlorophyll content             | mol C kg<sup>-1</sup>     | Yes         |
 | 17   | B<sub>np</sub><sup>Fe</sup>   | `p_phyfe`  | Nano-phytoplankton iron content                     | mol Fe kg<sup>-1</sup>    | Yes         |
 | 18   | B<sub>mp</sub><sup>Fe</sup>   | `p_diafe`  | Micro-phytoplankton iron content                    | mol Fe kg<sup>-1</sup>    | Yes         |
-| 19   | B<sub>mp</sub><sup>Si</sup>   | `p_diasi`  | Micro-phytoplankton silicon content                 | mol Fe kg<sup>-1</sup>    | Yes         |
+| 19   | B<sub>mp</sub><sup>Si</sup>   | `p_diasi`  | Micro-phytoplankton silicon content                 | mol Si kg<sup>-1</sup>    | Yes         |
 | 20   | B<sub>mz</sub><sup>Fe</sup>   | `p_zoofe`  | Micro-zooplankton iron content                      | mol Fe kg<sup>-1</sup>    | Yes         |
 | 21   | B<sub>Mz</sub><sup>Fe</sup>   | `p_mesfe`  | Meso-zooplankton iron content                       | mol Fe kg<sup>-1</sup>    | Yes         |
 | 22   | B<sub>sd</sub><sup>Fe</sup>   | `p_detfe`  | Small sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
 | 23   | B<sub>ld</sub><sup>Fe</sup>   | `p_bdetfe` | Large sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
 | 24   | B<sub>ld</sub><sup>Si</sup>   | `p_bdetsi` | Large sinking detritus silicon content              | mol Si kg<sup>-1</sup>    | Yes         |
 | 25   | B<sub>DOM</sub><sup>C</sup>   | `p_doc`    | Dissolved organic carbon                            | mol C kg<sup>-1</sup>     | Yes         |
-| 26   | B<sub>DOM</sub><sup>N</sup>   | `p_doc`    | Dissolved organic carbon                            | mol C kg<sup>-1</sup>     | Yes         |
+| 26   | B<sub>DOM</sub><sup>N</sup>   | `p_don`    | Dissolved organic nitrogen                          | mol N kg<sup>-1</sup>     | Yes         |
 | 27   | B<sub>aoa</sub><sup>C</sup>   | `p_aoa`    | Ammonia oxidizing archaea                           | mol C kg<sup>-1</sup>     | Yes         |
 | 28   | B<sub>b1</sub><sup>C</sup>    | `p_bac1`   | Faculative heterotrophic bacterial type 1           | mol C kg<sup>-1</sup>     | Yes         |
 | 29   | B<sub>b2</sub><sup>C</sup>    | `p_bac2`   | Faculative heterotrophic bacterial type 2           | mol C kg<sup>-1</sup>     | Yes         |
@@ -77,7 +77,7 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_benthic_denitrification` | Do implicit reduction of NO<sub>3</sub> in the sediment                                    | .true.    |
 | `do_tracer_dicp`             | Carry preformed dissolved inorganic carbon (dicp) as a tracer                              | .false.   |
 | `do_tracer_dicr`             | Carry remineralised dissolved inorganic carbon (dicr) as a tracer                          | .false.   |
-| `do_tracer_nosc`             | Carry nominal oxidation state of dissolved inorganic carbon (nosdoc) as a tracer           | .false.   |
+| `do_tracer_nosdoc`           | Carry nominal oxidation state of dissolved organic carbon (nosdoc) as a tracer           | .false.   |
 | `do_viscous_sinking`         | Rubey's formula uses a non-constant dynamic viscosity of seawater                          | .true.    |
 | `do_check_n_conserve`        | Checks that the ecosystem calculations are conserving the mass of nitrogen                 | .false.   |
 | `do_check_c_conserve`        | Checks that the ecosystem calculations are conserving the mass of carbon                   | .false.   |
@@ -89,7 +89,7 @@ We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic var
 
 ## Diagnostic outputs
 
-The following are all **2D** diagnostic output variables from WOMBAT-lite.
+The following are all **2D** diagnostic output variables from WOMBAT-mid.
 
 | Diagnostic        | Description                                                                                          | Units                                |
 | ----------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------ |
@@ -152,7 +152,7 @@ The following are all **2D** diagnostic output variables from WOMBAT-lite.
 | `alk_btf`         | Bottom flux of alkalinity into ocean                                                                 | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
 
 
-The following are all **3D** diagnostic output variables from WOMBAT-lite.
+The following are all **3D** diagnostic output variables from WOMBAT-mid.
 
 | Diagnostic         | Description                                                                        | Units                                           |
 | ------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -1567,10 +1567,10 @@ F_{Mz}^{\gamma} =& \quad \dfrac{B_{Mz}^{C}}{B_{Mz}^{C} + K_{Mz}^{\gamma}}
 $$
 
 _where_ <br>
-- $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`biozoo`, [mmol C m<sup>-1</sup>]) <br>
-- $B_{Mz}^{C}$ is the concentration of meso-zooplankton carbon biomass (`biomes`, [mmol C m<sup>-1</sup>]) <br>
-- $K_{mz}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses for micro-zooplankton (`zookz`, [mmol C m<sup>-1</sup>]) <br>
-- $K_{Mz}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses for meso-zooplankton (`meskz`, [mmol C m<sup>-1</sup>]) <br>
+- $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`biozoo`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{Mz}^{C}$ is the concentration of meso-zooplankton carbon biomass (`biomes`, [mmol C m<sup>-3</sup>]) <br>
+- $K_{mz}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses for micro-zooplankton (`zookz`, [mmol C m<sup>-3</sup>]) <br>
+- $K_{Mz}^{\gamma}$ is the half-saturation coefficient for scaling down linear mortality losses for meso-zooplankton (`meskz`, [mmol C m<sup>-3</sup>]) <br>
 
 
 **Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
