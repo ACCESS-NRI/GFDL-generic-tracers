@@ -2288,10 +2288,6 @@ module generic_WOMBATlite
     wombat%phy_lnit(:,:,:) = 0.0
     wombat%phy_lfer(:,:,:) = 0.0
     wombat%phy_dfeupt(:,:,:) = 0.0
-    wombat%tri_mumax(:,:,:) = 0.0
-    wombat%tri_lpar(:,:,:) = 0.0
-    wombat%tri_lfer(:,:,:) = 0.0
-    wombat%nitrfix(:,:,:) = 0.0
     wombat%feIII(:,:,:) = 0.0
     wombat%ligK(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
@@ -2344,6 +2340,12 @@ module generic_WOMBATlite
     wombat%sedhtotal(:,:) = 0.0
     wombat%sedco3(:,:) = 0.0
     wombat%sedomega_cal(:,:) = 0.0
+    if (do_nitrogen_fixation) then
+      wombat%tri_mumax(:,:,:) = 0.0
+      wombat%tri_lpar(:,:,:) = 0.0
+      wombat%tri_lfer(:,:,:) = 0.0
+      wombat%nitrfix(:,:,:) = 0.0
+    endif
 
     ! Allocate and initialise some multi-dimensional variables
     allocate(wsink(nk)); wsink(:)=0.0
@@ -3084,8 +3086,9 @@ module generic_WOMBATlite
                               wombat%zooexcrphy(i,j,k) + &
                               wombat%zooexcrdet(i,j,k) + &
                               wombat%phymorl(i,j,k) - &
-                              wombat%phygrow(i,j,k) ) &
-                              + dtsb * wombat%nitrfix(i,j,k)
+                              wombat%phygrow(i,j,k) )
+      if (do_nitrogen_fixation) &
+        wombat%p_no3(i,j,k,tau) = wombat%p_no3(i,j,k,tau) + dtsb * wombat%nitrfix(i,j,k)
 
       ! Detrital iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
