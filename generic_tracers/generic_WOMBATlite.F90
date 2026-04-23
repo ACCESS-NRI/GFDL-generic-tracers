@@ -945,7 +945,7 @@ module generic_WOMBATlite
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooeps', 'Zooplankton prey capture rate coefficient', 'h', 'L', 's', 'm^6/mmolC^2/s', 'f')
+        'zooeps', 'Zooplankton community-wide prey capture rate coefficient', 'h', 'L', 's', 'm^6/mmolC^2/s', 'f')
     wombat%id_zooeps = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -1974,7 +1974,7 @@ module generic_WOMBATlite
     real                                    :: rdtts ! 1 / dt
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
-    real                                    :: g_npz, wzphy, wzdet, Xzoo, I_Xzoo
+    real                                    :: g_zoo, wzphy, wzdet, Xzoo, I_Xzoo
     real                                    :: zooegesphyfe, zooegesdetfe
     real                                    :: zooassiphyfe, zooassidetfe
     real                                    :: zooexcrphyfe, zooexcrdetfe
@@ -2701,7 +2701,7 @@ module generic_WOMBATlite
 
       ! Scavenging of Fe` onto biogenic particles
       partic = (det_mmolm3*2 + caco3_mmolm3*8.3)
-      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7 + wombat%kscav_dfe * partic)
+      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7/86400.0 + wombat%kscav_dfe * partic)
       wombat%fescadet(i,j,k) = wombat%fescaven(i,j,k) * det_mmolm3*2 / (partic+epsi)
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
@@ -2787,7 +2787,7 @@ module generic_WOMBATlite
       zval1 = (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2
       zval2 = (wombat%zooprefdet(i,j,k) * det_mmolm3)**2
       Xzoo = (  wombat%zooepsphy * zval1 + wombat%zooepsdet * zval2 )
-      g_npz = wombat%zoogmax * fbc * Xzoo / (wombat%zoogmax * fbc + Xzoo)
+      g_zoo = wombat%zoogmax * fbc * Xzoo / (wombat%zoogmax * fbc + Xzoo)
 
       ! We follow Le Mezo & Galbraith (2021) L&O - The fecal iron pump: ...
       !  - egestion, assimilation and excretion of carbon and iron by zooplankton are calculated separately
@@ -2798,8 +2798,8 @@ module generic_WOMBATlite
         I_Xzoo = 1.0 / Xzoo
         ! find "apparent" community epsilon (prey capture rate coefficient)
         wombat%zooeps(i,j,k) = Xzoo / ( zval1 + zval2 )
-        wombat%zoograzphy(i,j,k) = g_npz * zoo_p * ( wombat%zooepsphy * zval1 * I_Xzoo )! [molC/kg/s]
-        wombat%zoograzdet(i,j,k) = g_npz * zoo_p * ( wombat%zooepsdet * zval2 * I_Xzoo ) ! [molC/kg/s]
+        wombat%zoograzphy(i,j,k) = g_zoo * zoo_p * ( wombat%zooepsphy * zval1 * I_Xzoo )! [molC/kg/s]
+        wombat%zoograzdet(i,j,k) = g_zoo * zoo_p * ( wombat%zooepsdet * zval2 * I_Xzoo ) ! [molC/kg/s]
       else
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdet(i,j,k) = 0.0

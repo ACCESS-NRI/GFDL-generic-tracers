@@ -142,7 +142,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-lite.
 | `phygrow`     | Growth of phytoplankton                                                | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
 | `phymorl`     | Linear mortality of phytoplankton                                      | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
 | `phymorq`     | Quadratic mortality of phytoplankton                                   | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
-| `zooeps`      | Zooplankton prey capture rate coefficient                              | (mmol C m<sup>-3</sup>)<sup>-2</sup> s<sup>-1</sup> |
+| `zooeps`      | Zooplankton community-wide prey capture rate coefficient               | (mmol C m<sup>-3</sup>)<sup>-2</sup> s<sup>-1</sup> |
 | `zooprefphy`  | Dietary fraction of phytoplankton in zooplankton grazing               | dimensionless                                    |
 | `zooprefdet`  | Dietary fraction of detritus in zooplankton grazing                    | dimensionless                                    |
 | `zoograzphy`  | Grazing rate of zooplankton on phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>             |
@@ -223,9 +223,8 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `fgutdiss`         | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
 | `zookz`            | Half-saturation coefficient for zooplankton mortality [mmolC/m³]            | 0.25               |
 | `zoogmax`          | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.0/86400.0        |
-| `zooepsmin`        | Zooplankton minimum prey capture rate [m⁶/mmol²/s]                          | 0.005/86400.0      |
-| `zooepsmax`        | Zooplankton maximum prey capture rate [m⁶/mmol²/s]                          | 0.25/86400.0       |
-| `zooepsrat`        | Zooplankton transition rate of epsilon [(mmolC/m³)⁻¹]                       | 0.1                |
+| `zooepsphy`        | Zooplankton prey capture rate coefficient for phytoplankton [m⁶/mmol²/s]    | 0.40/86400.0       |
+| `zooepsdet`        | Zooplankton prey capture rate coefficient for detritus [m⁶/mmol²/s]         | 0.25/86400.0       |
 | `zoopreyswitch`    | Zooplankton prey switching exponent [dimenionless]                          | 1.8                |
 | `zprefphy`         | Zooplankton preference for phytoplankton [dimensionless]                    | 1.0                |
 | `zprefdet`         | Zooplankton preference for detritus [dimensionless]                         | 0.50               |
@@ -913,11 +912,11 @@ since hydrolyzation of organic detritus is performed by an heterotrophic bacteri
 
 ### 10. Zooplankton grazing, egestion, excretion and assimilation.
 
-**Grazing by zooplankton** (`g_npz`, $g_{zoo}$, [s<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7):
+**Grazing by zooplankton** (`g_zoo`, $g_{zoo}$, [s<sup>-1</sup>]) is computed using a Holling Type III functional response [Holling, 1959](https://doi.org/10.4039/Ent91385-7):
 
 $$
 \begin{align}
-g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} \varepsilon \left(B_{prey}^{C}\right)^{2}}{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} + \varepsilon \left(B_{prey}^{C}\right)^{2}}
+g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{zoo}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C}\right)^{2}\right)} 
 \end{align}
 $$
 
@@ -925,91 +924,60 @@ _where_ <br>
 - $\mu_{zoo}^{max}$ is the maximum rate of zooplankton grazing at 0ºC (`zoogmax`, [s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $B_{prey}^{C}$ is the concentration of prey biomass (`zooprey`, [mmol C m<sup>-3</sup>]) <br>
-- $\varepsilon$ is the prey capture rate coefficient (`zooeps(i,j,k)`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
+- $B_{i}^{C}$ is the concentration of prey type $i$ carbon biomass ([mmol C m<sup>-3</sup>]) <br>
+- $\phi_{zoo}^{i}$ is the normalized prey preference of zooplankton for prey type $i$ ([dimenionless]) <br>
+- $\varepsilon_{zoo}^{i}$ is the prey capture rate coefficient of zooplankton for prey type $i$ ([(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
+
+and where
+
+$$
+\begin{align}
+\sum_{i} \phi_{zoo}^{i} = 1.0
+\end{align}
+$$
+
+
+This formulation suppresses grazing at low prey biomass ($B_{i}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
+
+The application of the temperature-dependent maximum growth rate in both the numerator and denominator makes this grazing formula unique [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w) and equivalent to a disk formulation, rather than a Michaelis–Menten formulation [(Rohr et al., 2022)](https://doi.org/10.1016/j.pocean.2022.102878). Practically, this amplifies grazing in warmer climes, but to a lesser extent than other formulations that apply the temperature amplification ($(β_{hete})^{T}$) only in the numerator [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w). This dampens the effect that variations in temperature have on grazing activity, amplifying the effect of $\varepsilon^{i}$ and aligning with observations that the ratio of grazing to phytoplankton growth varies little between tropical and polar climes [(Calbet and Landry, 2004)](https://doi.org/10.4319/lo.2004.49.1.0051). Theoretically, this assumes some evolutionary adaptation to account for the physiological effects of temperature across environmental niches, such that the efficiency of prey capture and handling becomes more important to grazers than metabolic constraints due to temperature.
+
+The normalized prey preferences (i.e., dietary fractions) are modified from initial values by prey switching prior to computation of total prey biomass ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)) such that
+
+$$
+\begin{align}
+\phi_{zoo}^{i} =& \quad \left( \phi_{zoo}^{i,0} B_{i}^{C} \right)^{s_{zoo}}
+\end{align}
+$$
+
+_where_ <br>
+- $\phi_{zoo}^{i,0}$ is the initial guess of the prey preference of zooplankton for prey type $i$ <br>
+- $B_{i}^{C}$ is the concentration of prey type $i$ in carbon biomass <br>
+- $s_{zoo}$ is the prey-switching exponent of zooplankton (`zoopreyswitch`) <br>
+
+When $s_{zoo} < 1$, zooplankton feed more evenly across prey items, compressing differences in dietary fractions  <br>
+When $s_{zoo} = 1$, zooplankton feed according to pre-defined dietary fractions weighted by prey biomass  <br>
+When $s_{zoo} > 1$, zooplankton exhibit prey-switching and feed disproportionately on most abundant prey  <br>
+
+The community average prey capture rate coefficient of zooplankton (`zooeps(i,j,k)`, $\varepsilon_{zoo}$, [(mmol C m<sup>-3</sup>)<sup>-2</sup> s<sup>-1</sup>]) varies as a function of the prey biomasses and the consequential variations in prey preferences associated with prey-switching, which is consistent with the prey-dependent behaviour described by [Rohr et al. (2024)](doi.org/10.1029/2023GL107732). This is computed as:
+
+$$
+\begin{align}
+\varepsilon_{zoo} =& \quad \dfrac{ \sum_{i} \left( \varepsilon_{zoo}^{i} \left( \phi_{zoo}^{i} B_{i}^{C} \right)^{2} \right) }{\sum_{i} \left( \left( \phi_{zoo}^{i} B_{i}^{C} \right)^{2} \right)}  \\
+\end{align}
+$$
+
 
 Total grazing of biomass by zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
 $$
 \begin{align}
-g_{zoo}^{\leftarrow C} =& \quad g_{zoo} B_{zoo}^{C} 
+g_{zoo}^{\leftarrow C} =& \quad g_{zoo} B_{zoo}^{C} \\
 \end{align}
 $$
 
 _where_ <br>
 - $g_{zoo}$ is the total specific rate of grazing of zooplankton (`g_zoo`, [s<sup>-1</sup>]) <br>
-- $B_{zoo}^{C}$ is the in situ concentration of zooplankton carbon biomass (`p_zoo(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
-
-This formulation suppresses grazing at very low prey biomass ($B_{prey}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
-
-The application of $g_{zoo}^{max} (β_{hete})^{T}$ in both the numerator and denominator makes this grazing formula unique [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w) and equivalent to a disk formulation, rather than a Michaelis–Menten formulation [(Rohr et al., 2022)](https://doi.org/10.1016/j.pocean.2022.102878). Practically, this amplifies grazing in warmer climes, but to a lesser extent than other formulations that apply the temperature amplification ($(β_{hete})^{T}$) only in the numerator [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w). This dampens the effect that variations in temperature have on grazing activity, amplifying the effect of $\varepsilon$ and aligning with observations that the ratio of grazing to phytoplankton growth varies little between tropical and polar climes [(Calbet and Landry, 2004)](https://doi.org/10.4319/lo.2004.49.1.0051). Theoretically, this assumes some evolutionary adaptation to account for the physiological effects of temperature across environmental niches, such that the efficiency of prey capture and handling becomes more important to grazers than metabolic constraints due to temperature.
-
-The total prey biomass available to zooplankton is defined as a preference-weighted sum of phytoplankton and detritus that is normalized to reflect explicit dietary fractions ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)):
-
-$$
-\begin{align}
-B_{prey}^{C} =& \quad \phi_{zoo}^{phy} B_{phy}^{C} + \phi_{zoo}^{det} B_{det}^{C}
-\end{align}
-$$
-
-_where_ <br>
-- $B_{phy}^{C}$ is the concentration of phytoplankton biomass (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{det}^{C}$ is the concentration of particulate organic detritus (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
-- $\phi_{zoo}^{phy}$ is the relative preference of zooplankton grazing on phytoplankton (`zooprefphy(i,j,k)`, [dimensionless]) <br>
-- $\phi_{zoo}^{det}$ is the relative preference of zooplankton grazing on particulate detritus (`zooprefdet(i,j,k)`, [dimensionless]) <br>
-
-and where:
-
-$$
-\begin{align}
-\phi_{zoo}^{phy} + \phi_{zoo}^{det} =& \quad 1
-\end{align}
-$$
-
-The normalized prey preferences (i.e., dietary fractions) are further modified by prey switching prior to computation of total prey biomass ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)) such that
-
-$$
-\begin{align}
-\phi_{zoo}^{phy} =& \quad \left( \phi_{zoo}^{phy} B_{phy}^{C} \right)^{s_{zoo}} \\
-\phi_{zoo}^{det} =& \quad \left( \phi_{zoo}^{det} B_{det}^{C} \right)^{s_{zoo}}
-\end{align}
-$$
-
-_where_ <br>
-- $\phi_{zoo}^{phy}$ and $\phi_{zoo}^{det}$ are the relative prey preference of zooplankton for phytoplankton and detritus (`zooprefphy(i,j,k)`; `zooprefdet(i,j,k)`, [dimensionless]) <br>
-- $B_{phy}^{C}$ and $B_{det}^{C}$ are the concentrations of phytoplankton and detritus in carbon biomass (`phy_mmolm3`; `det_mmolm3`, [mmol C m<sup>-3</sup>])<br>
-- $s_{zoo}$ is the prey-switching exponent of zooplankton (`zoopreyswitch`) <br>
-
-When $s_{zoo} < 1$, zooplankton feed equally across all prey items irrespective of availability  <br>
-When $s_{zoo} = 1$, zooplankton feed according to pre-defined dietary fractions  <br>
-When $s_{zoo} > 1$, zooplankton exhibit prey-switching and feed disproportionately on most abundant prey  <br>
-
-Again, prey preferences are normalized to ensure that $\phi_{zoo}^{phy} + \phi_{zoo}^{det} = 1$.
-
-The prey capture rate coefficient, $\varepsilon$ (`zooeps(i,j,k)`, $\varepsilon$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]), is allowed to vary as a function of prey biomass, following the prey-dependent behaviour described by [Rohr et al. (2024)](doi.org/10.1029/2023GL107732). This reflects a transition from microzooplankton-like feeding with higher prey capture rate coefficients at low prey biomass to mesozooplankton-like feeding with lower prey capture rate coefficients at high prey biomass.
-
-A prey-dependent scaling factor (`g_peffect`, $F_{prey}$, [dimensionless]) is defined as
-
-$$
-\begin{align}
-F_{prey} =& \quad e^{\left(-B_{prey}^{C} \varepsilon_{shift} \right)}
-\end{align}
-$$
-
-and the effective capture rate coefficient, (`zooeps`, $\varepsilon$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) is then computed as
-
-$$
-\begin{align}
-\varepsilon =& \quad \varepsilon_{\min} + \left(\varepsilon_{\max} - \varepsilon_{\min}\right) F_{prey}
-\end{align}
-$$
-
-_where_ <br>
-- $\varepsilon_{shift}$ is the rate at which the prey capture efficiency transitions from micro- to meso-zooplankton (`zooepsrat`, [(mmol C m<sup>-3</sup>)<sup>-1</sup>]) <br>
-- $\varepsilon_{\min}$ is the prey capture rate coefficient of a zooplankton community dominated by meso-zooplankton (`zooepsmin`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
-- $\varepsilon_{\max}$ is the prey capture rate coefficient of a zooplankton community dominated by micro-zooplankton (`zooepsmax`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
-
-At low prey biomass, $\varepsilon \rightarrow \varepsilon_{\max}$, enhancing grazing efficiency. At high prey biomass, $\varepsilon \rightarrow \varepsilon_{\min}$, reducing capture efficiency as handling time and feeding mode are more ineffective on average in a community with relatively more mesozooplankton.
+- $B_{zoo}^{C}$ is the in situ concentration of zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
 Total grazing of prey can also be expressed as the sum of individual prey type consumption:
 
@@ -1019,17 +987,17 @@ g_{zoo}^{\leftarrow C} =& \quad g_{zoo}^{\leftarrow B_{phy}^{C}} + g_{zoo}^{\lef
 \end{align}
 $$
 
-_where_ <br>
-- $g_{zoo}^{\leftarrow B_{phy}^{C}} = g_{zoo} \dfrac{\phi_{zoo}^{phy} B_{phy}^{C}}{B_{prey}^{C}}$ and is the proportion of zooplankton grazing of phytoplankton (`zoograzphy`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{zoo}^{\leftarrow B_{det}^{C}} = g_{zoo} \dfrac{\phi_{zoo}^{det} B_{det}^{C}}{B_{prey}^{C}}$ and is the proportion of zooplankton grazing of detritus (`zoograzdet`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-
-In this formulation, consumption of each prey item $i$ in [mol C kg<sup>-1</sup>] can also be expressed as:
+In this formulation, consumption of each prey item $i$ in [mol C kg<sup>-1</sup>] is equal to:
 
 $$
 \begin{align}
-g_{zoo}^{\leftarrow B_{i}^{C}} =& \quad g_{zoo} B_{zoo}^{C} \cdot \varepsilon \dfrac{\left(\phi_{zoo}^{i} B_{i}^{C} \right)^{2}}{\sum_{i} \left(\phi_{zoo}^{i} B_{i}^{C} \right)^{2}}
+g_{zoo}^{\leftarrow B_{i}^{C}} =& \quad g_{zoo} B_{z}^{C} \cdot \dfrac{\varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C} \right)^{2}}{\sum_{i} \varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C} \right)^{2}}
 \end{align}
 $$
+
+Thus: <br>
+- $g_{zoo}^{\leftarrow B_{phy}^{C}}$ is the grazing rate of phytoplankton by zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{zoo}^{\leftarrow B_{det}^{C}}$ is the grazing rate of particulate detritus by zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 
 
 **Zooplankton egestion, excretion and assimilation** are then calculated assuming static assimilation coefficients. Grazed biomass is routed to either egestion or ingestion via an ingestion coefficient ($\lambda^{C}$, [mol C (mol C)<sup>-1</sup>]), with the egested fraction being equal to $1.0 - \lambda^{C}$. The biomass that is ingested is then split between assimilation and excretion based on an assimilation coefficient ($\eta^{C}$, [mol C (mol C)<sup>-1</sup>]) with the excreted fraction being equal to $1.0 - \eta^{C}$. Egestion ($E$), excretion ($X$) and assimilation ($A$) of organic carbon due to grazing of prey type $i$ by zooplankton are calculated as:
