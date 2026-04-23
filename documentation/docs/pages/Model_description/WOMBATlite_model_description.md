@@ -49,9 +49,9 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_caco3_dynamics`            | Production and dissolution of CaCO3 depends on carbon system state              | .true.           |
 | `do_colloidal_shunt`           | Fraction of dissolved iron is colloids that coagulate onto sinking material     | .true.           |
 | `do_two_ligands`               | Complex soluble iron using two ligands (weak + strong) rather than one          | .false.          |
-| `do_burial`                    | Permanently bury a fraction of sinking detrital material into the sediments     | .true.           |
-| `do_nitrogen_fixation`         | Allow implicit nitrogen fixing popoulation to add NO<sub>3</sub> to ocean       | .true.           |
-| `do_benthic_denitrification`   | Allow implicit benthic bacterial population to remove NO<sub>3</sub> from ocean | .true.           |
+| `do_burial`                    | Permanently bury a fraction of sinking detrital material into the sediments     | .false.          |
+| `do_nitrogen_fixation`         | Allow implicit nitrogen fixing popoulation to add NO<sub>3</sub> to ocean       | .false.          |
+| `do_benthic_denitrification`   | Allow implicit benthic bacterial population to remove NO<sub>3</sub> from ocean | .false.          |
 | `do_tracer_dicp`               | Carry preformed dissolved inorganic carbon (dicp) as a tracer                   | .false.          |
 | `do_tracer_dicr`               | Carry remineralised dissolved inorganic carbon (dicr) as a tracer               | .false.          |
 | `do_check_n_conserve`          | Checks that the ecosystem calculations are conserving the mass of nitrogen      | .false.          |
@@ -134,7 +134,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-lite.
 | `phy_dfeupt`  | Uptake of dFe by phytoplankton                                         | mol kg<sup>-1</sup> s<sup>-1</sup>               |
 | `tri_mumax`   | Maximum growth rate of trichodesmium                                   | s<sup>-1</sup>                                   |
 | `tri_lpar`    | Limitation of trichodesmium by light                                   | dimensionless                                    |
-| `tri_lfer`    | Limitation of trichodesmkum by iron                                    | dimensionless                                    |
+| `tri_lfer`    | Limitation of trichodesmium by iron                                    | dimensionless                                    |
 | `nitrfix`     | Implicit nitrogen fixation rate (NO<sub>3</sub> production)            | mol N kg<sup>-1</sup> s<sup>-1</sup>             |
 | `feIII`       | Free iron (Fe<sup>3+</sup>)                                            | mol kg<sup>-1</sup>                              |
 | `ligK`        | Ligand stability constant                                              | L mol<sup>-1</sup>                               |
@@ -228,7 +228,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `phybiot`          | Phytoplankton biomass threshold [mmolC/m³]                                  | 0.6                |
 | `alphabio_tri`     | Trichodesmium initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹]               | 1.8                |
 | `trikf`            | Trichodesmium half saturation constant for iron uptake [µmolFe/m³]          | 0.125              |
-| `trichlc`          | Trichodesmium chlorophyll to carbon ratio [mol C (mol C)<sup>-1</sup>]      | 0.01               |
+| `trichlc`          | Trichodesmium chlorophyll to carbon ratio [mol Chl (mol C)<sup>-1</sup>]    | 0.01               |
 | `trin2c`           | Trichodesmium nitrogen to carbon ratio [molN (mol C)<sup>-1</sup>]          | 50/300             |
 | `zooCingest`       | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.8                |
 | `zooCassim`        | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.3                |
