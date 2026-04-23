@@ -195,9 +195,8 @@ module generic_WOMBATlite
         fgutdiss, &
         zookz, &
         zoogmax, &
-        zooepsmin, &
-        zooepsmax, &
-        zooepsrat, &
+        zooepsphy, &
+        zooepsdet, &
         zoopreyswitch, &
         zprefphy, &
         zprefdet, &
@@ -1306,19 +1305,19 @@ module generic_WOMBATlite
 
     ! Zooplankton maximum grazing rate constant [1/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoogmax', wombat%zoogmax, 3.0/86400.0)
+    call g_tracer_add_param('zoogmax', wombat%zoogmax, 3.3/86400.0)
 
-    ! Zooplankton minimum prey capture rate constant [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for nanophytoplankton [(mmol C m-3)-2 s-1]
+    !  - e.g., ciliates feeding on small (nano/pico)phytoplankton
+    !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsmin', wombat%zooepsmin, 0.005/86400.0)
+    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.40/86400.0)
 
-    ! Zooplankton maximum prey capture rate constant [m6/mmol2/s]
+    ! Zooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
+    !  - e.g., protozoa grazing on slowly sinking detrital particles
+    !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsmax', wombat%zooepsmax, 0.25/86400.0)
-
-    ! Rate of transition of epsilon from micro to mesozoo [per mmolC/m3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsrat', wombat%zooepsrat, 1.0/10.0)
+    call g_tracer_add_param('zooepsdet', wombat%zooepsdet, 0.25/86400.0)
 
     ! Prey switching exponent for microzooplantkon [van Leeuwen et al. (2013), J. Theor. Biol.]
     ! when <1, more even feeding across prey items
@@ -1975,7 +1974,7 @@ module generic_WOMBATlite
     real                                    :: rdtts ! 1 / dt
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
-    real                                    :: g_npz, g_peffect, wzphy, wzdet, zooprey
+    real                                    :: g_npz, wzphy, wzdet, Xzoo, I_Xzoo
     real                                    :: zooegesphyfe, zooegesdetfe
     real                                    :: zooassiphyfe, zooassidetfe
     real                                    :: zooexcrphyfe, zooexcrdetfe
@@ -2782,25 +2781,25 @@ module generic_WOMBATlite
       wzdet = (wombat%zooprefdet(i,j,k) * det_mmolm3)**wombat%zoopreyswitch
       wombat%zooprefphy(i,j,k) = wzphy / (wzphy + wzdet + epsi)
       wombat%zooprefdet(i,j,k) = wzdet / (wzphy + wzdet + epsi)
-      ! Determine prey biomass after dynamic dietary fractions found
-      zooprey = (wombat%zooprefphy(i,j,k) * phy_mmolm3 + wombat%zooprefdet(i,j,k) * det_mmolm3)
 
-      ! Epsilon (prey capture rate coefficient) is made a function of phytoplankton
-      ! biomass (Fig 2 of Rohr et al., 2024; GRL)
-      !  - scales towards lower values (mesozooplankton) as prey biomass increases
-      g_peffect = exp(-zooprey * wombat%zooepsrat)
-      wombat%zooeps(i,j,k) = wombat%zooepsmin + (wombat%zooepsmax - wombat%zooepsmin) * g_peffect
-      g_npz = wombat%zoogmax * fbc * (wombat%zooeps(i,j,k) * zooprey*zooprey) / &
-              (wombat%zoogmax * fbc + (wombat%zooeps(i,j,k) * zooprey*zooprey))
+      ! Compute sum of prey-specific Type-III terms to obtain grazing rate [1/s]
+      !  - this avoids "perfect substitution" of prey types and aligns with reccommendations of Gentleman et al. (2003)
+      Xzoo = (  wombat%zooepsphy * (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2 &
+              + wombat%zooepsdet * (wombat%zooprefdet(i,j,k) * det_mmolm3)**2 )
+      g_npz = wombat%zoogmax * fbc * Xzoo / (wombat%zoogmax * fbc + Xzoo)
 
       ! We follow Le Mezo & Galbraith (2021) L&O - The fecal iron pump: ...
       !  - egestion, assimilation and excretion of carbon and iron by zooplankton are calculated separately
       !  - the idea is to enrich fecal pellets in iron compared to carbon
       !  1. zooplankton ingest C and Fe (the rest is egested)
       !  2. zooplankton assimilate the ingested C and Fe (the rest is excreted)
-      if (zooprey > 1e-10) then
-        wombat%zoograzphy(i,j,k) = g_npz * zoo_p * (wombat%zooprefphy(i,j,k) * phy_mmolm3) / zooprey ! [molC/kg/s]
-        wombat%zoograzdet(i,j,k) = g_npz * zoo_p * (wombat%zooprefdet(i,j,k) * det_mmolm3) / zooprey ! [molC/kg/s]
+      if (Xzoo > 1e-10) then
+        I_Xzoo = 1.0 / Xzoo
+        ! find "apparent" community epsilon (prey capture rate coefficient)
+        wombat%zooeps(i,j,k) = Xzoo / ( (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2 &
+                                      + (wombat%zooprefdet(i,j,k) * det_mmolm3)**2 )
+        wombat%zoograzphy(i,j,k) = g_npz * zoo_p * wombat%zooepsphy*(wombat%zooprefphy(i,j,k)*phy_mmolm3)**2 * I_Xzoo ! [molC/kg/s]
+        wombat%zoograzdet(i,j,k) = g_npz * zoo_p * wombat%zooepsdet*(wombat%zooprefdet(i,j,k)*det_mmolm3)**2 * I_Xzoo ! [molC/kg/s]
       else
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdet(i,j,k) = 0.0
