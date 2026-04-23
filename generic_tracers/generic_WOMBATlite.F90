@@ -1981,7 +1981,7 @@ module generic_WOMBATlite
     real                                    :: phy_p, phyfe_p, pchl_p, zoo_p, det_p
     real                                    :: phy_mmolm3, zoo_mmolm3, det_mmolm3, no3_mmolm3
     real                                    :: fe_umolm3, caco3_mmolm3, phyfe_mmolm3
-    real                                    :: fbc, zval
+    real                                    :: fbc, zval, zval1, zval2
     real                                    :: P_expl, k_loss, k_loss_zoodiss
     real, parameter                         :: epsi = 1.0e-30
     integer                                 :: ichl, iter
@@ -2784,8 +2784,9 @@ module generic_WOMBATlite
 
       ! Compute sum of prey-specific Type-III terms to obtain grazing rate [1/s]
       !  - this avoids "perfect substitution" of prey types and aligns with reccommendations of Gentleman et al. (2003)
-      Xzoo = (  wombat%zooepsphy * (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2 &
-              + wombat%zooepsdet * (wombat%zooprefdet(i,j,k) * det_mmolm3)**2 )
+      zval1 = (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2
+      zval2 = (wombat%zooprefdet(i,j,k) * det_mmolm3)**2
+      Xzoo = (  wombat%zooepsphy * zval1 + wombat%zooepsdet * zval2 )
       g_npz = wombat%zoogmax * fbc * Xzoo / (wombat%zoogmax * fbc + Xzoo)
 
       ! We follow Le Mezo & Galbraith (2021) L&O - The fecal iron pump: ...
@@ -2796,10 +2797,9 @@ module generic_WOMBATlite
       if (Xzoo > 1e-10) then
         I_Xzoo = 1.0 / Xzoo
         ! find "apparent" community epsilon (prey capture rate coefficient)
-        wombat%zooeps(i,j,k) = Xzoo / ( (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2 &
-                                      + (wombat%zooprefdet(i,j,k) * det_mmolm3)**2 )
-        wombat%zoograzphy(i,j,k) = g_npz * zoo_p * wombat%zooepsphy*(wombat%zooprefphy(i,j,k)*phy_mmolm3)**2 * I_Xzoo ! [molC/kg/s]
-        wombat%zoograzdet(i,j,k) = g_npz * zoo_p * wombat%zooepsdet*(wombat%zooprefdet(i,j,k)*det_mmolm3)**2 * I_Xzoo ! [molC/kg/s]
+        wombat%zooeps(i,j,k) = Xzoo / ( zval1 + zval2 )
+        wombat%zoograzphy(i,j,k) = g_npz * zoo_p * ( wombat%zooepsphy * zval1 * I_Xzoo )! [molC/kg/s]
+        wombat%zoograzdet(i,j,k) = g_npz * zoo_p * ( wombat%zooepsdet * zval2 * I_Xzoo ) ! [molC/kg/s]
       else
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdet(i,j,k) = 0.0
