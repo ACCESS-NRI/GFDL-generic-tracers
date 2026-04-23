@@ -1162,6 +1162,11 @@ module generic_WOMBATlite
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'sedo2', 'Oxygen concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
+    wombat%id_sedo2 = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'seddic', 'Dissolved inorganic carbon concentration in the bottom layer', 'h', '1', 's', 'mol/kg', 'f')
     wombat%id_seddic = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -3422,8 +3427,13 @@ module generic_WOMBATlite
 
     do j = jsc,jec; do i = isc,iec;
       fbc = wombat%bbioh ** (wombat%sedtemp(i,j))
-      wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
-      wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
+      if ((wombat%sedo2(i,j) >= 0.0) .or. (wombat%sedno3(i,j) >= 0.0)) then
+        wombat%det_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_det_sediment(i,j,1) ! [mol/m2/s]
+        wombat%detfe_sed_remin(i,j) = wombat%detlrem_sed * fbc * wombat%p_detfe_sediment(i,j,1) ! [mol/m2/s]
+      else
+        wombat%det_sed_remin(i,j) = 0.0
+        wombat%detfe_sed_remin(i,j) = 0.0
+      endif
 
       !!!~~~ CaCO3 dissolution ~~~!!!
       if (do_caco3_dynamics) then
