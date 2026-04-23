@@ -4423,9 +4423,6 @@ module generic_WOMBATmid
     wombat%dia_lsil(:,:,:) = 0.0
     wombat%dia_dfeupt(:,:,:) = 0.0
     wombat%dia_silupt(:,:,:) = 0.0
-    wombat%tri_lfer(:,:,:) = 0.0
-    wombat%tri_lpar(:,:,:) = 0.0
-    wombat%trimumax(:,:,:) = 0.0
     wombat%sileqc(:,:,:) = 0.0
     wombat%disssi(:,:,:) = 0.0
     wombat%bsidiss(:,:,:) = 0.0
@@ -4572,7 +4569,6 @@ module generic_WOMBATmid
     wombat%bac2deni(:,:,:) = 0.0
     wombat%aox_lnh4(:,:,:) = 0.0
     wombat%aox_mu(:,:,:) = 0.0
-    wombat%nitrfix(:,:,:) = 0.0
     wombat%ammox(:,:,:) = 0.0
     wombat%anammox(:,:,:) = 0.0
     wombat%nosdoc_overflow(:,:,:) = 0.0
@@ -4600,6 +4596,12 @@ module generic_WOMBATmid
     wombat%sedhtotal(:,:) = 0.0
     wombat%sedco3(:,:) = 0.0
     wombat%sedomega_cal(:,:) = 0.0
+    if (do_nitrogen_fixation) then
+      wombat%trimumax(:,:,:) = 0.0
+      wombat%tri_lpar(:,:,:) = 0.0
+      wombat%tri_lfer(:,:,:) = 0.0
+      wombat%nitrfix(:,:,:) = 0.0
+    endif
 
     ! Allocate and initialise some multi-dimensional variables
     allocate(wsink1(nk)); wsink1(:)=0.0
@@ -6020,7 +6022,6 @@ module generic_WOMBATmid
                           + ( mesexcrbac2n &
                             + mesexcrbac1n &
                             + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
-                          + wombat%nitrfix(i,j,k) &
                           + (wombat%don1remi(i,j,k) - wombat%bac1grow(i,j,k)/wombat%bac1_C2N) &
                           + (wombat%don2remi(i,j,k) - wombat%bac2grow(i,j,k)/wombat%bac2_C2N) &
                           - wombat%ammox(i,j,k) &
@@ -6037,6 +6038,8 @@ module generic_WOMBATmid
                             + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
                           - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                           - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
+      if (do_nitrogen_fixation) &
+        wombat%f_nh4(i,j,k) = wombat%f_nh4(i,j,k) + dtsb * wombat%nitrfix(i,j,k)
 
       ! Silicic acid equation ! [molSi/kg]
       !   Microzooplankton grazing on diatoms produces clean, small, largely suspended
