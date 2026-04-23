@@ -109,6 +109,14 @@
 !   If true, do benthic denitrification
 !  </DATA>
 !
+!  <DATA NAME="do_tracer_dicp" TYPE="logical">
+!   If true, do carry preformed dissolved inorganic carbon (dicp) as a tracer
+!  </DATA>
+!
+!  <DATA NAME="do_tracer_dicr" TYPE="logical">
+!   If true, do carry remineralised dissolved inorganic carbon (dicr) as a tracer
+!  </DATA>
+!
 !  <DATA NAME="do_tracer_nosdoc" TYPE="logical">
 !   If true, do carry the nominal oxidation state of carbon in DOM (NOSDOC) as a tracer
 !  </DATA>
