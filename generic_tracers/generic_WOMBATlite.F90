@@ -157,16 +157,16 @@ module generic_WOMBATlite
   ! Namelist Options
   !=======================================================================
   character(len=10) :: co2_calc  = 'mocsy' ! other option is 'ocmip2'
-  logical :: do_caco3_dynamics   = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
-  logical :: do_colloidal_shunt  = .true.  ! do colloidal shunt and coagulation to authigenic pools?
-  logical :: do_two_ligands      = .false. ! do two ligands (one strong, one weak) for iron complexation?
-  logical :: do_burial           = .false. ! permanently bury organics and CaCO3 in sediments?
-  logical :: do_nitrogen_fixation = .false. ! do nitrogen fixation?
-  logical :: do_benthic_denitrification = .false. ! do benthic denitrification?
-  logical :: do_tracer_dicp      = .false.  ! enable preformed dissolved inorganic carbon tracer, dicp?
-  logical :: do_tracer_dicr      = .false.  ! enable remineralised dissolved inorganic carbon tracer dicr?
-  logical :: do_check_n_conserve = .false. ! check that the N fluxes balance in the ecosystem
-  logical :: do_check_c_conserve = .false. ! check that the C fluxes balance in the ecosystem
+  logical :: do_caco3_dynamics          = .true.  ! do dynamic CaCO3 precipitation, dissolution and ballasting?
+  logical :: do_colloidal_shunt         = .true.  ! do colloidal shunt and coagulation to authigenic pools?
+  logical :: do_two_ligands             = .false. ! do two ligands (one strong, one weak) for iron complexation?
+  logical :: do_burial                  = .true.  ! permanently bury organics and CaCO3 in sediments?
+  logical :: do_nitrogen_fixation       = .true.  ! do nitrogen fixation?
+  logical :: do_benthic_denitrification = .true.  ! do benthic denitrification?
+  logical :: do_tracer_dicp             = .false. ! enable preformed dissolved inorganic carbon tracer, dicp?
+  logical :: do_tracer_dicr             = .false. ! enable remineralised dissolved inorganic carbon tracer dicr?
+  logical :: do_check_n_conserve        = .false. ! check that the N fluxes balance in the ecosystem
+  logical :: do_check_c_conserve        = .false. ! check that the C fluxes balance in the ecosystem
 
   namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, &
                                     do_two_ligands, do_burial, do_nitrogen_fixation, do_benthic_denitrification, &
