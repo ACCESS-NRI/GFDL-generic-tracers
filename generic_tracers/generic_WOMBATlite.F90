@@ -1521,7 +1521,7 @@ module generic_WOMBATlite
     ! that roughly 40,000 mmol C kg-1), this translates to scavenging rates
     ! of 0.001 to 0.02 (mmol mass particles / m3)-1 day-1.
     ! NOTE that scavenging becomes less important when colloids dominate.
-    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.01/86400)
+    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.01/86400.0)
 
     ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -1533,7 +1533,7 @@ module generic_WOMBATlite
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
@@ -1939,7 +1939,7 @@ module generic_WOMBATlite
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
-          orgflux = wombat%det_btm(i,j) / dt * 86400 * 1e3 ! mmol C m-2 day-1
+          orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
           wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
         enddo
       enddo
@@ -2805,14 +2805,12 @@ module generic_WOMBATlite
       biof = max(1/3., phy_mmolm3 / (phy_mmolm3 + 0.03))
       if (wombat%zw(i,j,k)<=hblt_depth(i,j)) then
         zval = (      (12.*biof*biodoc + 9.05*det_mmolm3) &
-                + 2.49*det_mmolm3 + 127.8*biof*biodoc + 725.7*det_mmolm3 &
-                + wombat%kagg_col * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4) &
-               )*wombat%kcoag_dfe
+                + 2.49*det_mmolm3 + 127.8*biof*biodoc + 725.7*det_mmolm3 )*wombat%kcoag_dfe &
+               + wombat%kagg_col * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4)
       else
         zval = ( 0.01 * (12.*biof*biodoc + 9.05*det_mmolm3) &
-                + 2.49*det_mmolm3 + 127.8*biof*biodoc + 725.7*det_mmolm3 &
-                + wombat%kagg_col * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4) &
-               )*wombat%kcoag_dfe
+                + 2.49*det_mmolm3 + 127.8*biof*biodoc + 725.7*det_mmolm3 )*wombat%kcoag_dfe &
+               + wombat%kagg_col * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4)
       endif
       wombat%fecoag2det(i,j,k) = wombat%fecol(i,j,k) * zval
 
