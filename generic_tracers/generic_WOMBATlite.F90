@@ -2620,7 +2620,7 @@ module generic_WOMBATlite
       fbc = wombat%bbioh ** (Temp(i,j,k))
 
       ! Variable rates of remineralisation
-      o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3/1.0)))
+      o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3)))
       wombat%reminr(i,j,k) = wombat%detlrem * fbc * o2lim
 
 

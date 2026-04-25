@@ -905,11 +905,11 @@ _where_ <br>
 - $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass (`zoo_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 
-**Remineralisation** of detritus is only affected by a quadratic, density-dependent loss term,
+**Remineralisation** of detritus is affected by a quadratic, density-dependent loss term:
 
 $$
 \begin{align}
-\Gamma_{det}^{\rightarrow C} =& \quad \Gamma_{det}^{0^{\circ}C} \left(β_{hete}\right)^{T} \left(B_{det}^{C}\right)^{2}
+\Gamma_{det}^{\rightarrow C} =& \quad \Gamma_{det}^{0^{\circ}C} \left(β_{hete}\right)^{T} L_{det}^{O_2} \left(B_{det}^{C}\right)^{2}
 \end{align}
 $$
 
@@ -918,9 +918,18 @@ _where_ <br>
 - $\Gamma_{det}^{0^{\circ}C}$ is the quadratic (density-dependent) loss rate of particulate organic detritus at 0ºC (`detlrem`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
+- $L_{det}^{O_2}$ is a limiter of remineralisation in low oxygen conditions (`o2lim`, [dimensionless]) <br>
 - $B_{det}^{C}$ is the concentration of particulate organic detritus (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 since hydrolyzation of organic detritus is performed by an heterotrophic bacterial population that is not explicitly resolved in the model and their acitivity is density-dependent.
+
+Note that we also apply an oxygen limitation to detrital remineralisation at low oxygen concentrations (`o2lim`, $L_{det}^{O_2}$, [dimensionless]) based on the observed slow-down of detrital attenuation in low oxygen zones ([Engel et al., 2017](https://doi.org/10.5194/bg-14-1825-2017); [Cram et al., 2022)](https://doi.org/10.1029/2021GB007080):
+
+$$
+\begin{align}
+L_{det}^{O_2} =& \quad \left(1 - e^{\left(-O_2 \right)}\right)
+\end{align}
+$$
 
 ---
 
@@ -939,11 +948,11 @@ _where_ <br>
 - $\mu_{zoo}^{max}$ is the maximum rate of zooplankton grazing at 0ºC (`zoogmax`, [s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $L_{zoo}^{O_2}$ is a limiter of grazing in low oxygen conditions (`zoo_o2lim`, [dimensionless]) <br>
+- $L_{zoo}^{O_2}$ is a limiter of grazing in low oxygen conditions (`o2lim`, [dimensionless]) <br>
 - $B_{prey}^{C}$ is the concentration of prey biomass (`zooprey`, [mmol C m<sup>-3</sup>]) <br>
 - $\varepsilon$ is the prey capture rate coefficient (`zooeps(i,j,k)`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
 
-We apply an oxygen limitation to grazing at low oxygen concentrations (`zoo_o2lim`, $L_{zoo}^{O_2}$, [dimensionless]) based on the review of [Medina et al. (2017)](https://doi.org/10.3389/fmars.2017.00105) who found that from 5 µM to undetectable concentrations of oxygen, protist consumption of a bacterial population decreased from 28% to 13% of the population. Although they still see some consumption at undetectable oxygen concentrations, we scale grazing down to zero at an oxygen concentration of zero to avoid unrealistic negative oxygen concentrationsdue to grazing at zero oxygen:
+We apply an oxygen limitation to grazing at low oxygen concentrations (`o2lim`, $L_{zoo}^{O_2}$, [dimensionless]) based on the review of [Medina et al. (2017)](https://doi.org/10.3389/fmars.2017.00105), who found that from 5 µM to undetectable concentrations of oxygen, protist consumption of a bacterial population decreased from 28% to 13% of the population. Additionally, our decision to limit zooplankton grazing in low oxygen conditions is also informed by the results of [Cavan et al. (2017)](https://doi.org/10.1038/ncomms14847).
 
 $$
 \begin{align}
