@@ -2073,7 +2073,7 @@ module generic_WOMBATlite
     real                                    :: zooexcrphyfe, zooexcrdetfe
     real                                    :: phy_p, phyfe_p, pchl_p, zoo_p, det_p
     real                                    :: phy_mmolm3, zoo_mmolm3, det_mmolm3, no3_mmolm3
-    real                                    :: fe_umolm3, caco3_mmolm3, phyfe_mmolm3
+    real                                    :: fe_umolm3, caco3_mmolm3, phyfe_mmolm3, o2_mmolm3
     real                                    :: fbc, zval
     real                                    :: P_expl, k_loss, k_loss_zoodiss
     real, parameter                         :: epsi = 1.0e-30
@@ -2091,7 +2091,7 @@ module generic_WOMBATlite
     real                                    :: biof, biodoc
     real                                    :: phy_Fe2C, zoo_Fe2C, det_Fe2C
     real                                    :: phy_minqfe, phy_maxqfe
-    real                                    :: zoo_slmor, zoo_o2lim
+    real                                    :: zoo_slmor, o2lim
     real                                    :: hco3, ddic, do2_sink
     real                                    :: dzt_bot, dzt_bot_os
     real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools
@@ -2563,6 +2563,7 @@ module generic_WOMBATlite
       phyfe_mmolm3 = phyfe_p / mmol_m3_to_mol_kg ! [mmol/m3]
       zoo_mmolm3 = zoo_p / mmol_m3_to_mol_kg ! [mmol/m3]
       det_mmolm3 = det_p / mmol_m3_to_mol_kg ! [mmol/m3]
+      o2_mmolm3 = max(0.0, wombat%p_o2(i,j,k,tau)) / mmol_m3_to_mol_kg ! [mmol/m3]
       no3_mmolm3 = max(0.0, wombat%p_no3(i,j,k,tau)) / mmol_m3_to_mol_kg ! [mmol/m3]
       fe_umolm3 = max(0.0, wombat%p_fe(i,j,k,tau)) / umol_m3_to_mol_kg ![umol/m3]
       caco3_mmolm3 = max(0.0, wombat%p_caco3(i,j,k,tau)) / mmol_m3_to_mol_kg ![mmol/m3]
@@ -2619,7 +2620,8 @@ module generic_WOMBATlite
       fbc = wombat%bbioh ** (Temp(i,j,k))
 
       ! Variable rates of remineralisation
-      wombat%reminr(i,j,k) = wombat%detlrem * fbc
+      o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3/1.0)))
+      wombat%reminr(i,j,k) = wombat%detlrem * fbc * o2lim
 
 
       !-----------------------------------------------------------------------!
@@ -2885,11 +2887,11 @@ module generic_WOMBATlite
       wombat%zooeps(i,j,k) = wombat%zooepsmin + (wombat%zooepsmax - wombat%zooepsmin) * g_peffect
 
       ! Oxygen limitation term reducing zooplankton grazing pressure in low-oxygen waters (following Buchanan et al., 2025; Science)
-      zoo_o2lim = max(0.0, min(1.0, 1.0 - exp(-wombat%p_o2(i,j,k,tau) / (10.0 * mmol_m3_to_mol_kg))))
+      o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3/10.0)))
 
       ! Grazing rate [s-1]
       zval = wombat%zooeps(i,j,k) * zooprey*zooprey
-      g_zoo = wombat%zoogmax * fbc * zoo_o2lim * zval / (wombat%zoogmax * fbc + zval)
+      g_zoo = wombat%zoogmax * fbc * o2lim * zval / (wombat%zoogmax * fbc + zval)
 
       ! We follow Le Mezo & Galbraith (2021) L&O - The fecal iron pump: ...
       !  - egestion, assimilation and excretion of carbon and iron by zooplankton are calculated separately
@@ -3287,19 +3289,20 @@ module generic_WOMBATlite
       ! mac: bottom dFe fix to 1 nM when the water is <= 200 m deep.
       if (grid_kmt(i,j) > 0) then
         k = grid_kmt(i,j)
-        if (wombat%zw(i,j,k) <= 200) wombat%p_fe(i,j,k,tau) = umol_m3_to_mol_kg * 0.999 ! [mol/kg]
-      endif
-      do k = 1,nk
-        ! pjb: tune minimum dissolved iron concentration to detection limit...
-        !       this is essential for ensuring dFe is replenished in upper ocean and actually
-        !       looks to be the secret of PISCES ability to replicate dFe limitation in the right places
-        ! Only do this where the ocean is > 200m deep to avoid truncating negative tracer concentrations
-        ! at river mouths
-        if (wombat%zw(i,j,k) > 200) then
-          wombat%p_fe(i,j,k,tau) = max(wombat%dfefloor * umol_m3_to_mol_kg, &
-                                wombat%p_fe(i,j,k,tau)) * grid_tmask(i,j,k)
+        if (wombat%zw(i,j,k) <= 200) then
+          wombat%p_fe(i,j,k,tau) = umol_m3_to_mol_kg * 0.999 ! [mol/kg]
+        else
+          do k = 1,nk
+            ! pjb: tune minimum dissolved iron concentration to detection limit...
+            !       this is essential for ensuring dFe is replenished in upper ocean and actually
+            !       looks to be the secret of PISCES ability to replicate dFe limitation in the right places
+            ! Only do this where the ocean is > 200m deep to avoid truncating negative tracer concentrations
+            ! at river mouths
+            wombat%p_fe(i,j,k,tau) = max(wombat%dfefloor * umol_m3_to_mol_kg, &
+                                         wombat%p_fe(i,j,k,tau)) * grid_tmask(i,j,k)
+          enddo
         endif
-      enddo
+      endif
     enddo; enddo
 
 
