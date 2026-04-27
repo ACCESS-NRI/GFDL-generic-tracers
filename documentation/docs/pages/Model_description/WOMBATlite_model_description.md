@@ -49,9 +49,9 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_caco3_dynamics`            | Production and dissolution of CaCO3 depends on carbon system state              | .true.           |
 | `do_colloidal_shunt`           | Fraction of dissolved iron is colloids that coagulate onto sinking material     | .true.           |
 | `do_two_ligands`               | Complex soluble iron using two ligands (weak + strong) rather than one          | .false.          |
-| `do_burial`                    | Permanently bury a fraction of sinking detrital material into the sediments     | .false.          |
-| `do_nitrogen_fixation`         | Allow implicit nitrogen fixing popoulation to add NO<sub>3</sub> to ocean       | .false.          |
-| `do_benthic_denitrification`   | Allow implicit benthic bacterial population to remove NO<sub>3</sub> from ocean | .false.          |
+| `do_burial`                    | Permanently bury a fraction of sinking detrital material into the sediments     | .true.           |
+| `do_nitrogen_fixation`         | Allow implicit nitrogen fixing popoulation to add NO<sub>3</sub> to ocean       | .true.           |
+| `do_benthic_denitrification`   | Allow implicit benthic bacterial population to remove NO<sub>3</sub> from ocean | .true.           |
 | `do_tracer_dicp`               | Carry preformed dissolved inorganic carbon (dicp) as a tracer                   | .false.          |
 | `do_tracer_dicr`               | Carry remineralised dissolved inorganic carbon (dicr) as a tracer               | .false.          |
 | `do_check_n_conserve`          | Checks that the ecosystem calculations are conserving the mass of nitrogen      | .false.          |

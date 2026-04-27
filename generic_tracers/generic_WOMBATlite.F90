@@ -1533,7 +1533,7 @@ module generic_WOMBATlite
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
