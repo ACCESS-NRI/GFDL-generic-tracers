@@ -3286,10 +3286,10 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------!
     do j = jsc,jec; do i = isc,iec;
-      ! mac: bottom dFe fix to 1 nM when the water is <= 200 m deep.
       if (grid_kmt(i,j) > 0) then
         k = grid_kmt(i,j)
         if (wombat%zw(i,j,k) <= 200) then
+          ! mac: bottom dFe fix to 1 nM when the water is <= 200 m deep.
           wombat%p_fe(i,j,k,tau) = umol_m3_to_mol_kg * 0.999 ! [mol/kg]
         else
           do k = 1,nk
@@ -3299,7 +3299,7 @@ module generic_WOMBATlite
             ! Only do this where the ocean is > 200m deep to avoid truncating negative tracer concentrations
             ! at river mouths
             wombat%p_fe(i,j,k,tau) = max(wombat%dfefloor * umol_m3_to_mol_kg, &
-                                         wombat%p_fe(i,j,k,tau)) * grid_tmask(i,j,k)
+                                        wombat%p_fe(i,j,k,tau)) * grid_tmask(i,j,k)
           enddo
         endif
       endif
