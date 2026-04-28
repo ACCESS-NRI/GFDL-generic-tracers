@@ -44,16 +44,18 @@ The following are the active tracers in WOMBAT-lite
 
 The following are logical statements within the `input.nml` namelist file that can be switched to TRUE or FALSE at runtime. 
 
-| Logical             | Description                                                                 | Default setting  |
-|---------------------|-----------------------------------------------------------------------------|------------------|
-| `do_caco3_dynamics`   | Production and dissolution of CaCO3 depends on carbon system state          | .true.           |
-| `do_colloidal_shunt`  | Fraction of dissolved iron is colloids that coagulate onto sinking material | .true.           |
-| `do_two_ligands`      | Complex soluble iron using two ligands (weak + strong) rather than one      | .false.          |
-| `do_burial`           | Permanently bury a fraction of sinking detrital material into the sediments | .false.          |
-| `do_tracer_dicp`      | Carry preformed dissolved inorganic carbon (dicp) as a tracer               | .false.          |
-| `do_tracer_dicr`      | Carry remineralised dissolved inorganic carbon (dicr) as a tracer           | .false.          |
-| `do_check_n_conserve` | Checks that the ecosystem calculations are conserving the mass of nitrogen  | .false.          |
-| `do_check_c_conserve` | Checks that the ecosystem calculations are conserving the mass of carbon    | .false.          |
+| Logical                        | Description                                                                     | Default setting  |
+|--------------------------------|---------------------------------------------------------------------------------|------------------|
+| `do_caco3_dynamics`            | Production and dissolution of CaCO3 depends on carbon system state              | .true.           |
+| `do_colloidal_shunt`           | Fraction of dissolved iron is colloids that coagulate onto sinking material     | .true.           |
+| `do_two_ligands`               | Complex soluble iron using two ligands (weak + strong) rather than one          | .false.          |
+| `do_burial`                    | Permanently bury a fraction of sinking detrital material into the sediments     | .true.           |
+| `do_nitrogen_fixation`         | Allow implicit nitrogen fixing popoulation to add NO<sub>3</sub> to ocean       | .true.           |
+| `do_benthic_denitrification`   | Allow implicit benthic bacterial population to remove NO<sub>3</sub> from ocean | .true.           |
+| `do_tracer_dicp`               | Carry preformed dissolved inorganic carbon (dicp) as a tracer                   | .false.          |
+| `do_tracer_dicr`               | Carry remineralised dissolved inorganic carbon (dicr) as a tracer               | .false.          |
+| `do_check_n_conserve`          | Checks that the ecosystem calculations are conserving the mass of nitrogen      | .false.          |
+| `do_check_c_conserve`          | Checks that the ecosystem calculations are conserving the mass of carbon        | .false.          |
 
 We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic variable reflects the binding strength of the strong ligand. However, when `do_two_ligands` is set to `.false.`, this diagnostic (`ligK`) reflects the binding strength of the bulk ligand pool.
 
@@ -66,41 +68,44 @@ The following are all **2D** diagnostic output variables from WOMBAT-lite.
 | Diagnostic        | Description                                                                                          | Units                                |
 | ----------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | `pco2`            | Surface aqueous partial pressure of CO₂                                                              | µatm                                 |
-| `det_sed_remin`   | Rate of remineralisation of detritus in accumulated sediment                                         | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `det_sed_depst`   | Rate of deposition of detritus to sediment at base of water column                                   | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `det_sed_remin`   | Rate of remineralisation of detritus in accumulated sediment                                         | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `det_sed_depst`   | Rate of deposition of detritus to sediment at base of water column                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `det_sed_denit`   | Rate of denitrification (NO<sub>3</sub> consumption) in accumulated sediment                         | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `fbury`           | Fraction of deposited detritus permanently buried beneath sediment                                   | dimensionless                        |
-| `detfe_sed_remin` | Rate of remineralisation of detrital iron in accumulated sediment                                    | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `fdenit`          | Fraction of detritus remineralised via denitrification                                               | dimensionless                        |
+| `detfe_sed_remin` | Rate of remineralisation of detrital iron in accumulated sediment                                    | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `detfe_sed_depst` | Rate of deposition of detrital iron to sediment at base of water column                              | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
-| `caco3_sed_remin` | Rate of remineralisation of CaCO₃ in accumulated sediment                                            | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `caco3_sed_depst` | Rate of deposition of CaCO₃ to sediment at base of water column                                      | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `caco3_sed_remin` | Rate of remineralisation of CaCO₃ in accumulated sediment                                            | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `caco3_sed_depst` | Rate of deposition of CaCO₃ to sediment at base of water column                                      | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `zeuphot`         | Depth of the euphotic zone (1% incident light)                                                       | m                                    |
 | `seddep`          | Depth of the bottom layer                                                                            | m                                    |
 | `sedmask`         | Mask of active sediment points                                                                       | dimensionless                        |
 | `sedtemp`         | Temperature in the bottom layer                                                                      | °C                                   |
 | `sedsalt`         | Salinity in the bottom layer                                                                         | psu                                  |
-| `sedno3`          | Nitrate concentration in the bottom layer                                                            | mol kg<sup>-1</sup>                  |
-| `seddic`          | Dissolved inorganic carbon concentration in the bottom layer                                         | mol kg<sup>-1</sup>                  |
-| `sedalk`          | Alkalinity concentration in the bottom layer                                                         | mol kg<sup>-1</sup>                  |
-| `sedhtotal`       | H<sup>+</sup> ion concentration in the bottom layer                                                  | mol kg<sup>-1</sup>                  |
-| `sedco3`          | CO₃<sup>2−</sup> ion concentration in the bottom layer                                               | mol kg<sup>-1</sup>                  |
+| `sedno3`          | Nitrate concentration in the bottom layer                                                            | mol N kg<sup>-1</sup>                |
+| `sedo2`           | Dissolved oxygen concentration in the bottom layer                                                   | mol O2 kg<sup>-1</sup>               |
+| `seddic`          | Dissolved inorganic carbon concentration in the bottom layer                                         | mol C kg<sup>-1</sup>                |
+| `sedalk`          | Alkalinity concentration in the bottom layer                                                         | mol Eq kg<sup>-1</sup>               |
+| `sedhtotal`       | H<sup>+</sup> ion concentration in the bottom layer                                                  | mol H<sup>+</sup>kg<sup>-1</sup>     |
+| `sedco3`          | CO₃<sup>2−</sup> ion concentration in the bottom layer                                               | mol C kg<sup>-1</sup>                |
 | `sedomega_cal`    | Calcite saturation state in the bottom layer                                                         | dimensionless                        |
-| `o2_stf`          | Surface flux of dissolved oxygen into ocean                                                          | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `no3_stf`         | Surface flux of nitrate into ocean                                                                   | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `fe_stf`          | Surface flux of dissolved iron into ocean                                                            | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `det_stf`         | Surface flux of detritus into ocean                                                                  | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `dic_stf`         | Surface flux of dissolved inorganic carbon into ocean                                                | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `dicp_stf`        | Surface flux of preformed dissolved inorganic carbon into ocean                                      | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `alk_stf`         | Surface flux of alkalinity into ocean                                                                | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `no3_vstf`        | Virtual flux of nitrate into ocean due to salinity restoring/correction                              | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `dic_vstf`        | Virtual flux of dissolved inorganic carbon into ocean due to salinity restoring/correction           | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `dicp_vstf`       | Virtual flux of preformed dissolved inorganic carbon into ocean due to salinity restoring/correction | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `alk_vstf`        | Virtual flux of alkalinity into ocean due to salinity restoring/correction                           | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `o2_btf`          | Bottom flux of dissolved oxygen into ocean                                                           | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `no3_btf`         | Bottom flux of nitrate into ocean                                                                    | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `fe_btf`          | Bottom flux of dissolved iron into ocean                                                             | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `dic_btf`         | Bottom flux of dissolved inorganic carbon into ocean                                                 | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `dicr_btf`        | Bottom flux of preformed dissolved inorganic carbon into ocean                                       | mol m<sup>-2</sup> s<sup>-1</sup>    |
-| `alk_btf`         | Bottom flux of alkalinity into ocean                                                                 | mol m<sup>-2</sup> s<sup>-1</sup>    |
+| `o2_stf`          | Surface flux of dissolved oxygen into ocean                                                          | mol O2 m<sup>-2</sup> s<sup>-1</sup> |
+| `no3_stf`         | Surface flux of nitrate into ocean                                                                   | mol N m<sup>-2</sup> s<sup>-1</sup>  |
+| `fe_stf`          | Surface flux of dissolved iron into ocean                                                            | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
+| `det_stf`         | Surface flux of detritus into ocean                                                                  | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `dic_stf`         | Surface flux of dissolved inorganic carbon into ocean                                                | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `dicp_stf`        | Surface flux of preformed dissolved inorganic carbon into ocean                                      | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `alk_stf`         | Surface flux of alkalinity into ocean                                                                | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
+| `no3_vstf`        | Virtual flux of nitrate into ocean due to salinity restoring/correction                              | mol N m<sup>-2</sup> s<sup>-1</sup>  |
+| `dic_vstf`        | Virtual flux of dissolved inorganic carbon into ocean due to salinity restoring/correction           | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `dicp_vstf`       | Virtual flux of preformed dissolved inorganic carbon into ocean due to salinity restoring/correction | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `alk_vstf`        | Virtual flux of alkalinity into ocean due to salinity restoring/correction                           | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
+| `o2_btf`          | Bottom flux of dissolved oxygen into ocean                                                           | mol O2 m<sup>-2</sup> s<sup>-1</sup> |
+| `no3_btf`         | Bottom flux of nitrate into ocean                                                                    | mol N m<sup>-2</sup> s<sup>-1</sup>  |
+| `fe_btf`          | Bottom flux of dissolved iron into ocean                                                             | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
+| `dic_btf`         | Bottom flux of dissolved inorganic carbon into ocean                                                 | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `dicr_btf`        | Bottom flux of preformed dissolved inorganic carbon into ocean                                       | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `alk_btf`         | Bottom flux of alkalinity into ocean                                                                 | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
 
 
 The following are all **3D** diagnostic output variables from WOMBAT-lite.
@@ -127,6 +132,10 @@ The following are all **3D** diagnostic output variables from WOMBAT-lite.
 | `phy_lnit`    | Limitation of phytoplankton by nitrogen                                | dimensionless                                    |
 | `phy_lfer`    | Limitation of phytoplankton by iron                                    | dimensionless                                    |
 | `phy_dfeupt`  | Uptake of dFe by phytoplankton                                         | mol kg<sup>-1</sup> s<sup>-1</sup>               |
+| `tri_mumax`   | Maximum growth rate of trichodesmium                                   | s<sup>-1</sup>                                   |
+| `tri_lpar`    | Limitation of trichodesmium by light                                   | dimensionless                                    |
+| `tri_lfer`    | Limitation of trichodesmium by iron                                    | dimensionless                                    |
+| `nitrfix`     | Implicit nitrogen fixation rate (NO<sub>3</sub> production)            | mol N kg<sup>-1</sup> s<sup>-1</sup>             |
 | `feIII`       | Free iron (Fe<sup>3+</sup>)                                            | mol kg<sup>-1</sup>                              |
 | `ligK`        | Ligand stability constant                                              | L mol<sup>-1</sup>                               |
 | `felig`       | Ligand-bound dissolved iron                                            | mol kg<sup>-1</sup>                              |
@@ -186,11 +195,12 @@ The subroutine `generic_WOMBATlite_update_from_source` is the heart of the World
 9. Mortality and remineralisation.
 10. Zooplankton grazing, growth, excretion and egestion.
 11. CaCO3 calculations.
-12. Tracer tendencies (update tracer concentrations).
-13. Check for conservation of mass.
-14. Additional operations on tracers.
-15. Sinking rate of particulates.
-16. Sedimentary processes.
+12. Implicit nitrogen fixation
+13. Tracer tendencies (update tracer concentrations).
+14. Check for conservation of mass.
+15. Additional operations on tracers.
+16. Sinking rate of particulates.
+17. Sedimentary processes.
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in grey follow the Fortran code, while variable names in math font are pointers to the equations; i,j,k refer to horizontal and vertical indices; square brackets denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
@@ -200,9 +210,9 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 
 ### Parameter set and default values
 
-| Parameter        | Description                                                                 | Value              |
-|------------------|-----------------------------------------------------------------------------|--------------------|
-| `alphabio`         | Phytoplankton initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹ s⁻¹]           | 3.0                |
+| Parameter          | Description                                                                 | Value              |
+|--------------------|-----------------------------------------------------------------------------|--------------------|
+| `alphabio`         | Phytoplankton initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹]               | 3.0                |
 | `abioa`            | Autotrophy maximum growth rate parameter a [s⁻¹]                            | 1.0/86400.0        |
 | `bbioa`            | Autotrophy maximum growth rate parameter b [1]                              | 1.050              |
 | `bbioh`            | Heterotrophy maximum growth rate parameter b [1]                            | 1.060              |
@@ -216,6 +226,10 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `phylmor`          | Phytoplankton linear mortality rate constant [s⁻¹]                          | 0.005/86400.0      |
 | `phyqmor`          | Phytoplankton quadratic mortality rate constant [(mmolC/m³)⁻¹ s⁻¹]          | 0.05/86400.0       |
 | `phybiot`          | Phytoplankton biomass threshold [mmolC/m³]                                  | 0.6                |
+| `alphabio_tri`     | Trichodesmium initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹]               | 1.8                |
+| `trikf`            | Trichodesmium half saturation constant for iron uptake [µmolFe/m³]          | 0.125              |
+| `trichlc`          | Trichodesmium chlorophyll to carbon ratio [mol Chl (mol C)<sup>-1</sup>]    | 0.01               |
+| `trin2c`           | Trichodesmium nitrogen to carbon ratio [molN (mol C)<sup>-1</sup>]          | 50/300             |
 | `zooCingest`       | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.8                |
 | `zooCassim`        | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.3                |
 | `zooFeingest`      | Zooplankton ingestion efficiency of iron [molFe/molFe]                      | 0.2                |
@@ -890,11 +904,11 @@ _where_ <br>
 - $B_{zoo}^{C}$ is the concentration of zooplankton carbon biomass (`zoo_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 
-**Remineralisation** of detritus is only affected by a quadratic, density-dependent loss term,
+**Remineralisation** of detritus is affected by a quadratic, density-dependent loss term:
 
 $$
 \begin{align}
-\Gamma_{det}^{\rightarrow C} =& \quad \Gamma_{det}^{0^{\circ}C} \left(β_{hete}\right)^{T} \left(B_{det}^{C}\right)^{2}
+\Gamma_{det}^{\rightarrow C} =& \quad \Gamma_{det}^{0^{\circ}C} \left(β_{hete}\right)^{T} L_{det}^{O_2} \left(B_{det}^{C}\right)^{2}
 \end{align}
 $$
 
@@ -903,9 +917,18 @@ _where_ <br>
 - $\Gamma_{det}^{0^{\circ}C}$ is the quadratic (density-dependent) loss rate of particulate organic detritus at 0ºC (`detlrem`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
+- $L_{det}^{O_2}$ is a limiter of remineralisation in low oxygen conditions (`o2lim`, [dimensionless]) <br>
 - $B_{det}^{C}$ is the concentration of particulate organic detritus (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 since hydrolyzation of organic detritus is performed by an heterotrophic bacterial population that is not explicitly resolved in the model and their acitivity is density-dependent.
+
+Note that we also apply an oxygen limitation to detrital remineralisation at low oxygen concentrations (`o2lim`, $L_{det}^{O_2}$, [dimensionless]) based on the observed slow-down of detrital attenuation in low oxygen zones ([Engel et al., 2017](https://doi.org/10.5194/bg-14-1825-2017); [Cram et al., 2022)](https://doi.org/10.1029/2021GB007080):
+
+$$
+\begin{align}
+L_{det}^{O_2} =& \quad \left(1 - e^{\left(-O_2 \right)}\right)
+\end{align}
+$$
 
 ---
 
@@ -916,7 +939,7 @@ since hydrolyzation of organic detritus is performed by an heterotrophic bacteri
 
 $$
 \begin{align}
-g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} (β_{hete})^{T} \sum_{i} \left(\varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{zoo}^{max} (β_{hete})^{T} + \sum_{i} \left( \varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C}\right)^{2}\right)} 
+g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} \cdot L_{zoo}^{O_2} \varepsilon \left(B_{prey}^{C}\right)^{2}}{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} + \varepsilon \left(B_{prey}^{C}\right)^{2}}
 \end{align}
 $$
 
@@ -924,11 +947,19 @@ _where_ <br>
 - $\mu_{zoo}^{max}$ is the maximum rate of zooplankton grazing at 0ºC (`zoogmax`, [s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $B_{i}^{C}$ is the concentration of prey type $i$ carbon biomass ([mmol C m<sup>-3</sup>]) <br>
-- $\phi_{zoo}^{i}$ is the normalized prey preference of zooplankton for prey type $i$ ([dimenionless]) <br>
-- $\varepsilon_{zoo}^{i}$ is the prey capture rate coefficient of zooplankton for prey type $i$ ([(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
+- $L_{zoo}^{O_2}$ is a limiter of grazing in low oxygen conditions (`o2lim`, [dimensionless]) <br>
+- $B_{prey}^{C}$ is the concentration of prey biomass (`zooprey`, [mmol C m<sup>-3</sup>]) <br>
+- $\varepsilon$ is the prey capture rate coefficient (`zooeps(i,j,k)`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
 
-and where
+We apply an oxygen limitation to grazing at low oxygen concentrations (`o2lim`, $L_{zoo}^{O_2}$, [dimensionless]) based on the review of [Medina et al. (2017)](https://doi.org/10.3389/fmars.2017.00105), who found that from 5 µM to undetectable concentrations of oxygen, protist consumption of a bacterial population decreased from 28% to 13% of the population. Additionally, our decision to limit zooplankton grazing in low oxygen conditions is also informed by the results of [Cavan et al. (2017)](https://doi.org/10.1038/ncomms14847).
+
+$$
+\begin{align}
+L_{zoo}^{O_2} =& \quad \left(1 - e^{\left(-\dfrac{O_2}{10}\right)}\right)
+\end{align}
+$$
+
+Total grazing of biomass by zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
 $$
 \begin{align}
@@ -1161,7 +1192,55 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 ---
 
 
-### 12. Tracer tendencies.
+### 12. Implicit nitrogen fixation.
+
+Because we do not consider diazotrophs as an explicit phytoplankton functional type, we represent the fixation of nitrogen implicitly using a simple parameterization dependent on temperature, nutrient and light availability when `do_nitrogen_fixation == .true.`. The equation for new nitrogen (specifically NO<sub>3</sub>) added via diazotrophy is:
+
+$$
+\begin{align}
+\mu_{diazo}^{\rightarrow NO_3} =& \quad \mu_{diazo}^{max} \left(1 - L_{phy}^{N} \right) \\
+                                & \min\left(L_{diazo}^{Fe}, L_{diazo}^{PAR}\right) R_{diazo}^{N:C} \cdot 1 \times 10^{-6}
+\end{align}
+$$
+
+_where_ <br>
+- $\mu_{diazo}^{max}$ is the temperature-dependent maximum growth rate of diazotrophs (`tri_mumax(i,j,k)`, [s<sup>-1</sup>]) <br>
+- $L_{phy}^{N}$ is the limitation term of nano-phytoplankton growth on nitrogen (`phy_lnit(i,j,k)`, [dimensionless])  <br>
+- $L_{diazo}^{Fe}$ is the limitation term of diazotroph growth on iron (`tri_lfer(i,j,k)`, [dimensionless])  <br>
+- $L_{diazo}^{PAR}$ is the limitation term of diazotroph growth on light (`tri_lpar(i,j,k)`, [dimensionless])  <br>
+- $R_{diazo}^{N:C}$ is the ratio of N:C within diazotrophic biomass (`trin2c`, [mol N (mol C)<sup>-1</sup>]) <br>
+- $1 \times 10^{-6}$ is a conversion factor to mol kg<sup>-1</sup> <br>
+
+The temperature-dependent maximum growth rate ($\mu_{diazo}^{max}$) is taken directly from [Wrightson et al. (2022)]( https://doi.org/10.1111/gcb.16399) who based their formulation on the work of [Jiang et al. (2018)](https://doi.org/10.1038/s41558-018-021):
+
+$$
+\begin{align}
+\mu_{diazo}^{max} =& \quad \left( -0.000399(T)^{3} + 0.02685(T)^{2} - 0.555T + 3.633 \right) \dfrac{1}{86400}
+\end{align}
+$$
+
+_where_ <br>
+- $T$ is in situ water temperature (`Temp(i,j,k)`, [ºC]) and we only consider $T > 15.8$ºC <br>
+- $\dfrac{1}{86400}$ converts their formula from units of [day<sup>-1</sup>] to [s<sup>-1</sup>] <br>
+
+The iron and light limitation terms are as follows:
+
+$$
+\begin{align}
+L_{diazo}^{Fe} =& \quad \dfrac{dFe}{dFe + K_{diazo}^{Fe}} \\
+L_{diazo}^{PAR} =& \quad 1 - e^{- \alpha_{diazo} PAR}
+\end{align}
+$$
+
+_where_ <br>
+- $dFe$ is the in situ concentration of dissolved iron (`fe_umolm3`, [nmol Fe kg<sup>-1</sup>]) <br>
+- $K_{diazo}^{Fe}$ is the half-saturation coefficient for uptake of dissolved iron by diazotrophs (`trikf`, [nmol Fe kg<sup>-1</sup>]) <br>
+- $\alpha_{diazo}$ is the chlorophyll-adjusted slope of the photosynthesis-irradience curve of diazotrophs (`alphabio_tri * trichlc`, [(W m<sup>-2</sup>)<sup>-1</sup>]) <br>
+- $PAR$ is the downwelling photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>]) <br>
+
+---
+
+### 13. Tracer tendencies.
 
 **Nitrate** (`p_no3(i,j,k,tau)`, $NO_3$, [mol N kg<sup>-1</sup>])
 
@@ -1169,7 +1248,7 @@ $$
 \begin{align}
 \dfrac{\Delta NO_3}{\Delta t} =& \quad \bigg(\Gamma_{det}^{\rightarrow C} + \gamma_{zoo}^{\rightarrow C} \\
                                & \quad + \gamma_{phy}^{\rightarrow C} + X_{zoo}^{\leftarrow C} \\
-                               & \quad - \mu_{phy}^{\leftarrow C} \bigg) \cdot \dfrac{16}{122}
+                               & \quad - \mu_{phy}^{\leftarrow C} \bigg) \cdot \dfrac{16}{122} + \mu_{diazo}^{\rightarrow NO_{3}}
 \end{align}
 $$
 
@@ -1296,13 +1375,13 @@ $$
 ---
 
 
-### 13. Check for conservation of mass.
+### 14. Check for conservation of mass.
 
-When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.`), the model will calculate the budget of nitrogen or carbon both before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of both nitrogen and carbon within the ocean. In WOMBATlite, both $NO_3$ and $DIC$ should be perfectly conserved during ecosystem cycling.
+When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.`), the model will calculate the budget of nitrogen or carbon both before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of both nitrogen and carbon within the ocean. In WOMBATlite, both $NO_3$ and $DIC$ should be perfectly conserved during ecosystem cycling. However, the exception to this is for nitrogen, where if either of `do_nitrogen_fixation = .true.` or `do_benthic_denitrification = .true.` then the model does not and should not be expected to conserve nitrogen.
 
 ---
 
-### 14. Additional operations on tracers.
+### 15. Additional operations on tracers.
 
 **First**, dissolved iron concentrations are set to equal 1 nM everywhere where the depth of the water column is less than 200 metres deep. WOMBAT-lite is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we universally set the dissolved iron concentration in these waters to 1 nM.
 
@@ -1311,7 +1390,7 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 ---
 
 
-### 15. Sinking rate of particulates.
+### 16. Sinking rate of particulates.
 
 WOMBAT-lite functions with a spatially variable sinking rate of both organic and inorganic (i.e., $CaCO_3$) particulate matter. The variable sinking rates of detritus and $CaCO_3$ are computed within the `generic_WOMBATlite_update_from_source` subroutine. Values are positive downward. Once computed, these 3D arrays are transfered to pointer arrays (`p_wdet(i,j,k)` and `p_wcaco3(i,j,k)`) that interface with a tridiagonal solver within the `g_tracer_vertdiff_G` subroutine.
 
@@ -1413,33 +1492,39 @@ WOMBAT-lite sinks organic detrital iron at the same rate as organic detrital car
 ---
 
 
-### 16. Sedimentary processes.
+### 17. Sedimentary processes.
 
 WOMBAT-lite tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved inorganic carbon (DIC), nitrate ($NO_3$), dissolved iron (dFe), oxygen ($O_2$) and alkalinity (Alk). Remineralisation of organic carbon ($\gamma_{det,sed}^{C}$) produces DIC and $NO_3$, but removes $O_2$ and Alk. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and -172:122. Remineralisation of organic iron produces dFe.
+
+**Organics**
 
 $$
 \begin{align}
 \gamma_{det,sed}^{C} =& \quad \gamma_{det,sed}^{0^{\circ}C} (β_{hete})^{T} B_{det,sed}^{C} \\
-\gamma_{det,sed}^{N} =& \quad \gamma_{det,sed}^{C} R^{N:C} \\
-\gamma_{det,sed}^{O_2} =& \quad \gamma_{det,sed}^{C} R^{O_2:C} \\
+\gamma_{det,sed}^{N} =& \quad \gamma_{det,sed}^{C} R^{N:C} - \gamma_{det,sed}^{denit} \\
+\gamma_{det,sed}^{O_2} =& \quad \gamma_{det,sed}^{C} R^{O_2:C} \cdot \left(1 - f_{denit} \right) \\
 \gamma_{det,sed}^{Alk} =& \quad -\gamma_{det,sed}^{N} \\
 \gamma_{det,sed}^{Fe} =& \quad \gamma_{det,sed}^{0^{\circ}C} (β_{hete})^{T} B_{det,sed}^{Fe}
 \end{align}
 $$
 
 _where_ <br>
-- $\gamma_{det,sed}^{0^{\circ}C}$ is the base linear rate of remineralisation of sedimentary organic detritus (`detlrem_sed`, [s<sup>-1</sup>])
+- $\gamma_{det,sed}^{0^{\circ}C}$ is the base linear rate of remineralisation of sedimentary organic detritus (`detlrem_sed`, [s<sup>-1</sup>]) <br>
 - $\gamma_{det,sed}^{C}$ is the remineralisation rate of organic detrital carbon in the sediment pool (`det_sed_remin(i,j)`, [mol C m<sup>-2</sup> s<sup>-1</sup>]) <br>
 - $\gamma_{det,sed}^{N}$ is the production of nitrate due to organic detrital remineralisation in the sediment pool ([mol N m<sup>-2</sup> s<sup>-1</sup>]) <br>
+- $\gamma_{det,sed}^{denit}$ is the consumption rate of NO<sub>3</sub> due to benthic denitrification (`det_sed_denit(i,j)`, [mol N m<sup>-2</sup> s<sup>-1</sup>]) <br>
 - $\gamma_{det,sed}^{O_2}$ is the consumption rate of oxygen during remineralisation of organics in the sediment pool ([mol $O_2$ m<sup>-2</sup> s<sup>-1</sup>]) <br>
 - $\gamma_{det,sed}^{Alk}$ is the production of alkalinity due to organic detrital remineralisation in the sediment pool ([mol Alk m<sup>-2</sup> s<sup>-1</sup>]) <br>
 - $\gamma_{det,sed}^{Fe}$ is the production of dissolved iron due to organic detrital remineralisation in the sediment pool ([mol Fe m<sup>-2</sup> s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature at the sediment-water interface (`sedtemp(i,j)`, [ºC]) <br>
+- $f_{denit}$ is the fraction of organic matter being remineralised by anaerobic metabolism, i.e., denitrification (`fdenit(i,j)`, [dimensionless]) <br>
 - $B_{det,sed}^{C}$ is the total concentration of organic detrital carbon biomass (`p_det_sediment(i,j,1)`, [mol C m<sup>-2</sup>]) <br>
 - $B_{det,sed}^{Fe}$ is the total concentration of organic detrital iron biomass (`p_detfe_sediment(i,j,1)`, [mol Fe m<sup>-2</sup>]) <br>
 - $R^{N:C}$ is the static ratio of nitrogen to carbon in organic matter and is equal to 16:122 <br>
 - $R^{O_2:C}$ is the static ratio of dissolved oxygen utilisation to carbon content in organic matter and is equal to -172:122 <br>
+
+**Dissolution of $CaCO_3$**
 
 Alk and DIC are in turn affected by dissolution of the sedimenary $CaCO_3$ pool, which is considered as entirely calcite. Sedimentary dissolution is controlled by bottom water temperature and an estimate of the pore-water calcite saturation state ($\Omega_{cal}^{sed}$):
 
@@ -1454,6 +1539,30 @@ _where_ <br>
 - $\Omega_{cal,+sed}$ is the maximum possible saturation state within sediment pore water (`omegamax_sed`, [dimensionless]) <br>
 
 The $\Omega_{cal,sed}$ is calculated using the [`mocsy`](https://github.com/ACCESS-NRI/mocsy) package for solving carbonate chemistry of seawater ([Orr & Epitalon, 2015](https://doi.org/10.5194/gmd-8-485-2015)). These routines require Alk and DIC as inputs, along with nutrient concentrations and temperature and salinity of bottom waters. For DIC, we chose to sum the water column concentration of DIC and the organic carbon content of the sediment to approximate the interstitial (i.e., porewater) DIC concentration. We assume that the organic carbon content of the sediment (`p_det_sediment` [mol m<sup>-2</sup>]) is relevant over one meter, and therefore can be automatically converted to [mol m<sup>-3</sup>]. With this assumption these arrays can be added together and approximates the reducing conditions of organic-rich sediments, which have lower $\Omega_{cal,sed}$. This ensures a greater rate of $CaCO_3$ dissolution within the sediment as organic matter accumulates.
+
+**Benthic denitrification**
+
+We also consider the consumption of NO<sub>3</sub> via benthic denitrification. When `do_benthic_denitrification = .true.`, a portion of the particulate organic matter within the sediments that remineralised is performed anaerobically (i.e., using NO<sub>3</sub> as the electron acceptor). Unlike this process in the water column, which is performed by bacterial metabolism, we estimate this process using an empirical parameterization from [Bohlen et al. (2012)](https://doi.org/10.1029/2011GB004198):
+
+$$
+\begin{align}
+\gamma_{det,sed}^{denit} =& \quad \gamma_{det,sed}^{C} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)
+\end{align}
+$$
+
+_where_ <br>
+- $0.9$ is a hard upper limit stating that 90% of organic matter hydrolysation can potentially be performed anaerobically via denitrification <br>
+- $\dfrac{94}{122}$ is the stoichiometry of nitrate demand per mol of organic carbon hydrolysed ([Paulmier et al., 2009](https://doi.org/10.5194/bg-6-923-2009)) <br>
+- O<sub>2</sub> is the bottom water concentration of dissolved oxygen (mmol m<sup>-3</sup>) <br>
+- NO<sub>3</sub> is the bottom water concentration of nitrate (mmol m<sup>-3</sup>) <br>
+
+and where the fraction of organic matter that is remineralised via denitrification is equal to:
+
+$$
+\begin{align}
+f_{denit} =& \quad \gamma_{det,sed}^{denit} \dfrac{122/94}{\gamma_{det,sed}^{C}}
+\end{align}
+$$
 
 Overall bottom fluxes of tracers are:
 

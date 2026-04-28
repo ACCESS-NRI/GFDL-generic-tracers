@@ -98,6 +98,7 @@ nav:
 
   - Model description:
     - WOMBATlite: pages/Model_description/WOMBATlite_model_description.md
+    - WOMBATmid: pages/Model_description/WOMBATmid_model_description.md
 
 # Footer
 extra:
