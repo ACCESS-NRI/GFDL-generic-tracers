@@ -87,13 +87,13 @@ identifiers:
   - description: "The concept DOI of all versions."
     type: doi
     value: 110.5281/zenodo.17180329
-  - description: "Version 2026.02.001"
+  - description: "Version 2026.04.000"
     type: doi
-    value: 10.5281/zenodo.18995674
+    value: 10.5281/zenodo.19837668
 repository-code: 'https://github.com/ACCESS-NRI/GFDL-generic-tracers'
 url: 'https://docs.access-hive.org.au/'
 repository-artifact: >-
-  https://github.com/ACCESS-NRI/GFDL-generic-tracers/archive/refs/tags/2026.02.001.tar.gz
+  https://github.com/ACCESS-NRI/GFDL-generic-tracers/archive/refs/tags/2026.04.000.tar.gz
 abstract: >-
   This software is a fork of the repository https://github.com/NOAA-GFDL/ocean_BGC, which includes 
   "generic tracer" modules that can be used with the MOM and GOLD ocean models. This fork has been 
@@ -101,11 +101,8 @@ abstract: >-
   Trophic-dynamics (WOMBAT) models used in Australian Community Climate and Earth System Simulator 
   (ACCESS) earth-system models.
 license: CC-BY-4.0
-version: 2026.02.001
-date-released: "2026-03-13"
+version: 2026.04.000
+date-released: "2026-04-28"
 keywords:
   - ocean biogeochemistry
   - ocean modelling
-
-
-
