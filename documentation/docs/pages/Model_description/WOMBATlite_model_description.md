@@ -222,7 +222,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `zooFeassim`       | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.9                |
 | `fgutdiss`         | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
 | `zookz`            | Half-saturation coefficient for zooplankton mortality [mmolC/m³]            | 0.25               |
-| `zoogmax`          | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.0/86400.0        |
+| `zoogmax`          | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.3/86400.0        |
 | `zooepsphy`        | Zooplankton prey capture rate coefficient for phytoplankton [m⁶/mmol²/s]    | 0.40/86400.0       |
 | `zooepsdet`        | Zooplankton prey capture rate coefficient for detritus [m⁶/mmol²/s]         | 0.25/86400.0       |
 | `zoopreyswitch`    | Zooplankton prey switching exponent [dimenionless]                          | 1.8                |
@@ -977,7 +977,7 @@ $$
 
 _where_ <br>
 - $g_{zoo}$ is the total specific rate of grazing of zooplankton (`g_zoo`, [s<sup>-1</sup>]) <br>
-- $B_{zoo}^{C}$ is the in situ concentration of zooplankton carbon biomass (`f_zoo(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{zoo}^{C}$ is the in situ concentration of zooplankton carbon biomass (`p_zoo(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
 
 Total grazing of prey can also be expressed as the sum of individual prey type consumption:
 
