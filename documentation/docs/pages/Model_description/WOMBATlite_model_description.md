@@ -939,7 +939,7 @@ $$
 
 $$
 \begin{align}
-g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} \cdot L_{zoo}^{O_2} \varepsilon \left(B_{prey}^{C}\right)^{2}}{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} + \varepsilon \left(B_{prey}^{C}\right)^{2}}
+g_{zoo} =& \quad \dfrac{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} L_{zoo}^{O_2} \cdot \sum_{i} \left(\varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C}\right)^{2}\right)}{\mu_{zoo}^{max} \left(β_{hete}\right)^{T} + \sum_{i} \left( \varepsilon_{zoo}^{i} \left(\phi_{zoo}^{i} B_{i}^{C}\right)^{2}\right)}
 \end{align}
 $$
 
@@ -948,8 +948,13 @@ _where_ <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
 - $L_{zoo}^{O_2}$ is a limiter of grazing in low oxygen conditions (`o2lim`, [dimensionless]) <br>
-- $B_{prey}^{C}$ is the concentration of prey biomass (`zooprey`, [mmol C m<sup>-3</sup>]) <br>
-- $\varepsilon$ is the prey capture rate coefficient (`zooeps(i,j,k)`, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
+- $B_{i}^{C}$ is the concentration of prey type $i$ carbon biomass ([mmol C m<sup>-3</sup>]) <br>
+- $\phi_{zoo}^{i}$ is the relative prey preference of zooplankton for prey type $i$ ([dimenionless]) <br>
+- $\varepsilon_{zoo}^{i}$ is the prey capture rate coefficient of zooplankton for prey type $i$ ([(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
+
+This formulation suppresses grazing at low prey biomass ($B_{i}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
+
+The application of the temperature-dependent maximum growth rate in both the numerator and denominator makes this grazing formula unique [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w) and equivalent to a disk formulation, rather than a Michaelis–Menten formulation [(Rohr et al., 2022)](https://doi.org/10.1016/j.pocean.2022.102878). Practically, this amplifies grazing in warmer climes, but to a lesser extent than other formulations that apply the temperature amplification ($(β_{hete})^{T}$) only in the numerator [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w). This dampens the effect that variations in temperature have on grazing activity, amplifying the effect of $\varepsilon_{zoo}^{i}$ and aligning with observations that the ratio of grazing to phytoplankton growth varies little between tropical and polar climes [(Calbet and Landry, 2004)](https://doi.org/10.4319/lo.2004.49.1.0051). Theoretically, this assumes some evolutionary adaptation to account for the physiological effects of temperature across environmental niches, such that the efficiency of prey capture and handling becomes more important to grazers than metabolic constraints due to temperature.
 
 We apply an oxygen limitation to grazing at low oxygen concentrations (`o2lim`, $L_{zoo}^{O_2}$, [dimensionless]) based on the review of [Medina et al. (2017)](https://doi.org/10.3389/fmars.2017.00105), who found that from 5 µM to undetectable concentrations of oxygen, protist consumption of a bacterial population decreased from 28% to 13% of the population. Additionally, our decision to limit zooplankton grazing in low oxygen conditions is also informed by the results of [Cavan et al. (2017)](https://doi.org/10.1038/ncomms14847).
 
@@ -959,24 +964,12 @@ L_{zoo}^{O_2} =& \quad \left(1 - e^{\left(-\dfrac{O_2}{10}\right)}\right)
 \end{align}
 $$
 
-Total grazing of biomass by zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
-
-$$
-\begin{align}
-\sum_{i} \phi_{zoo}^{i} = 1.0
-\end{align}
-$$
-
-
-This formulation suppresses grazing at low prey biomass ($B_{i}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
-
-The application of the temperature-dependent maximum growth rate in both the numerator and denominator makes this grazing formula unique [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w) and equivalent to a disk formulation, rather than a Michaelis–Menten formulation [(Rohr et al., 2022)](https://doi.org/10.1016/j.pocean.2022.102878). Practically, this amplifies grazing in warmer climes, but to a lesser extent than other formulations that apply the temperature amplification ($(β_{hete})^{T}$) only in the numerator [(Rohr et al., 2023)](https://www.nature.com/articles/s43247-023-00871-w). This dampens the effect that variations in temperature have on grazing activity, amplifying the effect of $\varepsilon^{i}$ and aligning with observations that the ratio of grazing to phytoplankton growth varies little between tropical and polar climes [(Calbet and Landry, 2004)](https://doi.org/10.4319/lo.2004.49.1.0051). Theoretically, this assumes some evolutionary adaptation to account for the physiological effects of temperature across environmental niches, such that the efficiency of prey capture and handling becomes more important to grazers than metabolic constraints due to temperature.
-
 The normalized prey preferences (i.e., dietary fractions) are modified from initial values by prey switching prior to computation of total prey biomass ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)) such that
 
 $$
 \begin{align}
 \phi_{zoo}^{i} =& \quad \left( \phi_{zoo}^{i,0} B_{i}^{C} \right)^{s_{zoo}}
+\sum_{i} \phi_{zoo}^{i} =& 1.0
 \end{align}
 $$
 
@@ -996,7 +989,6 @@ $$
 \varepsilon_{zoo} =& \quad \dfrac{ \sum_{i} \left( \varepsilon_{zoo}^{i} \left( \phi_{zoo}^{i} B_{i}^{C} \right)^{2} \right) }{\sum_{i} \left( \left( \phi_{zoo}^{i} B_{i}^{C} \right)^{2} \right)}  \\
 \end{align}
 $$
-
 
 Total grazing of biomass by zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
 
