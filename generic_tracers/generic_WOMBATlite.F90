@@ -2882,10 +2882,10 @@ module generic_WOMBATlite
       zval1 = (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2
       zval2 = (wombat%zooprefdet(i,j,k) * det_mmolm3)**2
       Xzoo = (  wombat%zooepsphy * zval1 + wombat%zooepsdet * zval2 )
-      
+
       ! Oxygen limitation term reducing zooplankton grazing pressure in low-oxygen waters (following Buchanan et al., 2025; Science)
       o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3/10.0)))
-      
+
       ! Grazing rate of zooplankton
       g_zoo = wombat%zoogmax * fbc * o2lim * Xzoo / (wombat%zoogmax * fbc + Xzoo)
 
