@@ -950,7 +950,7 @@ _where_ <br>
 - $L_{zoo}^{O_2}$ is a limiter of grazing in low oxygen conditions (`o2lim`, [dimensionless]) <br>
 - $B_{i}^{C}$ is the concentration of prey type $i$ carbon biomass ([mmol C m<sup>-3</sup>]) <br>
 - $\phi_{zoo}^{i}$ is the relative prey preference of zooplankton for prey type $i$ ([dimenionless]) <br>
-- $\varepsilon_{zoo}^{i}$ is the prey capture rate coefficient of zooplankton for prey type $i$ ([(mmol C m<sup>-3</sup>)<sup>-2</sup>]) <br>
+- $\varepsilon_{zoo}^{i}$ is the prey capture rate coefficient of zooplankton for prey type $i$ ([(mmol C m<sup>-3</sup>)<sup>-2</sup> s<sup>-1</sup>]) <br>
 
 This formulation suppresses grazing at low prey biomass ($B_{i}^{C}$) due to reduced encounter and clearance rates, accelerates grazing at intermediate prey biomass as zooplankton effectively learn and switch to available prey, and saturates at high prey biomass due to handling-time limitation ([Gentleman and Neuheimer, 2008](https://doi.org/10.1093/plankt/fbn078); Rohr et al., [2022](https://doi.org/10.1016/j.pocean.2022.102878), [2024](https://doi.org/10.1029/2023GL107732)). This choice increases ecosystem stability and prolongs phytoplankton blooms relative to a Type II formulation.
 
@@ -968,7 +968,7 @@ The normalized prey preferences (i.e., dietary fractions) are modified from init
 
 $$
 \begin{align}
-\phi_{zoo}^{i} =& \quad \left( \phi_{zoo}^{i,0} B_{i}^{C} \right)^{s_{zoo}}
+\phi_{zoo}^{i} =& \quad \left( \phi_{zoo}^{i,0} B_{i}^{C} \right)^{s_{zoo}} \\
 \sum_{i} \phi_{zoo}^{i} =& 1.0
 \end{align}
 $$
