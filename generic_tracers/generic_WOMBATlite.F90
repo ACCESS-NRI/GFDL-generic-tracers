@@ -3417,10 +3417,10 @@ module generic_WOMBATlite
 
     call FMS_ocmip2_co2calc(CO2_dope_vec, wombat%sedmask(:,:), &
         wombat%sedtemp(:,:), wombat%sedsalt(:,:), &
-        wombat%seddic(:,:), &
+        max(1e-9, wombat%seddic(:,:)), &
         max(wombat%sedno3(:,:) / 16., 1e-9), &
         wombat%sio2(:,:), & ! dts: This is currently constant, equal to wombat%sio2_surf
-        wombat%sedalk(:,:), &
+        max(1e-9, wombat%sedalk(:,:)), &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_lo, &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_hi, &
         wombat%sedhtotal(:,:), &
