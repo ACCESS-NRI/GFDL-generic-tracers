@@ -338,6 +338,7 @@ module generic_WOMBATmid
         kbafe_dfe, &
         wafe, &
         wbafe, &
+        bsi_alpha, &
         bsi_fbac, &
         bsi_kbac, &
         bsilrem_sed, &
@@ -3092,9 +3093,16 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('wbafe', wombat%wbafe, 5.0/86400.0)
 
-    ! Factor increase in biogenic silica dissolution caused by bacterial activity [dimensionless]
+    ! Intercept of temperature-dependency of biogenic silica dissolution [Kamatani 1982 Marine Biology]
+    !  According to Kamatani (1982), this intercept varies between -7.35 to -10.38 depending on
+    !  the diatom species and possibly the degree roughness and biological film strength
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bsi_fbac', wombat%bsi_fbac, 20.0)
+    call g_tracer_add_param('bsi_alpha', wombat%bsi_alpha, -10.0)
+
+    ! Factor increase in biogenic silica dissolution caused by bacterial activity [dimensionless]
+    !  Bidle & Azam (1999) found 10x increase in dissolution with bacterial activity
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bsi_fbac', wombat%bsi_fbac, 10.0)
 
     ! Half-saturation coefficient modulating increase in biogenic silica dissolution due to bacterial activity [mmolC/m3]
     !-----------------------------------------------------------------------
@@ -5336,8 +5344,8 @@ module generic_WOMBATmid
         !    - Greenwood et al. (2005) finds dissolution rates [1/s] at a given temperature
         !      equal to exp(20 - 10050/T), with T in Kelvin (Figure 4). But these T are too high.
         !    We use Kamatani (1982):
-        disssi_temp = exp(-8.0 + 0.0833*Temp(i,j,k)) / 3600.0 ! [1/s]
-        ! 2. Undersaturation term with an exponent of 2.0
+        disssi_temp = exp(wombat%bsi_alpha + 0.0833*Temp(i,j,k)) / 3600.0 ! [1/s]
+        ! 2. Undersaturation term
         !    - see Eq. 2.13 and fits of this equation to ocean data in Figures 3.20 and 3.21 in
         !      Rickert, D., Dissolution kinetics of biogenic silica in marine environments, Ber. Polarforsch., 351, 2000.
         !    - From Van Cappellen et al., (2002) Global Biogeochemical Cycles:
@@ -5345,8 +5353,9 @@ module generic_WOMBATmid
         !       demonstrate that at very high degrees of undersaturation the dissolution kinetics switch
         !       from a linear dependence on the degree of undersaturation to an exponential one [Van Cappellen
         !       and Qiu, 1997b; Rickert, 2000]."
-        !    - We therefore assume substantial undersaturation, which is the case in most of the ocean
-      disssi_usat = (1 - min(1.0, wombat%f_sil(i,j,k) / wombat%sileqc(i,j,k)) )**2.0
+        !    - However, we apply an exponent of 1 because on acid-cleaned silica, the dissolution proceeds with
+        !      undersaturation linearly (Rickert 2000 - Table 3.4). This is thermodynamically defendable.
+      disssi_usat = (1 - min(1.0, wombat%f_sil(i,j,k) / wombat%sileqc(i,j,k)) )
       ! 3. Bio-interference term?
         !    - "The removal of organic or inorganic coatings enhance the reactivity by at least an order of magnitude."
         !      Ricket et al., 2002 Geochim. et Cosmochim. Acta
