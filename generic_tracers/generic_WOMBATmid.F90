@@ -5101,7 +5101,7 @@ module generic_WOMBATmid
                     * max(0.01, min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) ) )
       theta_opt = max(wombat%phyminqc, theta_opt)
       wombat%pchl_mu(i,j,k) = wombat%phy_mu(i,j,k) * wombat%f_pchl(i,j,k) &
-                            + max(0.0, (theta_opt - phy_chlc)) / wombat%chltau * wombat%f_phy(i,j,k)
+                            + (theta_opt - phy_chlc) / wombat%chltau * wombat%f_phy(i,j,k)
 
       !!!~~~ Microphytoplankton ~~~!!!
       theta_opt = wombat%diamaxqc / (1.0 + &
@@ -5110,7 +5110,7 @@ module generic_WOMBATmid
                     * max(0.01, min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k))) ) )
       theta_opt = max(wombat%diaminqc, theta_opt)
       wombat%dchl_mu(i,j,k) = wombat%dia_mu(i,j,k) * wombat%f_dchl(i,j,k) &
-                            + max(0.0, (theta_opt - dia_chlc)) / wombat%chltau * wombat%f_dia(i,j,k)
+                            + (theta_opt - dia_chlc) / wombat%chltau * wombat%f_dia(i,j,k)
 
 
       !-----------------------------------------------------------------------!

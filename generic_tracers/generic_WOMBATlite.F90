@@ -2682,7 +2682,7 @@ module generic_WOMBATlite
       !    Rates of chlorophyll synthesis are not instantaneous, and take hours to days
       !    Here, we make chlorophyll synthesis respond on a timescale of phytauqc
       wombat%pchl_mu(i,j,k) = wombat%phy_mu(i,j,k) * pchl_p &
-                            + max(0.0, theta_opt - phy_chlc) / wombat%phytauqc * phy_p
+                            + (theta_opt - phy_chlc) / wombat%phytauqc * phy_p
 
 
       !-----------------------------------------------------------------------!
