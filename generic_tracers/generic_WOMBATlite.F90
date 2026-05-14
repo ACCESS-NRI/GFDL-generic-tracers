@@ -1309,11 +1309,11 @@ module generic_WOMBATlite
 
     ! Autotrophy maximum growth rate parameter b [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bbioa', wombat%bbioa, 1.050)
+    call g_tracer_add_param('bbioa', wombat%bbioa, 1.070)
 
     ! Heterotrophy maximum growth rate parameter b [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bbioh', wombat%bbioh, 1.060)
+    call g_tracer_add_param('bbioh', wombat%bbioh, 1.072)
 
     ! Phytoplankton half saturation constant for nitrogen uptake [mmolN/m3]
     !-----------------------------------------------------------------------
@@ -1329,7 +1329,7 @@ module generic_WOMBATlite
 
     ! Phytoplankton maximum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.060)
+    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.030)
 
     ! Timescale over which chlorophyll to carbon ratios are altered [s]
     !-----------------------------------------------------------------------
@@ -1345,7 +1345,7 @@ module generic_WOMBATlite
 
     ! Phytoplankton linear mortality rate constant [1/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phylmor', wombat%phylmor, 0.005/86400.0)
+    call g_tracer_add_param('phylmor', wombat%phylmor, 0.0035/86400.0)
 
     ! Phytoplankton quadratic mortality rate constant [m3/mmolN/s]
     !-----------------------------------------------------------------------
@@ -1373,19 +1373,19 @@ module generic_WOMBATlite
 
     ! Zooplankton ingestion efficiency of prey carbon (the rest is egested) [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCingest', wombat%zooCingest, 0.8)
+    call g_tracer_add_param('zooCingest', wombat%zooCingest, 0.86)
 
     ! Zooplankton assimilation of ingested prey carbon (the rest is excreted) [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.3)
+    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.10)
 
     ! Zooplankton ingestion efficiency of prey carbon (the rest is egested) [1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooFeingest', wombat%zooFeingest, 0.2)
+    call g_tracer_add_param('zooFeingest', wombat%zooFeingest, 0.20)
 
     ! Zooplankton assimilation of ingested prey carbon (the rest is excreted) [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.9)
+    call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.86)
 
     ! Zooplankton dissolution efficiency of CaCO3 within guts [1]
     !-----------------------------------------------------------------------
@@ -1403,13 +1403,13 @@ module generic_WOMBATlite
     !  - e.g., ciliates feeding on small (nano/pico)phytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.40/86400.0)
+    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.30/86400.0)
 
     ! Zooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., protozoa grazing on slowly sinking detrital particles
-    !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
+    !  - aim for half-saturation coefficent B1/2 = 1.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsdet', wombat%zooepsdet, 0.25/86400.0)
+    call g_tracer_add_param('zooepsdet', wombat%zooepsdet, 1.0/86400.0)
 
     ! Prey switching exponent for microzooplantkon [van Leeuwen et al. (2013), J. Theor. Biol.]
     ! when <1, more even feeding across prey items
@@ -1424,11 +1424,11 @@ module generic_WOMBATlite
 
     ! Zooplankton preference for detritus [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefdet', wombat%zprefdet, 0.50)
+    call g_tracer_add_param('zprefdet', wombat%zprefdet, 1.0)
 
     ! Zooplankton respiration rate constant [1/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoolmor', wombat%zoolmor, 0.0025/86400.0)
+    call g_tracer_add_param('zoolmor', wombat%zoolmor, 0.0010/86400.0)
 
     ! Zooplankton quadratic mortality rate constant [m3/mmolN/s]
     !-----------------------------------------------------------------------
@@ -1440,7 +1440,7 @@ module generic_WOMBATlite
     ! matter concentration, with a detlrem equal to 10-5 per second,
     ! a 50% fraction (f) would be remineralised in 11 days.
     ! -ln(f) / k, where k = reminr*[det]**2
-    call g_tracer_add_param('detlrem', wombat%detlrem, 0.5/86400.0)
+    call g_tracer_add_param('detlrem', wombat%detlrem, 0.3/86400.0)
 
     ! Base detritus sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
@@ -1532,7 +1532,7 @@ module generic_WOMBATlite
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400.0)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
