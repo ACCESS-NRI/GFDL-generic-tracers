@@ -41,18 +41,17 @@
 !  This is the "mid" version of WOMBAT which includes two classes each of
 !  phytoplankton, zooplankton and sinking detritus, as well as nitrate
 !  (NO3), ammonium (NH4), nitrous oxide (N2O), dissolved iron (Fe),
-!  silicic acid (SIL), dissolved organic matter that is split into carbon
-!  (DOC) and nitrogen (DON), two explicit heterotrophic bacterial types
-!  (BAC1 & BAC2) and ammonia oxidizing archaea (AOA), dissolved inorganic
-!  carbon (DIC), calcium carbonate (CaCO3), alkalinity (ALK), and oxygen
-!  (O2). Fe is carried through all exosystem biomass pools except bacteria
-!  and AOA, who have constant C:N:Fe ratios. Fe is additionally routed to
-!  small and large authigenic Fe particle pools (AFe and bAFe) via the
-!  "colloidal shunt". C:N ratios are fixed in all biomass pools except
-!  for dissolved organics, since we represent both DOC and DON. Si is
-!  carried through microphytoplankton, large detrtis and, like for carbon
-!  and Fe, is deposited into a sediment pool.
-!  Gas exchange follows MOCSY protocols.
+!  silicic acid (SIL), dissolved organic matter split into carbon (DOC),
+!  hydrogen (DOH), oxygen (DOO) and nitrogen (DON), two explicit heterotrophic
+!  bacterial types (BAC1 & BAC2) and ammonia oxidizing archaea (AOA),
+!  dissolved inorganic carbon (DIC), calcium carbonate (CaCO3), alkalinity
+!  (ALK), and oxygen (O2). Fe is carried through all exosystem biomass pools
+!  except bacteria and AOA, who have constant C:N:Fe ratios. Fe is
+!  additionally routed to small and large authigenic Fe particle pools
+!  (AFe and bAFe) via the "colloidal shunt". C:H:O:N ratios are fixed in all
+!  biomass pools except for dissolved organics. Si is carried through
+!  microphytoplankton, large detrtis and, like for carbon and Fe, is deposited
+!  into a sediment pool. Gas exchange follows MOCSY protocols.
 ! </DESCRIPTION>
 !
 ! <INFO>
@@ -425,6 +424,8 @@ module generic_WOMBATmid
         b_dicr, &
         b_alk, &
         b_doc, &
+        b_doh, &
+        b_doo, &
         b_don, &
         b_no3, &
         b_sil, &
@@ -489,6 +490,8 @@ module generic_WOMBATmid
         f_bdetfe, &
         f_bdetsi, &
         f_doc, &
+        f_doh, &
+        f_doo, &
         f_don, &
         f_bac1, &
         f_bac2, &
@@ -3521,6 +3524,24 @@ module generic_WOMBATmid
         flux_bottom = .true., &
         prog = .true.)
 
+    ! Dissolved organic hydrogen
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'doh', &
+        longname = 'Dissolved organic hydrogen', &
+        units = 'mol/kg', &
+        flux_bottom = .true., &
+        prog = .true.)
+
+    ! Dissolved organic oxygen
+    !-----------------------------------------------------------------------
+    call g_tracer_add(tracer_list, package_name, &
+        name = 'doo', &
+        longname = 'Dissolved organic oxygen', &
+        units = 'mol/kg', &
+        flux_bottom = .true., &
+        prog = .true.)
+
     ! Dissolved organic nitrogen
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
@@ -3972,8 +3993,10 @@ module generic_WOMBATmid
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
     real                                    :: g_zoo, g_mes, Xzoo, I_Xzoo, Xmes, I_Xmes
-    real                                    :: biono3, bion2o, bionh4, biooxy, biofer, biosil, biodoc, biodon, biocaco3
-    real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobdetsi, biobac1, biobac2, bioaoa
+    real                                    :: biono3, bion2o, bionh4, biooxy, biofer, biosil
+    real                                    :: biodoc, biodoh, biodoo, biodon, biocaco3
+    real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobdetsi
+    real                                    :: biobac1, biobac2, bioaoa
     real                                    :: biophyfe, biodiafe
     real                                    :: I_denom, wzbac1, wzbac2, wzaoa, wzphy, wzdia, wzdet, wzbdet, wzzoo, I_wzsum
     real                                    :: fbc
@@ -4017,7 +4040,7 @@ module generic_WOMBATmid
     real                                    :: feagg1, feagg2, feagg3, feagg4, feagg5
     real                                    :: biof, shear
     real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, mes_Fe2C, det_Fe2C, bdet_Fe2C
-    real                                    :: dom_N2C, dia_Si2C
+    real                                    :: dom_H2C, dom_O2C, dom_N2C, dia_Si2C
     real                                    :: theta_opt
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe
@@ -4540,6 +4563,10 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'doc', 'field', wombat%f_doc, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'doh', 'field', wombat%f_doh, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
+    call g_tracer_get_values(tracer_list, 'doo', 'field', wombat%f_doo, isd, jsd, ntau=tau, &
+        positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau, &
@@ -4754,6 +4781,8 @@ module generic_WOMBATmid
       biobdet  = max(epsi, wombat%f_bdet(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biobdetsi= max(epsi, wombat%f_bdetsi(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodoc   = max(epsi, wombat%f_doc(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biodoh   = max(epsi, wombat%f_doh(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biodoo   = max(epsi, wombat%f_doo(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodon   = max(epsi, wombat%f_don(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biobac1  = max(epsi, wombat%f_bac1(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biobac2  = max(epsi, wombat%f_bac2(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
@@ -4773,6 +4802,8 @@ module generic_WOMBATmid
       mes_Fe2C = max(epsi, wombat%f_mesfe(i,j,k))/ max(epsi, wombat%f_mes(i,j,k))
       det_Fe2C = max(epsi, wombat%f_detfe(i,j,k))/ max(epsi, wombat%f_det(i,j,k))
       bdet_Fe2C= max(epsi, wombat%f_bdetfe(i,j,k))/max(epsi, wombat%f_bdet(i,j,k))
+      dom_H2C  = max(epsi, wombat%f_doh(i,j,k))  / max(epsi, wombat%f_doc(i,j,k))
+      dom_O2C  = max(epsi, wombat%f_doo(i,j,k))  / max(epsi, wombat%f_doc(i,j,k))
       dom_N2C  = max(epsi, wombat%f_don(i,j,k))  / max(epsi, wombat%f_doc(i,j,k))
       dia_Si2C = max(epsi, wombat%f_diasi(i,j,k))/ max(epsi, wombat%f_dia(i,j,k))
 
@@ -6091,6 +6122,14 @@ module generic_WOMBATmid
                           - wombat%doc1remi(i,j,k) &
                           - wombat%doc2remi(i,j,k) )
 
+      ! Dissolved organic hydrogen equation ! [molC/kg]
+      !-----------------------------------------------------------------------
+      wombat%f_doh(i,j,k) = wombat%f_doh(i,j,k) + dtsb * ( 0.0 )
+
+      ! Dissolved organic oxygen equation ! [molC/kg]
+      !-----------------------------------------------------------------------
+      wombat%f_doo(i,j,k) = wombat%f_doo(i,j,k) + dtsb * ( 0.0 )
+
       ! Dissolved organic nitrogen equation ! [molN/kg]
       !-----------------------------------------------------------------------
       wombat%f_don(i,j,k) = wombat%f_don(i,j,k) + dtsb * ( &
@@ -6576,6 +6615,8 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'bdetfe', 'field', wombat%f_bdetfe, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bdetsi', 'field', wombat%f_bdetsi, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'doc', 'field', wombat%f_doc, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'doh', 'field', wombat%f_doh, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'doo', 'field', wombat%f_doo, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau)
@@ -6900,6 +6941,8 @@ module generic_WOMBATmid
         ! Remineralisation of sediments to supply nutrient fields.
         ! btf values are positive from the water column into the sediment.
         wombat%b_doc(i,j) = -wombat%det_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_doh(i,j) = -wombat%det_sed_remin(i,j) * 0.0 ! [mol/m2/s] PJB
+        wombat%b_doo(i,j) = -wombat%det_sed_remin(i,j) * 0.0 ! [mol/m2/s] PJB
         wombat%b_don(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
         wombat%b_no3(i,j) = wombat%det_sed_denit(i,j) ! [molN/m2/s]
         wombat%b_o2(i,j) = -132./122. * wombat%b_doc(i,j) * (1.0 - wombat%fdenit(i,j))! [mol/m2/s]
@@ -6925,6 +6968,8 @@ module generic_WOMBATmid
     enddo; enddo
 
     call g_tracer_set_values(tracer_list, 'doc', 'btf', wombat%b_doc, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'doh', 'btf', wombat%b_doh, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'doo', 'btf', wombat%b_doo, isd, jsd)
     call g_tracer_set_values(tracer_list, 'don', 'btf', wombat%b_don, isd, jsd)
     call g_tracer_set_values(tracer_list, 'no3', 'btf', wombat%b_no3, isd, jsd)
     call g_tracer_set_values(tracer_list, 'o2', 'btf', wombat%b_o2, isd, jsd)
@@ -8174,6 +8219,8 @@ module generic_WOMBATmid
     allocate(wombat%f_bdetfe(isd:ied, jsd:jed, 1:nk)); wombat%f_bdetfe(:,:,:)=0.0
     allocate(wombat%f_bdetsi(isd:ied, jsd:jed, 1:nk)); wombat%f_bdetsi(:,:,:)=0.0
     allocate(wombat%f_doc(isd:ied, jsd:jed, 1:nk)); wombat%f_doc(:,:,:)=0.0
+    allocate(wombat%f_doh(isd:ied, jsd:jed, 1:nk)); wombat%f_doh(:,:,:)=0.0
+    allocate(wombat%f_doo(isd:ied, jsd:jed, 1:nk)); wombat%f_doo(:,:,:)=0.0
     allocate(wombat%f_don(isd:ied, jsd:jed, 1:nk)); wombat%f_don(:,:,:)=0.0
     allocate(wombat%f_bac1(isd:ied, jsd:jed, 1:nk)); wombat%f_bac1(:,:,:)=0.0
     allocate(wombat%f_bac2(isd:ied, jsd:jed, 1:nk)); wombat%f_bac2(:,:,:)=0.0
@@ -8186,6 +8233,8 @@ module generic_WOMBATmid
     allocate(wombat%f_bafe(isd:ied, jsd:jed, 1:nk)); wombat%f_bafe(:,:,:)=0.0
 
     allocate(wombat%b_doc(isd:ied, jsd:jed)); wombat%b_doc(:,:)=0.0
+    allocate(wombat%b_doh(isd:ied, jsd:jed)); wombat%b_doh(:,:)=0.0
+    allocate(wombat%b_doo(isd:ied, jsd:jed)); wombat%b_doo(:,:)=0.0
     allocate(wombat%b_don(isd:ied, jsd:jed)); wombat%b_don(:,:)=0.0
     allocate(wombat%b_no3(isd:ied, jsd:jed)); wombat%b_no3(:,:)=0.0
     allocate(wombat%b_o2(isd:ied, jsd:jed)); wombat%b_o2(:,:)=0.0
@@ -8478,6 +8527,8 @@ module generic_WOMBATmid
         wombat%f_bdetfe, &
         wombat%f_bdetsi, &
         wombat%f_doc, &
+        wombat%f_doh, &
+        wombat%f_doo, &
         wombat%f_don, &
         wombat%f_bac1, &
         wombat%f_bac2, &
@@ -8491,6 +8542,8 @@ module generic_WOMBATmid
 
     deallocate( &
         wombat%b_doc, &
+        wombat%b_doh, &
+        wombat%b_doo, &
         wombat%b_don, &
         wombat%b_no3, &
         wombat%b_o2, &
