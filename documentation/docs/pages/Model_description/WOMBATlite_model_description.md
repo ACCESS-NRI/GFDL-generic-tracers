@@ -214,37 +214,37 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 |--------------------|-----------------------------------------------------------------------------|--------------------|
 | `alphabio`         | Phytoplankton initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹]               | 3.0                |
 | `abioa`            | Autotrophy maximum growth rate parameter a [s⁻¹]                            | 1.0/86400.0        |
-| `bbioa`            | Autotrophy maximum growth rate parameter b [1]                              | 1.050              |
-| `bbioh`            | Heterotrophy maximum growth rate parameter b [1]                            | 1.060              |
+| `bbioa`            | Autotrophy maximum growth rate parameter b [1]                              | 1.070              |
+| `bbioh`            | Heterotrophy maximum growth rate parameter b [1]                            | 1.072              |
 | `phykn`            | Phytoplankton half saturation constant for nitrogen uptake [mmolN/m³]       | 2.0                |
 | `phykf`            | Phytoplankton half saturation constant for iron uptake [µmolFe/m³]          | 1.0                |
 | `phyminqc`         | Phytoplankton minimum chlorophyll:C quota [mg/mg]                           | 0.004              |
-| `phymaxqc`         | Phytoplankton maximum chlorophyll:C quota [mg/mg]                           | 0.060              |
+| `phymaxqc`         | Phytoplankton maximum chlorophyll:C quota [mg/mg]                           | 0.030              |
 | `phytauqc`         | Phytoplankton timescale for chlorophyll:C adjustment [s]                    | 86400.0            |
 | `phyoptqf`         | Phytoplankton optimal Fe:C quota [mol/mol]                                  | 10e-6              |
 | `phymaxqf`         | Phytoplankton maximum Fe:C quota [mol/mol]                                  | 50e-6              |
-| `phylmor`          | Phytoplankton linear mortality rate constant [s⁻¹]                          | 0.005/86400.0      |
+| `phylmor`          | Phytoplankton linear mortality rate constant [s⁻¹]                          | 0.0035/86400.0      |
 | `phyqmor`          | Phytoplankton quadratic mortality rate constant [(mmolC/m³)⁻¹ s⁻¹]          | 0.05/86400.0       |
 | `phybiot`          | Phytoplankton biomass threshold [mmolC/m³]                                  | 0.6                |
 | `alphabio_tri`     | Trichodesmium initial slope of P–I curve [(W/m²)⁻¹ (mg/mg)⁻¹]               | 1.8                |
 | `trikf`            | Trichodesmium half saturation constant for iron uptake [µmolFe/m³]          | 0.125              |
 | `trichlc`          | Trichodesmium chlorophyll to carbon ratio [mol Chl (mol C)<sup>-1</sup>]    | 0.01               |
 | `trin2c`           | Trichodesmium nitrogen to carbon ratio [molN (mol C)<sup>-1</sup>]          | 50/300             |
-| `zooCingest`       | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.8                |
-| `zooCassim`        | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.3                |
-| `zooFeingest`      | Zooplankton ingestion efficiency of iron [molFe/molFe]                      | 0.2                |
-| `zooFeassim`       | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.9                |
+| `zooCingest`       | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.86               |
+| `zooCassim`        | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.10               |
+| `zooFeingest`      | Zooplankton ingestion efficiency of iron [molFe/molFe]                      | 0.20               |
+| `zooFeassim`       | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.86               |
 | `fgutdiss`         | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
 | `zookz`            | Half-saturation coefficient for zooplankton mortality [mmolC/m³]            | 0.25               |
 | `zoogmax`          | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.3/86400.0        |
-| `zooepsphy`        | Zooplankton prey capture rate coefficient for phytoplankton [m⁶/mmol²/s]    | 0.40/86400.0       |
-| `zooepsdet`        | Zooplankton prey capture rate coefficient for detritus [m⁶/mmol²/s]         | 0.25/86400.0       |
+| `zooepsphy`        | Zooplankton prey capture rate coefficient for phytoplankton [m⁶/mmol²/s]    | 0.30/86400.0       |
+| `zooepsdet`        | Zooplankton prey capture rate coefficient for detritus [m⁶/mmol²/s]         | 1.00/86400.0       |
 | `zoopreyswitch`    | Zooplankton prey switching exponent [dimenionless]                          | 1.8                |
 | `zprefphy`         | Zooplankton preference for phytoplankton [dimensionless]                    | 1.0                |
-| `zprefdet`         | Zooplankton preference for detritus [dimensionless]                         | 0.50               |
-| `zoolmor`          | Zooplankton respiration rate [s⁻¹]                                          | 0.0025/86400.0     |
+| `zprefdet`         | Zooplankton preference for detritus [dimensionless]                         | 1.0                |
+| `zoolmor`          | Zooplankton respiration rate [s⁻¹]                                          | 0.001/86400.0      |
 | `zooqmor`          | Zooplankton quadratic mortality [(mmolC/m³)⁻¹ s⁻¹]                          | 0.8/86400.0        |
-| `detlrem`          | Detritus remineralisation rate [(mmolC/m³)⁻¹ s⁻¹]                           | 0.5/86400.0        |
+| `detlrem`          | Detritus remineralisation rate [(mmolC/m³)⁻¹ s⁻¹]                           | 0.3/86400.0        |
 | `wdetbio`          | Base detritus sinking rate [m/s]                                            | 25.0/86400.0       |
 | `wdetmax`          | Maximum detritus sinking rate [m/s]                                         | 42.0/86400.0       |
 | `wcaco3`           | CaCO₃ sinking rate [m/s]                                                    | 12.5/86400.0       |
@@ -261,7 +261,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `dfefloor`         | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
 | `knano_dfe`        | Fe nanoparticle precipitation rate [s⁻¹]                                    | 0.1/86400.0        |
 | `kscav_dfe`        | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
-| `kcoag_dfe`        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-5/86400         |
+| `kcoag_dfe`        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-6/86400         |
 | `kagg_col`         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | `kagg_kcol`        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
 | `bottom_thickness` | Bottom layer thickness [m]                                                  | 1.0                |
