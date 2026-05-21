@@ -4940,13 +4940,11 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
 
       ! Excess DOC exudation (active exudation via overflow hypothesis; Fogg 1966, 1983; Williams 1990; Carlson & Hansell 2014)
-        ! Up to 50% (set by `overflow`) of assimilated carbon can be exuded by phytoplankton as DOC in high light, low nutrient
-        ! conditions (Thornton 2014)
-        ! Some small amount of DOC is exuded via passive diffusion even in the healthiest phytoplankton (Bjornsen 1988)
-        ! If too much DOC is exuded, bacterial competition for nutrients can limit phytoplankton growth (Bratbak & Thingstad, 1985;
-        ! Ratnarajah et al. 2021)
-        ! However, active release of DOM by mixotrophic phytoplankton can "farm" heterotrophic bacteria (Mitra et al. 2013) (NOT
-        ! YET IMPLEMENTED)
+        ! Up to 75% (set by `overflow`) of assimilated carbon can be exuded by phytoplankton as DOC in high light, low nutrient
+        ! conditions (Thornton 2014). Some small amount of DOC is exuded via passive diffusion even in the healthiest
+        ! phytoplankton (Bjornsen 1988). If too much DOC is exuded, bacterial competition for nutrients can limit phytoplankton
+        ! growth (Bratbak & Thingstad, 1985; Ratnarajah et al. 2021). However, active release of DOM by mixotrophic phytoplankton
+        ! can "farm" heterotrophic bacteria and create a competitive niche for mixotrophs (Mitra et al. 2013) (NOT YET IMPLEMENTED)
       if (wombat%f_phy(i,j,k)>epsi) then
         zval = wombat%phy_mumax(i,j,k) * wombat%phy_lpar(i,j,k) * wombat%f_phy(i,j,k) ! Gross carbon fixation
         wombat%phydoc(i,j,k) = min( wombat%overflow * zval, &
@@ -6978,9 +6976,9 @@ module generic_WOMBATmid
         ! Remineralisation of sediments to supply nutrient fields.
         ! btf values are positive from the water column into the sediment.
         wombat%b_doc(i,j) = -wombat%det_sed_remin(i,j) ! [mol/m2/s]
-        wombat%b_doh(i,j) = -wombat%det_sed_remin(i,j) * 0.0 ! [mol/m2/s] PJB
-        wombat%b_doo(i,j) = -wombat%det_sed_remin(i,j) * 0.0 ! [mol/m2/s] PJB
-        wombat%b_don(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_doh(i,j) = -wombat%det_sed_remin(i,j) * 1.65 ! [mol/m2/s]
+        wombat%b_doo(i,j) = -wombat%det_sed_remin(i,j) * 0.4 ! [mol/m2/s]
+        wombat%b_don(i,j) = -wombat%det_sed_remin(i,j) * 16./122. ! [mol/m2/s]
         wombat%b_no3(i,j) = wombat%det_sed_denit(i,j) ! [molN/m2/s]
         wombat%b_o2(i,j) = -132./122. * wombat%b_doc(i,j) * (1.0 - wombat%fdenit(i,j))! [mol/m2/s]
         wombat%b_dic(i,j) = -wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
@@ -7739,6 +7737,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_bac1_ffelim, wombat%bac1_ffelim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
+    if (wombat%id_bac1_rq > 0) &
+      used = g_send_data(wombat%id_bac1_rq, wombat%bac1_rq, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
     if (wombat%id_bac1morl > 0) &
       used = g_send_data(wombat%id_bac1morl, wombat%bac1morl, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -7777,6 +7779,10 @@ module generic_WOMBATmid
 
     if (wombat%id_bac2_ffelim > 0) &
       used = g_send_data(wombat%id_bac2_ffelim, wombat%bac2_ffelim, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_bac2_rq > 0) &
+      used = g_send_data(wombat%id_bac2_rq, wombat%bac2_rq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_bac2morl > 0) &
