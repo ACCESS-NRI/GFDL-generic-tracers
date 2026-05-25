@@ -3329,7 +3329,7 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
-    call g_tracer_add_param('bac1_kpoc', wombat%bac1_kpoc, 60.0)
+    call g_tracer_add_param('bac1_kpoc', wombat%bac1_kpoc, 10.0)
 
     ! Facultative heterotrophic bacteria #1 half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
