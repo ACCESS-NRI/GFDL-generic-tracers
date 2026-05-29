@@ -5955,8 +5955,8 @@ module generic_WOMBATmid
       !  We use the prefactor (1/(sigma*sqrt(2*pi))) to ensure that specialists have an advantage when at their optimal NOSC
       f2_doc = 1.0 / (wombat%bac2_nosc_sig * 2.5066) * exp( -0.5 * ((nosc - wombat%bac2_nosc_opt)/wombat%bac2_nosc_sig)**2 )
       f3_doc = 1.0 / (wombat%bac3_nosc_sig * 2.5066) * exp( -0.5 * ((nosc - wombat%bac3_nosc_opt)/wombat%bac3_nosc_sig)**2 )
-      m2_doc = f2_doc / (f2_doc + f2_doc + epsi) * biodoc
-      m3_doc = f3_doc / (f3_doc + f3_doc + epsi) * biodoc
+      m2_doc = f2_doc / (f2_doc + f3_doc + epsi) * biodoc
+      m3_doc = f3_doc / (f2_doc + f3_doc + epsi) * biodoc
 
       ! From the base biomass yield on N, compute yields for O2 and anaerobic growth on alternative electron acceptors and DOC
       !  [ Zakem et al., 2020 ISME; Buchanan et al., 2025 Science]
@@ -6114,8 +6114,6 @@ module generic_WOMBATmid
                                + wombat%bac1grow(i,j,k) * bac1_pco2_ana * wombat%bac1_fanaer(i,j,k) ! [molCO2/kg/s]
       wombat%bac2pco2(i,j,k) = wombat%bac2grow(i,j,k) * bac2_pco2 * (1. - wombat%bac2_fanaer(i,j,k)) &
                                + wombat%bac2grow(i,j,k) * bac2_pco2_ana * wombat%bac2_fanaer(i,j,k) ! [molCO2/kg/s]
-      wombat%bac2pco2(i,j,k) = wombat%bac2grow(i,j,k) * bac2_pco2 * (1. - wombat%bac2_fanaer(i,j,k)) &
-                               + wombat%bac2grow(i,j,k) * bac2_pco2_ana * wombat%bac2_fanaer(i,j,k) ! [molCO2/kg/s]
       wombat%bac3pco2(i,j,k) = wombat%bac3grow(i,j,k) * bac3_pco2 * (1. - wombat%bac3_fanaer(i,j,k)) &
                                + wombat%bac3grow(i,j,k) * bac3_pco2_ana * wombat%bac3_fanaer(i,j,k) ! [molCO2/kg/s]
       wombat%bac1deni(i,j,k) = wombat%bac1grow(i,j,k) * bac1_cno3_ana * wombat%bac1_fanaer(i,j,k) ! [molNO3/kg/s]
@@ -6131,7 +6129,7 @@ module generic_WOMBATmid
       wombat%bac3pnh4(i,j,k) = wombat%bac3grow(i,j,k) * bac3_pnh4 * (1. - wombat%bac3_fanaer(i,j,k)) &
                                + wombat%bac3grow(i,j,k) * bac3_pnh4_ana * wombat%bac3_fanaer(i,j,k) ! [molN/kg/s]
 
-      ! Remineralisation of small and large particulate detritus
+      ! Total loss of small and large particulate detritus by bacterial action
       wombat%detremi(i,j,k) = wombat%poc1remi(i,j,k) * biodet / (biodet + biobdet + epsi)
       wombat%bdetremi(i,j,k) = wombat%poc1remi(i,j,k) * biobdet / (biodet + biobdet + epsi)
 
@@ -6527,8 +6525,7 @@ module generic_WOMBATmid
       ! Dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
       zval1 = (wombat%phydoc(i,j,k) + wombat%diadoc(i,j,k))
-      zval2 = ( wombat%detremi(i,j,k) + wombat%bdetremi(i,j,k) &
-              + wombat%phymorl(i,j,k) + wombat%diamorl(i,j,k) &
+      zval2 = ( wombat%phymorl(i,j,k) + wombat%diamorl(i,j,k) &
               + ( wombat%zooexcrbac1(i,j,k) &
                 + wombat%zooexcrbac2(i,j,k) &
                 + wombat%zooexcrbac3(i,j,k) &
@@ -6586,8 +6583,7 @@ module generic_WOMBATmid
 
       ! Dissolved organic nitrogen equation ! [molN/kg]
       !-----------------------------------------------------------------------
-      zval2 = ( wombat%detremi(i,j,k) + wombat%bdetremi(i,j,k) &
-              + wombat%phymorl(i,j,k) + wombat%diamorl(i,j,k) &
+      zval2 = ( wombat%phymorl(i,j,k) + wombat%diamorl(i,j,k) &
               + ( wombat%zooexcrphy(i,j,k) &
                 + wombat%zooexcrdia(i,j,k) &
                 + wombat%zooexcrdet(i,j,k) ) * wombat%zooexcrdom &
