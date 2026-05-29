@@ -3204,7 +3204,7 @@ module generic_WOMBATmid
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400.0)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
@@ -3329,7 +3329,7 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
-    call g_tracer_add_param('bac1_kpoc', wombat%bac1_kpoc, 10.0)
+    call g_tracer_add_param('bac1_kpoc', wombat%bac1_kpoc, 5.0)
 
     ! Facultative heterotrophic bacteria #1 half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
@@ -5455,8 +5455,8 @@ module generic_WOMBATmid
       feagg3 = 2.49
       feagg4 = 115.02 * biof ! 127.8 * 3 * 0.3 (Tagliabue et al., 2023; *3 (DOC effect) *0.3 (phytoplankton effect))
       feagg5 = 725.7
-      zval = ( shear*(feagg1*(biodoc+40.0) + feagg2*biodet) + feagg3*biodet &
-               + feagg4*(biodoc+40.0) + feagg5*biodet ) * wombat%kcoag_dfe
+      zval = ( shear*(feagg1*(biodoc) + feagg2*biodet) + feagg3*biodet &
+               + feagg4*(biodoc) + feagg5*biodet ) * wombat%kcoag_dfe
       wombat%fecoag2afe(i,j,k) = wombat%fecol(i,j,k) * zval
       ! Include an aggregation of colloidal authigenic Fe when concentration of colloidal Fe is high
       wombat%fecoag2afe(i,j,k) = wombat%fecoag2afe(i,j,k) + wombat%kagg_col &
@@ -6556,7 +6556,7 @@ module generic_WOMBATmid
 
       wombat%f_doc(i,j,k) = wombat%f_doc(i,j,k) + dtsb * ( &
                             zval1 + zval2 + zval3 &
-                          + wombat%doc2prod(i,j,k) &
+                          + wombat%doc1prod(i,j,k) &
                           + wombat%doc2prod(i,j,k) - wombat%doc2remi(i,j,k) &
                           + wombat%doc3prod(i,j,k) - wombat%doc3remi(i,j,k) )
 
@@ -6575,7 +6575,7 @@ module generic_WOMBATmid
       ! Dissolved organic oxygen equation ! [molO/kg]
       !-----------------------------------------------------------------------
       wombat%f_doo(i,j,k) = wombat%f_doo(i,j,k) + dtsb * ( &
-                            zval1 * 0.40 &
+                            zval1 * 1.00 &
                           + zval2 * 0.40 &
                           + zval3 * 0.40 &
                           - wombat%doc2remi(i,j,k) * dom_O2C &
