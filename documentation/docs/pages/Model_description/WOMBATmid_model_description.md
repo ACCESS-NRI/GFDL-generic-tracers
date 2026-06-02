@@ -17,6 +17,8 @@ _Dougie.Squire@anu.edu.au_
 
 ---
 
+![schematic](/assets/schematic-mid.png)
+
 ## Tracers
 
 The following are the active tracers in WOMBAT-mid
