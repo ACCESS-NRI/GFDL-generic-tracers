@@ -16,6 +16,8 @@ _Pearse.Buchanan@csiro.au_
 
 ---
 
+![schematic](/assets/schematic-lite.png)
+
 ## Tracers
 
 The following are the active tracers in WOMBAT-lite
