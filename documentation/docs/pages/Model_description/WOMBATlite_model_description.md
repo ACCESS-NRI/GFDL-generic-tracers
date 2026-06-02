@@ -16,7 +16,7 @@ _Pearse.Buchanan@csiro.au_
 
 ---
 
-![schematic](schematic-lite.png)
+![schematic](/assets/schematic-lite.png)
 
 ## Tracers
 
