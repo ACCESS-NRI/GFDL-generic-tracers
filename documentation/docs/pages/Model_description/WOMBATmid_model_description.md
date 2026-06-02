@@ -17,7 +17,7 @@ _Dougie.Squire@anu.edu.au_
 
 ---
 
-![schematic](schematic-mid.png)
+![schematic](/assets/schematic-mid.png)
 
 ## Tracers
 
