@@ -131,6 +131,10 @@
 !  <DATA NAME="do_check_si_conserve" TYPE="logical">
 !   If true, check that the ecosystem model conserves silicon
 !  </DATA>
+!
+!  <DATA NAME="do_check_fe_conserve" TYPE="logical">
+!   If true, check that the ecosystem model conserves iron
+!  </DATA>
 
 ! </NAMELIST>
 !
@@ -196,11 +200,12 @@ module generic_WOMBATmid
   logical :: do_check_n_conserve        = .false. ! check that the N fluxes balance in the ecosystem
   logical :: do_check_c_conserve        = .false. ! check that the C fluxes balance in the ecosystem
   logical :: do_check_si_conserve       = .false. ! check that the Si fluxes balance in the ecosystem
+  logical :: do_check_fe_conserve       = .false. ! check that the Fe fluxes balance in the ecosystem
 
   namelist /generic_wombatmid_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, do_two_ligands, do_burial, &
                                    do_nitrogen_fixation, do_anammox, do_wc_denitrification, do_benthic_denitrification, &
                                    do_tracer_dicp, do_tracer_dicr, do_viscous_sinking, &
-                                   do_check_n_conserve, do_check_c_conserve, do_check_si_conserve
+                                   do_check_n_conserve, do_check_c_conserve, do_check_si_conserve, do_check_fe_conserve
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
@@ -304,7 +309,7 @@ module generic_WOMBATmid
         mesqmor, &
         zoopreyswitch, &
         mespreyswitch, &
-        detlrem, &
+        !detlrem, &
         bottom_thickness, &
         detlrem_sed, &
         detphi, &
@@ -1166,6 +1171,11 @@ module generic_WOMBATmid
     if (do_check_si_conserve) then
       write (stdoutunit,*) trim(note_header), &
           'Checking that the ecosystem model conserves silicon'
+    endif
+
+    if (do_check_fe_conserve) then
+      write (stdoutunit,*) trim(note_header), &
+          'Checking that the ecosystem model conserves iron'
     endif
 
     ! Specify all prognostic and diagnostic tracers of this modules.
@@ -3088,9 +3098,9 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mespreyswitch', wombat%mespreyswitch, 1.8)
 
-    ! Detritus hydrolyzation rate constant [(mmol C m-3)-1 s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('detlrem', wombat%detlrem, 0.7/86400.0)
+    !! Detritus hydrolyzation rate constant [(mmol C m-3)-1 s-1]
+    !!-----------------------------------------------------------------------
+    !call g_tracer_add_param('detlrem', wombat%detlrem, 0.7/86400.0)
 
     ! Detritus hydrolyzation rate constant in sediments [s-1]
     !-----------------------------------------------------------------------
@@ -3477,7 +3487,7 @@ module generic_WOMBATmid
 
     ! Facultative heterotrophic bacteria #3 degree of partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_alpha', wombat%bac3_alpha, 0.0)
+    call g_tracer_add_param('bac3_alpha', wombat%bac3_alpha, 0.1)
 
     ! Facultative heterotrophic bacteria #3 fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
@@ -4334,7 +4344,7 @@ module generic_WOMBATmid
     real                                    :: aoa_Vnh4, aoa_Voxy, aoa_en2o_nh4, aoa_en2o_hyb
     real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect
     real                                    :: disssi_temp, disssi_usat, disssi_bact
-    real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools, si_pools
+    real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools, si_pools, fe_pools
     logical                                 :: used
 
     character(len=fm_string_len), parameter :: sub_name = 'generic_WOMBATmid_update_from_source'
@@ -4798,6 +4808,8 @@ module generic_WOMBATmid
     allocate(n_pools(isc:iec,jsc:jec,nk,2)); n_pools(:,:,:,:)=0.0
     allocate(c_pools(isc:iec,jsc:jec,nk,2)); c_pools(:,:,:,:)=0.0
     allocate(si_pools(isc:iec,jsc:jec,nk,2)); si_pools(:,:,:,:)=0.0
+    allocate(fe_pools(isc:iec,jsc:jec,nk,2)); fe_pools(:,:,:,:)=0.0
+
 
     ! Set the maximum index for euphotic depth
     ! dts: in WOMBAT v3, kmeuph and k100 are integers but here they are arrays since zw
@@ -5061,12 +5073,14 @@ module generic_WOMBATmid
     n_pools(:,:,:,:) = 0.0
     c_pools(:,:,:,:) = 0.0
     si_pools(:,:,:,:) = 0.0
+    fe_pools(:,:,:,:) = 0.0
 
     do tn = 1,ts_npzd  !{
 
       n_pools(:,:,:,1) = n_pools(:,:,:,2)
       c_pools(:,:,:,1) = c_pools(:,:,:,2)
       si_pools(:,:,:,1) = si_pools(:,:,:,2)
+      fe_pools(:,:,:,1) = fe_pools(:,:,:,2)
 
       do k = 1,nk; do j = jsc,jec; do i = isc,iec;
 
@@ -6952,7 +6966,11 @@ module generic_WOMBATmid
                          wombat%f_doc(i,j,k) + wombat%f_bac1(i,j,k) + wombat%f_bac2(i,j,k) + wombat%f_bac3(i,j,k) + &
                          wombat%f_aoa(i,j,k)
       si_pools(i,j,k,2) = wombat%f_sil(i,j,k) + wombat%f_diasi(i,j,k) + wombat%f_bdetsi(i,j,k)
-
+      fe_pools(i,j,k,2) = wombat%f_fe(i,j,k) + wombat%f_afe(i,j,k) + wombat%f_bafe(i,j,k) + &
+                          wombat%f_phyfe(i,j,k) + wombat%f_diafe(i,j,k) + wombat%f_zoofe(i,j,k) + wombat%f_mesfe(i,j,k) + &
+                          wombat%f_detfe(i,j,k) + wombat%f_bdetfe(i,j,k) + wombat%f_bac1(i,j,k) / wombat%bac1_C2Fe + &
+                          wombat%f_bac2(i,j,k) / wombat%bac2_C2Fe + wombat%f_bac3(i,j,k) / wombat%bac3_C2Fe + &
+                          wombat%f_aoa(i,j,k) / wombat%aoa_C2Fe
 
       if (tn>1) then
         if (do_check_n_conserve) then
@@ -6964,7 +6982,7 @@ module generic_WOMBATmid
             print *, "       Depth index and value =", k, wombat%zm(i,j,k)
             print *, "       Nested timestep number =", tn
             print *, " "
-            print *, "       Biological N budget (molN/kg) at two timesteps =", n_pools(i,j,k,1), n_pools(i,j,k,2)
+            print *, "       N budget (molN/kg) at two timesteps =", n_pools(i,j,k,1), n_pools(i,j,k,2)
             print *, "       Difference in budget between timesteps =", n_pools(i,j,k,2) - n_pools(i,j,k,1)
             print *, " "
             print *, "       NO3 (molNO3/kg) =", wombat%f_no3(i,j,k)
@@ -6995,7 +7013,7 @@ module generic_WOMBATmid
             print *, "       Depth index and value =", k, wombat%zm(i,j,k)
             print *, "       Nested timestep number =", tn
             print *, " "
-            print *, "       Biological C budget (molC/kg) at two timesteps =", c_pools(i,j,k,1), c_pools(i,j,k,2)
+            print *, "       C budget (molC/kg) at two timesteps =", c_pools(i,j,k,1), c_pools(i,j,k,2)
             print *, "       Difference in budget between timesteps =", c_pools(i,j,k,2) - c_pools(i,j,k,1)
             print *, " "
             print *, "       DIC (molC/kg) =", wombat%f_dic(i,j,k)
@@ -7030,7 +7048,7 @@ module generic_WOMBATmid
             print *, "       Depth index and value =", k, wombat%zm(i,j,k)
             print *, "       Nested timestep number =", tn
             print *, " "
-            print *, "       Biological Si budget (molSi/kg) at two timesteps =", si_pools(i,j,k,1), si_pools(i,j,k,2)
+            print *, "       Si budget (molSi/kg) at two timesteps =", si_pools(i,j,k,1), si_pools(i,j,k,2)
             print *, "       Difference in budget between timesteps =", si_pools(i,j,k,2) - si_pools(i,j,k,1)
             print *, " "
             print *, "       SIL (molSi/kg) =", wombat%f_sil(i,j,k)
@@ -7043,6 +7061,37 @@ module generic_WOMBATmid
             call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
           endif
         endif
+        if (do_check_fe_conserve) then
+          if (abs(fe_pools(i,j,k,2) - fe_pools(i,j,k,1))>1e-16) then
+            print *, "--------------------------------------------"
+            print *, trim(error_header) // " Ecosystem model is not conserving iron"
+            print *, "       Longitude index =", i
+            print *, "       Latitude index =", j
+            print *, "       Depth index and value =", k, wombat%zm(i,j,k)
+            print *, "       Nested timestep number =", tn
+            print *, " "
+            print *, "       Fe budget (molFe/kg) at two timesteps =", fe_pools(i,j,k,1), fe_pools(i,j,k,2)
+            print *, "       Difference in budget between timesteps =", fe_pools(i,j,k,2) - fe_pools(i,j,k,1)
+            print *, " "
+            print *, "       dFE (molFe/kg) =", wombat%f_fe(i,j,k)
+            print *, "       aFe (molFe/kg) =", wombat%f_afe(i,j,k)
+            print *, "       baFe (molFe/kg) =", wombat%f_bafe(i,j,k)
+            print *, "       PHY-Fe (molFe/kg) =", wombat%f_phyfe(i,j,k)
+            print *, "       DIA-Fe (molFe/kg) =", wombat%f_diafe(i,j,k)
+            print *, "       ZOO-Fe (molFe/kg) =", wombat%f_zoofe(i,j,k)
+            print *, "       MES-Fe (molFe/kg) =", wombat%f_mesfe(i,j,k)
+            print *, "       DET-Fe (molFe/kg) =", wombat%f_detfe(i,j,k)
+            print *, "       BDET-Fe (molFe/kg) =", wombat%f_bdetfe(i,j,k)
+            print *, "       BAC1 (molFe/kg) =", wombat%f_bac1(i,j,k) / wombat%bac1_C2Fe
+            print *, "       BAC2 (molFe/kg) =", wombat%f_bac2(i,j,k) / wombat%bac2_C2Fe
+            print *, "       BAC3 (molFe/kg) =", wombat%f_bac3(i,j,k) / wombat%bac3_C2Fe
+            print *, "       AOA (molFe/kg) =", wombat%f_aoa(i,j,k) / wombat%aoa_C2Fe
+            print *, " "
+            print *, "--------------------------------------------"
+            call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
+          endif
+        endif
+
       endif
 
       enddo; enddo; enddo
