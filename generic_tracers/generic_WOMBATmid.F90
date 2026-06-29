@@ -43,7 +43,7 @@
 !  (NO3), ammonium (NH4), nitrous oxide (N2O), dissolved iron (Fe),
 !  silicic acid (SIL), dissolved organic matter split into carbon (DOC),
 !  hydrogen (DOH), oxygen (DOO) and nitrogen (DON), three explicit heterotrophic
-!  bacterial types (BAC1, BAC2 & BAC3) and ammonia oxidizing archaea (AOA),
+!  bacterial types (BACP, BACF1 & BACF2) and ammonia oxidizing archaea (AOA),
 !  dissolved inorganic carbon (DIC), calcium carbonate (CaCO3), alkalinity
 !  (ALK), and oxygen (O2). Fe is carried through all exosystem biomass pools
 !  except bacteria and AOA, who have constant C:N:Fe ratios. Fe is
@@ -261,18 +261,17 @@ module generic_WOMBATmid
         zooFeingest, &
         zooFeassim, &
         zooexcrdom, &
-        zookz, &
         zoogmax, &
-        zooepsbac1, &
-        zooepsbac2, &
-        zooepsbac3, &
+        zooepsbacp, &
+        zooepsbacf1, &
+        zooepsbacf2, &
         zooepsaoa, &
         zooepsphy, &
         zooepsdia, &
         zooepsdet, &
-        zprefbac1, &
-        zprefbac2, &
-        zprefbac3, &
+        zprefbacp, &
+        zprefbacf1, &
+        zprefbacf2, &
         zprefaoa, &
         zprefphy, &
         zprefdia, &
@@ -287,18 +286,18 @@ module generic_WOMBATmid
         fgutdiss, &
         meskz, &
         mesgmax, &
-        mesepsbac1, &
-        mesepsbac2, &
-        mesepsbac3, &
+        mesepsbacp, &
+        mesepsbacf1, &
+        mesepsbacf2, &
         mesepsaoa, &
         mesepsphy, &
         mesepsdia, &
         mesepsdet, &
         mesepsbdet, &
         mesepszoo, &
-        mprefbac1, &
-        mprefbac2, &
-        mprefbac3, &
+        mprefbacp, &
+        mprefbacf1, &
+        mprefbacf2, &
         mprefaoa, &
         mprefphy, &
         mprefdia, &
@@ -352,49 +351,41 @@ module generic_WOMBATmid
         aoa_C2Fe, &
         aoalmor, &
         aoaqmor, &
-        bac1_Vmax_poc, &
-        bac1_Vmax_dfe, &
-        bac1_Vmax_no3, &
-        bac1_poxy, &
-        bac1_kno3, &
-        bac1_kpoc, &
-        bac1_kfer, &
-        bac1_alpha, &
-        bac1_fele, &
-        bac1_C2N, &
-        bac1_C2Fe, &
-        bac1lmor, &
-        bac1qmor, &
-        bac2_Vmax_doc, &
-        bac2_Vmax_dfe, &
-        bac2_Vmax_no3, &
-        bac2_poxy, &
-        bac2_kno3, &
-        bac2_kdoc, &
-        bac2_kfer, &
-        bac2_nosc_opt, &
-        bac2_nosc_sig, &
-        bac2_alpha, &
-        bac2_fele, &
-        bac2_C2N, &
-        bac2_C2Fe, &
-        bac2lmor, &
-        bac2qmor, &
-        bac3_Vmax_doc, &
-        bac3_Vmax_dfe, &
-        bac3_Vmax_nh4, &
-        bac3_poxy, &
-        bac3_pn2o, &
-        bac3_kdoc, &
-        bac3_kfer, &
-        bac3_nosc_opt, &
-        bac3_nosc_sig, &
-        bac3_alpha, &
-        bac3_fele, &
-        bac3_C2N, &
-        bac3_C2Fe, &
-        bac3lmor, &
-        bac3qmor, &
+        bacp_Vmax_poc, &
+        bacp_Vmax_dfe, &
+        bacp_Vmax_no3, &
+        bacp_poxy, &
+        bacp_kno3, &
+        bacp_kpoc, &
+        bacp_kfer, &
+        bacp_alpha, &
+        bacp_fele, &
+        bacf1_Vmax_doc, &
+        bacf1_Vmax_dfe, &
+        bacf1_Vmax_no3, &
+        bacf1_poxy, &
+        bacf1_kno3, &
+        bacf1_kdoc, &
+        bacf1_kfer, &
+        bacf1_nosc_opt, &
+        bacf1_nosc_sig, &
+        bacf1_alpha, &
+        bacf1_fele, &
+        bacf2_Vmax_doc, &
+        bacf2_Vmax_dfe, &
+        bacf2_Vmax_nh4, &
+        bacf2_poxy, &
+        bacf2_pn2o, &
+        bacf2_kdoc, &
+        bacf2_kfer, &
+        bacf2_nosc_opt, &
+        bacf2_nosc_sig, &
+        bacf2_alpha, &
+        bacf2_fele, &
+        bac_C2N, &
+        bac_C2Fe, &
+        baclmor, &
+        bacqmor, &
         Hox_fac, &
         Oox_fac, &
         Nox_fac, &
@@ -517,9 +508,9 @@ module generic_WOMBATmid
         f_doh, &
         f_doo, &
         f_don, &
-        f_bac1, &
-        f_bac2, &
-        f_bac3, &
+        f_bacp, &
+        f_bacf1, &
+        f_bacf2, &
         f_aoa, &
         f_n2o, &
         f_o2, &
@@ -591,49 +582,49 @@ module generic_WOMBATmid
         diamorl, &
         diamorq, &
         zooeps, &
-        zooprefbac1, &
-        zooprefbac2, &
-        zooprefbac3, &
+        zooprefbacp, &
+        zooprefbacf1, &
+        zooprefbacf2, &
         zooprefaoa, &
         zooprefphy, &
         zooprefdia, &
         zooprefdet, &
-        zoograzbac1, &
-        zoograzbac2, &
-        zoograzbac3, &
+        zoograzbacp, &
+        zoograzbacf1, &
+        zoograzbacf2, &
         zoograzaoa, &
         zoograzphy, &
         zoograzdia, &
         zoograzdet, &
         zoomorl, &
         zoomorq, &
-        zooexcrbac1, &
-        zooexcrbac2, &
-        zooexcrbac3, &
+        zooexcrbacp, &
+        zooexcrbacf1, &
+        zooexcrbacf2, &
         zooexcraoa, &
         zooexcrphy, &
         zooexcrdia, &
         zooexcrdet, &
-        zooegesbac1, &
-        zooegesbac2, &
-        zooegesbac3, &
+        zooegesbacp, &
+        zooegesbacf1, &
+        zooegesbacf2, &
         zooegesaoa, &
         zooegesphy, &
         zooegesdia, &
         zooegesdet, &
         meseps, &
-        mesprefbac1, &
-        mesprefbac2, &
-        mesprefbac3, &
+        mesprefbacp, &
+        mesprefbacf1, &
+        mesprefbacf2, &
         mesprefaoa, &
         mesprefphy, &
         mesprefdia, &
         mesprefdet, &
         mesprefbdet, &
         mesprefzoo, &
-        mesgrazbac1, &
-        mesgrazbac2, &
-        mesgrazbac3, &
+        mesgrazbacp, &
+        mesgrazbacf1, &
+        mesgrazbacf2, &
         mesgrazaoa, &
         mesgrazphy, &
         mesgrazdia, &
@@ -642,18 +633,18 @@ module generic_WOMBATmid
         mesgrazzoo, &
         mesmorl, &
         mesmorq, &
-        mesexcrbac1, &
-        mesexcrbac2, &
-        mesexcrbac3, &
+        mesexcrbacp, &
+        mesexcrbacf1, &
+        mesexcrbacf2, &
         mesexcraoa, &
         mesexcrphy, &
         mesexcrdia, &
         mesexcrdet, &
         mesexcrbdet, &
         mesexcrzoo, &
-        mesegesbac1, &
-        mesegesbac2, &
-        mesegesbac3, &
+        mesegesbacp, &
+        mesegesbacf1, &
+        mesegesbacf2, &
         mesegesaoa, &
         mesegesphy, &
         mesegesdia, &
@@ -690,45 +681,45 @@ module generic_WOMBATmid
         doc2prod, &
         doc3remi, &
         doc3prod, &
-        bac1_ypoc, &
-        bac2_ydoc, &
-        bac3_ydoc, &
-        bac1grow, &
-        bac1resp, &
-        bac1pco2, &
-        bac1pnh4, &
-        bac1ufer, &
-        bac1_mu, &
-        bac1_fanaer, &
-        bac1_ffelim, &
-        bac1_rq, &
-        bac1morl, &
-        bac1morq, &
-        bac1deni, &
-        bac2grow, &
-        bac2resp, &
-        bac2pco2, &
-        bac2pnh4, &
-        bac2ufer, &
-        bac2_mu, &
-        bac2_fanaer, &
-        bac2_ffelim, &
-        bac2_rq, &
-        bac2morl, &
-        bac2morq, &
-        bac2deni, &
-        bac3grow, &
-        bac3resp, &
-        bac3pco2, &
-        bac3pnh4, &
-        bac3ufer, &
-        bac3_mu, &
-        bac3_fanaer, &
-        bac3_ffelim, &
-        bac3_rq, &
-        bac3morl, &
-        bac3morq, &
-        bac3deni, &
+        bacp_ypoc, &
+        bacf1_ydoc, &
+        bacf2_ydoc, &
+        bacpgrow, &
+        bacpresp, &
+        bacppco2, &
+        bacppnh4, &
+        bacpufer, &
+        bacp_mu, &
+        bacp_fanaer, &
+        bacp_ffelim, &
+        bacp_rq, &
+        bacpmorl, &
+        bacpmorq, &
+        bacpdeni, &
+        bacf1grow, &
+        bacf1resp, &
+        bacf1pco2, &
+        bacf1pnh4, &
+        bacf1ufer, &
+        bacf1_mu, &
+        bacf1_fanaer, &
+        bacf1_ffelim, &
+        bacf1_rq, &
+        bacf1morl, &
+        bacf1morq, &
+        bacf1deni, &
+        bacf2grow, &
+        bacf2resp, &
+        bacf2pco2, &
+        bacf2pnh4, &
+        bacf2ufer, &
+        bacf2_mu, &
+        bacf2_fanaer, &
+        bacf2_ffelim, &
+        bacf2_rq, &
+        bacf2morl, &
+        bacf2morq, &
+        bacf2deni, &
         aox_lnh4, &
         aox_mu, &
         nitrfix, &
@@ -838,49 +829,49 @@ module generic_WOMBATmid
         id_diamorl = -1, &
         id_diamorq = -1, &
         id_zooeps = -1, &
-        id_zooprefbac1 = -1, &
-        id_zooprefbac2 = -1, &
-        id_zooprefbac3 = -1, &
+        id_zooprefbacp = -1, &
+        id_zooprefbacf1 = -1, &
+        id_zooprefbacf2 = -1, &
         id_zooprefaoa = -1, &
         id_zooprefphy = -1, &
         id_zooprefdia = -1, &
         id_zooprefdet = -1, &
-        id_zoograzbac1 = -1, &
-        id_zoograzbac2 = -1, &
-        id_zoograzbac3 = -1, &
+        id_zoograzbacp = -1, &
+        id_zoograzbacf1 = -1, &
+        id_zoograzbacf2 = -1, &
         id_zoograzaoa = -1, &
         id_zoograzphy = -1, &
         id_zoograzdia = -1, &
         id_zoograzdet = -1, &
         id_zoomorl = -1, &
         id_zoomorq = -1, &
-        id_zooexcrbac1 = -1, &
-        id_zooexcrbac2 = -1, &
-        id_zooexcrbac3 = -1, &
+        id_zooexcrbacp = -1, &
+        id_zooexcrbacf1 = -1, &
+        id_zooexcrbacf2 = -1, &
         id_zooexcraoa = -1, &
         id_zooexcrphy = -1, &
         id_zooexcrdia = -1, &
         id_zooexcrdet = -1, &
-        id_zooegesbac1 = -1, &
-        id_zooegesbac2 = -1, &
-        id_zooegesbac3 = -1, &
+        id_zooegesbacp = -1, &
+        id_zooegesbacf1 = -1, &
+        id_zooegesbacf2 = -1, &
         id_zooegesaoa = -1, &
         id_zooegesphy = -1, &
         id_zooegesdia = -1, &
         id_zooegesdet = -1, &
         id_meseps = -1, &
-        id_mesprefbac1 = -1, &
-        id_mesprefbac2 = -1, &
-        id_mesprefbac3 = -1, &
+        id_mesprefbacp = -1, &
+        id_mesprefbacf1 = -1, &
+        id_mesprefbacf2 = -1, &
         id_mesprefaoa = -1, &
         id_mesprefphy = -1, &
         id_mesprefdia = -1, &
         id_mesprefdet = -1, &
         id_mesprefbdet = -1, &
         id_mesprefzoo = -1, &
-        id_mesgrazbac1 = -1, &
-        id_mesgrazbac2 = -1, &
-        id_mesgrazbac3 = -1, &
+        id_mesgrazbacp = -1, &
+        id_mesgrazbacf1 = -1, &
+        id_mesgrazbacf2 = -1, &
         id_mesgrazaoa = -1, &
         id_mesgrazphy = -1, &
         id_mesgrazdia = -1, &
@@ -889,18 +880,18 @@ module generic_WOMBATmid
         id_mesgrazzoo = -1, &
         id_mesmorl = -1, &
         id_mesmorq = -1, &
-        id_mesexcrbac1 = -1, &
-        id_mesexcrbac2 = -1, &
-        id_mesexcrbac3 = -1, &
+        id_mesexcrbacp = -1, &
+        id_mesexcrbacf1 = -1, &
+        id_mesexcrbacf2 = -1, &
         id_mesexcraoa = -1, &
         id_mesexcrphy = -1, &
         id_mesexcrdia = -1, &
         id_mesexcrdet = -1, &
         id_mesexcrbdet = -1, &
         id_mesexcrzoo = -1, &
-        id_mesegesbac1 = -1, &
-        id_mesegesbac2 = -1, &
-        id_mesegesbac3 = -1, &
+        id_mesegesbacp = -1, &
+        id_mesegesbacf1 = -1, &
+        id_mesegesbacf2 = -1, &
         id_mesegesaoa = -1, &
         id_mesegesphy = -1, &
         id_mesegesdia = -1, &
@@ -935,45 +926,45 @@ module generic_WOMBATmid
         id_doc2prod = -1, &
         id_doc3remi = -1, &
         id_doc3prod = -1, &
-        id_bac1_ypoc = -1, &
-        id_bac2_ydoc = -1, &
-        id_bac3_ydoc = -1, &
-        id_bac1grow = -1, &
-        id_bac1resp = -1, &
-        id_bac1pco2 = -1, &
-        id_bac1pnh4 = -1, &
-        id_bac1ufer = -1, &
-        id_bac1_mu = -1, &
-        id_bac1_fanaer = -1, &
-        id_bac1_ffelim = -1, &
-        id_bac1_rq = -1, &
-        id_bac1morl = -1, &
-        id_bac1morq = -1, &
-        id_bac1deni = -1, &
-        id_bac2grow = -1, &
-        id_bac2resp = -1, &
-        id_bac2pco2 = -1, &
-        id_bac2pnh4 = -1, &
-        id_bac2ufer = -1, &
-        id_bac2_mu = -1, &
-        id_bac2_fanaer = -1, &
-        id_bac2_ffelim = -1, &
-        id_bac2_rq = -1, &
-        id_bac2morl = -1, &
-        id_bac2morq = -1, &
-        id_bac2deni = -1, &
-        id_bac3grow = -1, &
-        id_bac3resp = -1, &
-        id_bac3pco2 = -1, &
-        id_bac3pnh4 = -1, &
-        id_bac3ufer = -1, &
-        id_bac3_mu = -1, &
-        id_bac3_fanaer = -1, &
-        id_bac3_ffelim = -1, &
-        id_bac3_rq = -1, &
-        id_bac3morl = -1, &
-        id_bac3morq = -1, &
-        id_bac3deni = -1, &
+        id_bacp_ypoc = -1, &
+        id_bacf1_ydoc = -1, &
+        id_bacf2_ydoc = -1, &
+        id_bacpgrow = -1, &
+        id_bacpresp = -1, &
+        id_bacppco2 = -1, &
+        id_bacppnh4 = -1, &
+        id_bacpufer = -1, &
+        id_bacp_mu = -1, &
+        id_bacp_fanaer = -1, &
+        id_bacp_ffelim = -1, &
+        id_bacp_rq = -1, &
+        id_bacpmorl = -1, &
+        id_bacpmorq = -1, &
+        id_bacpdeni = -1, &
+        id_bacf1grow = -1, &
+        id_bacf1resp = -1, &
+        id_bacf1pco2 = -1, &
+        id_bacf1pnh4 = -1, &
+        id_bacf1ufer = -1, &
+        id_bacf1_mu = -1, &
+        id_bacf1_fanaer = -1, &
+        id_bacf1_ffelim = -1, &
+        id_bacf1_rq = -1, &
+        id_bacf1morl = -1, &
+        id_bacf1morq = -1, &
+        id_bacf1deni = -1, &
+        id_bacf2grow = -1, &
+        id_bacf2resp = -1, &
+        id_bacf2pco2 = -1, &
+        id_bacf2pnh4 = -1, &
+        id_bacf2ufer = -1, &
+        id_bacf2_mu = -1, &
+        id_bacf2_fanaer = -1, &
+        id_bacf2_ffelim = -1, &
+        id_bacf2_rq = -1, &
+        id_bacf2morl = -1, &
+        id_bacf2morq = -1, &
+        id_bacf2deni = -1, &
         id_aox_lnh4 = -1, &
         id_aox_mu = -1, &
         id_nitrfix = -1, &
@@ -1770,18 +1761,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooprefbac1', 'Grazing dietary fraction of zooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooprefbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooprefbacp', 'Grazing dietary fraction of zooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooprefbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooprefbac2', 'Grazing dietary fraction of zooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooprefbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooprefbacf1', 'Grazing dietary fraction of zooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooprefbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooprefbac3', 'Grazing dietary fraction of zooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooprefbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooprefbacf2', 'Grazing dietary fraction of zooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooprefbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1805,18 +1796,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zoograzbac1', 'Grazing rate of zooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zoograzbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zoograzbacp', 'Grazing rate of zooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zoograzbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zoograzbac2', 'Grazing rate of zooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zoograzbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zoograzbacf1', 'Grazing rate of zooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zoograzbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zoograzbac3', 'Grazing rate of zooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zoograzbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zoograzbacf2', 'Grazing rate of zooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zoograzbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1850,18 +1841,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooexcrbac1', 'Excretion rate of zooplankton eating bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooexcrbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooexcrbacp', 'Excretion rate of zooplankton eating bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooexcrbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooexcrbac2', 'Excretion rate of zooplankton eating bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooexcrbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooexcrbacf1', 'Excretion rate of zooplankton eating bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooexcrbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooexcrbac3', 'Excretion rate of zooplankton eating bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooexcrbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooexcrbacf2', 'Excretion rate of zooplankton eating bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooexcrbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1885,18 +1876,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooegesbac1', 'Egestion rate of zooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooegesbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooegesbacp', 'Egestion rate of zooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooegesbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooegesbac2', 'Egestion rate of zooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooegesbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooegesbacf1', 'Egestion rate of zooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooegesbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooegesbac3', 'Egestion rate of zooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_zooegesbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'zooegesbacf2', 'Egestion rate of zooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_zooegesbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1925,18 +1916,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefbac1', 'Grazing dietary fraction of mesozooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesprefbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesprefbacp', 'Grazing dietary fraction of mesozooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesprefbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefbac2', 'Grazing dietary fraction of mesozooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesprefbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesprefbacf1', 'Grazing dietary fraction of mesozooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesprefbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefbac3', 'Grazing dietary fraction of mesozooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesprefbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesprefbacf2', 'Grazing dietary fraction of mesozooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesprefbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1970,18 +1961,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesgrazbac1', 'Grazing rate of mesozooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesgrazbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesgrazbacp', 'Grazing rate of mesozooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesgrazbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesgrazbac2', 'Grazing rate of mesozooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesgrazbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesgrazbacf1', 'Grazing rate of mesozooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesgrazbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesgrazbac3', 'Grazing rate of mesozooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesgrazbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesgrazbacf2', 'Grazing rate of mesozooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesgrazbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2025,18 +2016,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesexcrbac1', 'Excretion rate of mesozooplankton eating bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesexcrbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesexcrbacp', 'Excretion rate of mesozooplankton eating bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesexcrbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesexcrbac2', 'Excretion rate of mesozooplankton eating bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesexcrbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesexcrbacf1', 'Excretion rate of mesozooplankton eating bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesexcrbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesexcrbac3', 'Excretion rate of mesozooplankton eating bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesexcrbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesexcrbacf2', 'Excretion rate of mesozooplankton eating bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesexcrbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2070,18 +2061,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesegesbac1', 'Egestion rate of mesozooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesegesbac1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesegesbacp', 'Egestion rate of mesozooplankton on bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesegesbacp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesegesbac2', 'Egestion rate of mesozooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesegesbac2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesegesbacf1', 'Egestion rate of mesozooplankton on bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesegesbacf1 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesegesbac3', 'Egestion rate of mesozooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_mesegesbac3 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'mesegesbacf2', 'Egestion rate of mesozooplankton on bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_mesegesbacf2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2257,198 +2248,198 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1_ypoc', 'Biomass yield of bacteria #1 (mol C-biomass per mol POC)', 'h', 'L', 's', 'molB/molPOC', 'f')
-    wombat%id_bac1_ypoc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacp_ypoc', 'Biomass yield of bacteria #1 (mol C-biomass per mol POC)', 'h', 'L', 's', 'molB/molPOC', 'f')
+    wombat%id_bacp_ypoc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2_ydoc', 'Biomass yield of bacteria #2 (mol C-biomass per mol DOC)', 'h', 'L', 's', 'molB/molDOC', 'f')
-    wombat%id_bac2_ydoc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1_ydoc', 'Biomass yield of bacteria #2 (mol C-biomass per mol DOC)', 'h', 'L', 's', 'molB/molDOC', 'f')
+    wombat%id_bacf1_ydoc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3_ydoc', 'Biomass yield of bacteria #3 (mol C-biomass per mol DOC)', 'h', 'L', 's', 'molB/molDOC', 'f')
-    wombat%id_bac3_ydoc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2_ydoc', 'Biomass yield of bacteria #3 (mol C-biomass per mol DOC)', 'h', 'L', 's', 'molB/molDOC', 'f')
+    wombat%id_bacf2_ydoc = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1grow', 'Growth of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac1grow = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacpgrow', 'Growth of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacpgrow = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1resp', 'Oxygen consumption of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molO2/kg/s', 'f')
-    wombat%id_bac1resp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacpresp', 'Oxygen consumption of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molO2/kg/s', 'f')
+    wombat%id_bacpresp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1pco2', 'Production of CO2 of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molCO2/kg/s', 'f')
-    wombat%id_bac1pco2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacppco2', 'Production of CO2 of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molCO2/kg/s', 'f')
+    wombat%id_bacppco2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1pnh4', 'Production of NH4 of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molNH4/kg/s', 'f')
-    wombat%id_bac1pnh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacppnh4', 'Production of NH4 of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molNH4/kg/s', 'f')
+    wombat%id_bacppnh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1ufer', 'Uptake of dFe of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'moldFe/kg/s', 'f')
-    wombat%id_bac1ufer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacpufer', 'Uptake of dFe of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'moldFe/kg/s', 'f')
+    wombat%id_bacpufer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1_mu', 'Realized growth rate of facultative heterotrophic bacteria 1', 'h', 'L', 's', '/s', 'f')
-    wombat%id_bac1_mu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacp_mu', 'Realized growth rate of facultative heterotrophic bacteria 1', 'h', 'L', 's', '/s', 'f')
+    wombat%id_bacp_mu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_bac1_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacp_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bacp_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1_ffelim', 'Bacteria #1 growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_bac1_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacp_ffelim', 'Bacteria #1 growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bacp_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1_rq', 'Respiration quotient of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molCO2/molO2', 'f')
-    wombat%id_bac1_rq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacp_rq', 'Respiration quotient of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molCO2/molO2', 'f')
+    wombat%id_bacp_rq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1morl', 'Linear mortality of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac1morl = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacpmorl', 'Linear mortality of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacpmorl = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1morq', 'Quadratic mortality of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac1morq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacpmorq', 'Quadratic mortality of facultative heterotrophic bacteria 1', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacpmorq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac1deni', 'bacterial denitrification rate (NO3-->N2 consumption)', 'h', 'L', 's', '[molN/kg/s]', 'f')
-    wombat%id_bac1deni = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacpdeni', 'bacterial denitrification rate (NO3-->N2 consumption)', 'h', 'L', 's', '[molN/kg/s]', 'f')
+    wombat%id_bacpdeni = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2grow', 'Growth of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac2grow = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1grow', 'Growth of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacf1grow = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2resp', 'Oxygen consumption of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molO2/kg/s', 'f')
-    wombat%id_bac2resp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1resp', 'Oxygen consumption of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molO2/kg/s', 'f')
+    wombat%id_bacf1resp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2pco2', 'Production of CO2 of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molCO2/kg/s', 'f')
-    wombat%id_bac2pco2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1pco2', 'Production of CO2 of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molCO2/kg/s', 'f')
+    wombat%id_bacf1pco2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2pnh4', 'Production of NH4 of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molNH4/kg/s', 'f')
-    wombat%id_bac2pnh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1pnh4', 'Production of NH4 of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molNH4/kg/s', 'f')
+    wombat%id_bacf1pnh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2ufer', 'Uptake of dFe of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'moldFe/kg/s', 'f')
-    wombat%id_bac2ufer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1ufer', 'Uptake of dFe of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'moldFe/kg/s', 'f')
+    wombat%id_bacf1ufer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2_mu', 'Realized growth rate of facultative heterotrophic bacteria 2', 'h', 'L', 's', '/s', 'f')
-    wombat%id_bac2_mu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1_mu', 'Realized growth rate of facultative heterotrophic bacteria 2', 'h', 'L', 's', '/s', 'f')
+    wombat%id_bacf1_mu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_bac2_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bacf1_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2_ffelim', 'Bacteria #2 growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_bac2_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1_ffelim', 'Bacteria #2 growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bacf1_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2_rq', 'Respiration quotient of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molCO2/molO2', 'f')
-    wombat%id_bac2_rq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1_rq', 'Respiration quotient of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molCO2/molO2', 'f')
+    wombat%id_bacf1_rq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2morl', 'Linear mortality of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac2morl = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1morl', 'Linear mortality of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacf1morl = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2morq', 'Quadratic mortality of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac2morq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1morq', 'Quadratic mortality of facultative heterotrophic bacteria 2', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacf1morq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac2deni', 'bacterial denitrification rate (NO3 -- N2O consumption)', 'h', 'L', 's', '[molN/kg/s]', 'f')
-    wombat%id_bac2deni = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf1deni', 'bacterial denitrification rate (NO3 -- N2O consumption)', 'h', 'L', 's', '[molN/kg/s]', 'f')
+    wombat%id_bacf1deni = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3grow', 'Growth of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac3grow = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2grow', 'Growth of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacf2grow = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3resp', 'Oxygen consumption of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molO2/kg/s', 'f')
-    wombat%id_bac3resp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2resp', 'Oxygen consumption of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molO2/kg/s', 'f')
+    wombat%id_bacf2resp = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3pco2', 'Production of CO2 of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molCO2/kg/s', 'f')
-    wombat%id_bac3pco2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2pco2', 'Production of CO2 of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molCO2/kg/s', 'f')
+    wombat%id_bacf2pco2 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3pnh4', 'Production of NH4 of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molNH4/kg/s', 'f')
-    wombat%id_bac3pnh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2pnh4', 'Production of NH4 of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molNH4/kg/s', 'f')
+    wombat%id_bacf2pnh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3ufer', 'Uptake of dFe of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'moldFe/kg/s', 'f')
-    wombat%id_bac3ufer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2ufer', 'Uptake of dFe of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'moldFe/kg/s', 'f')
+    wombat%id_bacf2ufer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3_mu', 'Realized growth rate of facultative heterotrophic bacteria 3', 'h', 'L', 's', '/s', 'f')
-    wombat%id_bac3_mu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2_mu', 'Realized growth rate of facultative heterotrophic bacteria 3', 'h', 'L', 's', '/s', 'f')
+    wombat%id_bacf2_mu = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_bac3_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bacf2_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3_ffelim', 'Bacteria #3 growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_bac3_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2_ffelim', 'Bacteria #3 growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_bacf2_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3_rq', 'Respiration quotient of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molCO2/molO2', 'f')
-    wombat%id_bac3_rq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2_rq', 'Respiration quotient of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molCO2/molO2', 'f')
+    wombat%id_bacf2_rq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3morl', 'Linear mortality of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac3morl = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2morl', 'Linear mortality of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacf2morl = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3morq', 'Quadratic mortality of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
-    wombat%id_bac3morq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2morq', 'Quadratic mortality of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
+    wombat%id_bacf2morq = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'bac3deni', 'bacterial denitrification rate (N2O --> N2 consumption)', 'h', 'L', 's', '[molN2O/kg/s]', 'f')
-    wombat%id_bac3deni = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'bacf2deni', 'bacterial denitrification rate (N2O --> N2 consumption)', 'h', 'L', 's', '[molN2O/kg/s]', 'f')
+    wombat%id_bacf2deni = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2682,16 +2673,16 @@ module generic_WOMBATmid
 
     ! Initial slope of P-I curve for phytoplankton [mol Chl (mol C)-1 (W m-2)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('alphabio_phy', wombat%alphabio_phy, 1.5)
+    call g_tracer_add_param('alphabio_phy', wombat%alphabio_phy, 2.0)
 
     ! Autotrophy maximum growth rate parameter a for phytoplankton [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('abioa_phy', wombat%abioa_phy, 0.7/86400.0)
+    call g_tracer_add_param('abioa_phy', wombat%abioa_phy, 0.85/86400.0)
 
     ! Autotrophy maximum growth rate parameter b for phytoplankton [dimensionless]
     ! Q10 = b^(10)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bbioa_phy', wombat%bbioa_phy, 1.055)
+    call g_tracer_add_param('bbioa_phy', wombat%bbioa_phy, 1.060)
 
     ! Initial slope of P-I curve for microphytoplankton [mol Chl (mol C)-1 (W m-2)-1]
     ! "When diatoms are compared to other groups of phytoplankton, they tend to differ
@@ -2708,12 +2699,12 @@ module generic_WOMBATmid
     ! Autotrophy maximum growth rate parameter a for microphytoplankton [s-1]
     ! [Anderson et al., 2021 Nat Communications]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('abioa_dia', wombat%abioa_dia, 1.0/86400.0)
+    call g_tracer_add_param('abioa_dia', wombat%abioa_dia, 1.1/86400.0)
 
     ! Autotrophy maximum growth rate parameter b for microphytoplankton [dimensionless]
     ! Q10 = b^(10)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bbioa_dia', wombat%bbioa_dia, 1.070)
+    call g_tracer_add_param('bbioa_dia', wombat%bbioa_dia, 1.067)
 
     ! Heterotrophy maximum growth rate parameter b [dimensionless]
     ! Q10 = b^(10)
@@ -2726,7 +2717,7 @@ module generic_WOMBATmid
 
     ! Phytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phykf', wombat%phykf, 1.0)
+    call g_tracer_add_param('phykf', wombat%phykf, 0.7)
 
     ! Nano-phytoplankton preference for ammonium over nitrate [dimensionless]
     !-----------------------------------------------------------------------
@@ -2738,7 +2729,7 @@ module generic_WOMBATmid
 
     ! Phytoplankton maximum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.065)
+    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.025)
 
     ! Phytoplankton optimal quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
@@ -2758,18 +2749,18 @@ module generic_WOMBATmid
 
     ! microphytoplankton half saturation constant for nitrogen uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diakn', wombat%diakn, 2.4)
+    call g_tracer_add_param('diakn', wombat%diakn, 2.5)
 
     ! microphytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diakf', wombat%diakf, 2.7)
+    call g_tracer_add_param('diakf', wombat%diakf, 2.0)
 
     ! microphytoplankton half saturation constant for silicic acid uptake [mmolSi/m3]
     !-----------------------------------------------------------------------
     !  - minimal Ks in natural assemblages of 0.5 - 0.9 mmolSi/m3
     !    [Nelson & Brzezinski, 1990, Marine Ecology Progress Series, 62, 283-292]
     !  - We set 5.0 here as default due to recalculation of variable Ksi below
-    call g_tracer_add_param('diaks', wombat%diaks, 6.7)
+    call g_tracer_add_param('diaks', wombat%diaks, 5.0)
 
     ! Micro-phytoplankton preference for ammonium over nitrate [dimensionless]
     !-----------------------------------------------------------------------
@@ -2781,7 +2772,7 @@ module generic_WOMBATmid
 
     ! microphytoplankton maximum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diamaxqc', wombat%diamaxqc, 0.060)
+    call g_tracer_add_param('diamaxqc', wombat%diamaxqc, 0.030)
 
     ! microphytoplankton optimal quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
@@ -2789,7 +2780,7 @@ module generic_WOMBATmid
 
     ! microphytoplankton maximum quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diamaxqf', wombat%diamaxqf, 65e-6)
+    call g_tracer_add_param('diamaxqf', wombat%diamaxqf, 70e-6)
 
     ! microphytoplankton minimal quota of silicon to carbon to build a valve [mol Si (mol C)-1]
     !   Brzezinksi (1985) J. Phycology, 21, 347-357
@@ -2812,7 +2803,7 @@ module generic_WOMBATmid
     !  for a 100 pg C cell (8.3 pmol), this maps to roughly 0.0012 - 0.012 mol Si/mol C h-1
     !  which is roughly 0.03 to 0.3 mol Si/mol C day-1
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diaVmaxs', wombat%diaVmaxs, 0.1/86400.0)
+    call g_tracer_add_param('diaVmaxs', wombat%diaVmaxs, 0.25/86400.0)
 
     ! microphytoplankton linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
@@ -2828,7 +2819,7 @@ module generic_WOMBATmid
 
     ! Maximum fraction of NPP that can be routed to DOC exudation by phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('overflow', wombat%overflow, 0.75)
+    call g_tracer_add_param('overflow', wombat%overflow, 0.50)
 
     ! Trichodesmium half saturation constant for iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
@@ -2844,27 +2835,23 @@ module generic_WOMBATmid
 
     ! Zooplankton carbon bulk ingestion efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCingest', wombat%zooCingest, 0.70)
+    call g_tracer_add_param('zooCingest', wombat%zooCingest, 0.725)
 
     ! Zooplankton carbon assimilation efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.40)
+    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.45)
 
     ! Zooplankton iron bulk ingestion efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooFeingest', wombat%zooFeingest, 0.06)
+    call g_tracer_add_param('zooFeingest', wombat%zooFeingest, 0.275)
 
     ! Zooplankton iron assimilation efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.60)
+    call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.725)
 
     ! Zooplankton fraction of excretion to DOM [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooexcrdom', wombat%zooexcrdom, 0.70)
-
-    ! Zooplankton half saturation coefficient for linear mortality [mmol C m-3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('zookz', wombat%zookz, 0.25)
 
     ! Zooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
@@ -2874,19 +2861,19 @@ module generic_WOMBATmid
     !  - e.g., protozoans feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsbac1', wombat%zooepsbac1, 0.10/86400.0)
+    call g_tracer_add_param('zooepsbacp', wombat%zooepsbacp, 0.25/86400.0)
 
     ! Zooplankton prey capture rate constant for bacteria 2 [(mmol C m-3)-2 s-1]
     !  - e.g., protozoans feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsbac2', wombat%zooepsbac2, 0.10/86400.0)
+    call g_tracer_add_param('zooepsbacf1', wombat%zooepsbacf1, 0.25/86400.0)
 
     ! Zooplankton prey capture rate constant for bacteria 3 [(mmol C m-3)-2 s-1]
     !  - e.g., protozoans feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsbac3', wombat%zooepsbac3, 0.10/86400.0)
+    call g_tracer_add_param('zooepsbacf2', wombat%zooepsbacf2, 0.25/86400.0)
 
     ! Zooplankton prey capture rate constant for ammonia oxidizing archaea [(mmol C m-3)-2 s-1]
     !  - e.g., ciliates feeding on ammonia oxidizing archaea (similar size or larger than pico)
@@ -2898,13 +2885,13 @@ module generic_WOMBATmid
     !  - e.g., ciliates feeding on small (nano/pico)phytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.40/86400.0)
+    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.25/86400.0)
 
     ! Zooplankton prey capture rate constant for microphytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., larger ciliates feeding on smaller diatoms and other microphytoplankton
     !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsdia', wombat%zooepsdia, 0.40/86400.0)
+    call g_tracer_add_param('zooepsdia', wombat%zooepsdia, 0.25/86400.0)
 
     ! Zooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., protozoa grazing on slowly sinking detrital particles
@@ -2916,19 +2903,19 @@ module generic_WOMBATmid
     ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
     !  of microzooplankton grazing/biomass gain comes from bacterivory
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefbac1', wombat%zprefbac1, 0.25)
+    call g_tracer_add_param('zprefbacp', wombat%zprefbacp, 0.25)
 
     ! Zooplankton preference for bacteria 2 [dimensionless]
     ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
     !  of microzooplankton grazing/biomass gain comes from bacterivory
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefbac2', wombat%zprefbac2, 0.25)
+    call g_tracer_add_param('zprefbacf1', wombat%zprefbacf1, 0.25)
 
     ! Zooplankton preference for bacteria 3 [dimensionless]
     ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
     !  of microzooplankton grazing/biomass gain comes from bacterivory
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefbac3', wombat%zprefbac3, 0.25)
+    call g_tracer_add_param('zprefbacf2', wombat%zprefbacf2, 0.25)
 
     ! Zooplankton preference for ammonia oxidizing archaea [dimensionless]
     !-----------------------------------------------------------------------
@@ -2940,11 +2927,11 @@ module generic_WOMBATmid
 
     ! Zooplankton preference for microphytoplankton [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefdia', wombat%zprefdia, 0.25)
+    call g_tracer_add_param('zprefdia', wombat%zprefdia, 0.50)
 
     ! Zooplankton preference for small detritus [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefdet', wombat%zprefdet, 0.80)
+    call g_tracer_add_param('zprefdet', wombat%zprefdet, 1.00)
 
     ! Zooplankton respiration rate constant [s-1]
     !-----------------------------------------------------------------------
@@ -2960,19 +2947,19 @@ module generic_WOMBATmid
 
     ! Mesozooplankton carbon assimilation efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesCassim', wombat%mesCassim, 0.30)
+    call g_tracer_add_param('mesCassim', wombat%mesCassim, 0.50)
 
     ! Mesozooplankton iron bulk ingestion efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesFeingest', wombat%mesFeingest, 0.43)
+    call g_tracer_add_param('mesFeingest', wombat%mesFeingest, 0.275)
 
     ! Mesozooplankton iron assimilation efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesFeassim', wombat%mesFeassim, 0.75)
+    call g_tracer_add_param('mesFeassim', wombat%mesFeassim, 0.725)
 
     ! Mesozooplankton fraction of excretion to DOM [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesexcrdom', wombat%mesexcrdom, 0.35)
+    call g_tracer_add_param('mesexcrdom', wombat%mesexcrdom, 0.40)
 
     ! Zooplankton dissolution efficiency of CaCO3 within guts [dimensionless]
     !-----------------------------------------------------------------------
@@ -2984,25 +2971,25 @@ module generic_WOMBATmid
 
     ! Mesozooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesgmax', wombat%mesgmax, 0.30/86400.0)
+    call g_tracer_add_param('mesgmax', wombat%mesgmax, 1.00/86400.0)
 
     ! Mesozooplankton prey capture rate constant for bacteria 1 [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsbac1', wombat%mesepsbac1, 0.11/86400.0)
+    call g_tracer_add_param('mesepsbacp', wombat%mesepsbacp, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for bacteria 2 [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsbac2', wombat%mesepsbac2, 0.11/86400.0)
+    call g_tracer_add_param('mesepsbacf1', wombat%mesepsbacf1, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for bacteria 3 [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on bacteria
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsbac3', wombat%mesepsbac3, 0.11/86400.0)
+    call g_tracer_add_param('mesepsbacf2', wombat%mesepsbacf2, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for ammonia oxidizing archaea [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on ammonia oxidizing archaea
@@ -3020,61 +3007,61 @@ module generic_WOMBATmid
     !  - e.g., copepods preying on diatoms and other microphytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.20/86400.0)
+    call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on fine detritus
     !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsdet', wombat%mesepsdet, 0.05/86400.0)
+    call g_tracer_add_param('mesepsdet', wombat%mesepsdet, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for large detritus [(mmol C m-3)-2 s-1]
     !  - e.g., copepods consuming sinking aggregates of marine snow
     !  - aim for half-saturation coefficent B1/2 = 10.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsbdet', wombat%mesepsbdet, 0.10/86400.0)
+    call g_tracer_add_param('mesepsbdet', wombat%mesepsbdet, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for microzooplankton [(mmol C m-3)-2 s-1]
     !  - e.g., chaetognaths preying on copepods; copepods consuming ciliates
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.10/86400.0)
+    call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.11/86400.0)
 
     ! Mesozooplankton preference for bacteria 1 [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefbac1', wombat%mprefbac1, 0.25)
+    call g_tracer_add_param('mprefbacp', wombat%mprefbacp, 0.25)
 
     ! Mesozooplankton preference for bacteria 2 [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefbac2', wombat%mprefbac2, 0.25)
+    call g_tracer_add_param('mprefbacf1', wombat%mprefbacf1, 0.25)
 
     ! Mesozooplankton preference for bacteria 3 [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefbac3', wombat%mprefbac3, 0.25)
+    call g_tracer_add_param('mprefbacf2', wombat%mprefbacf2, 0.25)
 
     ! Mesozooplankton preference for ammonia oxidizing archaea [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefaoa', wombat%mprefaoa, 0.4)
+    call g_tracer_add_param('mprefaoa', wombat%mprefaoa, 0.25)
 
     ! Mesozooplankton preference for phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.1)
+    call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.25)
 
     ! Mesozooplankton preference for microphytoplankton [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefdia', wombat%mprefdia, 0.85)
+    call g_tracer_add_param('mprefdia', wombat%mprefdia, 1.00)
 
     ! Mesozooplankton preference for small detritus [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefdet', wombat%mprefdet, 0.80)
+    call g_tracer_add_param('mprefdet', wombat%mprefdet, 1.00)
 
     ! Mesozooplankton preference for large detritus (aggregates) [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefbdet', wombat%mprefbdet, 0.80)
+    call g_tracer_add_param('mprefbdet', wombat%mprefbdet, 1.00)
 
     ! Mesozooplankton preference for micro-zooplankton [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefzoo', wombat%mprefzoo, 0.85)
+    call g_tracer_add_param('mprefzoo', wombat%mprefzoo, 1.00)
 
     ! Mesozooplankton respiration rate constant [s-1]
     !-----------------------------------------------------------------------
@@ -3082,21 +3069,21 @@ module generic_WOMBATmid
 
     ! Mesozooplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesqmor', wombat%mesqmor, 0.75/86400.0)
+    call g_tracer_add_param('mesqmor', wombat%mesqmor, 0.40/86400.0)
 
     ! Prey switching exponent for microzooplantkon [van Leeuwen et al. (2013), J. Theor. Biol.]
     ! when <1, more even feeding across prey items
     ! when =1, grazing proportional to prey biomasses
     ! when >1, overweighting abundant prey and downweighting scarce prey
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoopreyswitch', wombat%zoopreyswitch, 1.8)
+    call g_tracer_add_param('zoopreyswitch', wombat%zoopreyswitch, 2.0)
 
     ! Prey switching exponent for mesozooplantkon [van Leeuwen et al. (2013), J. Theor. Biol.]
     ! when <1, more even feeding across prey items
     ! when =1, grazing proportional to prey biomasses
     ! when >1, overweighting abundant prey and downweighting scarce prey
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mespreyswitch', wombat%mespreyswitch, 1.8)
+    call g_tracer_add_param('mespreyswitch', wombat%mespreyswitch, 2.0)
 
     !! Detritus hydrolyzation rate constant [(mmol C m-3)-1 s-1]
     !!-----------------------------------------------------------------------
@@ -3112,17 +3099,17 @@ module generic_WOMBATmid
 
     ! Porosity of sinking large aggregated detritus [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bdetphi', wombat%bdetphi, 0.75)
+    call g_tracer_add_param('bdetphi', wombat%bdetphi, 0.87)
 
     ! Base radius of nanophytoplankton [µm]
     !  2–20 µm in diameter
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyrad0', wombat%phyrad0, 10.0)
+    call g_tracer_add_param('phyrad0', wombat%phyrad0, 11.0)
 
     ! Base radius of microphytoplankton [µm]
     !  20–200 µm in diameter
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diarad0', wombat%diarad0, 50.0)
+    call g_tracer_add_param('diarad0', wombat%diarad0, 100.0)
 
     ! Base radius of microzooplankton [µm]
     !  takes into account fecal pellets / waste produced
@@ -3133,7 +3120,7 @@ module generic_WOMBATmid
     !  takes into account fecal pellets / waste produced
     !  [Hatton et al. 2021 Sci Adv - near 1mm]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesrad0', wombat%mesrad0, 1000.0)
+    call g_tracer_add_param('mesrad0', wombat%mesrad0, 650.0)
 
     ! Density of organic detritus [kg/m3]
     !-----------------------------------------------------------------------
@@ -3153,7 +3140,7 @@ module generic_WOMBATmid
 
     ! Microphytoplankton biomass threshold to scale recycling [mmolC/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diabiot', wombat%diabiot, 0.5)
+    call g_tracer_add_param('diabiot', wombat%diabiot, 1.0)
 
     ! CaCO3 dissolution rate constant (base rate) [s-1]
     !-----------------------------------------------------------------------
@@ -3165,7 +3152,7 @@ module generic_WOMBATmid
 
     ! CaCO3 inorganic fraction (PIC:POC) [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.04)
+    call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.045)
 
     ! CaCO3 dissolution factor due to calcite undersaturation (s-1)
     !-----------------------------------------------------------------------
@@ -3186,12 +3173,12 @@ module generic_WOMBATmid
 
     ! Background concentration of strong iron-binding ligand [µmol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ligS', wombat%ligS, 0.4)
+    call g_tracer_add_param('ligS', wombat%ligS, 0.8)
 
     ! Set floor for dissolved iron concentration based on the measurement detection limit [µmol/m3]
     ! Worsford et al., 2014 Mar. Chem. says anywhere between 10 - 50 pM
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.025)
+    call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.01)
 
     ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -3214,7 +3201,7 @@ module generic_WOMBATmid
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 5.0e-9/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
@@ -3234,11 +3221,11 @@ module generic_WOMBATmid
 
     ! Sinking speed of authigenic iron (oxyhydroxide) [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wafe', wombat%wafe, 0.5/86400.0)
+    call g_tracer_add_param('wafe', wombat%wafe, 2.5/86400.0)
 
     ! Sinking speed of bigger authigenic iron (oxyhydroxide) [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wbafe', wombat%wbafe, 5.0/86400.0)
+    call g_tracer_add_param('wbafe', wombat%wbafe, 20.0/86400.0)
 
     ! Factor increase in biogenic silica dissolution caused by bacterial activity [dimensionless]
     !-----------------------------------------------------------------------
@@ -3246,7 +3233,7 @@ module generic_WOMBATmid
 
     ! Half-saturation coefficient modulating increase in biogenic silica dissolution due to bacterial activity [mmolC/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bsi_kbac', wombat%bsi_kbac, 0.5)
+    call g_tracer_add_param('bsi_kbac', wombat%bsi_kbac, 0.25)
 
     ! Rate of biogenic silica dissolution in the sediments when at near-total undersaturation [s-1]
     !-----------------------------------------------------------------------
@@ -3306,200 +3293,164 @@ module generic_WOMBATmid
 
     ! Change in oxygen content of organic matter due to partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('Oox_fac', wombat%Oox_fac, 1.25)
+    call g_tracer_add_param('Oox_fac', wombat%Oox_fac, 1.5)
 
     ! Change in nitrogen content of organic matter due to partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('Nox_fac', wombat%Nox_fac, 0.5)
+    call g_tracer_add_param('Nox_fac', wombat%Nox_fac, 0.6)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of POC [mmol C m-3 s-1]
+    ! Facultative particle-associated heterotrophic bacteria maximum rate of uptake of POC [mmol C (mol C)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_Vmax_poc', wombat%bac1_Vmax_poc, 6.7/86400.0)
+    call g_tracer_add_param('bacp_Vmax_poc', wombat%bacp_Vmax_poc, 6.7/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of NO3 [mmol N m-3 s-1]
+    ! Facultative particle-associated heterotrophic bacteria maximum rate of uptake of NO3 [mmol N (mol C)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_Vmax_no3', wombat%bac1_Vmax_no3, 7.2/86400.0)
+    call g_tracer_add_param('bacp_Vmax_no3', wombat%bacp_Vmax_no3, 7.2/86400.0)
 
-    ! Facultative heterotrophic bacteria #1 maximum rate of uptake of dFe [mmol Fe m-3 s-1]
-    !-----------------------------------------------------------------------
-    ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
-    ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
-    ! in unfiltered seawater when they added Fe+C
-    call g_tracer_add_param('bac1_Vmax_dFe', wombat%bac1_Vmax_dFe, 0.00010/86400.0)
-
-    ! Facultative heterotrophic bacteria #1 diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_poxy', wombat%bac1_poxy, 450.0/86400.0)
-
-    ! Facultative heterotrophic bacteria #1 half saturation constant for nitrate uptake [mmolN/m3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_kno3', wombat%bac1_kno3, 15.0)
-
-    ! Facultative heterotrophic bacteria #1 half saturation constant for DOC uptake [mmolC/m3]
-    !-----------------------------------------------------------------------
-    ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
-    ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
-    call g_tracer_add_param('bac1_kpoc', wombat%bac1_kpoc, 5.0)
-
-    ! Facultative heterotrophic bacteria #1 half saturation constant for dissolved iron uptake [µmolFe/m3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_kfer', wombat%bac1_kfer, 0.35)
-
-    ! Facultative heterotrophic bacteria #1 biomass carbon to nitrogen ratio [mol C (mol N)-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_C2N', wombat%bac1_C2N, 5.0)
-
-    ! Facultative heterotrophic bacteria #1 biomass carbon to iron ratio [mol C (mol Fe)-1]
-    !-----------------------------------------------------------------------
-    ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
-    ! measured 20 - 50 µmol Fe per mol C in unfiltered seawater samples
-    call g_tracer_add_param('bac1_C2Fe', wombat%bac1_C2Fe, 1.0/40e-6)
-
-    ! Facultative heterotrophic bacteria #1 degree of partial oxidation [dimensionless]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_alpha', wombat%bac1_alpha, 0.9)
-
-    ! Facultative heterotrophic bacteria #1 fraction of electrons to biosynthesis [dimensionless]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1_fele', wombat%bac1_fele, 0.1)
-
-    ! Facultative heterotrophic bacteria #1 linear mortality rate constant [s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1lmor', wombat%bac1lmor, 0.005/86400.0)
-
-    ! Facultative heterotrophic bacteria #1 quadratic mortality rate constant [(mmol C m-3)-1 s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac1qmor', wombat%bac1qmor, 0.05/86400.0)
-
-    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of DOC [mmol C m-3 s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_Vmax_doc', wombat%bac2_Vmax_doc, 6.7/86400.0)
-
-    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of NO3 [mmol N m-3 s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_Vmax_no3', wombat%bac2_Vmax_no3, 7.2/86400.0)
-
-    ! Facultative heterotrophic bacteria #2 maximum rate of uptake of dFe [mmol Fe m-3 s-1]
+    ! Facultative particle-associated heterotrophic bacteria maximum rate of uptake of dFe [mmol Fe (mol C)-1 s-1]
     !-----------------------------------------------------------------------
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
     ! in unfiltered seawater when they added Fe+C
-    call g_tracer_add_param('bac2_Vmax_dFe', wombat%bac2_Vmax_dFe, 0.00010/86400.0)
+    call g_tracer_add_param('bacp_Vmax_dFe', wombat%bacp_Vmax_dFe, 0.00010/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
+    ! Facultative particle-associated heterotrophic bacteria diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_poxy', wombat%bac2_poxy, 450.0/86400.0)
+    call g_tracer_add_param('bacp_poxy', wombat%bacp_poxy, 450.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 half saturation constant for nitrate uptake [mmolN/m3]
+    ! Facultative particle-associated heterotrophic bacteria half saturation constant for nitrate uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_kno3', wombat%bac2_kno3, 15.0)
+    call g_tracer_add_param('bacp_kno3', wombat%bacp_kno3, 15.0)
 
-    ! Facultative heterotrophic bacteria #2 half saturation constant for DOC uptake [mmolC/m3]
+    ! Facultative particle-associated heterotrophic bacteria half saturation constant for DOC uptake [mmolC/m3]
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
-    call g_tracer_add_param('bac2_kdoc', wombat%bac2_kdoc, 60.0)
+    call g_tracer_add_param('bacp_kpoc', wombat%bacp_kpoc, 5.0)
 
-    ! Facultative heterotrophic bacteria #2 half saturation constant for dissolved iron uptake [µmolFe/m3]
+    ! Facultative particle-associated heterotrophic bacteria half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_kfer', wombat%bac2_kfer, 0.35)
+    call g_tracer_add_param('bacp_kfer', wombat%bacp_kfer, 0.35)
 
-    ! Facultative heterotrophic bacteria #2 biomass carbon to nitrogen ratio [mol C (mol N)-1]
+    ! Facultative particle-associated heterotrophic bacteria degree of partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_C2N', wombat%bac2_C2N, 5.0)
+    call g_tracer_add_param('bacp_alpha', wombat%bacp_alpha, 0.25)
 
-    ! Facultative heterotrophic bacteria #2 biomass carbon to iron ratio [mol C (mol Fe)-1]
+    ! Facultative particle-associated heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
-    ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
-    ! measured 20 - 50 µmol Fe per mol C in unfiltered seawater samples
-    call g_tracer_add_param('bac2_C2Fe', wombat%bac2_C2Fe, 1.0/40e-6)
+    call g_tracer_add_param('bacp_fele', wombat%bacp_fele, 0.15)
 
-    ! Facultative heterotrophic bacteria #2 optimal NOSC [dimensionless]
+    ! Facultative free-living heterotrophic bacteria #1 maximum rate of uptake of DOC [mmol C (mol C)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_nosc_opt', wombat%bac2_nosc_opt, -0.5)
+    call g_tracer_add_param('bacf1_Vmax_doc', wombat%bacf1_Vmax_doc, 6.7/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 standard deviation of NOSC [dimensionless]
+    ! Facultative free-living heterotrophic bacteria #1 maximum rate of uptake of NO3 [mmol N (mol C)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_nosc_sig', wombat%bac2_nosc_sig, 1.0)
+    call g_tracer_add_param('bacf1_Vmax_no3', wombat%bacf1_Vmax_no3, 7.2/86400.0)
 
-    ! Facultative heterotrophic bacteria #2 degree of partial oxidation [dimensionless]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_alpha', wombat%bac2_alpha, 0.5)
-
-    ! Facultative heterotrophic bacteria #2 fraction of electrons to biosynthesis [dimensionless]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2_fele', wombat%bac2_fele, 0.1)
-
-    ! Facultative heterotrophic bacteria #2 linear mortality rate constant [s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2lmor', wombat%bac2lmor, 0.005/86400.0)
-
-    ! Facultative heterotrophic bacteria #2 quadratic mortality rate constant [(mmol C m-3)-1 s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac2qmor', wombat%bac2qmor, 0.05/86400.0)
-
-    ! Facultative heterotrophic bacteria #3 maximum rate of uptake of DOC [mmolC/m3/s]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_Vmax_doc', wombat%bac3_Vmax_doc, 6.7/86400.0)
-
-    ! Facultative heterotrophic bacteria #3 maximum rate of uptake of dFe [mmolFe/m3/s]
+    ! Facultative free-living heterotrophic bacteria #1 maximum rate of uptake of dFe [mmol Fe (mol C)-1 s-1]
     !-----------------------------------------------------------------------
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
     ! in unfiltered seawater when they added Fe+C
-    call g_tracer_add_param('bac3_Vmax_dFe', wombat%bac3_Vmax_dFe, 0.00010/86400.0)
+    call g_tracer_add_param('bacf1_Vmax_dFe', wombat%bacf1_Vmax_dFe, 0.00010/86400.0)
 
-    ! Facultative heterotrophic bacteria #3 diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
+    ! Facultative free-living heterotrophic bacteria #1 diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_poxy', wombat%bac3_poxy, 450.0/86400.0)
+    call g_tracer_add_param('bacf1_poxy', wombat%bacf1_poxy, 450.0/86400.0)
 
-    ! Facultative heterotrophic bacteria #3 diffusive uptake limit of N2O [(mmol C biomass m-3)-1 s-1)]
+    ! Facultative free-living heterotrophic bacteria #1 half saturation constant for nitrate uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_pn2o', wombat%bac3_pn2o, 452.0/86400.0)
+    call g_tracer_add_param('bacf1_kno3', wombat%bacf1_kno3, 15.0)
 
-    ! Facultative heterotrophic bacteria #3 half saturation constant for DOC uptake [mmolC/m3]
+    ! Facultative free-living heterotrophic bacteria #1 half saturation constant for DOC uptake [mmolC/m3]
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
-    call g_tracer_add_param('bac3_kdoc', wombat%bac3_kdoc, 60.0)
+    call g_tracer_add_param('bacf1_kdoc', wombat%bacf1_kdoc, 60.0)
 
-    ! Facultative heterotrophic bacteria #3 half saturation constant for dissolved iron uptake [µmolFe/m3]
+    ! Facultative free-living heterotrophic bacteria #1 half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_kfer', wombat%bac3_kfer, 0.35)
+    call g_tracer_add_param('bacf1_kfer', wombat%bacf1_kfer, 0.35)
 
-    ! Facultative heterotrophic bacteria #3 biomass carbon to nitrogen ratio [mol C (mol N)-1]
+    ! Facultative free-living heterotrophic bacteria #1 optimal NOSC [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_C2N', wombat%bac3_C2N, 5.0)
+    call g_tracer_add_param('bacf1_nosc_opt', wombat%bacf1_nosc_opt, -0.5)
 
-    ! Facultative heterotrophic bacteria #3 biomass carbon to iron ratio [mol C (mol Fe)-1]
+    ! Facultative free-living heterotrophic bacteria #1 standard deviation of NOSC [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf1_nosc_sig', wombat%bacf1_nosc_sig, 1.0)
+
+    ! Facultative free-living heterotrophic bacteria #1 degree of partial oxidation [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf1_alpha', wombat%bacf1_alpha, 0.6)
+
+    ! Facultative free-living heterotrophic bacteria #1 fraction of electrons to biosynthesis [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf1_fele', wombat%bacf1_fele, 0.45)
+
+    ! Facultative free-living heterotrophic bacteria #2 maximum rate of uptake of DOC [mmolC (mol C)-1 s-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_Vmax_doc', wombat%bacf2_Vmax_doc, 6.7/86400.0)
+
+    ! Facultative free-living heterotrophic bacteria #2 maximum rate of uptake of dFe [mmolFe (mol C)-1 s-1]
+    !-----------------------------------------------------------------------
+    ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
+    ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
+    ! in unfiltered seawater when they added Fe+C
+    call g_tracer_add_param('bacf2_Vmax_dFe', wombat%bacf2_Vmax_dFe, 0.00010/86400.0)
+
+    ! Facultative free-living heterotrophic bacteria #2 diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_poxy', wombat%bacf2_poxy, 450.0/86400.0)
+
+    ! Facultative free-living heterotrophic bacteria #2 diffusive uptake limit of N2O [(mmol C biomass m-3)-1 s-1)]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_pn2o', wombat%bacf2_pn2o, 452.0/86400.0)
+
+    ! Facultative free-living heterotrophic bacteria #2 half saturation constant for DOC uptake [mmolC/m3]
+    !-----------------------------------------------------------------------
+    ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
+    ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
+    call g_tracer_add_param('bacf2_kdoc', wombat%bacf2_kdoc, 60.0)
+
+    ! Facultative free-living heterotrophic bacteria #2 half saturation constant for dissolved iron uptake [µmolFe/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_kfer', wombat%bacf2_kfer, 0.35)
+
+    ! Facultative free-living heterotrophic bacteria optimal NOSC [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_nosc_opt', wombat%bacf2_nosc_opt, 1.0)
+
+    ! Facultative free-living heterotrophic bacteria #2 standard deviation of NOSC [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_nosc_sig', wombat%bacf2_nosc_sig, 1.0)
+
+    ! Facultative free-living heterotrophic bacteria #2 degree of partial oxidation [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_alpha', wombat%bacf2_alpha, 0.1)
+
+    ! Facultative free-living heterotrophic bacteria #2 fraction of electrons to biosynthesis [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bacf2_fele', wombat%bacf2_fele, 0.15)
+
+    ! Facultative heterotrophic bacteria biomass carbon to nitrogen ratio [mol C (mol N)-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('bac_C2N', wombat%bac_C2N, 5.0)
+
+    ! Facultative heterotrophic bacteria biomass carbon to iron ratio [mol C (mol Fe)-1]
     !-----------------------------------------------------------------------
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! measured 20 - 50 µmol Fe per mol C in unfiltered seawater samples
-    call g_tracer_add_param('bac3_C2Fe', wombat%bac3_C2Fe, 1.0/40e-6)
+    call g_tracer_add_param('bac_C2Fe', wombat%bac_C2Fe, 1.0/40e-6)
 
-    ! Facultative heterotrophic bacteria #3 optimal NOSC [dimensionless]
+    ! Facultative heterotrophic bacteria linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_nosc_opt', wombat%bac3_nosc_opt, 1.0)
+    call g_tracer_add_param('baclmor', wombat%baclmor, 0.005/86400.0)
 
-    ! Facultative heterotrophic bacteria #3 standard deviation of NOSC [dimensionless]
+    ! Facultative heterotrophic bacteria quadratic mortality rate constant [(mmol C m-3)-1 s-1])]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_nosc_sig', wombat%bac3_nosc_sig, 1.0)
-
-    ! Facultative heterotrophic bacteria #3 degree of partial oxidation [dimensionless]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_alpha', wombat%bac3_alpha, 0.1)
-
-    ! Facultative heterotrophic bacteria #3 fraction of electrons to biosynthesis [dimensionless]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3_fele', wombat%bac3_fele, 0.1)
-
-    ! Facultative heterotrophic bacteria #3 linear mortality rate constant [s-1]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3lmor', wombat%bac3lmor, 0.005/86400.0)
-
-    ! Facultative heterotrophic bacteria #3 quadratic mortality rate constant [(mmol C m-3)-1 s-1])]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac3qmor', wombat%bac3qmor, 0.05/86400.0)
+    call g_tracer_add_param('bacqmor', wombat%bacqmor, 0.05/86400.0)
 
     ! Anammox bacteria half saturation constant for ammonium uptake [mmolN/m3]
     !-----------------------------------------------------------------------
@@ -3825,7 +3776,7 @@ module generic_WOMBATmid
     ! Facultative heterotrophic bacteria #1
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
-        name = 'bac1', &
+        name = 'bacp', &
         longname = 'Facultative heterotrophic bacteria #1', &
         units = 'mol/kg', &
         prog = .true.)
@@ -3833,7 +3784,7 @@ module generic_WOMBATmid
     ! Facultative heterotrophic bacteria #2
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
-        name = 'bac2', &
+        name = 'bacf1', &
         longname = 'Facultative heterotrophic bacteria #2', &
         units = 'mol/kg', &
         prog = .true.)
@@ -3841,7 +3792,7 @@ module generic_WOMBATmid
     ! Facultative heterotrophic bacteria #3
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
-        name = 'bac3', &
+        name = 'bacf2', &
         longname = 'Facultative heterotrophic bacteria #3', &
         units = 'mol/kg', &
         prog = .true.)
@@ -4275,9 +4226,9 @@ module generic_WOMBATmid
     real                                    :: biono3, bion2o, bionh4, biooxy, biofer, biosil
     real                                    :: biodoc, biodoh, biodoo, biodon, biocaco3
     real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobdetsi
-    real                                    :: biobac1, biobac2, biobac3, bioaoa
+    real                                    :: biobacp, biobacf1, biobacf2, bioaoa
     real                                    :: biophyfe, biodiafe
-    real                                    :: I_denom, wzbac1, wzbac2, wzbac3, wzaoa, wzphy, wzdia, wzdet, wzbdet, wzzoo, I_wzsum
+    real                                    :: I_denom, wzbacp, wzbacf1, wzbacf2, wzaoa, wzphy, wzdia, wzdet, wzbdet, wzzoo, I_wzsum
     real                                    :: fbc, zval, zval1, zval2, zval3, sqrt_zval
     real, parameter                         :: epsi = 1.0e-30
     real, parameter                         :: pi = 3.14159265358979
@@ -4300,20 +4251,20 @@ module generic_WOMBATmid
     real                                    :: phy_limnh4, phy_limno3, phy_limdin
     real                                    :: dia_limnh4, dia_limno3, dia_limdin
     real                                    :: phy_pisl, dia_pisl
-    real                                    :: zooegesbac1fe, zooegesbac2fe, zooegesbac3fe, zooegesaoafe, &
+    real                                    :: zooegesbacpfe, zooegesbacf1fe, zooegesbacf2fe, zooegesaoafe, &
                                                zooegesphyfe, zooegesdiafe, zooegesdetfe
-    real                                    :: zooassibac1fe, zooassibac2fe, zooassibac3fe, zooassiaoafe, &
+    real                                    :: zooassibacpfe, zooassibacf1fe, zooassibacf2fe, zooassiaoafe, &
                                                zooassiphyfe, zooassidiafe, zooassidetfe
-    real                                    :: zooexcrbac1fe, zooexcrbac2fe, zooexcrbac3fe, zooexcraoafe, &
+    real                                    :: zooexcrbacpfe, zooexcrbacf1fe, zooexcrbacf2fe, zooexcraoafe, &
                                                zooexcrphyfe, zooexcrdiafe, zooexcrdetfe
-    real                                    :: mesegesbac1fe, mesegesbac2fe, mesegesbac3fe, mesegesaoafe, &
+    real                                    :: mesegesbacpfe, mesegesbacf1fe, mesegesbacf2fe, mesegesaoafe, &
                                                mesegesphyfe, mesegesdiafe, mesegesdetfe, mesegesbdetfe, mesegeszoofe
-    real                                    :: mesassibac1fe, mesassibac2fe, mesassibac3fe, mesassiaoafe, &
+    real                                    :: mesassibacpfe, mesassibacf1fe, mesassibacf2fe, mesassiaoafe, &
                                                mesassiphyfe, mesassidiafe, mesassidetfe, mesassibdetfe, mesassizoofe
-    real                                    :: mesexcrbac1fe, mesexcrbac2fe, mesexcrbac3fe, mesexcraoafe, &
+    real                                    :: mesexcrbacpfe, mesexcrbacf1fe, mesexcrbacf2fe, mesexcraoafe, &
                                                mesexcrphyfe, mesexcrdiafe, mesexcrdetfe, mesexcrbdetfe, mesexcrzoofe
-    real                                    :: zooexcrbac1n, zooexcrbac2n, zooexcrbac3n, mesexcrbac1n, &
-                                               mesexcrbac2n, mesexcrbac3n, zooexcraoan, mesexcraoan
+    real                                    :: zooexcrbacpn, zooexcrbacf1n, zooexcrbacf2n, mesexcrbacpn, &
+                                               mesexcrbacf1n, mesexcrbacf2n, zooexcraoan, mesexcraoan
     real, dimension(:,:), allocatable       :: ek_bgr, par_bgr_mid, par_bgr_top
     real, dimension(:), allocatable         :: wsink1, wsink2
     real, dimension(4,61)                   :: zbgr
@@ -4327,17 +4278,17 @@ module generic_WOMBATmid
     real                                    :: theta_opt
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe
-    real                                    :: zoo_slmor, mes_slmor
+    real                                    :: mes_slmor
     real                                    :: hco3
     real                                    :: dzt_bot, dzt_bot_os
     real                                    :: nosc, f2_doc, f3_doc, m2_doc, m3_doc
-    real                                    :: e_pom, e_pomp, e_dom, e_domp, e_bac1, e_bac2, e_bac3, e1_res, e2_res, e3_res
-    real                                    :: bac1_cpoc, bac1_coxy, bac1_pdoc, bac1_pco2, bac1_pnh4, bac1_ypoc_ana
-    real                                    :: bac1_cpoc_ana, bac1_cno3_ana, bac1_pdoc_ana, bac1_pco2_ana, bac1_pnh4_ana
-    real                                    :: bac2_cdoc, bac2_coxy, bac2_pdoc, bac2_pco2, bac2_pnh4, bac2_ydoc_ana
-    real                                    :: bac2_cdoc_ana, bac2_cno3_ana, bac2_pdoc_ana, bac2_pco2_ana, bac2_pnh4_ana
-    real                                    :: bac3_cdoc, bac3_coxy, bac3_pdoc, bac3_pco2, bac3_pnh4, bac3_ydoc_ana
-    real                                    :: bac3_cdoc_ana, bac3_cn2o_ana, bac3_pdoc_ana, bac3_pco2_ana, bac3_pnh4_ana
+    real                                    :: e_pom, e_pomp, e_dom, e_domp, e_bac, e1_res, e2_res, e3_res
+    real                                    :: bacp_cpoc, bacp_coxy, bacp_pdoc, bacp_pco2, bacp_pnh4, bacp_ypoc_ana
+    real                                    :: bacp_cpoc_ana, bacp_cno3_ana, bacp_pdoc_ana, bacp_pco2_ana, bacp_pnh4_ana
+    real                                    :: bacf1_cdoc, bacf1_coxy, bacf1_pdoc, bacf1_pco2, bacf1_pnh4, bacf1_ydoc_ana
+    real                                    :: bacf1_cdoc_ana, bacf1_cno3_ana, bacf1_pdoc_ana, bacf1_pco2_ana, bacf1_pnh4_ana
+    real                                    :: bacf2_cdoc, bacf2_coxy, bacf2_pdoc, bacf2_pco2, bacf2_pnh4, bacf2_ydoc_ana
+    real                                    :: bacf2_cdoc_ana, bacf2_cn2o_ana, bacf2_pdoc_ana, bacf2_pco2_ana, bacf2_pnh4_ana
     real                                    :: bac_Voc, bac_VdFe, bac_Voxy, bac_Vno3, bac_Vn2o
     real                                    :: bac_gC, bac_gFe, bac_gEA
     real                                    :: bac_muana, bac_muaer
@@ -4634,49 +4585,49 @@ module generic_WOMBATmid
     wombat%diamorl(:,:,:) = 0.0
     wombat%diamorq(:,:,:) = 0.0
     wombat%zooeps(:,:,:) = 0.0
-    wombat%zooprefbac1(:,:,:) = 0.0
-    wombat%zooprefbac2(:,:,:) = 0.0
-    wombat%zooprefbac3(:,:,:) = 0.0
+    wombat%zooprefbacp(:,:,:) = 0.0
+    wombat%zooprefbacf1(:,:,:) = 0.0
+    wombat%zooprefbacf2(:,:,:) = 0.0
     wombat%zooprefaoa(:,:,:) = 0.0
     wombat%zooprefphy(:,:,:) = 0.0
     wombat%zooprefdia(:,:,:) = 0.0
     wombat%zooprefdet(:,:,:) = 0.0
-    wombat%zoograzbac1(:,:,:) = 0.0
-    wombat%zoograzbac2(:,:,:) = 0.0
-    wombat%zoograzbac3(:,:,:) = 0.0
+    wombat%zoograzbacp(:,:,:) = 0.0
+    wombat%zoograzbacf1(:,:,:) = 0.0
+    wombat%zoograzbacf2(:,:,:) = 0.0
     wombat%zoograzaoa(:,:,:) = 0.0
     wombat%zoograzphy(:,:,:) = 0.0
     wombat%zoograzdia(:,:,:) = 0.0
     wombat%zoograzdet(:,:,:) = 0.0
     wombat%zoomorl(:,:,:) = 0.0
     wombat%zoomorq(:,:,:) = 0.0
-    wombat%zooexcrbac1(:,:,:) = 0.0
-    wombat%zooexcrbac2(:,:,:) = 0.0
-    wombat%zooexcrbac3(:,:,:) = 0.0
+    wombat%zooexcrbacp(:,:,:) = 0.0
+    wombat%zooexcrbacf1(:,:,:) = 0.0
+    wombat%zooexcrbacf2(:,:,:) = 0.0
     wombat%zooexcraoa(:,:,:) = 0.0
     wombat%zooexcrphy(:,:,:) = 0.0
     wombat%zooexcrdia(:,:,:) = 0.0
     wombat%zooexcrdet(:,:,:) = 0.0
-    wombat%zooegesbac1(:,:,:) = 0.0
-    wombat%zooegesbac2(:,:,:) = 0.0
-    wombat%zooegesbac3(:,:,:) = 0.0
+    wombat%zooegesbacp(:,:,:) = 0.0
+    wombat%zooegesbacf1(:,:,:) = 0.0
+    wombat%zooegesbacf2(:,:,:) = 0.0
     wombat%zooegesaoa(:,:,:) = 0.0
     wombat%zooegesphy(:,:,:) = 0.0
     wombat%zooegesdia(:,:,:) = 0.0
     wombat%zooegesdet(:,:,:) = 0.0
     wombat%meseps(:,:,:) = 0.0
-    wombat%mesprefbac1(:,:,:) = 0.0
-    wombat%mesprefbac2(:,:,:) = 0.0
-    wombat%mesprefbac3(:,:,:) = 0.0
+    wombat%mesprefbacp(:,:,:) = 0.0
+    wombat%mesprefbacf1(:,:,:) = 0.0
+    wombat%mesprefbacf2(:,:,:) = 0.0
     wombat%mesprefaoa(:,:,:) = 0.0
     wombat%mesprefphy(:,:,:) = 0.0
     wombat%mesprefdia(:,:,:) = 0.0
     wombat%mesprefdet(:,:,:) = 0.0
     wombat%mesprefbdet(:,:,:) = 0.0
     wombat%mesprefzoo(:,:,:) = 0.0
-    wombat%mesgrazbac1(:,:,:) = 0.0
-    wombat%mesgrazbac2(:,:,:) = 0.0
-    wombat%mesgrazbac3(:,:,:) = 0.0
+    wombat%mesgrazbacp(:,:,:) = 0.0
+    wombat%mesgrazbacf1(:,:,:) = 0.0
+    wombat%mesgrazbacf2(:,:,:) = 0.0
     wombat%mesgrazaoa(:,:,:) = 0.0
     wombat%mesgrazphy(:,:,:) = 0.0
     wombat%mesgrazdia(:,:,:) = 0.0
@@ -4685,18 +4636,18 @@ module generic_WOMBATmid
     wombat%mesgrazzoo(:,:,:) = 0.0
     wombat%mesmorl(:,:,:) = 0.0
     wombat%mesmorq(:,:,:) = 0.0
-    wombat%mesexcrbac1(:,:,:) = 0.0
-    wombat%mesexcrbac2(:,:,:) = 0.0
-    wombat%mesexcrbac3(:,:,:) = 0.0
+    wombat%mesexcrbacp(:,:,:) = 0.0
+    wombat%mesexcrbacf1(:,:,:) = 0.0
+    wombat%mesexcrbacf2(:,:,:) = 0.0
     wombat%mesexcraoa(:,:,:) = 0.0
     wombat%mesexcrphy(:,:,:) = 0.0
     wombat%mesexcrdia(:,:,:) = 0.0
     wombat%mesexcrdet(:,:,:) = 0.0
     wombat%mesexcrbdet(:,:,:) = 0.0
     wombat%mesexcrzoo(:,:,:) = 0.0
-    wombat%mesegesbac1(:,:,:) = 0.0
-    wombat%mesegesbac2(:,:,:) = 0.0
-    wombat%mesegesbac3(:,:,:) = 0.0
+    wombat%mesegesbacp(:,:,:) = 0.0
+    wombat%mesegesbacf1(:,:,:) = 0.0
+    wombat%mesegesbacf2(:,:,:) = 0.0
     wombat%mesegesaoa(:,:,:) = 0.0
     wombat%mesegesphy(:,:,:) = 0.0
     wombat%mesegesdia(:,:,:) = 0.0
@@ -4731,44 +4682,44 @@ module generic_WOMBATmid
     wombat%doc2prod(:,:,:) = 0.0
     wombat%doc3remi(:,:,:) = 0.0
     wombat%doc3prod(:,:,:) = 0.0
-    wombat%bac1_ypoc(:,:,:) = 1.0
-    wombat%bac2_ydoc(:,:,:) = 1.0
-    wombat%bac3_ydoc(:,:,:) = 1.0
-    wombat%bac1grow(:,:,:) = 0.0
-    wombat%bac1resp(:,:,:) = 0.0
-    wombat%bac1pco2(:,:,:) = 0.0
-    wombat%bac1pnh4(:,:,:) = 0.0
-    wombat%bac1ufer(:,:,:) = 0.0
-    wombat%bac1_mu(:,:,:) = 0.0
-    wombat%bac1_fanaer(:,:,:) = 0.0
-    wombat%bac1_ffelim(:,:,:) = 0.0
-    wombat%bac1_rq(:,:,:) = 0.0
-    wombat%bac1morl(:,:,:) = 0.0
-    wombat%bac1morq(:,:,:) = 0.0
-    wombat%bac1deni(:,:,:) = 0.0
-    wombat%bac2grow(:,:,:) = 0.0
-    wombat%bac2resp(:,:,:) = 0.0
-    wombat%bac2pco2(:,:,:) = 0.0
-    wombat%bac2pnh4(:,:,:) = 0.0
-    wombat%bac2ufer(:,:,:) = 0.0
-    wombat%bac2_mu(:,:,:) = 0.0
-    wombat%bac2_fanaer(:,:,:) = 0.0
-    wombat%bac2_ffelim(:,:,:) = 0.0
-    wombat%bac2_rq(:,:,:) = 0.0
-    wombat%bac2morl(:,:,:) = 0.0
-    wombat%bac2morq(:,:,:) = 0.0
-    wombat%bac2deni(:,:,:) = 0.0
-    wombat%bac3grow(:,:,:) = 0.0
-    wombat%bac3resp(:,:,:) = 0.0
-    wombat%bac3pco2(:,:,:) = 0.0
-    wombat%bac3pnh4(:,:,:) = 0.0
-    wombat%bac3ufer(:,:,:) = 0.0
-    wombat%bac3_mu(:,:,:) = 0.0
-    wombat%bac3_fanaer(:,:,:) = 0.0
-    wombat%bac3_ffelim(:,:,:) = 0.0
-    wombat%bac3_rq(:,:,:) = 0.0
-    wombat%bac3morl(:,:,:) = 0.0
-    wombat%bac3morq(:,:,:) = 0.0
+    wombat%bacp_ypoc(:,:,:) = 1.0
+    wombat%bacf1_ydoc(:,:,:) = 1.0
+    wombat%bacf2_ydoc(:,:,:) = 1.0
+    wombat%bacpgrow(:,:,:) = 0.0
+    wombat%bacpresp(:,:,:) = 0.0
+    wombat%bacppco2(:,:,:) = 0.0
+    wombat%bacppnh4(:,:,:) = 0.0
+    wombat%bacpufer(:,:,:) = 0.0
+    wombat%bacp_mu(:,:,:) = 0.0
+    wombat%bacp_fanaer(:,:,:) = 0.0
+    wombat%bacp_ffelim(:,:,:) = 0.0
+    wombat%bacp_rq(:,:,:) = 0.0
+    wombat%bacpmorl(:,:,:) = 0.0
+    wombat%bacpmorq(:,:,:) = 0.0
+    wombat%bacpdeni(:,:,:) = 0.0
+    wombat%bacf1grow(:,:,:) = 0.0
+    wombat%bacf1resp(:,:,:) = 0.0
+    wombat%bacf1pco2(:,:,:) = 0.0
+    wombat%bacf1pnh4(:,:,:) = 0.0
+    wombat%bacf1ufer(:,:,:) = 0.0
+    wombat%bacf1_mu(:,:,:) = 0.0
+    wombat%bacf1_fanaer(:,:,:) = 0.0
+    wombat%bacf1_ffelim(:,:,:) = 0.0
+    wombat%bacf1_rq(:,:,:) = 0.0
+    wombat%bacf1morl(:,:,:) = 0.0
+    wombat%bacf1morq(:,:,:) = 0.0
+    wombat%bacf1deni(:,:,:) = 0.0
+    wombat%bacf2grow(:,:,:) = 0.0
+    wombat%bacf2resp(:,:,:) = 0.0
+    wombat%bacf2pco2(:,:,:) = 0.0
+    wombat%bacf2pnh4(:,:,:) = 0.0
+    wombat%bacf2ufer(:,:,:) = 0.0
+    wombat%bacf2_mu(:,:,:) = 0.0
+    wombat%bacf2_fanaer(:,:,:) = 0.0
+    wombat%bacf2_ffelim(:,:,:) = 0.0
+    wombat%bacf2_rq(:,:,:) = 0.0
+    wombat%bacf2morl(:,:,:) = 0.0
+    wombat%bacf2morq(:,:,:) = 0.0
     wombat%aox_lnh4(:,:,:) = 0.0
     wombat%aox_mu(:,:,:) = 0.0
     wombat%ammox(:,:,:) = 0.0
@@ -4879,11 +4830,11 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau, &
+    call g_tracer_get_values(tracer_list, 'bacp', 'field', wombat%f_bacp, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau, &
+    call g_tracer_get_values(tracer_list, 'bacf1', 'field', wombat%f_bacf1, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'bac3', 'field', wombat%f_bac3, isd, jsd, ntau=tau, &
+    call g_tracer_get_values(tracer_list, 'bacf2', 'field', wombat%f_bacf2, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
@@ -5098,9 +5049,9 @@ module generic_WOMBATmid
       biodoh   = max(epsi, wombat%f_doh(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodoo   = max(epsi, wombat%f_doo(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biodon   = max(epsi, wombat%f_don(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
-      biobac1  = max(epsi, wombat%f_bac1(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
-      biobac2  = max(epsi, wombat%f_bac2(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
-      biobac3  = max(epsi, wombat%f_bac3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biobacp  = max(epsi, wombat%f_bacp(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biobacf1  = max(epsi, wombat%f_bacf1(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+      biobacf2  = max(epsi, wombat%f_bacf2(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       bioaoa   = max(epsi, wombat%f_aoa(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biono3   = max(epsi, wombat%f_no3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       bion2o   = max(epsi, wombat%f_n2o(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
@@ -5549,7 +5500,7 @@ module generic_WOMBATmid
         !      Ricket et al., 2002 Geochim. et Cosmochim. Acta
         !    - Diatom frustule dissolution increased by order of magnitude with bacteria (Bidle & Azam 1999 Nature)
         !    - During a bloom off Monterey Bay, anti-biotics decreased dissolution by ~50% (Bidle et al., 2003 Limnol. Oceanogr.)
-      zval = biobac1
+      zval = biobacp
       disssi_bact = 1.0 + wombat%bsi_fbac * zval / ( zval + wombat%bsi_kbac )
         ! 4. Dissolution rate of biogenic silica (/s) composed of the above terms
       wombat%disssi(i,j,k) = disssi_temp * disssi_usat * disssi_bact
@@ -5571,7 +5522,6 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
 
       ! reduce linear mortality (respiration losses) of zooplankton when there is low biomass
-      zoo_slmor = biozoo / (biozoo + wombat%zookz)
       mes_slmor = biomes / (biomes + wombat%meskz)
 
       ! Mortality terms
@@ -5590,7 +5540,7 @@ module generic_WOMBATmid
         wombat%diamorq(i,j,k) = 0.0
       endif
       if (biozoo>1e-3) then
-        wombat%zoomorl(i,j,k) = wombat%zoolmor * fbc * wombat%f_zoo(i,j,k) * zoo_slmor ! [molC/kg/s]
+        wombat%zoomorl(i,j,k) = wombat%zoolmor * fbc * wombat%f_zoo(i,j,k) ! [molC/kg/s]
         wombat%zoomorq(i,j,k) = wombat%zooqmor / mmol_m3_to_mol_kg * wombat%f_zoo(i,j,k) * wombat%f_zoo(i,j,k) ! [molC/kg/s]
       else
         wombat%zoomorl(i,j,k) = 0.0
@@ -5603,26 +5553,26 @@ module generic_WOMBATmid
         wombat%mesmorl(i,j,k) = 0.0
         wombat%mesmorq(i,j,k) = 0.0
       endif
-      if (biobac1>1e-3) then
-        wombat%bac1morl(i,j,k) = wombat%bac1lmor * fbc * wombat%f_bac1(i,j,k) ! [molC/kg/s]
-        wombat%bac1morq(i,j,k) = wombat%bac1qmor / mmol_m3_to_mol_kg * wombat%f_bac1(i,j,k) * wombat%f_bac1(i,j,k) ! [molC/kg/s]
+      if (biobacp>1e-3) then
+        wombat%bacpmorl(i,j,k) = wombat%baclmor * fbc * wombat%f_bacp(i,j,k) ! [molC/kg/s]
+        wombat%bacpmorq(i,j,k) = wombat%bacqmor / mmol_m3_to_mol_kg * wombat%f_bacp(i,j,k) * wombat%f_bacp(i,j,k) ! [molC/kg/s]
       else
-        wombat%bac1morl(i,j,k) = 0.0
-        wombat%bac1morq(i,j,k) = 0.0
+        wombat%bacpmorl(i,j,k) = 0.0
+        wombat%bacpmorq(i,j,k) = 0.0
       endif
-      if (biobac2>1e-3) then
-        wombat%bac2morl(i,j,k) = wombat%bac2lmor * fbc * wombat%f_bac2(i,j,k) ! [molC/kg/s]
-        wombat%bac2morq(i,j,k) = wombat%bac2qmor / mmol_m3_to_mol_kg * wombat%f_bac2(i,j,k) * wombat%f_bac2(i,j,k) ! [molC/kg/s]
+      if (biobacf1>1e-3) then
+        wombat%bacf1morl(i,j,k) = wombat%baclmor * fbc * wombat%f_bacf1(i,j,k) ! [molC/kg/s]
+        wombat%bacf1morq(i,j,k) = wombat%bacqmor / mmol_m3_to_mol_kg * wombat%f_bacf1(i,j,k) * wombat%f_bacf1(i,j,k) ! [molC/kg/s]
       else
-        wombat%bac2morl(i,j,k) = 0.0
-        wombat%bac2morq(i,j,k) = 0.0
+        wombat%bacf1morl(i,j,k) = 0.0
+        wombat%bacf1morq(i,j,k) = 0.0
       endif
-      if (biobac3>1e-3) then
-        wombat%bac3morl(i,j,k) = wombat%bac3lmor * fbc * wombat%f_bac3(i,j,k) ! [molC/kg/s]
-        wombat%bac3morq(i,j,k) = wombat%bac3qmor / mmol_m3_to_mol_kg * wombat%f_bac3(i,j,k) * wombat%f_bac3(i,j,k) ! [molC/kg/s]
+      if (biobacf2>1e-3) then
+        wombat%bacf2morl(i,j,k) = wombat%baclmor * fbc * wombat%f_bacf2(i,j,k) ! [molC/kg/s]
+        wombat%bacf2morq(i,j,k) = wombat%bacqmor / mmol_m3_to_mol_kg * wombat%f_bacf2(i,j,k) * wombat%f_bacf2(i,j,k) ! [molC/kg/s]
       else
-        wombat%bac3morl(i,j,k) = 0.0
-        wombat%bac3morq(i,j,k) = 0.0
+        wombat%bacf2morl(i,j,k) = 0.0
+        wombat%bacf2morq(i,j,k) = 0.0
       endif
       if (bioaoa>1e-3) then
         wombat%aoamorl(i,j,k) = wombat%aoalmor * fbc * wombat%f_aoa(i,j,k) ! [molC/kg/s]
@@ -5644,12 +5594,12 @@ module generic_WOMBATmid
       !!!~~~ Zooplankton ~~~!!!
       ! Grazing function ! [1/s]
       ! normalize the prey preference kernal to reflect dietary fractions (Gentleman et al., (2003) DSRII)
-      I_denom = 1.0 / (wombat%zprefbac1 + wombat%zprefbac2 + wombat%zprefbac3 &
+      I_denom = 1.0 / (wombat%zprefbacp + wombat%zprefbacf1 + wombat%zprefbacf2 &
                       + wombat%zprefaoa + wombat%zprefphy + wombat%zprefdia &
                       + wombat%zprefdet)
-      wombat%zooprefbac1(i,j,k) = wombat%zprefbac1 * I_denom
-      wombat%zooprefbac2(i,j,k) = wombat%zprefbac2 * I_denom
-      wombat%zooprefbac3(i,j,k) = wombat%zprefbac3 * I_denom
+      wombat%zooprefbacp(i,j,k) = wombat%zprefbacp * I_denom
+      wombat%zooprefbacf1(i,j,k) = wombat%zprefbacf1 * I_denom
+      wombat%zooprefbacf2(i,j,k) = wombat%zprefbacf2 * I_denom
       wombat%zooprefaoa(i,j,k) = wombat%zprefaoa * I_denom
       wombat%zooprefphy(i,j,k) = wombat%zprefphy * I_denom
       wombat%zooprefdia(i,j,k) = wombat%zprefdia * I_denom
@@ -5660,24 +5610,24 @@ module generic_WOMBATmid
       !   - see their Eq. 19
       ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
       !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
-      zval = wombat%zooprefbac1(i,j,k) + wombat%zooprefbac2(i,j,k) + wombat%zooprefbac3(i,j,k) &
+      zval = wombat%zooprefbacp(i,j,k) + wombat%zooprefbacf1(i,j,k) + wombat%zooprefbacf2(i,j,k) &
            + wombat%zooprefaoa(i,j,k) + wombat%zooprefphy(i,j,k) + wombat%zooprefdia(i,j,k) + wombat%zooprefdet(i,j,k)
       if (zval < epsi) then
-        wombat%zooprefbac1(i,j,k) = 1.0/7.0; wombat%zooprefbac2(i,j,k) = 1.0/7.0; wombat%zooprefbac3(i,j,k) = 1.0/7.0
+        wombat%zooprefbacp(i,j,k) = 1.0/7.0; wombat%zooprefbacf1(i,j,k) = 1.0/7.0; wombat%zooprefbacf2(i,j,k) = 1.0/7.0
         wombat%zooprefaoa(i,j,k) = 1.0/7.0; wombat%zooprefphy(i,j,k) = 1.0/7.0; wombat%zooprefdia(i,j,k) = 1.0/7.0;
         wombat%zooprefdet(i,j,k) = 1.0/7.0
       else
-        wzbac1 = (wombat%zooprefbac1(i,j,k) * biobac1)**wombat%zoopreyswitch
-        wzbac2 = (wombat%zooprefbac2(i,j,k) * biobac2)**wombat%zoopreyswitch
-        wzbac3 = (wombat%zooprefbac3(i,j,k) * biobac3)**wombat%zoopreyswitch
+        wzbacp = (wombat%zooprefbacp(i,j,k) * biobacp)**wombat%zoopreyswitch
+        wzbacf1 = (wombat%zooprefbacf1(i,j,k) * biobacf1)**wombat%zoopreyswitch
+        wzbacf2 = (wombat%zooprefbacf2(i,j,k) * biobacf2)**wombat%zoopreyswitch
         wzaoa = (wombat%zooprefaoa(i,j,k) * bioaoa)**wombat%zoopreyswitch
         wzphy = (wombat%zooprefphy(i,j,k) * biophy)**wombat%zoopreyswitch
         wzdia = (wombat%zooprefdia(i,j,k) * biodia)**wombat%zoopreyswitch
         wzdet = (wombat%zooprefdet(i,j,k) * biodet)**wombat%zoopreyswitch
-        I_wzsum = 1.0 / (wzbac1 + wzbac2 + wzbac3 + wzaoa + wzphy + wzdia + wzdet + epsi)
-        wombat%zooprefbac1(i,j,k) = wzbac1 * I_wzsum
-        wombat%zooprefbac2(i,j,k) = wzbac2 * I_wzsum
-        wombat%zooprefbac3(i,j,k) = wzbac3 * I_wzsum
+        I_wzsum = 1.0 / (wzbacp + wzbacf1 + wzbacf2 + wzaoa + wzphy + wzdia + wzdet + epsi)
+        wombat%zooprefbacp(i,j,k) = wzbacp * I_wzsum
+        wombat%zooprefbacf1(i,j,k) = wzbacf1 * I_wzsum
+        wombat%zooprefbacf2(i,j,k) = wzbacf2 * I_wzsum
         wombat%zooprefaoa(i,j,k) = wzaoa * I_wzsum
         wombat%zooprefphy(i,j,k) = wzphy * I_wzsum
         wombat%zooprefdia(i,j,k) = wzdia * I_wzsum
@@ -5685,18 +5635,18 @@ module generic_WOMBATmid
       endif
       ! Compute sum of prey-specific Type-III terms to obtain grazing rate [1/s]
       !  - this avoids "perfect substitution" of prey types and aligns with reccommendations of Gentleman et al. (2003)
-      Xzoo = (  wombat%zooepsbac1 * (wombat%zooprefbac1(i,j,k) * biobac1)**2 &
-              + wombat%zooepsbac2 * (wombat%zooprefbac2(i,j,k) * biobac2)**2 &
-              + wombat%zooepsbac3 * (wombat%zooprefbac3(i,j,k) * biobac3)**2 &
+      Xzoo = (  wombat%zooepsbacp * (wombat%zooprefbacp(i,j,k) * biobacp)**2 &
+              + wombat%zooepsbacf1 * (wombat%zooprefbacf1(i,j,k) * biobacf1)**2 &
+              + wombat%zooepsbacf2 * (wombat%zooprefbacf2(i,j,k) * biobacf2)**2 &
               + wombat%zooepsaoa * (wombat%zooprefaoa(i,j,k) * bioaoa)**2 &
               + wombat%zooepsphy * (wombat%zooprefphy(i,j,k) * biophy)**2 &
               + wombat%zooepsdia * (wombat%zooprefdia(i,j,k) * biodia)**2 &
               + wombat%zooepsdet * (wombat%zooprefdet(i,j,k) * biodet)**2)
       g_zoo = wombat%zoogmax * fbc * Xzoo / (wombat%zoogmax * fbc + Xzoo)
       ! find "apparent" community epsilon (prey capture rate coefficient)
-      wombat%zooeps(i,j,k) = Xzoo / ( (wombat%zooprefbac1(i,j,k) * biobac1)**2 &
-                                    + (wombat%zooprefbac2(i,j,k) * biobac2)**2 &
-                                    + (wombat%zooprefbac3(i,j,k) * biobac3)**2 &
+      wombat%zooeps(i,j,k) = Xzoo / ( (wombat%zooprefbacp(i,j,k) * biobacp)**2 &
+                                    + (wombat%zooprefbacf1(i,j,k) * biobacf1)**2 &
+                                    + (wombat%zooprefbacf2(i,j,k) * biobacf2)**2 &
                                     + (wombat%zooprefaoa(i,j,k) * bioaoa)**2 &
                                     + (wombat%zooprefphy(i,j,k) * biophy)**2 &
                                     + (wombat%zooprefdia(i,j,k) * biodia)**2 &
@@ -5705,17 +5655,17 @@ module generic_WOMBATmid
       ! Grazing, egestion, excretion and assimilation
       if (Xzoo>epsi) then
         I_Xzoo = 1.0 / Xzoo
-        wombat%zoograzbac1(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsbac1*(wombat%zooprefbac1(i,j,k)*biobac1)**2 * I_Xzoo ! [molC/kg/s]
-        wombat%zoograzbac2(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsbac2*(wombat%zooprefbac2(i,j,k)*biobac2)**2 * I_Xzoo ! [molC/kg/s]
-        wombat%zoograzbac3(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsbac3*(wombat%zooprefbac3(i,j,k)*biobac3)**2 * I_Xzoo ! [molC/kg/s]
+        wombat%zoograzbacp(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsbacp*(wombat%zooprefbacp(i,j,k)*biobacp)**2 * I_Xzoo ! [molC/kg/s]
+        wombat%zoograzbacf1(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsbacf1*(wombat%zooprefbacf1(i,j,k)*biobacf1)**2 * I_Xzoo ! [molC/kg/s]
+        wombat%zoograzbacf2(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsbacf2*(wombat%zooprefbacf2(i,j,k)*biobacf2)**2 * I_Xzoo ! [molC/kg/s]
         wombat%zoograzaoa(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsaoa*(wombat%zooprefaoa(i,j,k)*bioaoa)**2 * I_Xzoo ! [molC/kg/s]
         wombat%zoograzphy(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsphy*(wombat%zooprefphy(i,j,k)*biophy)**2 * I_Xzoo ! [molC/kg/s]
         wombat%zoograzdia(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsdia*(wombat%zooprefdia(i,j,k)*biodia)**2 * I_Xzoo ! [molC/kg/s]
         wombat%zoograzdet(i,j,k) = g_zoo * wombat%f_zoo(i,j,k) * wombat%zooepsdet*(wombat%zooprefdet(i,j,k)*biodet)**2 * I_Xzoo ! [molC/kg/s]
       else
-        wombat%zoograzbac1(i,j,k) = 0.0
-        wombat%zoograzbac2(i,j,k) = 0.0
-        wombat%zoograzbac3(i,j,k) = 0.0
+        wombat%zoograzbacp(i,j,k) = 0.0
+        wombat%zoograzbacf1(i,j,k) = 0.0
+        wombat%zoograzbacf2(i,j,k) = 0.0
         wombat%zoograzaoa(i,j,k) = 0.0
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdia(i,j,k) = 0.0
@@ -5724,50 +5674,50 @@ module generic_WOMBATmid
       ! We follow Le Mezo & Galbraith (2021) L&O - The fecal iron pump: Global impact of animals on the iron stoichiometry...
       !  - ingestion, assimilation and excretion of carbon and iron by zooplankton are calculated separately
       !  - the idea is to enrich fecal pellets in iron compared to carbon
-      wombat%zooexcrbac1(i,j,k) = wombat%zoograzbac1(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
-      wombat%zooexcrbac2(i,j,k) = wombat%zoograzbac2(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
-      wombat%zooexcrbac3(i,j,k) = wombat%zoograzbac3(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
+      wombat%zooexcrbacp(i,j,k) = wombat%zoograzbacp(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
+      wombat%zooexcrbacf1(i,j,k) = wombat%zoograzbacf1(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
+      wombat%zooexcrbacf2(i,j,k) = wombat%zoograzbacf2(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
       wombat%zooexcraoa(i,j,k) = wombat%zoograzaoa(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
       wombat%zooexcrphy(i,j,k) = wombat%zoograzphy(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
       wombat%zooexcrdia(i,j,k) = wombat%zoograzdia(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
       wombat%zooexcrdet(i,j,k) = wombat%zoograzdet(i,j,k) * wombat%zooCingest*(1.0 - wombat%zooCassim)
-      wombat%zooegesbac1(i,j,k) = wombat%zoograzbac1(i,j,k) * (1.0-wombat%zooCingest)
-      wombat%zooegesbac2(i,j,k) = wombat%zoograzbac2(i,j,k) * (1.0-wombat%zooCingest)
-      wombat%zooegesbac3(i,j,k) = wombat%zoograzbac3(i,j,k) * (1.0-wombat%zooCingest)
+      wombat%zooegesbacp(i,j,k) = wombat%zoograzbacp(i,j,k) * (1.0-wombat%zooCingest)
+      wombat%zooegesbacf1(i,j,k) = wombat%zoograzbacf1(i,j,k) * (1.0-wombat%zooCingest)
+      wombat%zooegesbacf2(i,j,k) = wombat%zoograzbacf2(i,j,k) * (1.0-wombat%zooCingest)
       wombat%zooegesaoa(i,j,k) = wombat%zoograzaoa(i,j,k) * (1.0-wombat%zooCingest)
       wombat%zooegesphy(i,j,k) = wombat%zoograzphy(i,j,k) * (1.0-wombat%zooCingest)
       wombat%zooegesdia(i,j,k) = wombat%zoograzdia(i,j,k) * (1.0-wombat%zooCingest)
       wombat%zooegesdet(i,j,k) = wombat%zoograzdet(i,j,k) * (1.0-wombat%zooCingest)
-      zooegesbac1fe = wombat%zoograzbac1(i,j,k) / wombat%bac1_C2Fe * (1.0-wombat%zooFeingest)
-      zooegesbac2fe = wombat%zoograzbac2(i,j,k) / wombat%bac2_C2Fe * (1.0-wombat%zooFeingest)
-      zooegesbac3fe = wombat%zoograzbac3(i,j,k) / wombat%bac3_C2Fe * (1.0-wombat%zooFeingest)
+      zooegesbacpfe = wombat%zoograzbacp(i,j,k) / wombat%bac_C2Fe * (1.0-wombat%zooFeingest)
+      zooegesbacf1fe = wombat%zoograzbacf1(i,j,k) / wombat%bac_C2Fe * (1.0-wombat%zooFeingest)
+      zooegesbacf2fe = wombat%zoograzbacf2(i,j,k) / wombat%bac_C2Fe * (1.0-wombat%zooFeingest)
       zooegesaoafe = wombat%zoograzaoa(i,j,k) / wombat%aoa_C2Fe * (1.0-wombat%zooFeingest)
       zooegesphyfe = wombat%zoograzphy(i,j,k) * phy_Fe2C * (1.0-wombat%zooFeingest)
       zooegesdiafe = wombat%zoograzdia(i,j,k) * dia_Fe2C * (1.0-wombat%zooFeingest)
       zooegesdetfe = wombat%zoograzdet(i,j,k) * det_Fe2C * (1.0-wombat%zooFeingest)
-      zooassibac1fe = wombat%zoograzbac1(i,j,k) / wombat%bac1_C2Fe * wombat%zooFeingest*wombat%zooFeassim
-      zooassibac2fe = wombat%zoograzbac2(i,j,k) / wombat%bac2_C2Fe * wombat%zooFeingest*wombat%zooFeassim
-      zooassibac3fe = wombat%zoograzbac3(i,j,k) / wombat%bac3_C2Fe * wombat%zooFeingest*wombat%zooFeassim
+      zooassibacpfe = wombat%zoograzbacp(i,j,k) / wombat%bac_C2Fe * wombat%zooFeingest*wombat%zooFeassim
+      zooassibacf1fe = wombat%zoograzbacf1(i,j,k) / wombat%bac_C2Fe * wombat%zooFeingest*wombat%zooFeassim
+      zooassibacf2fe = wombat%zoograzbacf2(i,j,k) / wombat%bac_C2Fe * wombat%zooFeingest*wombat%zooFeassim
       zooassiaoafe = wombat%zoograzaoa(i,j,k) / wombat%aoa_C2Fe * wombat%zooFeingest*wombat%zooFeassim
       zooassiphyfe = wombat%zoograzphy(i,j,k) * phy_Fe2C * wombat%zooFeingest*wombat%zooFeassim
       zooassidiafe = wombat%zoograzdia(i,j,k) * dia_Fe2C * wombat%zooFeingest*wombat%zooFeassim
       zooassidetfe = wombat%zoograzdet(i,j,k) * det_Fe2C * wombat%zooFeingest*wombat%zooFeassim
-      zooexcrbac1fe = wombat%zoograzbac1(i,j,k) / wombat%bac1_C2Fe * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
-      zooexcrbac2fe = wombat%zoograzbac2(i,j,k) / wombat%bac2_C2Fe * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
-      zooexcrbac3fe = wombat%zoograzbac3(i,j,k) / wombat%bac3_C2Fe * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
+      zooexcrbacpfe = wombat%zoograzbacp(i,j,k) / wombat%bac_C2Fe * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
+      zooexcrbacf1fe = wombat%zoograzbacf1(i,j,k) / wombat%bac_C2Fe * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
+      zooexcrbacf2fe = wombat%zoograzbacf2(i,j,k) / wombat%bac_C2Fe * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
       zooexcraoafe = wombat%zoograzaoa(i,j,k) / wombat%aoa_C2Fe * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
       zooexcrphyfe = wombat%zoograzphy(i,j,k) * phy_Fe2C * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
       zooexcrdiafe = wombat%zoograzdia(i,j,k) * dia_Fe2C * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
       zooexcrdetfe = wombat%zoograzdet(i,j,k) * det_Fe2C * wombat%zooFeingest*(1.0 - wombat%zooFeassim)
-      zooexcrbac1n  = wombat%zoograzbac1(i,j,k) / wombat%bac1_C2N &
-                     - (wombat%zoograzbac1(i,j,k) * wombat%zooCingest * wombat%zooCassim / (122.0/16.0)) &
-                     - (wombat%zooegesbac1(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
-      zooexcrbac2n  = wombat%zoograzbac2(i,j,k) / wombat%bac2_C2N &
-                     - (wombat%zoograzbac2(i,j,k) * wombat%zooCingest * wombat%zooCassim / (122.0/16.0)) &
-                     - (wombat%zooegesbac2(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
-      zooexcrbac3n  = wombat%zoograzbac3(i,j,k) / wombat%bac3_C2N &
-                     - (wombat%zoograzbac3(i,j,k) * wombat%zooCingest * wombat%zooCassim / (122.0/16.0)) &
-                     - (wombat%zooegesbac3(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
+      zooexcrbacpn  = wombat%zoograzbacp(i,j,k) / wombat%bac_C2N &
+                     - (wombat%zoograzbacp(i,j,k) * wombat%zooCingest * wombat%zooCassim / (122.0/16.0)) &
+                     - (wombat%zooegesbacp(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
+      zooexcrbacf1n  = wombat%zoograzbacf1(i,j,k) / wombat%bac_C2N &
+                     - (wombat%zoograzbacf1(i,j,k) * wombat%zooCingest * wombat%zooCassim / (122.0/16.0)) &
+                     - (wombat%zooegesbacf1(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
+      zooexcrbacf2n  = wombat%zoograzbacf2(i,j,k) / wombat%bac_C2N &
+                     - (wombat%zoograzbacf2(i,j,k) * wombat%zooCingest * wombat%zooCassim / (122.0/16.0)) &
+                     - (wombat%zooegesbacf2(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
       zooexcraoan  = wombat%zoograzaoa(i,j,k) / wombat%aoa_C2N &
                      - (wombat%zoograzaoa(i,j,k) * wombat%zooCingest * wombat%zooCassim / (122.0/16.0)) &
                      - (wombat%zooegesaoa(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
@@ -5776,19 +5726,19 @@ module generic_WOMBATmid
       !!!~~~ Mesozooplankton ~~~!!!
       ! Grazing function ! [1/s]
       ! normalize the prey preference kernal to reflect dietary fractions (Gentleman et al., (2003) DSRII)
-      I_denom = 1.0 / ( wombat%mprefbac1 + wombat%mprefbac2 + wombat%mprefbac3 &
+      I_denom = 1.0 / ( wombat%mprefbacp + wombat%mprefbacf1 + wombat%mprefbacf2 &
                       + wombat%mprefaoa + wombat%mprefphy + wombat%mprefdia &
                       + wombat%mprefdet + wombat%mprefzoo )
-      wombat%mesprefbac1(i,j,k) = wombat%mprefbac1 * I_denom
-      wombat%mesprefbac2(i,j,k) = wombat%mprefbac2 * I_denom
-      wombat%mesprefbac3(i,j,k) = wombat%mprefbac3 * I_denom
+      wombat%mesprefbacp(i,j,k) = wombat%mprefbacp * I_denom
+      wombat%mesprefbacf1(i,j,k) = wombat%mprefbacf1 * I_denom
+      wombat%mesprefbacf2(i,j,k) = wombat%mprefbacf2 * I_denom
       wombat%mesprefaoa(i,j,k) = wombat%mprefaoa * I_denom
       wombat%mesprefphy(i,j,k) = wombat%mprefphy * I_denom
       wombat%mesprefdia(i,j,k) = wombat%mprefdia * I_denom
       wombat%mesprefdet(i,j,k) = wombat%mprefdet * I_denom
       wombat%mesprefbdet(i,j,k) = wombat%mprefbdet * I_denom
       wombat%mesprefzoo(i,j,k) = wombat%mprefzoo * I_denom
-      zval = wombat%mesprefbac1(i,j,k) + wombat%mesprefbac2(i,j,k) + wombat%mesprefbac3(i,j,k) &
+      zval = wombat%mesprefbacp(i,j,k) + wombat%mesprefbacf1(i,j,k) + wombat%mesprefbacf2(i,j,k) &
            + wombat%mesprefaoa(i,j,k) + wombat%mesprefphy(i,j,k) + wombat%mesprefdia(i,j,k) &
            + wombat%mesprefdet(i,j,k) + wombat%mesprefbdet(i,j,k) + wombat%mesprefzoo(i,j,k)
       ! Gentleman et al. (2003) DSRII
@@ -5797,23 +5747,23 @@ module generic_WOMBATmid
       ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
       !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
       if (zval < 1e-20) then
-        wombat%mesprefbac1(i,j,k) = 1.0/9.0; wombat%mesprefbac2(i,j,k) = 1.0/9.0; wombat%mesprefbac3(i,j,k) = 1.0/9.0
+        wombat%mesprefbacp(i,j,k) = 1.0/9.0; wombat%mesprefbacf1(i,j,k) = 1.0/9.0; wombat%mesprefbacf2(i,j,k) = 1.0/9.0
         wombat%mesprefaoa(i,j,k) = 1.0/9.0; wombat%mesprefphy(i,j,k) = 1.0/9.0; wombat%mesprefdia(i,j,k) = 1.0/9.0
         wombat%mesprefdet(i,j,k) = 1.0/9.0; wombat%mesprefbdet(i,j,k) = 1.0/9.0; wombat%mesprefzoo(i,j,k) = 1.0/9.0
       else
-        wzbac1 = (wombat%mesprefbac1(i,j,k) * biobac1)**wombat%mespreyswitch
-        wzbac2 = (wombat%mesprefbac2(i,j,k) * biobac2)**wombat%mespreyswitch
-        wzbac3 = (wombat%mesprefbac3(i,j,k) * biobac3)**wombat%mespreyswitch
+        wzbacp = (wombat%mesprefbacp(i,j,k) * biobacp)**wombat%mespreyswitch
+        wzbacf1 = (wombat%mesprefbacf1(i,j,k) * biobacf1)**wombat%mespreyswitch
+        wzbacf2 = (wombat%mesprefbacf2(i,j,k) * biobacf2)**wombat%mespreyswitch
         wzaoa = (wombat%mesprefaoa(i,j,k) * bioaoa)**wombat%mespreyswitch
         wzphy = (wombat%mesprefphy(i,j,k) * biophy)**wombat%mespreyswitch
         wzdia = (wombat%mesprefdia(i,j,k) * biodia)**wombat%mespreyswitch
         wzdet = (wombat%mesprefdet(i,j,k) * biodet)**wombat%mespreyswitch
         wzbdet= (wombat%mesprefbdet(i,j,k) * biobdet)**wombat%mespreyswitch
         wzzoo = (wombat%mesprefzoo(i,j,k) * biozoo)**wombat%mespreyswitch
-        I_wzsum = 1.0 / (wzbac1 + wzbac2 + wzbac3 + wzaoa + wzphy + wzdia + wzdet + wzbdet + wzzoo + epsi)
-        wombat%mesprefbac1(i,j,k) = wzbac1 * I_wzsum
-        wombat%mesprefbac2(i,j,k) = wzbac2 * I_wzsum
-        wombat%mesprefbac3(i,j,k) = wzbac3 * I_wzsum
+        I_wzsum = 1.0 / (wzbacp + wzbacf1 + wzbacf2 + wzaoa + wzphy + wzdia + wzdet + wzbdet + wzzoo + epsi)
+        wombat%mesprefbacp(i,j,k) = wzbacp * I_wzsum
+        wombat%mesprefbacf1(i,j,k) = wzbacf1 * I_wzsum
+        wombat%mesprefbacf2(i,j,k) = wzbacf2 * I_wzsum
         wombat%mesprefaoa(i,j,k) = wzaoa * I_wzsum
         wombat%mesprefphy(i,j,k) = wzphy * I_wzsum
         wombat%mesprefdia(i,j,k) = wzdia * I_wzsum
@@ -5823,9 +5773,9 @@ module generic_WOMBATmid
       endif
       ! Compute sum of prey-specific Type-III terms to obtain grazing rate [1/s]
       !  - this avoids "perfect substitution" of prey types and aligns with reccommendations of Gentleman et al. (2003)
-      Xmes = (  wombat%mesepsbac1 * (wombat%mesprefbac1(i,j,k) * biobac1)**2 &
-              + wombat%mesepsbac2 * (wombat%mesprefbac2(i,j,k) * biobac2)**2 &
-              + wombat%mesepsbac3 * (wombat%mesprefbac3(i,j,k) * biobac3)**2 &
+      Xmes = (  wombat%mesepsbacp * (wombat%mesprefbacp(i,j,k) * biobacp)**2 &
+              + wombat%mesepsbacf1 * (wombat%mesprefbacf1(i,j,k) * biobacf1)**2 &
+              + wombat%mesepsbacf2 * (wombat%mesprefbacf2(i,j,k) * biobacf2)**2 &
               + wombat%mesepsaoa * (wombat%mesprefaoa(i,j,k) * bioaoa)**2 &
               + wombat%mesepsphy * (wombat%mesprefphy(i,j,k) * biophy)**2 &
               + wombat%mesepsdia * (wombat%mesprefdia(i,j,k) * biodia)**2 &
@@ -5834,9 +5784,9 @@ module generic_WOMBATmid
               + wombat%mesepszoo * (wombat%mesprefzoo(i,j,k) * biozoo)**2 )
       g_mes = wombat%mesgmax * fbc * Xmes / (wombat%mesgmax * fbc + Xmes)
       ! find "apparent" community epsilon (prey capture rate coefficient)
-      wombat%meseps(i,j,k) = Xmes / ( (wombat%mesprefbac1(i,j,k) * biobac1)**2 &
-                                    + (wombat%mesprefbac2(i,j,k) * biobac2)**2 &
-                                    + (wombat%mesprefbac3(i,j,k) * biobac3)**2 &
+      wombat%meseps(i,j,k) = Xmes / ( (wombat%mesprefbacp(i,j,k) * biobacp)**2 &
+                                    + (wombat%mesprefbacf1(i,j,k) * biobacf1)**2 &
+                                    + (wombat%mesprefbacf2(i,j,k) * biobacf2)**2 &
                                     + (wombat%mesprefaoa(i,j,k) * bioaoa)**2 &
                                     + (wombat%mesprefphy(i,j,k) * biophy)**2 &
                                     + (wombat%mesprefdia(i,j,k) * biodia)**2 &
@@ -5847,9 +5797,9 @@ module generic_WOMBATmid
       ! Grazing, egestion, excretion and assimilation
       if (Xmes>epsi) then
         I_Xmes = 1.0 / Xmes
-        wombat%mesgrazbac1(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsbac1*(wombat%mesprefbac1(i,j,k)*biobac1)**2 * I_Xmes ! [molC/kg/s]
-        wombat%mesgrazbac2(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsbac2*(wombat%mesprefbac2(i,j,k)*biobac2)**2 * I_Xmes ! [molC/kg/s]
-        wombat%mesgrazbac3(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsbac3*(wombat%mesprefbac3(i,j,k)*biobac3)**2 * I_Xmes ! [molC/kg/s]
+        wombat%mesgrazbacp(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsbacp*(wombat%mesprefbacp(i,j,k)*biobacp)**2 * I_Xmes ! [molC/kg/s]
+        wombat%mesgrazbacf1(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsbacf1*(wombat%mesprefbacf1(i,j,k)*biobacf1)**2 * I_Xmes ! [molC/kg/s]
+        wombat%mesgrazbacf2(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsbacf2*(wombat%mesprefbacf2(i,j,k)*biobacf2)**2 * I_Xmes ! [molC/kg/s]
         wombat%mesgrazaoa(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsaoa*(wombat%mesprefaoa(i,j,k)*bioaoa)**2 * I_Xmes ! [molC/kg/s]
         wombat%mesgrazphy(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsphy*(wombat%mesprefphy(i,j,k)*biophy)**2 * I_Xmes ! [molC/kg/s]
         wombat%mesgrazdia(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsdia*(wombat%mesprefdia(i,j,k)*biodia)**2 * I_Xmes ! [molC/kg/s]
@@ -5857,9 +5807,9 @@ module generic_WOMBATmid
         wombat%mesgrazbdet(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepsbdet*(wombat%mesprefbdet(i,j,k)*biobdet)**2 * I_Xmes ! [molC/kg/s]
         wombat%mesgrazzoo(i,j,k) = g_mes * wombat%f_mes(i,j,k) * wombat%mesepszoo*(wombat%mesprefzoo(i,j,k)*biozoo)**2 * I_Xmes ! [molC/kg/s]
       else
-        wombat%mesgrazbac1(i,j,k) = 0.0
-        wombat%mesgrazbac2(i,j,k) = 0.0
-        wombat%mesgrazbac3(i,j,k) = 0.0
+        wombat%mesgrazbacp(i,j,k) = 0.0
+        wombat%mesgrazbacf1(i,j,k) = 0.0
+        wombat%mesgrazbacf2(i,j,k) = 0.0
         wombat%mesgrazaoa(i,j,k) = 0.0
         wombat%mesgrazphy(i,j,k) = 0.0
         wombat%mesgrazdia(i,j,k) = 0.0
@@ -5870,60 +5820,60 @@ module generic_WOMBATmid
       ! We follow Le Mezo & Galbraith (2021) L&O - The fecal iron pump: Global impact of animals on the iron stoichiometry...
       !  - ingestion, assimilation and excretion of carbon and iron by zooplankton are calculated separately
       !  - the idea is to enrich fecal pellets in iron compared to carbon
-      wombat%mesexcrbac1(i,j,k) = wombat%mesgrazbac1(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
-      wombat%mesexcrbac2(i,j,k) = wombat%mesgrazbac2(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
-      wombat%mesexcrbac3(i,j,k) = wombat%mesgrazbac3(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
+      wombat%mesexcrbacp(i,j,k) = wombat%mesgrazbacp(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
+      wombat%mesexcrbacf1(i,j,k) = wombat%mesgrazbacf1(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
+      wombat%mesexcrbacf2(i,j,k) = wombat%mesgrazbacf2(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
       wombat%mesexcraoa(i,j,k) = wombat%mesgrazaoa(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
       wombat%mesexcrphy(i,j,k) = wombat%mesgrazphy(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
       wombat%mesexcrdia(i,j,k) = wombat%mesgrazdia(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
       wombat%mesexcrdet(i,j,k) = wombat%mesgrazdet(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
       wombat%mesexcrbdet(i,j,k) = wombat%mesgrazbdet(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
       wombat%mesexcrzoo(i,j,k) = wombat%mesgrazzoo(i,j,k) * wombat%mesCingest*(1.0 - wombat%mesCassim)
-      wombat%mesegesbac1(i,j,k) = wombat%mesgrazbac1(i,j,k) * (1.0 - wombat%mesCingest)
-      wombat%mesegesbac2(i,j,k) = wombat%mesgrazbac2(i,j,k) * (1.0 - wombat%mesCingest)
-      wombat%mesegesbac3(i,j,k) = wombat%mesgrazbac3(i,j,k) * (1.0 - wombat%mesCingest)
+      wombat%mesegesbacp(i,j,k) = wombat%mesgrazbacp(i,j,k) * (1.0 - wombat%mesCingest)
+      wombat%mesegesbacf1(i,j,k) = wombat%mesgrazbacf1(i,j,k) * (1.0 - wombat%mesCingest)
+      wombat%mesegesbacf2(i,j,k) = wombat%mesgrazbacf2(i,j,k) * (1.0 - wombat%mesCingest)
       wombat%mesegesaoa(i,j,k) = wombat%mesgrazaoa(i,j,k) * (1.0 - wombat%mesCingest)
       wombat%mesegesphy(i,j,k) = wombat%mesgrazphy(i,j,k) * (1.0 - wombat%mesCingest)
       wombat%mesegesdia(i,j,k) = wombat%mesgrazdia(i,j,k) * (1.0 - wombat%mesCingest)
       wombat%mesegesdet(i,j,k) = wombat%mesgrazdet(i,j,k) * (1.0 - wombat%mesCingest)
       wombat%mesegesbdet(i,j,k) = wombat%mesgrazbdet(i,j,k) * (1.0 - wombat%mesCingest)
       wombat%mesegeszoo(i,j,k) = wombat%mesgrazzoo(i,j,k) * (1.0 - wombat%mesCingest)
-      mesegesbac1fe = wombat%mesgrazbac1(i,j,k) / wombat%bac1_C2Fe * (1.0-wombat%mesFeingest)
-      mesegesbac2fe = wombat%mesgrazbac2(i,j,k) / wombat%bac2_C2Fe * (1.0-wombat%mesFeingest)
-      mesegesbac3fe = wombat%mesgrazbac3(i,j,k) / wombat%bac3_C2Fe * (1.0-wombat%mesFeingest)
+      mesegesbacpfe = wombat%mesgrazbacp(i,j,k) / wombat%bac_C2Fe * (1.0-wombat%mesFeingest)
+      mesegesbacf1fe = wombat%mesgrazbacf1(i,j,k) / wombat%bac_C2Fe * (1.0-wombat%mesFeingest)
+      mesegesbacf2fe = wombat%mesgrazbacf2(i,j,k) / wombat%bac_C2Fe * (1.0-wombat%mesFeingest)
       mesegesaoafe = wombat%mesgrazaoa(i,j,k) / wombat%aoa_C2Fe * (1.0-wombat%mesFeingest)
       mesegesphyfe = wombat%mesgrazphy(i,j,k) * phy_Fe2C * (1.0-wombat%mesFeingest)
       mesegesdiafe = wombat%mesgrazdia(i,j,k) * dia_Fe2C * (1.0-wombat%mesFeingest)
       mesegesdetfe = wombat%mesgrazdet(i,j,k) * det_Fe2C * (1.0-wombat%mesFeingest)
       mesegesbdetfe = wombat%mesgrazbdet(i,j,k) * bdet_Fe2C * (1.0-wombat%mesFeingest)
       mesegeszoofe = wombat%mesgrazzoo(i,j,k) * zoo_Fe2C * (1.0-wombat%mesFeingest)
-      mesassibac1fe = wombat%mesgrazbac1(i,j,k) / wombat%bac1_C2Fe * wombat%mesFeingest*wombat%mesFeassim
-      mesassibac2fe = wombat%mesgrazbac2(i,j,k) / wombat%bac2_C2Fe * wombat%mesFeingest*wombat%mesFeassim
-      mesassibac3fe = wombat%mesgrazbac3(i,j,k) / wombat%bac3_C2Fe * wombat%mesFeingest*wombat%mesFeassim
+      mesassibacpfe = wombat%mesgrazbacp(i,j,k) / wombat%bac_C2Fe * wombat%mesFeingest*wombat%mesFeassim
+      mesassibacf1fe = wombat%mesgrazbacf1(i,j,k) / wombat%bac_C2Fe * wombat%mesFeingest*wombat%mesFeassim
+      mesassibacf2fe = wombat%mesgrazbacf2(i,j,k) / wombat%bac_C2Fe * wombat%mesFeingest*wombat%mesFeassim
       mesassiaoafe = wombat%mesgrazaoa(i,j,k) / wombat%aoa_C2Fe * wombat%mesFeingest*wombat%mesFeassim
       mesassiphyfe = wombat%mesgrazphy(i,j,k) * phy_Fe2C * wombat%mesFeingest*wombat%mesFeassim
       mesassidiafe = wombat%mesgrazdia(i,j,k) * dia_Fe2C * wombat%mesFeingest*wombat%mesFeassim
       mesassidetfe = wombat%mesgrazdet(i,j,k) * det_Fe2C * wombat%mesFeingest*wombat%mesFeassim
       mesassibdetfe = wombat%mesgrazbdet(i,j,k) * bdet_Fe2C * wombat%mesFeingest*wombat%mesFeassim
       mesassizoofe = wombat%mesgrazzoo(i,j,k) * zoo_Fe2C * wombat%mesFeingest*wombat%mesFeassim
-      mesexcrbac1fe = wombat%mesgrazbac1(i,j,k) / wombat%bac1_C2Fe * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
-      mesexcrbac2fe = wombat%mesgrazbac2(i,j,k) / wombat%bac2_C2Fe * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
-      mesexcrbac3fe = wombat%mesgrazbac3(i,j,k) / wombat%bac3_C2Fe * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
+      mesexcrbacpfe = wombat%mesgrazbacp(i,j,k) / wombat%bac_C2Fe * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
+      mesexcrbacf1fe = wombat%mesgrazbacf1(i,j,k) / wombat%bac_C2Fe * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
+      mesexcrbacf2fe = wombat%mesgrazbacf2(i,j,k) / wombat%bac_C2Fe * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
       mesexcraoafe = wombat%mesgrazaoa(i,j,k) / wombat%aoa_C2Fe * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
       mesexcrphyfe = wombat%mesgrazphy(i,j,k) * phy_Fe2C * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
       mesexcrdiafe = wombat%mesgrazdia(i,j,k) * dia_Fe2C * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
       mesexcrdetfe = wombat%mesgrazdet(i,j,k) * det_Fe2C * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
       mesexcrbdetfe = wombat%mesgrazbdet(i,j,k) * bdet_Fe2C * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
       mesexcrzoofe = wombat%mesgrazzoo(i,j,k) * zoo_Fe2C * wombat%mesFeingest*(1.0 - wombat%mesFeassim)
-      mesexcrbac1n  = wombat%mesgrazbac1(i,j,k) / wombat%bac1_C2N &
-                     - (wombat%mesgrazbac1(i,j,k) * wombat%mesCingest * wombat%mesCassim / (122.0/16.0)) &
-                     - (wombat%mesegesbac1(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
-      mesexcrbac2n  = wombat%mesgrazbac2(i,j,k) / wombat%bac2_C2N &
-                     - (wombat%mesgrazbac2(i,j,k) * wombat%mesCingest * wombat%mesCassim / (122.0/16.0)) &
-                     - (wombat%mesegesbac2(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
-      mesexcrbac3n  = wombat%mesgrazbac3(i,j,k) / wombat%bac3_C2N &
-                     - (wombat%mesgrazbac3(i,j,k) * wombat%mesCingest * wombat%mesCassim / (122.0/16.0)) &
-                     - (wombat%mesegesbac3(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
+      mesexcrbacpn  = wombat%mesgrazbacp(i,j,k) / wombat%bac_C2N &
+                     - (wombat%mesgrazbacp(i,j,k) * wombat%mesCingest * wombat%mesCassim / (122.0/16.0)) &
+                     - (wombat%mesegesbacp(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
+      mesexcrbacf1n  = wombat%mesgrazbacf1(i,j,k) / wombat%bac_C2N &
+                     - (wombat%mesgrazbacf1(i,j,k) * wombat%mesCingest * wombat%mesCassim / (122.0/16.0)) &
+                     - (wombat%mesegesbacf1(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
+      mesexcrbacf2n  = wombat%mesgrazbacf2(i,j,k) / wombat%bac_C2N &
+                     - (wombat%mesgrazbacf2(i,j,k) * wombat%mesCingest * wombat%mesCassim / (122.0/16.0)) &
+                     - (wombat%mesegesbacf2(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
       mesexcraoan  = wombat%mesgrazaoa(i,j,k) / wombat%aoa_C2N &
                      - (wombat%mesgrazaoa(i,j,k) * wombat%mesCingest * wombat%mesCassim / (122.0/16.0)) &
                      - (wombat%mesegesaoa(i,j,k) / (122.0/16.0)) ! [molN/kg/s]
@@ -5967,181 +5917,182 @@ module generic_WOMBATmid
 
       ! Find the relative fractional availability of DOM for each bacterial group
       !  We use the prefactor (1/(sigma*sqrt(2*pi))) to ensure that specialists have an advantage when at their optimal NOSC
-      f2_doc = 1.0 / (wombat%bac2_nosc_sig * 2.5066) * exp( -0.5 * ((nosc - wombat%bac2_nosc_opt)/wombat%bac2_nosc_sig)**2 )
-      f3_doc = 1.0 / (wombat%bac3_nosc_sig * 2.5066) * exp( -0.5 * ((nosc - wombat%bac3_nosc_opt)/wombat%bac3_nosc_sig)**2 )
+      f2_doc = 1.0 / (wombat%bacf1_nosc_sig * 2.5066) * exp( -0.5 * ((nosc - wombat%bacf1_nosc_opt)/wombat%bacf1_nosc_sig)**2 )
+      f3_doc = 1.0 / (wombat%bacf2_nosc_sig * 2.5066) * exp( -0.5 * ((nosc - wombat%bacf2_nosc_opt)/wombat%bacf2_nosc_sig)**2 )
       m2_doc = f2_doc / (f2_doc + f3_doc + epsi) * biodoc
       m3_doc = f3_doc / (f2_doc + f3_doc + epsi) * biodoc
 
-      ! From the base biomass yield on N, compute yields for O2 and anaerobic growth on alternative electron acceptors and DOC
+      ! Compute carbon-normalized electron contents, biomass yields and source-sink stoichiometric coefficients
       !  [ Zakem et al., 2020 ISME; Buchanan et al., 2025 Science]
       !  1. Find electron potential of the bacterial biomass and DOM per carbon atom
       e_pom = max(0.0, 4.0 + 1.65 - 2.0*0.4 - 3.0*16./122. )  ! [Anderson et al., 1995]
+      e_pomp = max(0.0, 4.0 + 1.65*wombat%Hox_fac - 2.0*0.4*wombat%Oox_fac - 3.0*16./122.*wombat%Nox_fac )
       e_dom = max(0.0, 4.0 + dom_H2C - 2.0*dom_O2C - 3.0*dom_N2C )  ! [Anderson et al., 1995]
       e_domp = max(0.0, 4.0 + dom_H2C * wombat%Hox_fac - 2.0 * dom_O2C * wombat%Oox_fac - 3.0 * dom_N2C * wombat%Nox_fac ) ! Partially oxidized product
-      e_bac1 = 4.0 + 1.4 - 2.0*0.4 - 3.0/wombat%bac1_C2N ! [Zimmerman et al., 2014]
-      e_bac2 = 4.0 + 1.4 - 2.0*0.4 - 3.0/wombat%bac2_C2N  ! [Zimmerman et al., 2014]
-      e_bac3 = 4.0 + 1.4 - 2.0*0.4 - 3.0/wombat%bac3_C2N  ! [Zimmerman et al., 2014]
+      e_bac = 4.0 + 1.4 - 2.0*0.4 - 3.0/wombat%bac_C2N ! [Zimmerman et al., 2014]
       ! Determine the residual electrons remaining after partial oxidation
-      e1_res = max(0.0, e_pom - wombat%bac1_alpha * e_pom)
-      e2_res = max(0.0, e_dom - wombat%bac2_alpha * e_domp)
-      e3_res = max(0.0, e_dom - wombat%bac3_alpha * e_domp)
+      e1_res = max(0.0, e_pom - wombat%bacp_alpha * e_pomp)
+      e2_res = max(0.0, e_dom - wombat%bacf1_alpha * e_domp)
+      e3_res = max(0.0, e_dom - wombat%bacf2_alpha * e_domp)
 
       ! Determine the biomass yield in terms of carbon (mol C-biomass per mol DOC consumed)
-      wombat%bac1_ypoc(i,j,k) = min(1.0 - wombat%bac1_alpha, wombat%bac1_fele * e1_res/e_bac1)
-      wombat%bac2_ydoc(i,j,k) = min(1.0 - wombat%bac2_alpha, wombat%bac2_fele * e2_res/e_bac2)
-      wombat%bac3_ydoc(i,j,k) = min(1.0 - wombat%bac3_alpha, wombat%bac3_fele * e3_res/e_bac3)
+      wombat%bacp_ypoc(i,j,k) = min(1.0 - wombat%bacp_alpha, wombat%bacp_fele * e1_res/e_bac)
+      wombat%bacf1_ydoc(i,j,k) = min(1.0 - wombat%bacf1_alpha, wombat%bacf1_fele * e2_res/e_bac)
+      wombat%bacf2_ydoc(i,j,k) = min(1.0 - wombat%bacf2_alpha, wombat%bacf2_fele * e3_res/e_bac)
       ! Determine all other yields during bacterial growth
-      bac1_cpoc = 1.0 / (wombat%bac1_ypoc(i,j,k) + epsi) ! The amount of POC consumed per mol of bacterial C-biomass produced
-      bac2_cdoc = 1.0 / (wombat%bac2_ydoc(i,j,k) + epsi) ! The amount of DOC consumed per mol of bacterial C-biomass produced
-      bac3_cdoc = 1.0 / (wombat%bac3_ydoc(i,j,k) + epsi) ! The amount of DOC consumed per mol of bacterial C-biomass produced
-      bac1_coxy = e1_res * (1.0 - wombat%bac1_fele)/4.0 * bac1_cpoc ! The amount of oxygen consumed per mol of C-biomass produced
-      bac2_coxy = e2_res * (1.0 - wombat%bac2_fele)/4.0 * bac2_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
-      bac3_coxy = e3_res * (1.0 - wombat%bac3_fele)/4.0 * bac3_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
-      bac1_pdoc = wombat%bac1_alpha * bac1_cpoc ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bac2_pdoc = wombat%bac2_alpha * bac2_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bac3_pdoc = wombat%bac3_alpha * bac3_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bac1_pco2 = (1.0 - wombat%bac1_alpha - wombat%bac1_ypoc(i,j,k)) * bac1_cpoc ! The amount of CO2 produced per mol of C-biomass produced
-      bac2_pco2 = (1.0 - wombat%bac2_alpha - wombat%bac2_ydoc(i,j,k)) * bac2_cdoc ! The amount of CO2 produced per mol of C-biomass produced
-      bac3_pco2 = (1.0 - wombat%bac3_alpha - wombat%bac3_ydoc(i,j,k)) * bac3_cdoc ! The amount of CO2 produced per mol of C-biomass produced
-      bac1_pnh4 = (16./122. - wombat%bac1_alpha * 16./122. &
-                   - 1.0/wombat%bac1_C2N * wombat%bac1_ypoc(i,j,k)) * bac1_cpoc ! The amount of NH4 produced per mol of C-biomass produced
-      bac2_pnh4 = (dom_N2C - wombat%bac2_alpha * dom_N2C*wombat%Nox_fac &
-                   - 1.0/wombat%bac2_C2N * wombat%bac2_ydoc(i,j,k)) * bac2_cdoc ! The amount of NH4 produced per mol of C-biomass produced
-      bac3_pnh4 = (dom_N2C - wombat%bac3_alpha * dom_N2C*wombat%Nox_fac &
-                   - 1.0/wombat%bac3_C2N * wombat%bac3_ydoc(i,j,k)) * bac3_cdoc ! The amount of NH4 produced per mol of C-biomass produced
+      bacp_cpoc = 0.0; bacf1_cdoc = 0.0; bacf2_cdoc = 0.0 ! reinitialise these values for safety
+      if (wombat%bacp_ypoc(i,j,k) > 0.0) bacp_cpoc = 1.0 / wombat%bacp_ypoc(i,j,k) ! The amount of POC consumed per mol of bacterial C-biomass produced
+      if (wombat%bacf1_ydoc(i,j,k) > 0.0) bacf1_cdoc = 1.0 / wombat%bacf1_ydoc(i,j,k) ! The amount of DOC consumed per mol of bacterial C-biomass produced
+      if (wombat%bacf2_ydoc(i,j,k) > 0.0) bacf2_cdoc = 1.0 / wombat%bacf2_ydoc(i,j,k) ! The amount of DOC consumed per mol of bacterial C-biomass produced
+      bacp_coxy = max(0.0, e1_res - wombat%bacp_ypoc(i,j,k)*e_bac)/4.0 * bacp_cpoc ! The amount of oxygen consumed per mol of C-biomass produced
+      bacf1_coxy = max(0.0, e2_res - wombat%bacf1_ydoc(i,j,k)*e_bac)/4.0 * bacf1_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
+      bacf2_coxy = max(0.0, e3_res - wombat%bacf2_ydoc(i,j,k)*e_bac)/4.0 * bacf2_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
+      bacp_pdoc = wombat%bacp_alpha * bacp_cpoc ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf1_pdoc = wombat%bacf1_alpha * bacf1_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf2_pdoc = wombat%bacf2_alpha * bacf2_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacp_pco2 = (1.0 - wombat%bacp_alpha - wombat%bacp_ypoc(i,j,k)) * bacp_cpoc ! The amount of CO2 produced per mol of C-biomass produced
+      bacf1_pco2 = (1.0 - wombat%bacf1_alpha - wombat%bacf1_ydoc(i,j,k)) * bacf1_cdoc ! The amount of CO2 produced per mol of C-biomass produced
+      bacf2_pco2 = (1.0 - wombat%bacf2_alpha - wombat%bacf2_ydoc(i,j,k)) * bacf2_cdoc ! The amount of CO2 produced per mol of C-biomass produced
+      bacp_pnh4 = (16./122. - wombat%bacp_alpha * 16./122.*wombat%Nox_fac &
+                   - 1.0/wombat%bac_C2N * wombat%bacp_ypoc(i,j,k)) * bacp_cpoc ! The amount of NH4 produced per mol of C-biomass produced
+      bacf1_pnh4 = (dom_N2C - wombat%bacf1_alpha * dom_N2C*wombat%Nox_fac &
+                   - 1.0/wombat%bac_C2N * wombat%bacf1_ydoc(i,j,k)) * bacf1_cdoc ! The amount of NH4 produced per mol of C-biomass produced
+      bacf2_pnh4 = (dom_N2C - wombat%bacf2_alpha * dom_N2C*wombat%Nox_fac &
+                   - 1.0/wombat%bac_C2N * wombat%bacf2_ydoc(i,j,k)) * bacf2_cdoc ! The amount of NH4 produced per mol of C-biomass produced
 
       ! Save the respiratory quotient as a diagnostic
-      wombat%bac1_rq(i,j,k) = bac1_pco2 / (bac1_coxy + epsi)
-      wombat%bac2_rq(i,j,k) = bac2_pco2 / (bac2_coxy + epsi)
-      wombat%bac3_rq(i,j,k) = bac3_pco2 / (bac3_coxy + epsi)
+      wombat%bacp_rq(i,j,k) = (bacp_pco2 + epsi) / (bacp_coxy + epsi)
+      wombat%bacf1_rq(i,j,k) = (bacf1_pco2 + epsi) / (bacf1_coxy + epsi)
+      wombat%bacf2_rq(i,j,k) = (bacf2_pco2 + epsi) / (bacf2_coxy + epsi)
 
-      ! Consider ananerobic conditions
-      bac1_ypoc_ana = min(1.0 - wombat%bac1_alpha, wombat%bac1_fele * 0.9 * e1_res/e_bac1)
-      bac2_ydoc_ana = min(1.0 - wombat%bac2_alpha, wombat%bac2_fele * 0.9 * e2_res/e_bac2)
-      bac3_ydoc_ana = min(1.0 - wombat%bac3_alpha, wombat%bac3_fele * 0.9 * e3_res/e_bac3)
-      bac1_cpoc_ana = 1.0 / (bac1_ypoc_ana + epsi) ! The amount of POC consumed per mol of bacterial C-biomass produced
-      bac2_cdoc_ana = 1.0 / (bac2_ydoc_ana + epsi) ! The amount of DOC consumed per mol of bacterial C-biomass produced
-      bac3_cdoc_ana = 1.0 / (bac3_ydoc_ana + epsi) ! The amount of DOC consumed per mol of bacterial C-biomass produced
-      bac1_cno3_ana = e1_res * (1.0 - wombat%bac1_fele * 0.9)/5.0 * bac1_cpoc_ana ! The amount of N (NO3 --> N2) consumed per mol of C-biomass produced
-      bac2_cno3_ana = e2_res * (1.0 - wombat%bac2_fele * 0.9)/4.0 * bac2_cdoc_ana ! The amount of N (NO3 --> N2O) molecules consumed per mol of C-biomass produced
-      bac3_cn2o_ana = e3_res * (1.0 - wombat%bac3_fele * 0.9)/2.0 * bac3_cdoc_ana ! The amount of N2O molecules consumed per mol of C-biomass produced
-      bac1_pdoc_ana = wombat%bac1_alpha * bac1_cpoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bac2_pdoc_ana = wombat%bac2_alpha * bac2_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bac3_pdoc_ana = wombat%bac3_alpha * bac3_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bac1_pco2_ana = (1.0 - wombat%bac1_alpha - bac1_ypoc_ana) * bac1_cpoc_ana ! The amount of CO2 produced per mol of C-biomass produced
-      bac2_pco2_ana = (1.0 - wombat%bac2_alpha - bac2_ydoc_ana) * bac2_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
-      bac3_pco2_ana = (1.0 - wombat%bac3_alpha - bac3_ydoc_ana) * bac3_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
-      bac1_pnh4_ana = (16./122. - wombat%bac1_alpha * 16./122. &
-                       - 1.0/wombat%bac1_C2N * bac1_ypoc_ana) * bac1_cpoc_ana ! The amount of NH4 produced per mol of C-biomass produced
-      bac2_pnh4_ana = (dom_N2C - wombat%bac2_alpha * dom_N2C*wombat%Nox_fac &
-                       - 1.0/wombat%bac2_C2N * bac2_ydoc_ana) * bac2_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
-      bac3_pnh4_ana = (dom_N2C - wombat%bac3_alpha * dom_N2C*wombat%Nox_fac &
-                       - 1.0/wombat%bac3_C2N * bac3_ydoc_ana) * bac3_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
+      ! Consider anaerobic conditions
+      bacp_ypoc_ana = min(1.0 - wombat%bacp_alpha, wombat%bacp_fele * 0.9 * e1_res/e_bac)
+      bacf1_ydoc_ana = min(1.0 - wombat%bacf1_alpha, wombat%bacf1_fele * 0.9 * e2_res/e_bac)
+      bacf2_ydoc_ana = min(1.0 - wombat%bacf2_alpha, wombat%bacf2_fele * 0.9 * e3_res/e_bac)
+      bacp_cpoc_ana = 0.0; bacf1_cdoc_ana = 0.0; bacf2_cdoc_ana = 0.0 ! reinitialise these values for safety
+      if (bacp_ypoc_ana > 0.0) bacp_cpoc_ana = 1.0 / bacp_ypoc_ana ! The amount of POC consumed per mol of bacterial C-biomass produced
+      if (bacf1_ydoc_ana > 0.0) bacf1_cdoc_ana = 1.0 / bacf1_ydoc_ana ! The amount of DOC consumed per mol of bacterial C-biomass produced
+      if (bacf2_ydoc_ana > 0.0) bacf2_cdoc_ana = 1.0 / bacf2_ydoc_ana ! The amount of DOC consumed per mol of bacterial C-biomass produced
+      bacp_cno3_ana = max(0.0, e1_res - bacp_ypoc_ana*e_bac)/5.0 * bacp_cpoc_ana ! The amount of N (NO3 --> N2) consumed per mol of C-biomass produced
+      bacf1_cno3_ana = max(0.0, e2_res * bacf1_ydoc_ana*e_bac)/4.0 * bacf1_cdoc_ana ! The amount of N (NO3 --> N2O) molecules consumed per mol of C-biomass produced
+      bacf2_cn2o_ana = max(0.0, e3_res * bacf2_ydoc_ana*e_bac)/2.0 * bacf2_cdoc_ana ! The amount of N2O molecules consumed per mol of C-biomass produced
+      bacp_pdoc_ana = wombat%bacp_alpha * bacp_cpoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf1_pdoc_ana = wombat%bacf1_alpha * bacf1_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf2_pdoc_ana = wombat%bacf2_alpha * bacf2_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacp_pco2_ana = (1.0 - wombat%bacp_alpha - bacp_ypoc_ana) * bacp_cpoc_ana ! The amount of CO2 produced per mol of C-biomass produced
+      bacf1_pco2_ana = (1.0 - wombat%bacf1_alpha - bacf1_ydoc_ana) * bacf1_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
+      bacf2_pco2_ana = (1.0 - wombat%bacf2_alpha - bacf2_ydoc_ana) * bacf2_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
+      bacp_pnh4_ana = (16./122. - wombat%bacp_alpha * 16./122.*wombat%Nox_fac &
+                       - 1.0/wombat%bac_C2N * bacp_ypoc_ana) * bacp_cpoc_ana ! The amount of NH4 produced per mol of C-biomass produced
+      bacf1_pnh4_ana = (dom_N2C - wombat%bacf1_alpha * dom_N2C*wombat%Nox_fac &
+                       - 1.0/wombat%bac_C2N * bacf1_ydoc_ana) * bacf1_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
+      bacf2_pnh4_ana = (dom_N2C - wombat%bacf2_alpha * dom_N2C*wombat%Nox_fac &
+                       - 1.0/wombat%bac_C2N * bacf2_ydoc_ana) * bacf2_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
 
-      !!!~~~ Bacterial type #1 ~~~!!!
+      !!!~~~ Particle-associated bacteria ~~~!!!
       ! Aerobic growth
       zval = biodet + biobdet
-      bac_Voxy = biooxy * wombat%bac1_poxy ! Uptake of O2 (i.e., O2-limited growth)
-      bac_VdFe = wombat%bac1_Vmax_dfe * biofer / (biofer + wombat%bac1_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
-      bac_Voc = wombat%bac1_Vmax_poc * zval / (zval + wombat%bac1_kpoc + epsi) ! Uptake of POC (i.e., POC-limited growth)
-      bac_gEA = bac_Voxy / (bac1_coxy  + epsi)! Growth of C biomass due to electron acceptor (O2) uptake
-      bac_gFe = bac_VdFe * wombat%bac1_C2Fe ! Growth of C biomass due to Fe uptake
-      bac_gC = bac_Voc * wombat%bac1_ypoc(i,j,k) ! Growth of C biomass due to POC uptake
+      bac_Voxy = biooxy * wombat%bacp_poxy ! Uptake of O2 (i.e., O2-limited growth)
+      bac_VdFe = wombat%bacp_Vmax_dfe * biofer / (biofer + wombat%bacp_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
+      bac_Voc = wombat%bacp_Vmax_poc * zval / (zval + wombat%bacp_kpoc + epsi) ! Uptake of POC (i.e., POC-limited growth)
+      bac_gEA = bac_Voxy / (bacp_coxy  + epsi)! Growth of C biomass due to electron acceptor (O2) uptake
+      bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gC = bac_Voc * wombat%bacp_ypoc(i,j,k) ! Growth of C biomass due to POC uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
-      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%bac1_ffelim(i,j,k) = 1.0
+      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%bacp_ffelim(i,j,k) = 1.0
       ! Anaerobic growth
-      bac_Vno3 = wombat%bac1_Vmax_no3 * biono3 / (biono3 + wombat%bac1_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
-      bac_gEA = bac_Vno3 / (bac1_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
-      bac_gFe = bac_VdFe * wombat%bac1_C2Fe ! Growth of C biomass due to Fe uptake
-      bac_gC = bac_Voc * bac1_ypoc_ana ! Growth of C biomass due to POC uptake
+      bac_Vno3 = wombat%bacp_Vmax_no3 * biono3 / (biono3 + wombat%bacp_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
+      bac_gEA = bac_Vno3 / (bacp_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
+      bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gC = bac_Voc * bacp_ypoc_ana ! Growth of C biomass due to POC uptake
       bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
       ! Save occurance of anaerobic growth to array
-      if (bac_muana>bac_muaer) wombat%bac1_fanaer(i,j,k) = 1.0
+      if (bac_muana>bac_muaer) wombat%bacp_fanaer(i,j,k) = 1.0
       ! Take the maximum growth rate as the realised growth rate
-      wombat%bac1_mu(i,j,k) = max(bac_muaer, bac_muana)
+      wombat%bacp_mu(i,j,k) = max(bac_muaer, bac_muana)
 
-      !!!~~~ Bacterial type #2 ~~~!!!
+      !!!~~~ Free-living bacterial type #1 ~~~!!!
       ! Aerobic growth
-      bac_Voxy = biooxy * wombat%bac2_poxy ! Uptake of O2 (i.e., O2-limited growth)
-      bac_VdFe = wombat%bac2_Vmax_dfe * biofer / (biofer + wombat%bac2_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
-      bac_Voc = wombat%bac2_Vmax_doc * m2_doc / (m2_doc + wombat%bac2_kdoc + epsi) ! Uptake of DOC (i.e., DOC-limited growth)
-      bac_gEA = bac_Voxy / (bac2_coxy + epsi) ! Growth of C biomass due to electron acceptor (O2) uptake
-      bac_gFe = bac_VdFe * wombat%bac2_C2Fe ! Growth of C biomass due to Fe uptake
-      bac_gC = bac_Voc * wombat%bac2_ydoc(i,j,k) ! Growth of C biomass due to DOC uptake
+      bac_Voxy = biooxy * wombat%bacf1_poxy ! Uptake of O2 (i.e., O2-limited growth)
+      bac_VdFe = wombat%bacf1_Vmax_dfe * biofer / (biofer + wombat%bacf1_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
+      bac_Voc = wombat%bacf1_Vmax_doc * m2_doc / (m2_doc + wombat%bacf1_kdoc + epsi) ! Uptake of DOC (i.e., DOC-limited growth)
+      bac_gEA = bac_Voxy / (bacf1_coxy + epsi) ! Growth of C biomass due to electron acceptor (O2) uptake
+      bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gC = bac_Voc * wombat%bacf1_ydoc(i,j,k) ! Growth of C biomass due to DOC uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
-      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%bac2_ffelim(i,j,k) = 1.0
+      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%bacf1_ffelim(i,j,k) = 1.0
       ! Anaerobic growth
-      bac_Vno3 = wombat%bac2_Vmax_no3 * biono3 / (biono3 + wombat%bac2_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
-      bac_gEA = bac_Vno3 / (bac2_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
-      bac_gFe = bac_VdFe * wombat%bac2_C2Fe ! Growth of C biomass due to Fe uptake
-      bac_gC = bac_Voc * bac2_ydoc_ana ! Growth of C biomass due to DOC uptake
+      bac_Vno3 = wombat%bacf1_Vmax_no3 * biono3 / (biono3 + wombat%bacf1_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
+      bac_gEA = bac_Vno3 / (bacf1_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
+      bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gC = bac_Voc * bacf1_ydoc_ana ! Growth of C biomass due to DOC uptake
       bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
       ! Save occurance of anaerobic growth to array
-      if (bac_muana>bac_muaer) wombat%bac2_fanaer(i,j,k) = 1.0
+      if (bac_muana>bac_muaer) wombat%bacf1_fanaer(i,j,k) = 1.0
       ! Take the maximum growth rate as the realised growth rate
-      wombat%bac2_mu(i,j,k) = max(bac_muaer, bac_muana)
+      wombat%bacf1_mu(i,j,k) = max(bac_muaer, bac_muana)
 
-      !!!~~~ Bacterial type #3 ~~~!!!
+      !!!~~~ Free-living bacterial type #2 ~~~!!!
       ! Aerobic growth
-      bac_Voxy = biooxy * wombat%bac3_poxy ! Uptake of O2 (i.e., O2-limited growth)
-      bac_VdFe = wombat%bac3_Vmax_dfe * biofer / (biofer + wombat%bac3_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
-      bac_Voc = wombat%bac3_Vmax_doc * m3_doc / (m3_doc + wombat%bac3_kdoc + epsi) ! Uptake of DOC (i.e., DOC-limited growth)
-      bac_gEA = bac_Voxy / (bac3_coxy + epsi) ! Growth of C biomass due to electron acceptor (O2) uptake
-      bac_gFe = bac_VdFe * wombat%bac3_C2Fe ! Growth of C biomass due to Fe uptake
-      bac_gC = bac_Voc * wombat%bac3_ydoc(i,j,k) ! Growth of C biomass due to DOC uptake
+      bac_Voxy = biooxy * wombat%bacf2_poxy ! Uptake of O2 (i.e., O2-limited growth)
+      bac_VdFe = wombat%bacf2_Vmax_dfe * biofer / (biofer + wombat%bacf2_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
+      bac_Voc = wombat%bacf2_Vmax_doc * m3_doc / (m3_doc + wombat%bacf2_kdoc + epsi) ! Uptake of DOC (i.e., DOC-limited growth)
+      bac_gEA = bac_Voxy / (bacf2_coxy + epsi) ! Growth of C biomass due to electron acceptor (O2) uptake
+      bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gC = bac_Voc * wombat%bacf2_ydoc(i,j,k) ! Growth of C biomass due to DOC uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
-      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%bac3_ffelim(i,j,k) = 1.0
+      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%bacf2_ffelim(i,j,k) = 1.0
       ! Anaerobic growth
-      bac_Vn2o = bion2o * wombat%bac3_pn2o
-      bac_gEA = bac_Vn2o / (bac3_cn2o_ana + epsi) ! Growth of C biomass due to electron acceptor (N2O) uptake
-      bac_gFe = bac_VdFe * wombat%bac3_C2Fe ! Growth of C biomass due to Fe uptake
-      bac_gC = bac_Voc * bac3_ydoc_ana ! Growth of C biomass due to DOC uptake
+      bac_Vn2o = bion2o * wombat%bacf2_pn2o
+      bac_gEA = bac_Vn2o / (bacf2_cn2o_ana + epsi) ! Growth of C biomass due to electron acceptor (N2O) uptake
+      bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gC = bac_Voc * bacf2_ydoc_ana ! Growth of C biomass due to DOC uptake
       bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
       ! Save occurance of anaerobic growth to array
-      if (bac_muana>bac_muaer) wombat%bac3_fanaer(i,j,k) = 1.0
+      if (bac_muana>bac_muaer) wombat%bacf2_fanaer(i,j,k) = 1.0
       ! Take the maximum growth rate as the realised growth rate
-      wombat%bac3_mu(i,j,k) = max(bac_muaer, bac_muana)
+      wombat%bacf2_mu(i,j,k) = max(bac_muaer, bac_muana)
 
       ! Sources and sinks due to heterotrophic bacterial activity
-      wombat%bac1grow(i,j,k) = wombat%bac1_mu(i,j,k) * wombat%f_bac1(i,j,k) ! [molC/kg/s]
-      wombat%bac2grow(i,j,k) = wombat%bac2_mu(i,j,k) * wombat%f_bac2(i,j,k) ! [molC/kg/s]
-      wombat%bac3grow(i,j,k) = wombat%bac3_mu(i,j,k) * wombat%f_bac3(i,j,k) ! [molC/kg/s]
-      wombat%poc1remi(i,j,k) = wombat%bac1grow(i,j,k) * bac1_cpoc * (1. - wombat%bac1_fanaer(i,j,k)) &
-                               + wombat%bac1grow(i,j,k) * bac1_cpoc_ana * wombat%bac1_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%doc2remi(i,j,k) = wombat%bac2grow(i,j,k) * bac2_cdoc * (1. - wombat%bac2_fanaer(i,j,k)) &
-                               + wombat%bac2grow(i,j,k) * bac2_cdoc_ana * wombat%bac2_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%doc3remi(i,j,k) = wombat%bac3grow(i,j,k) * bac3_cdoc * (1. - wombat%bac3_fanaer(i,j,k)) &
-                               + wombat%bac3grow(i,j,k) * bac3_cdoc_ana * wombat%bac3_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%doc1prod(i,j,k) = wombat%bac1grow(i,j,k) * bac1_pdoc * (1. - wombat%bac1_fanaer(i,j,k)) &
-                               + wombat%bac1grow(i,j,k) * bac1_pdoc_ana * wombat%bac1_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%doc2prod(i,j,k) = wombat%bac2grow(i,j,k) * bac2_pdoc * (1. - wombat%bac2_fanaer(i,j,k)) &
-                               + wombat%bac2grow(i,j,k) * bac2_pdoc_ana * wombat%bac2_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%doc3prod(i,j,k) = wombat%bac3grow(i,j,k) * bac3_pdoc * (1. - wombat%bac3_fanaer(i,j,k)) &
-                               + wombat%bac3grow(i,j,k) * bac3_pdoc_ana * wombat%bac3_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%bac1resp(i,j,k) = wombat%bac1grow(i,j,k) * bac1_coxy * (1. - wombat%bac1_fanaer(i,j,k)) ! [molO2/kg/s]
-      wombat%bac2resp(i,j,k) = wombat%bac2grow(i,j,k) * bac2_coxy * (1. - wombat%bac2_fanaer(i,j,k)) ! [molO2/kg/s]
-      wombat%bac3resp(i,j,k) = wombat%bac3grow(i,j,k) * bac3_coxy * (1. - wombat%bac3_fanaer(i,j,k)) ! [molO2/kg/s]
-      wombat%bac1pco2(i,j,k) = wombat%bac1grow(i,j,k) * bac1_pco2 * (1. - wombat%bac1_fanaer(i,j,k)) &
-                               + wombat%bac1grow(i,j,k) * bac1_pco2_ana * wombat%bac1_fanaer(i,j,k) ! [molCO2/kg/s]
-      wombat%bac2pco2(i,j,k) = wombat%bac2grow(i,j,k) * bac2_pco2 * (1. - wombat%bac2_fanaer(i,j,k)) &
-                               + wombat%bac2grow(i,j,k) * bac2_pco2_ana * wombat%bac2_fanaer(i,j,k) ! [molCO2/kg/s]
-      wombat%bac3pco2(i,j,k) = wombat%bac3grow(i,j,k) * bac3_pco2 * (1. - wombat%bac3_fanaer(i,j,k)) &
-                               + wombat%bac3grow(i,j,k) * bac3_pco2_ana * wombat%bac3_fanaer(i,j,k) ! [molCO2/kg/s]
-      wombat%bac1deni(i,j,k) = wombat%bac1grow(i,j,k) * bac1_cno3_ana * wombat%bac1_fanaer(i,j,k) ! [molNO3/kg/s]
-      wombat%bac2deni(i,j,k) = wombat%bac2grow(i,j,k) * bac2_cno3_ana * wombat%bac2_fanaer(i,j,k) ! [molNO3/kg/s]
-      wombat%bac3deni(i,j,k) = wombat%bac3grow(i,j,k) * bac3_cn2o_ana * wombat%bac3_fanaer(i,j,k) ! [molN2O/kg/s]
-      wombat%bac1ufer(i,j,k) = wombat%bac1grow(i,j,k) / wombat%bac1_C2Fe ! [molFe/kg/s]
-      wombat%bac2ufer(i,j,k) = wombat%bac2grow(i,j,k) / wombat%bac2_C2Fe ! [molFe/kg/s]
-      wombat%bac3ufer(i,j,k) = wombat%bac3grow(i,j,k) / wombat%bac3_C2Fe ! [molFe/kg/s]
-      wombat%bac1pnh4(i,j,k) = wombat%bac1grow(i,j,k) * bac1_pnh4 * (1. - wombat%bac1_fanaer(i,j,k)) &
-                               + wombat%bac1grow(i,j,k) * bac1_pnh4_ana * wombat%bac1_fanaer(i,j,k) ! [molN/kg/s]
-      wombat%bac2pnh4(i,j,k) = wombat%bac2grow(i,j,k) * bac2_pnh4 * (1. - wombat%bac2_fanaer(i,j,k)) &
-                               + wombat%bac2grow(i,j,k) * bac2_pnh4_ana * wombat%bac2_fanaer(i,j,k) ! [molN/kg/s]
-      wombat%bac3pnh4(i,j,k) = wombat%bac3grow(i,j,k) * bac3_pnh4 * (1. - wombat%bac3_fanaer(i,j,k)) &
-                               + wombat%bac3grow(i,j,k) * bac3_pnh4_ana * wombat%bac3_fanaer(i,j,k) ! [molN/kg/s]
+      wombat%bacpgrow(i,j,k) = wombat%bacp_mu(i,j,k) * wombat%f_bacp(i,j,k) ! [molC/kg/s]
+      wombat%bacf1grow(i,j,k) = wombat%bacf1_mu(i,j,k) * wombat%f_bacf1(i,j,k) ! [molC/kg/s]
+      wombat%bacf2grow(i,j,k) = wombat%bacf2_mu(i,j,k) * wombat%f_bacf2(i,j,k) ! [molC/kg/s]
+      wombat%poc1remi(i,j,k) = wombat%bacpgrow(i,j,k) * bacp_cpoc * (1. - wombat%bacp_fanaer(i,j,k)) &
+                               + wombat%bacpgrow(i,j,k) * bacp_cpoc_ana * wombat%bacp_fanaer(i,j,k) ! [molC/kg/s]
+      wombat%doc2remi(i,j,k) = wombat%bacf1grow(i,j,k) * bacf1_cdoc * (1. - wombat%bacf1_fanaer(i,j,k)) &
+                               + wombat%bacf1grow(i,j,k) * bacf1_cdoc_ana * wombat%bacf1_fanaer(i,j,k) ! [molC/kg/s]
+      wombat%doc3remi(i,j,k) = wombat%bacf2grow(i,j,k) * bacf2_cdoc * (1. - wombat%bacf2_fanaer(i,j,k)) &
+                               + wombat%bacf2grow(i,j,k) * bacf2_cdoc_ana * wombat%bacf2_fanaer(i,j,k) ! [molC/kg/s]
+      wombat%doc1prod(i,j,k) = wombat%bacpgrow(i,j,k) * bacp_pdoc * (1. - wombat%bacp_fanaer(i,j,k)) &
+                               + wombat%bacpgrow(i,j,k) * bacp_pdoc_ana * wombat%bacp_fanaer(i,j,k) ! [molC/kg/s]
+      wombat%doc2prod(i,j,k) = wombat%bacf1grow(i,j,k) * bacf1_pdoc * (1. - wombat%bacf1_fanaer(i,j,k)) &
+                               + wombat%bacf1grow(i,j,k) * bacf1_pdoc_ana * wombat%bacf1_fanaer(i,j,k) ! [molC/kg/s]
+      wombat%doc3prod(i,j,k) = wombat%bacf2grow(i,j,k) * bacf2_pdoc * (1. - wombat%bacf2_fanaer(i,j,k)) &
+                               + wombat%bacf2grow(i,j,k) * bacf2_pdoc_ana * wombat%bacf2_fanaer(i,j,k) ! [molC/kg/s]
+      wombat%bacpresp(i,j,k) = wombat%bacpgrow(i,j,k) * bacp_coxy * (1. - wombat%bacp_fanaer(i,j,k)) ! [molO2/kg/s]
+      wombat%bacf1resp(i,j,k) = wombat%bacf1grow(i,j,k) * bacf1_coxy * (1. - wombat%bacf1_fanaer(i,j,k)) ! [molO2/kg/s]
+      wombat%bacf2resp(i,j,k) = wombat%bacf2grow(i,j,k) * bacf2_coxy * (1. - wombat%bacf2_fanaer(i,j,k)) ! [molO2/kg/s]
+      wombat%bacppco2(i,j,k) = wombat%bacpgrow(i,j,k) * bacp_pco2 * (1. - wombat%bacp_fanaer(i,j,k)) &
+                               + wombat%bacpgrow(i,j,k) * bacp_pco2_ana * wombat%bacp_fanaer(i,j,k) ! [molCO2/kg/s]
+      wombat%bacf1pco2(i,j,k) = wombat%bacf1grow(i,j,k) * bacf1_pco2 * (1. - wombat%bacf1_fanaer(i,j,k)) &
+                               + wombat%bacf1grow(i,j,k) * bacf1_pco2_ana * wombat%bacf1_fanaer(i,j,k) ! [molCO2/kg/s]
+      wombat%bacf2pco2(i,j,k) = wombat%bacf2grow(i,j,k) * bacf2_pco2 * (1. - wombat%bacf2_fanaer(i,j,k)) &
+                               + wombat%bacf2grow(i,j,k) * bacf2_pco2_ana * wombat%bacf2_fanaer(i,j,k) ! [molCO2/kg/s]
+      wombat%bacpdeni(i,j,k) = wombat%bacpgrow(i,j,k) * bacp_cno3_ana * wombat%bacp_fanaer(i,j,k) ! [molNO3/kg/s]
+      wombat%bacf1deni(i,j,k) = wombat%bacf1grow(i,j,k) * bacf1_cno3_ana * wombat%bacf1_fanaer(i,j,k) ! [molNO3/kg/s]
+      wombat%bacf2deni(i,j,k) = wombat%bacf2grow(i,j,k) * bacf2_cn2o_ana * wombat%bacf2_fanaer(i,j,k) ! [molN2O/kg/s]
+      wombat%bacpufer(i,j,k) = wombat%bacpgrow(i,j,k) / wombat%bac_C2Fe ! [molFe/kg/s]
+      wombat%bacf1ufer(i,j,k) = wombat%bacf1grow(i,j,k) / wombat%bac_C2Fe ! [molFe/kg/s]
+      wombat%bacf2ufer(i,j,k) = wombat%bacf2grow(i,j,k) / wombat%bac_C2Fe ! [molFe/kg/s]
+      wombat%bacppnh4(i,j,k) = wombat%bacpgrow(i,j,k) * bacp_pnh4 * (1. - wombat%bacp_fanaer(i,j,k)) &
+                               + wombat%bacpgrow(i,j,k) * bacp_pnh4_ana * wombat%bacp_fanaer(i,j,k) ! [molN/kg/s]
+      wombat%bacf1pnh4(i,j,k) = wombat%bacf1grow(i,j,k) * bacf1_pnh4 * (1. - wombat%bacf1_fanaer(i,j,k)) &
+                               + wombat%bacf1grow(i,j,k) * bacf1_pnh4_ana * wombat%bacf1_fanaer(i,j,k) ! [molN/kg/s]
+      wombat%bacf2pnh4(i,j,k) = wombat%bacf2grow(i,j,k) * bacf2_pnh4 * (1. - wombat%bacf2_fanaer(i,j,k)) &
+                               + wombat%bacf2grow(i,j,k) * bacf2_pnh4_ana * wombat%bacf2_fanaer(i,j,k) ! [molN/kg/s]
 
       ! Total loss of small and large particulate detritus by bacterial action
       wombat%detremi(i,j,k) = wombat%poc1remi(i,j,k) * biodet / (biodet + biobdet + epsi)
@@ -6223,7 +6174,7 @@ module generic_WOMBATmid
         ! Anaerobic ammonium oxidation (anammox)
         wombat%aox_lnh4(i,j,k) = bionh4 / (bionh4 + wombat%aoxkn)
         wombat%aox_mu(i,j,k) = wombat%aoxmumax * wombat%bbioh**(Temp(i,j,k)) &
-                               * wombat%bac2_fanaer(i,j,k) * wombat%aox_lnh4(i,j,k)
+                               * wombat%bacf1_fanaer(i,j,k) * wombat%aox_lnh4(i,j,k)
       endif
 
       ! Chemoautotrophy
@@ -6256,7 +6207,7 @@ module generic_WOMBATmid
       !----------------------------------------------------------------------
       wombat%f_no3(i,j,k) = wombat%f_no3(i,j,k) + dtsb * ( &
                             wombat%aoagrow(i,j,k) * wombat%aoa_eno3(i,j,k) &
-                          - wombat%bac1deni(i,j,k) - wombat%bac2deni(i,j,k) ) &
+                          - wombat%bacpdeni(i,j,k) - wombat%bacf1deni(i,j,k) ) &
                           - dtsb * 16./122. * ( &
                             wombat%phygrow(i,j,k) * wombat%phy_lno3(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                           + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
@@ -6264,17 +6215,17 @@ module generic_WOMBATmid
       ! Ammonium equation ! [molN/kg]
       !----------------------------------------------------------------------
       wombat%f_nh4(i,j,k) = wombat%f_nh4(i,j,k) + dtsb * ( &
-                            ( zooexcrbac1n  &
-                            + zooexcrbac2n &
-                            + zooexcrbac3n &
+                            ( zooexcrbacpn  &
+                            + zooexcrbacf1n &
+                            + zooexcrbacf2n &
                             + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
-                          + ( mesexcrbac2n &
-                            + mesexcrbac1n &
-                            + mesexcrbac3n &
+                          + ( mesexcrbacf1n &
+                            + mesexcrbacpn &
+                            + mesexcrbacf2n &
                             + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
-                          + wombat%bac1pnh4(i,j,k) &
-                          + wombat%bac2pnh4(i,j,k) &
-                          + wombat%bac3pnh4(i,j,k) &
+                          + wombat%bacppnh4(i,j,k) &
+                          + wombat%bacf1pnh4(i,j,k) &
+                          + wombat%bacf2pnh4(i,j,k) &
                           - wombat%ammox(i,j,k) &
                           - wombat%anammox(i,j,k) ) + dtsb * 16./122. * ( &
                             wombat%zoomorl(i,j,k) &
@@ -6308,8 +6259,8 @@ module generic_WOMBATmid
       !----------------------------------------------------------------------
       wombat%f_n2o(i,j,k) = wombat%f_n2o(i,j,k) + dtsb * ( &
                             wombat%aoagrow(i,j,k) * wombat%aoa_en2o(i,j,k) &
-                          + wombat%bac2deni(i,j,k)/2.0 &
-                          - wombat%bac3deni(i,j,k) )
+                          + wombat%bacf1deni(i,j,k)/2.0 &
+                          - wombat%bacf2deni(i,j,k) )
 
       ! Phytoplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -6386,9 +6337,9 @@ module generic_WOMBATmid
       ! Zooplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_zoo(i,j,k) = wombat%f_zoo(i,j,k) + dtsb * ( &
-                            ( wombat%zoograzbac1(i,j,k) &
-                            + wombat%zoograzbac2(i,j,k) &
-                            + wombat%zoograzbac3(i,j,k) &
+                            ( wombat%zoograzbacp(i,j,k) &
+                            + wombat%zoograzbacf1(i,j,k) &
+                            + wombat%zoograzbacf2(i,j,k) &
                             + wombat%zoograzaoa(i,j,k) &
                             + wombat%zoograzphy(i,j,k) &
                             + wombat%zoograzdia(i,j,k) &
@@ -6400,9 +6351,9 @@ module generic_WOMBATmid
       ! Zooplankton iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%f_zoofe(i,j,k) = wombat%f_zoofe(i,j,k) + dtsb * ( &
-                              zooassibac1fe &
-                            + zooassibac2fe &
-                            + zooassibac3fe &
+                              zooassibacpfe &
+                            + zooassibacf1fe &
+                            + zooassibacf2fe &
                             + zooassiaoafe &
                             + zooassiphyfe &
                             + zooassidiafe &
@@ -6414,9 +6365,9 @@ module generic_WOMBATmid
       ! Mesozooplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_mes(i,j,k) = wombat%f_mes(i,j,k) + dtsb * ( &
-                            ( wombat%mesgrazbac1(i,j,k) &
-                            + wombat%mesgrazbac2(i,j,k) &
-                            + wombat%mesgrazbac3(i,j,k) &
+                            ( wombat%mesgrazbacp(i,j,k) &
+                            + wombat%mesgrazbacf1(i,j,k) &
+                            + wombat%mesgrazbacf2(i,j,k) &
                             + wombat%mesgrazaoa(i,j,k) &
                             + wombat%mesgrazphy(i,j,k) &
                             + wombat%mesgrazdia(i,j,k) &
@@ -6429,9 +6380,9 @@ module generic_WOMBATmid
       ! Mesozooplankton iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%f_mesfe(i,j,k) = wombat%f_mesfe(i,j,k) + dtsb * ( &
-                              mesassibac1fe &
-                            + mesassibac2fe &
-                            + mesassibac3fe &
+                              mesassibacpfe &
+                            + mesassibacf1fe &
+                            + mesassibacf2fe &
                             + mesassiaoafe &
                             + mesassiphyfe &
                             + mesassidiafe &
@@ -6443,16 +6394,16 @@ module generic_WOMBATmid
 
       ! Estimate secondary productivity from zooplankton growth ! [molC/kg/s]
       wombat%zsp3d(i,j,k) = wombat%zsp3d(i,j,k) + dtsb * ( &
-                            ( wombat%zoograzbac1(i,j,k) &
-                            + wombat%zoograzbac2(i,j,k) &
-                            + wombat%zoograzbac3(i,j,k) &
+                            ( wombat%zoograzbacp(i,j,k) &
+                            + wombat%zoograzbacf1(i,j,k) &
+                            + wombat%zoograzbacf2(i,j,k) &
                             + wombat%zoograzaoa(i,j,k) &
                             + wombat%zoograzphy(i,j,k) &
                             + wombat%zoograzdia(i,j,k) &
                             + wombat%zoograzdet(i,j,k) ) * wombat%zooCingest*wombat%zooCassim &
-                          + ( wombat%mesgrazbac1(i,j,k) &
-                            + wombat%mesgrazbac2(i,j,k) &
-                            + wombat%mesgrazbac3(i,j,k) &
+                          + ( wombat%mesgrazbacp(i,j,k) &
+                            + wombat%mesgrazbacf1(i,j,k) &
+                            + wombat%mesgrazbacf2(i,j,k) &
                             + wombat%mesgrazaoa(i,j,k) &
                             + wombat%mesgrazphy(i,j,k) &
                             + wombat%mesgrazdia(i,j,k) &
@@ -6463,9 +6414,9 @@ module generic_WOMBATmid
       ! Detritus equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_det(i,j,k) = wombat%f_det(i,j,k) + dtsb * ( &
-                            wombat%zooegesbac1(i,j,k) &
-                          + wombat%zooegesbac2(i,j,k) &
-                          + wombat%zooegesbac3(i,j,k) &
+                            wombat%zooegesbacp(i,j,k) &
+                          + wombat%zooegesbacf1(i,j,k) &
+                          + wombat%zooegesbacf2(i,j,k) &
                           + wombat%zooegesaoa(i,j,k) &
                           + wombat%zooegesphy(i,j,k) &
                           + wombat%zooegesdia(i,j,k) &
@@ -6479,9 +6430,9 @@ module generic_WOMBATmid
       ! Detrital iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%f_detfe(i,j,k) = wombat%f_detfe(i,j,k) + dtsb * ( &
-                              zooegesbac1fe &
-                            + zooegesbac2fe &
-                            + zooegesbac3fe &
+                              zooegesbacpfe &
+                            + zooegesbacf1fe &
+                            + zooegesbacf2fe &
                             + zooegesaoafe &
                             + zooegesphyfe &
                             + zooegesdiafe &
@@ -6495,9 +6446,9 @@ module generic_WOMBATmid
       ! Big detritus equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_bdet(i,j,k) = wombat%f_bdet(i,j,k) + dtsb * ( &
-                             wombat%mesegesbac1(i,j,k) &
-                           + wombat%mesegesbac2(i,j,k) &
-                           + wombat%mesegesbac3(i,j,k) &
+                             wombat%mesegesbacp(i,j,k) &
+                           + wombat%mesegesbacf1(i,j,k) &
+                           + wombat%mesegesbacf2(i,j,k) &
                            + wombat%mesegesaoa(i,j,k) &
                            + wombat%mesegesphy(i,j,k) &
                            + wombat%mesegesdia(i,j,k) &
@@ -6512,9 +6463,9 @@ module generic_WOMBATmid
       ! Compact, fast sinking detrital iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%f_bdetfe(i,j,k) = wombat%f_bdetfe(i,j,k) + dtsb * ( &
-                               mesegesbac1fe &
-                             + mesegesbac2fe &
-                             + mesegesbac3fe &
+                               mesegesbacpfe &
+                             + mesegesbacf1fe &
+                             + mesegesbacf2fe &
                              + mesegesaoafe &
                              + mesegesphyfe &
                              + mesegesdiafe &
@@ -6540,28 +6491,28 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------
       zval1 = (wombat%phydoc(i,j,k) + wombat%diadoc(i,j,k))
       zval2 = ( wombat%phymorl(i,j,k) + wombat%diamorl(i,j,k) &
-              + ( wombat%zooexcrbac1(i,j,k) &
-                + wombat%zooexcrbac2(i,j,k) &
-                + wombat%zooexcrbac3(i,j,k) &
+              + ( wombat%zooexcrbacp(i,j,k) &
+                + wombat%zooexcrbacf1(i,j,k) &
+                + wombat%zooexcrbacf2(i,j,k) &
                 + wombat%zooexcraoa(i,j,k) &
                 + wombat%zooexcrphy(i,j,k) &
                 + wombat%zooexcrdia(i,j,k) &
                 + wombat%zooexcrdet(i,j,k) ) * wombat%zooexcrdom &
-              + ( wombat%mesexcrbac1(i,j,k) &
-                + wombat%mesexcrbac2(i,j,k) &
-                + wombat%mesexcrbac3(i,j,k) &
+              + ( wombat%mesexcrbacp(i,j,k) &
+                + wombat%mesexcrbacf1(i,j,k) &
+                + wombat%mesexcrbacf2(i,j,k) &
                 + wombat%mesexcraoa(i,j,k) &
                 + wombat%mesexcrphy(i,j,k) &
                 + wombat%mesexcrdia(i,j,k) &
                 + wombat%mesexcrdet(i,j,k) &
                 + wombat%mesexcrbdet(i,j,k) &
                 + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom )
-      zval3 = ( wombat%bac1morl(i,j,k) &
-              + wombat%bac1morq(i,j,k) &
-              + wombat%bac2morl(i,j,k) &
-              + wombat%bac2morq(i,j,k) &
-              + wombat%bac3morl(i,j,k) &
-              + wombat%bac3morq(i,j,k) &
+      zval3 = ( wombat%bacpmorl(i,j,k) &
+              + wombat%bacpmorq(i,j,k) &
+              + wombat%bacf1morl(i,j,k) &
+              + wombat%bacf1morq(i,j,k) &
+              + wombat%bacf2morl(i,j,k) &
+              + wombat%bacf2morq(i,j,k) &
               + wombat%aoamorl(i,j,k) &
               + wombat%aoamorq(i,j,k) )
 
@@ -6579,7 +6530,7 @@ module generic_WOMBATmid
                           + zval3 * 1.40 &
                           - wombat%doc2remi(i,j,k) * dom_H2C &
                           - wombat%doc3remi(i,j,k) * dom_H2C &
-                          + wombat%doc1prod(i,j,k) * 1.65 &
+                          + wombat%doc1prod(i,j,k) * 1.65 * wombat%Hox_fac &
                           + wombat%doc2prod(i,j,k) * dom_H2C * wombat%Hox_fac &
                           + wombat%doc3prod(i,j,k) * dom_H2C * wombat%Hox_fac )
 
@@ -6591,7 +6542,7 @@ module generic_WOMBATmid
                           + zval3 * 0.40 &
                           - wombat%doc2remi(i,j,k) * dom_O2C &
                           - wombat%doc3remi(i,j,k) * dom_O2C &
-                          + wombat%doc1prod(i,j,k) * 0.4 &
+                          + wombat%doc1prod(i,j,k) * 0.4 * wombat%Oox_fac &
                           + wombat%doc2prod(i,j,k) * dom_O2C * wombat%Oox_fac &
                           + wombat%doc3prod(i,j,k) * dom_O2C * wombat%Oox_fac )
 
@@ -6606,21 +6557,21 @@ module generic_WOMBATmid
                 + wombat%mesexcrdet(i,j,k) &
                 + wombat%mesexcrbdet(i,j,k) &
                 + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom )
-      zval3 = ( ( wombat%bac1morl(i,j,k) &
-                + wombat%bac1morq(i,j,k) ) / wombat%bac1_C2N &
-              + ( wombat%bac2morl(i,j,k) &
-                + wombat%bac2morq(i,j,k) ) / wombat%bac2_C2N &
-              + ( wombat%bac3morl(i,j,k) &
-                + wombat%bac3morq(i,j,k) ) / wombat%bac3_C2N &
+      zval3 = ( ( wombat%bacpmorl(i,j,k) &
+                + wombat%bacpmorq(i,j,k) &
+                + wombat%bacf1morl(i,j,k) &
+                + wombat%bacf1morq(i,j,k) &
+                + wombat%bacf2morl(i,j,k) &
+                + wombat%bacf2morq(i,j,k) ) / wombat%bac_C2N &
               + ( wombat%aoamorl(i,j,k) &
                 + wombat%aoamorq(i,j,k) ) / wombat%aoa_C2N &
-              + ( zooexcrbac1n &
-                + zooexcrbac2n &
-                + zooexcrbac3n &
+              + ( zooexcrbacpn &
+                + zooexcrbacf1n &
+                + zooexcrbacf2n &
                 + zooexcraoan ) * wombat%zooexcrdom &
-              + ( mesexcrbac1n &
-                + mesexcrbac2n &
-                + mesexcrbac3n &
+              + ( mesexcrbacpn &
+                + mesexcrbacf1n &
+                + mesexcrbacf2n &
                 + mesexcraoan ) * wombat%mesexcrdom )
 
       wombat%f_don(i,j,k) = wombat%f_don(i,j,k) + dtsb * ( &
@@ -6629,36 +6580,36 @@ module generic_WOMBATmid
                           + zval3 &
                           - wombat%doc2remi(i,j,k) * dom_N2C &
                           - wombat%doc3remi(i,j,k) * dom_N2C &
-                          + wombat%doc1prod(i,j,k) * 16./122. &
+                          + wombat%doc1prod(i,j,k) * 16./122. * wombat%Nox_fac &
                           + wombat%doc2prod(i,j,k) * dom_N2C * wombat%Nox_fac &
                           + wombat%doc3prod(i,j,k) * dom_N2C * wombat%Nox_fac )
 
       ! Heterotrophic bacteria #1 ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%f_bac1(i,j,k) = wombat%f_bac1(i,j,k) + dtsb * ( &
-                             wombat%bac1grow(i,j,k) &
-                           - wombat%zoograzbac1(i,j,k) &
-                           - wombat%mesgrazbac1(i,j,k) &
-                           - wombat%bac1morl(i,j,k) &
-                           - wombat%bac1morq(i,j,k) )
+      wombat%f_bacp(i,j,k) = wombat%f_bacp(i,j,k) + dtsb * ( &
+                             wombat%bacpgrow(i,j,k) &
+                           - wombat%zoograzbacp(i,j,k) &
+                           - wombat%mesgrazbacp(i,j,k) &
+                           - wombat%bacpmorl(i,j,k) &
+                           - wombat%bacpmorq(i,j,k) )
 
       ! Heterotrophic bacteria #2 ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%f_bac2(i,j,k) = wombat%f_bac2(i,j,k) + dtsb * ( &
-                             wombat%bac2grow(i,j,k) &
-                           - wombat%zoograzbac2(i,j,k) &
-                           - wombat%mesgrazbac2(i,j,k) &
-                           - wombat%bac2morl(i,j,k) &
-                           - wombat%bac2morq(i,j,k) )
+      wombat%f_bacf1(i,j,k) = wombat%f_bacf1(i,j,k) + dtsb * ( &
+                             wombat%bacf1grow(i,j,k) &
+                           - wombat%zoograzbacf1(i,j,k) &
+                           - wombat%mesgrazbacf1(i,j,k) &
+                           - wombat%bacf1morl(i,j,k) &
+                           - wombat%bacf1morq(i,j,k) )
 
       ! Heterotrophic bacteria #3 ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%f_bac3(i,j,k) = wombat%f_bac3(i,j,k) + dtsb * ( &
-                             wombat%bac3grow(i,j,k) &
-                           - wombat%zoograzbac3(i,j,k) &
-                           - wombat%mesgrazbac3(i,j,k) &
-                           - wombat%bac3morl(i,j,k) &
-                           - wombat%bac3morq(i,j,k) )
+      wombat%f_bacf2(i,j,k) = wombat%f_bacf2(i,j,k) + dtsb * ( &
+                             wombat%bacf2grow(i,j,k) &
+                           - wombat%zoograzbacf2(i,j,k) &
+                           - wombat%mesgrazbacf2(i,j,k) &
+                           - wombat%bacf2morl(i,j,k) &
+                           - wombat%bacf2morq(i,j,k) )
 
       ! AOA ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -6673,16 +6624,16 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------
       if (wombat%f_o2(i,j,k) > epsi) &
         wombat%f_o2(i,j,k) = wombat%f_o2(i,j,k) - 132./122. * dtsb * ( &
-                             ( wombat%zooexcrbac1(i,j,k) &
-                             + wombat%zooexcrbac2(i,j,k) &
-                             + wombat%zooexcrbac3(i,j,k) &
+                             ( wombat%zooexcrbacp(i,j,k) &
+                             + wombat%zooexcrbacf1(i,j,k) &
+                             + wombat%zooexcrbacf2(i,j,k) &
                              + wombat%zooexcraoa(i,j,k) &
                              + wombat%zooexcrphy(i,j,k) &
                              + wombat%zooexcrdia(i,j,k) &
                              + wombat%zooexcrdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                           + ( wombat%mesexcrbac1(i,j,k) &
-                             + wombat%mesexcrbac2(i,j,k) &
-                             + wombat%mesexcrbac3(i,j,k) &
+                           + ( wombat%mesexcrbacp(i,j,k) &
+                             + wombat%mesexcrbacf1(i,j,k) &
+                             + wombat%mesexcrbacf2(i,j,k) &
                              + wombat%mesexcraoa(i,j,k) &
                              + wombat%mesexcrphy(i,j,k) &
                              + wombat%mesexcrdia(i,j,k) &
@@ -6694,9 +6645,9 @@ module generic_WOMBATmid
                            - wombat%phygrow(i,j,k) &
                            - wombat%diagrow(i,j,k) ) &
                            - dtsb * ( &
-                             wombat%bac1resp(i,j,k) &
-                           + wombat%bac2resp(i,j,k) &
-                           + wombat%bac3resp(i,j,k) &
+                             wombat%bacpresp(i,j,k) &
+                           + wombat%bacf1resp(i,j,k) &
+                           + wombat%bacf2resp(i,j,k) &
                            + wombat%aoaresp(i,j,k) )
 
 
@@ -6717,16 +6668,16 @@ module generic_WOMBATmid
       ! Equation for DIC ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%f_dic(i,j,k) = wombat%f_dic(i,j,k) + dtsb * ( &
-                            ( wombat%zooexcrbac1(i,j,k) &
-                            + wombat%zooexcrbac2(i,j,k) &
-                            + wombat%zooexcrbac3(i,j,k) &
+                            ( wombat%zooexcrbacp(i,j,k) &
+                            + wombat%zooexcrbacf1(i,j,k) &
+                            + wombat%zooexcrbacf2(i,j,k) &
                             + wombat%zooexcraoa(i,j,k) &
                             + wombat%zooexcrphy(i,j,k) &
                             + wombat%zooexcrdia(i,j,k) &
                             + wombat%zooexcrdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                          + ( wombat%mesexcrbac1(i,j,k) &
-                            + wombat%mesexcrbac2(i,j,k) &
-                            + wombat%mesexcrbac3(i,j,k) &
+                          + ( wombat%mesexcrbacp(i,j,k) &
+                            + wombat%mesexcrbacf1(i,j,k) &
+                            + wombat%mesexcrbacf2(i,j,k) &
                             + wombat%mesexcraoa(i,j,k) &
                             + wombat%mesexcrphy(i,j,k) &
                             + wombat%mesexcrdia(i,j,k) &
@@ -6735,9 +6686,9 @@ module generic_WOMBATmid
                             + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
                           + wombat%zoomorl(i,j,k) &
                           + wombat%mesmorl(i,j,k) &
-                          + wombat%bac1pco2(i,j,k) &
-                          + wombat%bac2pco2(i,j,k) &
-                          + wombat%bac3pco2(i,j,k) &
+                          + wombat%bacppco2(i,j,k) &
+                          + wombat%bacf1pco2(i,j,k) &
+                          + wombat%bacf2pco2(i,j,k) &
                           + wombat%zoodiss(i,j,k) &
                           + wombat%mesdiss(i,j,k) &
                           + wombat%caldiss(i,j,k) &
@@ -6758,16 +6709,16 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------
       if (do_tracer_dicr) then
         wombat%f_dicr(i,j,k) = wombat%f_dicr(i,j,k) + dtsb * ( &
-                                ( wombat%zooexcrbac1(i,j,k) &
-                                + wombat%zooexcrbac2(i,j,k) &
-                                + wombat%zooexcrbac3(i,j,k) &
+                                ( wombat%zooexcrbacp(i,j,k) &
+                                + wombat%zooexcrbacf1(i,j,k) &
+                                + wombat%zooexcrbacf2(i,j,k) &
                                 + wombat%zooexcraoa(i,j,k) &
                                 + wombat%zooexcrphy(i,j,k) &
                                 + wombat%zooexcrdia(i,j,k) &
                                 + wombat%zooexcrdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                            + ( wombat%mesexcrbac1(i,j,k) &
-                                + wombat%mesexcrbac2(i,j,k) &
-                                + wombat%mesexcrbac3(i,j,k) &
+                            + ( wombat%mesexcrbacp(i,j,k) &
+                                + wombat%mesexcrbacf1(i,j,k) &
+                                + wombat%mesexcrbacf2(i,j,k) &
                                 + wombat%mesexcraoa(i,j,k) &
                                 + wombat%mesexcrphy(i,j,k) &
                                 + wombat%mesexcrdia(i,j,k) &
@@ -6776,9 +6727,9 @@ module generic_WOMBATmid
                                 + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
                             + wombat%zoomorl(i,j,k) &
                             + wombat%mesmorl(i,j,k) &
-                            + wombat%bac1pco2(i,j,k) &
-                            + wombat%bac2pco2(i,j,k) &
-                            + wombat%bac3pco2(i,j,k) &
+                            + wombat%bacppco2(i,j,k) &
+                            + wombat%bacf1pco2(i,j,k) &
+                            + wombat%bacf2pco2(i,j,k) &
                             + wombat%zoodiss(i,j,k) &
                             + wombat%mesdiss(i,j,k) &
                             + wombat%caldiss(i,j,k) &
@@ -6815,19 +6766,19 @@ module generic_WOMBATmid
                             + wombat%mesexcrbdet(i,j,k) &
                             + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) ) &
                           + dtsb * ( &
-                            wombat%bac1pnh4(i,j,k) &
-                          + wombat%bac2pnh4(i,j,k) &
-                          + wombat%bac3pnh4(i,j,k) &
-                          + ( zooexcrbac1n &
-                            + zooexcrbac2n &
-                            + zooexcrbac3n &
+                            wombat%bacppnh4(i,j,k) &
+                          + wombat%bacf1pnh4(i,j,k) &
+                          + wombat%bacf2pnh4(i,j,k) &
+                          + ( zooexcrbacpn &
+                            + zooexcrbacf1n &
+                            + zooexcrbacf2n &
                             + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
-                          + ( mesexcrbac1n &
-                            + mesexcrbac2n &
-                            + mesexcrbac3n &
+                          + ( mesexcrbacpn &
+                            + mesexcrbacf1n &
+                            + mesexcrbacf2n &
                             + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
-                          + wombat%bac1deni(i,j,k) &
-                          + wombat%bac2deni(i,j,k) &
+                          + wombat%bacpdeni(i,j,k) &
+                          + wombat%bacf1deni(i,j,k) &
                           - 2.0 * wombat%ammox(i,j,k) + wombat%aoagrow(i,j,k)/wombat%aoa_C2N &
                           - wombat%anammox(i,j,k) ) &
                           + dtsb * 2.0 * ( &
@@ -6852,24 +6803,24 @@ module generic_WOMBATmid
                          + wombat%diamorl(i,j,k) * dia_Fe2C &
                          + wombat%zoomorl(i,j,k) * zoo_Fe2C &
                          + wombat%mesmorl(i,j,k) * mes_Fe2C &
-                         + ( wombat%bac1morl(i,j,k) &
-                           + wombat%bac1morq(i,j,k) ) / wombat%bac1_C2Fe &
-                         + ( wombat%bac2morl(i,j,k) &
-                           + wombat%bac2morq(i,j,k) ) / wombat%bac2_C2Fe &
-                         + ( wombat%bac3morl(i,j,k) &
-                           + wombat%bac3morq(i,j,k) ) / wombat%bac3_C2Fe &
+                         + ( wombat%bacpmorl(i,j,k) &
+                           + wombat%bacpmorq(i,j,k) &
+                           + wombat%bacf1morl(i,j,k) &
+                           + wombat%bacf1morq(i,j,k) &
+                           + wombat%bacf2morl(i,j,k) &
+                           + wombat%bacf2morq(i,j,k) ) / wombat%bac_C2Fe &
                          + ( wombat%aoamorl(i,j,k) &
                            + wombat%aoamorq(i,j,k) ) / wombat%aoa_C2Fe &
-                         + zooexcrbac1fe &
-                         + zooexcrbac2fe &
-                         + zooexcrbac3fe &
+                         + zooexcrbacpfe &
+                         + zooexcrbacf1fe &
+                         + zooexcrbacf2fe &
                          + zooexcraoafe &
                          + zooexcrphyfe &
                          + zooexcrdiafe &
                          + zooexcrdetfe &
-                         + mesexcrbac1fe &
-                         + mesexcrbac2fe &
-                         + mesexcrbac3fe &
+                         + mesexcrbacpfe &
+                         + mesexcrbacf1fe &
+                         + mesexcrbacf2fe &
                          + mesexcraoafe &
                          + mesexcrphyfe &
                          + mesexcrdiafe &
@@ -6880,9 +6831,9 @@ module generic_WOMBATmid
                          + wombat%bafediss(i,j,k) &
                          - wombat%phy_dfeupt(i,j,k) &
                          - wombat%dia_dfeupt(i,j,k) &
-                         - wombat%bac1ufer(i,j,k) &
-                         - wombat%bac2ufer(i,j,k) &
-                         - wombat%bac3ufer(i,j,k) &
+                         - wombat%bacpufer(i,j,k) &
+                         - wombat%bacf1ufer(i,j,k) &
+                         - wombat%bacf2ufer(i,j,k) &
                          - wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
                          - wombat%fescaven(i,j,k) &
                          - wombat%fecoag2afe(i,j,k) &
@@ -6894,24 +6845,24 @@ module generic_WOMBATmid
                                 + wombat%bdetremi(i,j,k) * bdet_Fe2C &
                                 + wombat%zoomorl(i,j,k) * zoo_Fe2C &
                                 + wombat%mesmorl(i,j,k) * mes_Fe2C &
-                                + wombat%bac1morl(i,j,k) / wombat%bac1_C2Fe &
-                                + wombat%bac1morq(i,j,k) / wombat%bac1_C2Fe &
-                                + wombat%bac2morl(i,j,k) / wombat%bac2_C2Fe &
-                                + wombat%bac2morq(i,j,k) / wombat%bac2_C2Fe &
-                                + wombat%bac3morl(i,j,k) / wombat%bac3_C2Fe &
-                                + wombat%bac3morq(i,j,k) / wombat%bac3_C2Fe &
+                                + ( wombat%bacpmorl(i,j,k) &
+                                  + wombat%bacpmorq(i,j,k) &
+                                  + wombat%bacf1morl(i,j,k) &
+                                  + wombat%bacf1morq(i,j,k) &
+                                  + wombat%bacf2morl(i,j,k) &
+                                  + wombat%bacf2morq(i,j,k) ) / wombat%bac_C2Fe &
                                 + wombat%aoamorl(i,j,k) / wombat%aoa_C2Fe &
                                 + wombat%aoamorq(i,j,k) / wombat%aoa_C2Fe &
-                                + zooexcrbac1fe &
-                                + zooexcrbac2fe &
-                                + zooexcrbac3fe &
+                                + zooexcrbacpfe &
+                                + zooexcrbacf1fe &
+                                + zooexcrbacf2fe &
                                 + zooexcraoafe &
                                 + zooexcrphyfe &
                                 + zooexcrdiafe &
                                 + zooexcrdetfe &
-                                + mesexcrbac1fe &
-                                + mesexcrbac2fe &
-                                + mesexcrbac3fe &
+                                + mesexcrbacpfe &
+                                + mesexcrbacf1fe &
+                                + mesexcrbacf2fe &
                                 + mesexcraoafe &
                                 + mesexcrphyfe &
                                 + mesexcrdiafe &
@@ -6925,9 +6876,9 @@ module generic_WOMBATmid
       wombat%fesinks(i,j,k) = wombat%fesinks(i,j,k) + dtsb * ( &
                                 wombat%phy_dfeupt(i,j,k) &
                               + wombat%dia_dfeupt(i,j,k) &
-                              + wombat%bac1ufer(i,j,k) &
-                              + wombat%bac2ufer(i,j,k) &
-                              + wombat%bac3ufer(i,j,k) &
+                              + wombat%bacpufer(i,j,k) &
+                              + wombat%bacf1ufer(i,j,k) &
+                              + wombat%bacf2ufer(i,j,k) &
                               + wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
                               + wombat%fescaven(i,j,k) &
                               + wombat%fecoag2afe(i,j,k) &
@@ -6959,18 +6910,17 @@ module generic_WOMBATmid
       n_pools(i,j,k,2) = wombat%f_no3(i,j,k) + wombat%f_nh4(i,j,k) + wombat%f_don(i,j,k) + 2*wombat%f_n2o(i,j,k) &
                           + ( wombat%f_phy(i,j,k) + wombat%f_det(i,j,k) + wombat%f_bdet(i,j,k) &
                           +   wombat%f_zoo(i,j,k) + wombat%f_mes(i,j,k) + wombat%f_dia(i,j,k) ) * 16/122.0 &
-                          + ( wombat%f_bac1(i,j,k) / wombat%bac1_C2N + wombat%f_bac2(i,j,k) / wombat%bac2_C2N &
-                              + wombat%f_bac3(i,j,k) / wombat%bac3_C2N + wombat%f_aoa(i,j,k) / wombat%aoa_C2N )
+                          + ( wombat%f_bacp(i,j,k) + wombat%f_bacf1(i,j,k) + wombat%f_bacf2(i,j,k) ) / wombat%bac_C2N &
+                          + wombat%f_aoa(i,j,k) / wombat%aoa_C2N
       c_pools(i,j,k,2) = wombat%f_dic(i,j,k) + wombat%f_phy(i,j,k) + wombat%f_det(i,j,k) + wombat%f_bdet(i,j,k) + &
                          wombat%f_zoo(i,j,k) + wombat%f_mes(i,j,k) + wombat%f_caco3(i,j,k) + wombat%f_dia(i,j,k) + &
-                         wombat%f_doc(i,j,k) + wombat%f_bac1(i,j,k) + wombat%f_bac2(i,j,k) + wombat%f_bac3(i,j,k) + &
+                         wombat%f_doc(i,j,k) + wombat%f_bacp(i,j,k) + wombat%f_bacf1(i,j,k) + wombat%f_bacf2(i,j,k) + &
                          wombat%f_aoa(i,j,k)
       si_pools(i,j,k,2) = wombat%f_sil(i,j,k) + wombat%f_diasi(i,j,k) + wombat%f_bdetsi(i,j,k)
       fe_pools(i,j,k,2) = wombat%f_fe(i,j,k) + wombat%f_afe(i,j,k) + wombat%f_bafe(i,j,k) + &
                           wombat%f_phyfe(i,j,k) + wombat%f_diafe(i,j,k) + wombat%f_zoofe(i,j,k) + wombat%f_mesfe(i,j,k) + &
-                          wombat%f_detfe(i,j,k) + wombat%f_bdetfe(i,j,k) + wombat%f_bac1(i,j,k) / wombat%bac1_C2Fe + &
-                          wombat%f_bac2(i,j,k) / wombat%bac2_C2Fe + wombat%f_bac3(i,j,k) / wombat%bac3_C2Fe + &
-                          wombat%f_aoa(i,j,k) / wombat%aoa_C2Fe
+                          wombat%f_detfe(i,j,k) + wombat%f_bdetfe(i,j,k) + ( wombat%f_bacp(i,j,k) + wombat%f_bacf1(i,j,k) + &
+                          wombat%f_bacf2(i,j,k) ) / wombat%bac_C2Fe + wombat%f_aoa(i,j,k) / wombat%aoa_C2Fe
 
       if (tn>1) then
         if (do_check_n_conserve) then
@@ -6995,9 +6945,9 @@ module generic_WOMBATmid
             print *, "       DET (molN/kg) =", wombat%f_det(i,j,k) * 16.0 / 122.0
             print *, "       BDET (molN/kg) =", wombat%f_bdet(i,j,k) * 16.0 / 122.0
             print *, "       DON (molN/kg) =", wombat%f_don(i,j,k)
-            print *, "       BAC1 (molN/kg) =", wombat%f_bac1(i,j,k) / wombat%bac1_C2N
-            print *, "       BAC2 (molN/kg) =", wombat%f_bac2(i,j,k) / wombat%bac2_C2N
-            print *, "       BAC3 (molN/kg) =", wombat%f_bac3(i,j,k) / wombat%bac3_C2N
+            print *, "       BACP (molN/kg) =", wombat%f_bacp(i,j,k) / wombat%bac_C2N
+            print *, "       BACF1 (molN/kg) =", wombat%f_bacf1(i,j,k) / wombat%bac_C2N
+            print *, "       BACF2 (molN/kg) =", wombat%f_bacf2(i,j,k) / wombat%bac_C2N
             print *, "       AOA (molN/kg) =", wombat%f_aoa(i,j,k) / wombat%aoa_C2N
             print *, " "
             print *, "--------------------------------------------"
@@ -7024,9 +6974,9 @@ module generic_WOMBATmid
             print *, "       MES (molC/kg) =", wombat%f_mes(i,j,k)
             print *, "       DET (molC/kg) =", wombat%f_det(i,j,k)
             print *, "       BDET (molC/kg) =", wombat%f_bdet(i,j,k)
-            print *, "       BAC1 (molC/kg) =", wombat%f_bac1(i,j,k)
-            print *, "       BAC2 (molC/kg) =", wombat%f_bac2(i,j,k)
-            print *, "       BAC3 (molC/kg) =", wombat%f_bac3(i,j,k)
+            print *, "       BACP (molC/kg) =", wombat%f_bacp(i,j,k)
+            print *, "       BACF1 (molC/kg) =", wombat%f_bacf1(i,j,k)
+            print *, "       BACF2 (molC/kg) =", wombat%f_bacf2(i,j,k)
             print *, "       AOA (molC/kg) =", wombat%f_aoa(i,j,k)
             print *, "       DOC (molC/kg) =", wombat%f_doc(i,j,k)
             print *, "       CaCO3 (molC/kg) =", wombat%f_caco3(i,j,k)
@@ -7082,9 +7032,9 @@ module generic_WOMBATmid
             print *, "       MES-Fe (molFe/kg) =", wombat%f_mesfe(i,j,k)
             print *, "       DET-Fe (molFe/kg) =", wombat%f_detfe(i,j,k)
             print *, "       BDET-Fe (molFe/kg) =", wombat%f_bdetfe(i,j,k)
-            print *, "       BAC1 (molFe/kg) =", wombat%f_bac1(i,j,k) / wombat%bac1_C2Fe
-            print *, "       BAC2 (molFe/kg) =", wombat%f_bac2(i,j,k) / wombat%bac2_C2Fe
-            print *, "       BAC3 (molFe/kg) =", wombat%f_bac3(i,j,k) / wombat%bac3_C2Fe
+            print *, "       BACP (molFe/kg) =", wombat%f_bacp(i,j,k) / wombat%bac_C2Fe
+            print *, "       BACF1 (molFe/kg) =", wombat%f_bacf1(i,j,k) / wombat%bac_C2Fe
+            print *, "       BACF2 (molFe/kg) =", wombat%f_bacf2(i,j,k) / wombat%bac_C2Fe
             print *, "       AOA (molFe/kg) =", wombat%f_aoa(i,j,k) / wombat%aoa_C2Fe
             print *, " "
             print *, "--------------------------------------------"
@@ -7160,9 +7110,9 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'doh', 'field', wombat%f_doh, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'doo', 'field', wombat%f_doo, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'don', 'field', wombat%f_don, isd, jsd, ntau=tau)
-    call g_tracer_set_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau)
-    call g_tracer_set_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau)
-    call g_tracer_set_values(tracer_list, 'bac3', 'field', wombat%f_bac3, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'bacp', 'field', wombat%f_bacp, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'bacf1', 'field', wombat%f_bacf1, isd, jsd, ntau=tau)
+    call g_tracer_set_values(tracer_list, 'bacf2', 'field', wombat%f_bacf2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'n2o', 'field', wombat%f_n2o, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau)
@@ -7452,10 +7402,10 @@ module generic_WOMBATmid
 
         !!!~~~ Biogenic silica ~~~!!!
         zval = max(273.15, wombat%sedtemp(i,j) + 273.15)  ! temperature in Kelvin
-        biobac1 = max(epsi, wombat%f_bac1(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
+        biobacp = max(epsi, wombat%f_bacp(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
         disssi_temp = exp(-8.0 + 0.0833*Temp(i,j,k)) / 3600.0 ! [1/s]
         disssi_usat = (1 - min(1.0, wombat%f_sil(i,j,k) / max(wombat%sileqc(i,j,k), 1e-3)) )**2.0
-        disssi_bact = 1.0 + wombat%bsi_fbac * biobac1 / ( biobac1 + wombat%bsi_kbac )
+        disssi_bact = 1.0 + wombat%bsi_fbac * biobacp / ( biobacp + wombat%bsi_kbac )
         wombat%detsi_sed_remin(i,j) = wombat%p_detsi_sediment(i,j,1) * disssi_temp * disssi_usat * disssi_bact! [mol/m2/s]
 
         !!!~~~ CaCO3 dissolution ~~~!!!
@@ -7860,16 +7810,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_zooeps, wombat%zooeps, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooprefbac1 > 0) &
-      used = g_send_data(wombat%id_zooprefbac1, wombat%zooprefbac1, model_time, &
+    if (wombat%id_zooprefbacp > 0) &
+      used = g_send_data(wombat%id_zooprefbacp, wombat%zooprefbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooprefbac2 > 0) &
-      used = g_send_data(wombat%id_zooprefbac2, wombat%zooprefbac2, model_time, &
+    if (wombat%id_zooprefbacf1 > 0) &
+      used = g_send_data(wombat%id_zooprefbacf1, wombat%zooprefbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooprefbac3 > 0) &
-      used = g_send_data(wombat%id_zooprefbac3, wombat%zooprefbac3, model_time, &
+    if (wombat%id_zooprefbacf2 > 0) &
+      used = g_send_data(wombat%id_zooprefbacf2, wombat%zooprefbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_zooprefaoa > 0) &
@@ -7888,16 +7838,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_zooprefdet, wombat%zooprefdet, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zoograzbac1 > 0) &
-      used = g_send_data(wombat%id_zoograzbac1, wombat%zoograzbac1, model_time, &
+    if (wombat%id_zoograzbacp > 0) &
+      used = g_send_data(wombat%id_zoograzbacp, wombat%zoograzbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zoograzbac2 > 0) &
-      used = g_send_data(wombat%id_zoograzbac2, wombat%zoograzbac2, model_time, &
+    if (wombat%id_zoograzbacf1 > 0) &
+      used = g_send_data(wombat%id_zoograzbacf1, wombat%zoograzbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zoograzbac3 > 0) &
-      used = g_send_data(wombat%id_zoograzbac3, wombat%zoograzbac3, model_time, &
+    if (wombat%id_zoograzbacf2 > 0) &
+      used = g_send_data(wombat%id_zoograzbacf2, wombat%zoograzbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_zoograzaoa > 0) &
@@ -7924,16 +7874,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_zoomorq, wombat%zoomorq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooexcrbac1 > 0) &
-      used = g_send_data(wombat%id_zooexcrbac1, wombat%zooexcrbac1, model_time, &
+    if (wombat%id_zooexcrbacp > 0) &
+      used = g_send_data(wombat%id_zooexcrbacp, wombat%zooexcrbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooexcrbac2 > 0) &
-      used = g_send_data(wombat%id_zooexcrbac2, wombat%zooexcrbac2, model_time, &
+    if (wombat%id_zooexcrbacf1 > 0) &
+      used = g_send_data(wombat%id_zooexcrbacf1, wombat%zooexcrbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooexcrbac3 > 0) &
-      used = g_send_data(wombat%id_zooexcrbac3, wombat%zooexcrbac3, model_time, &
+    if (wombat%id_zooexcrbacf2 > 0) &
+      used = g_send_data(wombat%id_zooexcrbacf2, wombat%zooexcrbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_zooexcraoa > 0) &
@@ -7952,16 +7902,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_zooexcrdet, wombat%zooexcrdet, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooegesbac1 > 0) &
-      used = g_send_data(wombat%id_zooegesbac1, wombat%zooegesbac1, model_time, &
+    if (wombat%id_zooegesbacp > 0) &
+      used = g_send_data(wombat%id_zooegesbacp, wombat%zooegesbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooegesbac2 > 0) &
-      used = g_send_data(wombat%id_zooegesbac2, wombat%zooegesbac2, model_time, &
+    if (wombat%id_zooegesbacf1 > 0) &
+      used = g_send_data(wombat%id_zooegesbacf1, wombat%zooegesbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_zooegesbac3 > 0) &
-      used = g_send_data(wombat%id_zooegesbac3, wombat%zooegesbac3, model_time, &
+    if (wombat%id_zooegesbacf2 > 0) &
+      used = g_send_data(wombat%id_zooegesbacf2, wombat%zooegesbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_zooegesaoa > 0) &
@@ -7984,16 +7934,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_meseps, wombat%meseps, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesprefbac1 > 0) &
-      used = g_send_data(wombat%id_mesprefbac1, wombat%mesprefbac1, model_time, &
+    if (wombat%id_mesprefbacp > 0) &
+      used = g_send_data(wombat%id_mesprefbacp, wombat%mesprefbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesprefbac2 > 0) &
-      used = g_send_data(wombat%id_mesprefbac2, wombat%mesprefbac2, model_time, &
+    if (wombat%id_mesprefbacf1 > 0) &
+      used = g_send_data(wombat%id_mesprefbacf1, wombat%mesprefbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesprefbac3 > 0) &
-      used = g_send_data(wombat%id_mesprefbac3, wombat%mesprefbac3, model_time, &
+    if (wombat%id_mesprefbacf2 > 0) &
+      used = g_send_data(wombat%id_mesprefbacf2, wombat%mesprefbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_mesprefaoa > 0) &
@@ -8020,16 +7970,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_mesprefzoo, wombat%mesprefzoo, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesgrazbac1 > 0) &
-      used = g_send_data(wombat%id_mesgrazbac1, wombat%mesgrazbac1, model_time, &
+    if (wombat%id_mesgrazbacp > 0) &
+      used = g_send_data(wombat%id_mesgrazbacp, wombat%mesgrazbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesgrazbac2 > 0) &
-      used = g_send_data(wombat%id_mesgrazbac2, wombat%mesgrazbac2, model_time, &
+    if (wombat%id_mesgrazbacf1 > 0) &
+      used = g_send_data(wombat%id_mesgrazbacf1, wombat%mesgrazbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesgrazbac3 > 0) &
-      used = g_send_data(wombat%id_mesgrazbac3, wombat%mesgrazbac3, model_time, &
+    if (wombat%id_mesgrazbacf2 > 0) &
+      used = g_send_data(wombat%id_mesgrazbacf2, wombat%mesgrazbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_mesgrazaoa > 0) &
@@ -8064,16 +8014,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_mesmorq, wombat%mesmorq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesexcrbac1 > 0) &
-      used = g_send_data(wombat%id_mesexcrbac1, wombat%mesexcrbac1, model_time, &
+    if (wombat%id_mesexcrbacp > 0) &
+      used = g_send_data(wombat%id_mesexcrbacp, wombat%mesexcrbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesexcrbac2 > 0) &
-      used = g_send_data(wombat%id_mesexcrbac2, wombat%mesexcrbac2, model_time, &
+    if (wombat%id_mesexcrbacf1 > 0) &
+      used = g_send_data(wombat%id_mesexcrbacf1, wombat%mesexcrbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesexcrbac3 > 0) &
-      used = g_send_data(wombat%id_mesexcrbac3, wombat%mesexcrbac3, model_time, &
+    if (wombat%id_mesexcrbacf2 > 0) &
+      used = g_send_data(wombat%id_mesexcrbacf2, wombat%mesexcrbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_mesexcraoa > 0) &
@@ -8100,16 +8050,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_mesexcrzoo, wombat%mesexcrzoo, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesegesbac1 > 0) &
-      used = g_send_data(wombat%id_mesegesbac1, wombat%mesegesbac1, model_time, &
+    if (wombat%id_mesegesbacp > 0) &
+      used = g_send_data(wombat%id_mesegesbacp, wombat%mesegesbacp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesegesbac2 > 0) &
-      used = g_send_data(wombat%id_mesegesbac2, wombat%mesegesbac2, model_time, &
+    if (wombat%id_mesegesbacf1 > 0) &
+      used = g_send_data(wombat%id_mesegesbacf1, wombat%mesegesbacf1, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_mesegesbac3 > 0) &
-      used = g_send_data(wombat%id_mesegesbac3, wombat%mesegesbac3, model_time, &
+    if (wombat%id_mesegesbacf2 > 0) &
+      used = g_send_data(wombat%id_mesegesbacf2, wombat%mesegesbacf2, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_mesegesaoa > 0) &
@@ -8248,148 +8198,148 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_aoamorq, wombat%aoamorq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1_ypoc > 0) &
-      used = g_send_data(wombat%id_bac1_ypoc, wombat%bac1_ypoc, model_time, &
+    if (wombat%id_bacp_ypoc > 0) &
+      used = g_send_data(wombat%id_bacp_ypoc, wombat%bacp_ypoc, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2_ydoc > 0) &
-      used = g_send_data(wombat%id_bac2_ydoc, wombat%bac2_ydoc, model_time, &
+    if (wombat%id_bacf1_ydoc > 0) &
+      used = g_send_data(wombat%id_bacf1_ydoc, wombat%bacf1_ydoc, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3_ydoc > 0) &
-      used = g_send_data(wombat%id_bac3_ydoc, wombat%bac3_ydoc, model_time, &
+    if (wombat%id_bacf2_ydoc > 0) &
+      used = g_send_data(wombat%id_bacf2_ydoc, wombat%bacf2_ydoc, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1grow > 0) &
-      used = g_send_data(wombat%id_bac1grow, wombat%bac1grow, model_time, &
+    if (wombat%id_bacpgrow > 0) &
+      used = g_send_data(wombat%id_bacpgrow, wombat%bacpgrow, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1resp > 0) &
-      used = g_send_data(wombat%id_bac1resp, wombat%bac1resp, model_time, &
+    if (wombat%id_bacpresp > 0) &
+      used = g_send_data(wombat%id_bacpresp, wombat%bacpresp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1pnh4 > 0) &
-      used = g_send_data(wombat%id_bac1pnh4, wombat%bac1pnh4, model_time, &
+    if (wombat%id_bacppnh4 > 0) &
+      used = g_send_data(wombat%id_bacppnh4, wombat%bacppnh4, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1ufer > 0) &
-      used = g_send_data(wombat%id_bac1ufer, wombat%bac1ufer, model_time, &
+    if (wombat%id_bacpufer > 0) &
+      used = g_send_data(wombat%id_bacpufer, wombat%bacpufer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1_mu > 0) &
-      used = g_send_data(wombat%id_bac1_mu, wombat%bac1_mu, model_time, &
+    if (wombat%id_bacp_mu > 0) &
+      used = g_send_data(wombat%id_bacp_mu, wombat%bacp_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1_fanaer > 0) &
-      used = g_send_data(wombat%id_bac1_fanaer, wombat%bac1_fanaer, model_time, &
+    if (wombat%id_bacp_fanaer > 0) &
+      used = g_send_data(wombat%id_bacp_fanaer, wombat%bacp_fanaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1_ffelim > 0) &
-      used = g_send_data(wombat%id_bac1_ffelim, wombat%bac1_ffelim, model_time, &
+    if (wombat%id_bacp_ffelim > 0) &
+      used = g_send_data(wombat%id_bacp_ffelim, wombat%bacp_ffelim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1_rq > 0) &
-      used = g_send_data(wombat%id_bac1_rq, wombat%bac1_rq, model_time, &
+    if (wombat%id_bacp_rq > 0) &
+      used = g_send_data(wombat%id_bacp_rq, wombat%bacp_rq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1morl > 0) &
-      used = g_send_data(wombat%id_bac1morl, wombat%bac1morl, model_time, &
+    if (wombat%id_bacpmorl > 0) &
+      used = g_send_data(wombat%id_bacpmorl, wombat%bacpmorl, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1morq > 0) &
-      used = g_send_data(wombat%id_bac1morq, wombat%bac1morq, model_time, &
+    if (wombat%id_bacpmorq > 0) &
+      used = g_send_data(wombat%id_bacpmorq, wombat%bacpmorq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac1deni > 0) &
-      used = g_send_data(wombat%id_bac1deni, wombat%bac1deni, model_time, &
+    if (wombat%id_bacpdeni > 0) &
+      used = g_send_data(wombat%id_bacpdeni, wombat%bacpdeni, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2grow > 0) &
-      used = g_send_data(wombat%id_bac2grow, wombat%bac2grow, model_time, &
+    if (wombat%id_bacf1grow > 0) &
+      used = g_send_data(wombat%id_bacf1grow, wombat%bacf1grow, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2resp > 0) &
-      used = g_send_data(wombat%id_bac2resp, wombat%bac2resp, model_time, &
+    if (wombat%id_bacf1resp > 0) &
+      used = g_send_data(wombat%id_bacf1resp, wombat%bacf1resp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2pnh4 > 0) &
-      used = g_send_data(wombat%id_bac2pnh4, wombat%bac2pnh4, model_time, &
+    if (wombat%id_bacf1pnh4 > 0) &
+      used = g_send_data(wombat%id_bacf1pnh4, wombat%bacf1pnh4, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2ufer > 0) &
-      used = g_send_data(wombat%id_bac2ufer, wombat%bac2ufer, model_time, &
+    if (wombat%id_bacf1ufer > 0) &
+      used = g_send_data(wombat%id_bacf1ufer, wombat%bacf1ufer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2_mu > 0) &
-      used = g_send_data(wombat%id_bac2_mu, wombat%bac2_mu, model_time, &
+    if (wombat%id_bacf1_mu > 0) &
+      used = g_send_data(wombat%id_bacf1_mu, wombat%bacf1_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2_fanaer > 0) &
-      used = g_send_data(wombat%id_bac2_fanaer, wombat%bac2_fanaer, model_time, &
+    if (wombat%id_bacf1_fanaer > 0) &
+      used = g_send_data(wombat%id_bacf1_fanaer, wombat%bacf1_fanaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2_ffelim > 0) &
-      used = g_send_data(wombat%id_bac2_ffelim, wombat%bac2_ffelim, model_time, &
+    if (wombat%id_bacf1_ffelim > 0) &
+      used = g_send_data(wombat%id_bacf1_ffelim, wombat%bacf1_ffelim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2_rq > 0) &
-      used = g_send_data(wombat%id_bac2_rq, wombat%bac2_rq, model_time, &
+    if (wombat%id_bacf1_rq > 0) &
+      used = g_send_data(wombat%id_bacf1_rq, wombat%bacf1_rq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2morl > 0) &
-      used = g_send_data(wombat%id_bac2morl, wombat%bac2morl, model_time, &
+    if (wombat%id_bacf1morl > 0) &
+      used = g_send_data(wombat%id_bacf1morl, wombat%bacf1morl, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2morq > 0) &
-      used = g_send_data(wombat%id_bac2morq, wombat%bac2morq, model_time, &
+    if (wombat%id_bacf1morq > 0) &
+      used = g_send_data(wombat%id_bacf1morq, wombat%bacf1morq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac2deni > 0) &
-      used = g_send_data(wombat%id_bac2deni, wombat%bac2deni, model_time, &
+    if (wombat%id_bacf1deni > 0) &
+      used = g_send_data(wombat%id_bacf1deni, wombat%bacf1deni, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-        if (wombat%id_bac3grow > 0) &
-      used = g_send_data(wombat%id_bac3grow, wombat%bac3grow, model_time, &
+        if (wombat%id_bacf2grow > 0) &
+      used = g_send_data(wombat%id_bacf2grow, wombat%bacf2grow, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3resp > 0) &
-      used = g_send_data(wombat%id_bac3resp, wombat%bac3resp, model_time, &
+    if (wombat%id_bacf2resp > 0) &
+      used = g_send_data(wombat%id_bacf2resp, wombat%bacf2resp, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3pnh4 > 0) &
-      used = g_send_data(wombat%id_bac3pnh4, wombat%bac3pnh4, model_time, &
+    if (wombat%id_bacf2pnh4 > 0) &
+      used = g_send_data(wombat%id_bacf2pnh4, wombat%bacf2pnh4, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3ufer > 0) &
-      used = g_send_data(wombat%id_bac3ufer, wombat%bac3ufer, model_time, &
+    if (wombat%id_bacf2ufer > 0) &
+      used = g_send_data(wombat%id_bacf2ufer, wombat%bacf2ufer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3_mu > 0) &
-      used = g_send_data(wombat%id_bac3_mu, wombat%bac3_mu, model_time, &
+    if (wombat%id_bacf2_mu > 0) &
+      used = g_send_data(wombat%id_bacf2_mu, wombat%bacf2_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3_fanaer > 0) &
-      used = g_send_data(wombat%id_bac3_fanaer, wombat%bac3_fanaer, model_time, &
+    if (wombat%id_bacf2_fanaer > 0) &
+      used = g_send_data(wombat%id_bacf2_fanaer, wombat%bacf2_fanaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3_ffelim > 0) &
-      used = g_send_data(wombat%id_bac3_ffelim, wombat%bac3_ffelim, model_time, &
+    if (wombat%id_bacf2_ffelim > 0) &
+      used = g_send_data(wombat%id_bacf2_ffelim, wombat%bacf2_ffelim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3_rq > 0) &
-      used = g_send_data(wombat%id_bac3_rq, wombat%bac3_rq, model_time, &
+    if (wombat%id_bacf2_rq > 0) &
+      used = g_send_data(wombat%id_bacf2_rq, wombat%bacf2_rq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3morl > 0) &
-      used = g_send_data(wombat%id_bac3morl, wombat%bac3morl, model_time, &
+    if (wombat%id_bacf2morl > 0) &
+      used = g_send_data(wombat%id_bacf2morl, wombat%bacf2morl, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3morq > 0) &
-      used = g_send_data(wombat%id_bac3morq, wombat%bac3morq, model_time, &
+    if (wombat%id_bacf2morq > 0) &
+      used = g_send_data(wombat%id_bacf2morq, wombat%bacf2morq, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_bac3deni > 0) &
-      used = g_send_data(wombat%id_bac3deni, wombat%bac3deni, model_time, &
+    if (wombat%id_bacf2deni > 0) &
+      used = g_send_data(wombat%id_bacf2deni, wombat%bacf2deni, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_aox_lnh4 > 0) &
@@ -8844,9 +8794,9 @@ module generic_WOMBATmid
     allocate(wombat%f_doh(isd:ied, jsd:jed, 1:nk)); wombat%f_doh(:,:,:)=0.0
     allocate(wombat%f_doo(isd:ied, jsd:jed, 1:nk)); wombat%f_doo(:,:,:)=0.0
     allocate(wombat%f_don(isd:ied, jsd:jed, 1:nk)); wombat%f_don(:,:,:)=0.0
-    allocate(wombat%f_bac1(isd:ied, jsd:jed, 1:nk)); wombat%f_bac1(:,:,:)=0.0
-    allocate(wombat%f_bac2(isd:ied, jsd:jed, 1:nk)); wombat%f_bac2(:,:,:)=0.0
-    allocate(wombat%f_bac3(isd:ied, jsd:jed, 1:nk)); wombat%f_bac3(:,:,:)=0.0
+    allocate(wombat%f_bacp(isd:ied, jsd:jed, 1:nk)); wombat%f_bacp(:,:,:)=0.0
+    allocate(wombat%f_bacf1(isd:ied, jsd:jed, 1:nk)); wombat%f_bacf1(:,:,:)=0.0
+    allocate(wombat%f_bacf2(isd:ied, jsd:jed, 1:nk)); wombat%f_bacf2(:,:,:)=0.0
     allocate(wombat%f_aoa(isd:ied, jsd:jed, 1:nk)); wombat%f_aoa(:,:,:)=0.0
     allocate(wombat%f_n2o(isd:ied, jsd:jed, 1:nk)); wombat%f_n2o(:,:,:)=0.0
     allocate(wombat%f_o2(isd:ied, jsd:jed, 1:nk)); wombat%f_o2(:,:,:)=0.0
@@ -8937,49 +8887,49 @@ module generic_WOMBATmid
     allocate(wombat%diamorl(isd:ied, jsd:jed, 1:nk)); wombat%diamorl(:,:,:)=0.0
     allocate(wombat%diamorq(isd:ied, jsd:jed, 1:nk)); wombat%diamorq(:,:,:)=0.0
     allocate(wombat%zooeps(isd:ied, jsd:jed, 1:nk)); wombat%zooeps(:,:,:)=0.0
-    allocate(wombat%zooprefbac1(isd:ied, jsd:jed, 1:nk)); wombat%zooprefbac1(:,:,:)=0.0
-    allocate(wombat%zooprefbac2(isd:ied, jsd:jed, 1:nk)); wombat%zooprefbac2(:,:,:)=0.0
-    allocate(wombat%zooprefbac3(isd:ied, jsd:jed, 1:nk)); wombat%zooprefbac3(:,:,:)=0.0
+    allocate(wombat%zooprefbacp(isd:ied, jsd:jed, 1:nk)); wombat%zooprefbacp(:,:,:)=0.0
+    allocate(wombat%zooprefbacf1(isd:ied, jsd:jed, 1:nk)); wombat%zooprefbacf1(:,:,:)=0.0
+    allocate(wombat%zooprefbacf2(isd:ied, jsd:jed, 1:nk)); wombat%zooprefbacf2(:,:,:)=0.0
     allocate(wombat%zooprefaoa(isd:ied, jsd:jed, 1:nk)); wombat%zooprefaoa(:,:,:)=0.0
     allocate(wombat%zooprefphy(isd:ied, jsd:jed, 1:nk)); wombat%zooprefphy(:,:,:)=0.0
     allocate(wombat%zooprefdia(isd:ied, jsd:jed, 1:nk)); wombat%zooprefdia(:,:,:)=0.0
     allocate(wombat%zooprefdet(isd:ied, jsd:jed, 1:nk)); wombat%zooprefdet(:,:,:)=0.0
-    allocate(wombat%zoograzbac1(isd:ied, jsd:jed, 1:nk)); wombat%zoograzbac1(:,:,:)=0.0
-    allocate(wombat%zoograzbac2(isd:ied, jsd:jed, 1:nk)); wombat%zoograzbac2(:,:,:)=0.0
-    allocate(wombat%zoograzbac3(isd:ied, jsd:jed, 1:nk)); wombat%zoograzbac3(:,:,:)=0.0
+    allocate(wombat%zoograzbacp(isd:ied, jsd:jed, 1:nk)); wombat%zoograzbacp(:,:,:)=0.0
+    allocate(wombat%zoograzbacf1(isd:ied, jsd:jed, 1:nk)); wombat%zoograzbacf1(:,:,:)=0.0
+    allocate(wombat%zoograzbacf2(isd:ied, jsd:jed, 1:nk)); wombat%zoograzbacf2(:,:,:)=0.0
     allocate(wombat%zoograzaoa(isd:ied, jsd:jed, 1:nk)); wombat%zoograzaoa(:,:,:)=0.0
     allocate(wombat%zoograzphy(isd:ied, jsd:jed, 1:nk)); wombat%zoograzphy(:,:,:)=0.0
     allocate(wombat%zoograzdia(isd:ied, jsd:jed, 1:nk)); wombat%zoograzdia(:,:,:)=0.0
     allocate(wombat%zoograzdet(isd:ied, jsd:jed, 1:nk)); wombat%zoograzdet(:,:,:)=0.0
     allocate(wombat%zoomorl(isd:ied, jsd:jed, 1:nk)); wombat%zoomorl(:,:,:)=0.0
     allocate(wombat%zoomorq(isd:ied, jsd:jed, 1:nk)); wombat%zoomorq(:,:,:)=0.0
-    allocate(wombat%zooexcrbac1(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrbac1(:,:,:)=0.0
-    allocate(wombat%zooexcrbac2(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrbac2(:,:,:)=0.0
-    allocate(wombat%zooexcrbac3(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrbac3(:,:,:)=0.0
+    allocate(wombat%zooexcrbacp(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrbacp(:,:,:)=0.0
+    allocate(wombat%zooexcrbacf1(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrbacf1(:,:,:)=0.0
+    allocate(wombat%zooexcrbacf2(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrbacf2(:,:,:)=0.0
     allocate(wombat%zooexcraoa(isd:ied, jsd:jed, 1:nk)); wombat%zooexcraoa(:,:,:)=0.0
     allocate(wombat%zooexcrphy(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrphy(:,:,:)=0.0
     allocate(wombat%zooexcrdia(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrdia(:,:,:)=0.0
     allocate(wombat%zooexcrdet(isd:ied, jsd:jed, 1:nk)); wombat%zooexcrdet(:,:,:)=0.0
-    allocate(wombat%zooegesbac1(isd:ied, jsd:jed, 1:nk)); wombat%zooegesbac1(:,:,:)=0.0
-    allocate(wombat%zooegesbac2(isd:ied, jsd:jed, 1:nk)); wombat%zooegesbac2(:,:,:)=0.0
-    allocate(wombat%zooegesbac3(isd:ied, jsd:jed, 1:nk)); wombat%zooegesbac3(:,:,:)=0.0
+    allocate(wombat%zooegesbacp(isd:ied, jsd:jed, 1:nk)); wombat%zooegesbacp(:,:,:)=0.0
+    allocate(wombat%zooegesbacf1(isd:ied, jsd:jed, 1:nk)); wombat%zooegesbacf1(:,:,:)=0.0
+    allocate(wombat%zooegesbacf2(isd:ied, jsd:jed, 1:nk)); wombat%zooegesbacf2(:,:,:)=0.0
     allocate(wombat%zooegesaoa(isd:ied, jsd:jed, 1:nk)); wombat%zooegesaoa(:,:,:)=0.0
     allocate(wombat%zooegesphy(isd:ied, jsd:jed, 1:nk)); wombat%zooegesphy(:,:,:)=0.0
     allocate(wombat%zooegesdia(isd:ied, jsd:jed, 1:nk)); wombat%zooegesdia(:,:,:)=0.0
     allocate(wombat%zooegesdet(isd:ied, jsd:jed, 1:nk)); wombat%zooegesdet(:,:,:)=0.0
     allocate(wombat%meseps(isd:ied, jsd:jed, 1:nk)); wombat%meseps(:,:,:)=0.0
-    allocate(wombat%mesprefbac1(isd:ied, jsd:jed, 1:nk)); wombat%mesprefbac1(:,:,:)=0.0
-    allocate(wombat%mesprefbac2(isd:ied, jsd:jed, 1:nk)); wombat%mesprefbac2(:,:,:)=0.0
-    allocate(wombat%mesprefbac3(isd:ied, jsd:jed, 1:nk)); wombat%mesprefbac3(:,:,:)=0.0
+    allocate(wombat%mesprefbacp(isd:ied, jsd:jed, 1:nk)); wombat%mesprefbacp(:,:,:)=0.0
+    allocate(wombat%mesprefbacf1(isd:ied, jsd:jed, 1:nk)); wombat%mesprefbacf1(:,:,:)=0.0
+    allocate(wombat%mesprefbacf2(isd:ied, jsd:jed, 1:nk)); wombat%mesprefbacf2(:,:,:)=0.0
     allocate(wombat%mesprefaoa(isd:ied, jsd:jed, 1:nk)); wombat%mesprefaoa(:,:,:)=0.0
     allocate(wombat%mesprefphy(isd:ied, jsd:jed, 1:nk)); wombat%mesprefphy(:,:,:)=0.0
     allocate(wombat%mesprefdia(isd:ied, jsd:jed, 1:nk)); wombat%mesprefdia(:,:,:)=0.0
     allocate(wombat%mesprefdet(isd:ied, jsd:jed, 1:nk)); wombat%mesprefdet(:,:,:)=0.0
     allocate(wombat%mesprefbdet(isd:ied, jsd:jed, 1:nk)); wombat%mesprefbdet(:,:,:)=0.0
     allocate(wombat%mesprefzoo(isd:ied, jsd:jed, 1:nk)); wombat%mesprefzoo(:,:,:)=0.0
-    allocate(wombat%mesgrazbac1(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazbac1(:,:,:)=0.0
-    allocate(wombat%mesgrazbac2(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazbac2(:,:,:)=0.0
-    allocate(wombat%mesgrazbac3(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazbac3(:,:,:)=0.0
+    allocate(wombat%mesgrazbacp(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazbacp(:,:,:)=0.0
+    allocate(wombat%mesgrazbacf1(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazbacf1(:,:,:)=0.0
+    allocate(wombat%mesgrazbacf2(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazbacf2(:,:,:)=0.0
     allocate(wombat%mesgrazaoa(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazaoa(:,:,:)=0.0
     allocate(wombat%mesgrazphy(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazphy(:,:,:)=0.0
     allocate(wombat%mesgrazdia(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazdia(:,:,:)=0.0
@@ -8988,18 +8938,18 @@ module generic_WOMBATmid
     allocate(wombat%mesgrazzoo(isd:ied, jsd:jed, 1:nk)); wombat%mesgrazzoo(:,:,:)=0.0
     allocate(wombat%mesmorl(isd:ied, jsd:jed, 1:nk)); wombat%mesmorl(:,:,:)=0.0
     allocate(wombat%mesmorq(isd:ied, jsd:jed, 1:nk)); wombat%mesmorq(:,:,:)=0.0
-    allocate(wombat%mesexcrbac1(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrbac1(:,:,:)=0.0
-    allocate(wombat%mesexcrbac2(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrbac2(:,:,:)=0.0
-    allocate(wombat%mesexcrbac3(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrbac3(:,:,:)=0.0
+    allocate(wombat%mesexcrbacp(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrbacp(:,:,:)=0.0
+    allocate(wombat%mesexcrbacf1(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrbacf1(:,:,:)=0.0
+    allocate(wombat%mesexcrbacf2(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrbacf2(:,:,:)=0.0
     allocate(wombat%mesexcraoa(isd:ied, jsd:jed, 1:nk)); wombat%mesexcraoa(:,:,:)=0.0
     allocate(wombat%mesexcrphy(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrphy(:,:,:)=0.0
     allocate(wombat%mesexcrdia(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrdia(:,:,:)=0.0
     allocate(wombat%mesexcrdet(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrdet(:,:,:)=0.0
     allocate(wombat%mesexcrbdet(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrbdet(:,:,:)=0.0
     allocate(wombat%mesexcrzoo(isd:ied, jsd:jed, 1:nk)); wombat%mesexcrzoo(:,:,:)=0.0
-    allocate(wombat%mesegesbac1(isd:ied, jsd:jed, 1:nk)); wombat%mesegesbac1(:,:,:)=0.0
-    allocate(wombat%mesegesbac2(isd:ied, jsd:jed, 1:nk)); wombat%mesegesbac2(:,:,:)=0.0
-    allocate(wombat%mesegesbac3(isd:ied, jsd:jed, 1:nk)); wombat%mesegesbac3(:,:,:)=0.0
+    allocate(wombat%mesegesbacp(isd:ied, jsd:jed, 1:nk)); wombat%mesegesbacp(:,:,:)=0.0
+    allocate(wombat%mesegesbacf1(isd:ied, jsd:jed, 1:nk)); wombat%mesegesbacf1(:,:,:)=0.0
+    allocate(wombat%mesegesbacf2(isd:ied, jsd:jed, 1:nk)); wombat%mesegesbacf2(:,:,:)=0.0
     allocate(wombat%mesegesaoa(isd:ied, jsd:jed, 1:nk)); wombat%mesegesaoa(:,:,:)=0.0
     allocate(wombat%mesegesphy(isd:ied, jsd:jed, 1:nk)); wombat%mesegesphy(:,:,:)=0.0
     allocate(wombat%mesegesdia(isd:ied, jsd:jed, 1:nk)); wombat%mesegesdia(:,:,:)=0.0
@@ -9034,45 +8984,45 @@ module generic_WOMBATmid
     allocate(wombat%doc2prod(isd:ied, jsd:jed, 1:nk)); wombat%doc2prod(:,:,:)=0.0
     allocate(wombat%doc3remi(isd:ied, jsd:jed, 1:nk)); wombat%doc3remi(:,:,:)=0.0
     allocate(wombat%doc3prod(isd:ied, jsd:jed, 1:nk)); wombat%doc3prod(:,:,:)=0.0
-    allocate(wombat%bac1_ypoc(isd:ied, jsd:jed, 1:nk)); wombat%bac1_ypoc(:,:,:)=0.0
-    allocate(wombat%bac2_ydoc(isd:ied, jsd:jed, 1:nk)); wombat%bac2_ydoc(:,:,:)=0.0
-    allocate(wombat%bac3_ydoc(isd:ied, jsd:jed, 1:nk)); wombat%bac3_ydoc(:,:,:)=0.0
-    allocate(wombat%bac1grow(isd:ied, jsd:jed, 1:nk)); wombat%bac1grow(:,:,:)=0.0
-    allocate(wombat%bac1resp(isd:ied, jsd:jed, 1:nk)); wombat%bac1resp(:,:,:)=0.0
-    allocate(wombat%bac1pco2(isd:ied, jsd:jed, 1:nk)); wombat%bac1pco2(:,:,:)=0.0
-    allocate(wombat%bac1pnh4(isd:ied, jsd:jed, 1:nk)); wombat%bac1pnh4(:,:,:)=0.0
-    allocate(wombat%bac1ufer(isd:ied, jsd:jed, 1:nk)); wombat%bac1ufer(:,:,:)=0.0
-    allocate(wombat%bac1_mu(isd:ied, jsd:jed, 1:nk)); wombat%bac1_mu(:,:,:)=0.0
-    allocate(wombat%bac1_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bac1_fanaer(:,:,:)=0.0
-    allocate(wombat%bac1_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%bac1_ffelim(:,:,:)=0.0
-    allocate(wombat%bac1_rq(isd:ied, jsd:jed, 1:nk)); wombat%bac1_rq(:,:,:)=0.0
-    allocate(wombat%bac1morl(isd:ied, jsd:jed, 1:nk)); wombat%bac1morl(:,:,:)=0.0
-    allocate(wombat%bac1morq(isd:ied, jsd:jed, 1:nk)); wombat%bac1morq(:,:,:)=0.0
-    allocate(wombat%bac1deni(isd:ied, jsd:jed, 1:nk)); wombat%bac1deni(:,:,:)=0.0
-    allocate(wombat%bac2grow(isd:ied, jsd:jed, 1:nk)); wombat%bac2grow(:,:,:)=0.0
-    allocate(wombat%bac2resp(isd:ied, jsd:jed, 1:nk)); wombat%bac2resp(:,:,:)=0.0
-    allocate(wombat%bac2pco2(isd:ied, jsd:jed, 1:nk)); wombat%bac2pco2(:,:,:)=0.0
-    allocate(wombat%bac2pnh4(isd:ied, jsd:jed, 1:nk)); wombat%bac2pnh4(:,:,:)=0.0
-    allocate(wombat%bac2ufer(isd:ied, jsd:jed, 1:nk)); wombat%bac2ufer(:,:,:)=0.0
-    allocate(wombat%bac2_mu(isd:ied, jsd:jed, 1:nk)); wombat%bac2_mu(:,:,:)=0.0
-    allocate(wombat%bac2_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bac2_fanaer(:,:,:)=0.0
-    allocate(wombat%bac2_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%bac2_ffelim(:,:,:)=0.0
-    allocate(wombat%bac2_rq(isd:ied, jsd:jed, 1:nk)); wombat%bac2_rq(:,:,:)=0.0
-    allocate(wombat%bac2morl(isd:ied, jsd:jed, 1:nk)); wombat%bac2morl(:,:,:)=0.0
-    allocate(wombat%bac2morq(isd:ied, jsd:jed, 1:nk)); wombat%bac2morq(:,:,:)=0.0
-    allocate(wombat%bac2deni(isd:ied, jsd:jed, 1:nk)); wombat%bac2deni(:,:,:)=0.0
-    allocate(wombat%bac3grow(isd:ied, jsd:jed, 1:nk)); wombat%bac3grow(:,:,:)=0.0
-    allocate(wombat%bac3resp(isd:ied, jsd:jed, 1:nk)); wombat%bac3resp(:,:,:)=0.0
-    allocate(wombat%bac3pco2(isd:ied, jsd:jed, 1:nk)); wombat%bac3pco2(:,:,:)=0.0
-    allocate(wombat%bac3pnh4(isd:ied, jsd:jed, 1:nk)); wombat%bac3pnh4(:,:,:)=0.0
-    allocate(wombat%bac3ufer(isd:ied, jsd:jed, 1:nk)); wombat%bac3ufer(:,:,:)=0.0
-    allocate(wombat%bac3_mu(isd:ied, jsd:jed, 1:nk)); wombat%bac3_mu(:,:,:)=0.0
-    allocate(wombat%bac3_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bac3_fanaer(:,:,:)=0.0
-    allocate(wombat%bac3_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%bac3_ffelim(:,:,:)=0.0
-    allocate(wombat%bac3_rq(isd:ied, jsd:jed, 1:nk)); wombat%bac3_rq(:,:,:)=0.0
-    allocate(wombat%bac3morl(isd:ied, jsd:jed, 1:nk)); wombat%bac3morl(:,:,:)=0.0
-    allocate(wombat%bac3morq(isd:ied, jsd:jed, 1:nk)); wombat%bac3morq(:,:,:)=0.0
-    allocate(wombat%bac3deni(isd:ied, jsd:jed, 1:nk)); wombat%bac3deni(:,:,:)=0.0
+    allocate(wombat%bacp_ypoc(isd:ied, jsd:jed, 1:nk)); wombat%bacp_ypoc(:,:,:)=0.0
+    allocate(wombat%bacf1_ydoc(isd:ied, jsd:jed, 1:nk)); wombat%bacf1_ydoc(:,:,:)=0.0
+    allocate(wombat%bacf2_ydoc(isd:ied, jsd:jed, 1:nk)); wombat%bacf2_ydoc(:,:,:)=0.0
+    allocate(wombat%bacpgrow(isd:ied, jsd:jed, 1:nk)); wombat%bacpgrow(:,:,:)=0.0
+    allocate(wombat%bacpresp(isd:ied, jsd:jed, 1:nk)); wombat%bacpresp(:,:,:)=0.0
+    allocate(wombat%bacppco2(isd:ied, jsd:jed, 1:nk)); wombat%bacppco2(:,:,:)=0.0
+    allocate(wombat%bacppnh4(isd:ied, jsd:jed, 1:nk)); wombat%bacppnh4(:,:,:)=0.0
+    allocate(wombat%bacpufer(isd:ied, jsd:jed, 1:nk)); wombat%bacpufer(:,:,:)=0.0
+    allocate(wombat%bacp_mu(isd:ied, jsd:jed, 1:nk)); wombat%bacp_mu(:,:,:)=0.0
+    allocate(wombat%bacp_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bacp_fanaer(:,:,:)=0.0
+    allocate(wombat%bacp_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%bacp_ffelim(:,:,:)=0.0
+    allocate(wombat%bacp_rq(isd:ied, jsd:jed, 1:nk)); wombat%bacp_rq(:,:,:)=0.0
+    allocate(wombat%bacpmorl(isd:ied, jsd:jed, 1:nk)); wombat%bacpmorl(:,:,:)=0.0
+    allocate(wombat%bacpmorq(isd:ied, jsd:jed, 1:nk)); wombat%bacpmorq(:,:,:)=0.0
+    allocate(wombat%bacpdeni(isd:ied, jsd:jed, 1:nk)); wombat%bacpdeni(:,:,:)=0.0
+    allocate(wombat%bacf1grow(isd:ied, jsd:jed, 1:nk)); wombat%bacf1grow(:,:,:)=0.0
+    allocate(wombat%bacf1resp(isd:ied, jsd:jed, 1:nk)); wombat%bacf1resp(:,:,:)=0.0
+    allocate(wombat%bacf1pco2(isd:ied, jsd:jed, 1:nk)); wombat%bacf1pco2(:,:,:)=0.0
+    allocate(wombat%bacf1pnh4(isd:ied, jsd:jed, 1:nk)); wombat%bacf1pnh4(:,:,:)=0.0
+    allocate(wombat%bacf1ufer(isd:ied, jsd:jed, 1:nk)); wombat%bacf1ufer(:,:,:)=0.0
+    allocate(wombat%bacf1_mu(isd:ied, jsd:jed, 1:nk)); wombat%bacf1_mu(:,:,:)=0.0
+    allocate(wombat%bacf1_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bacf1_fanaer(:,:,:)=0.0
+    allocate(wombat%bacf1_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%bacf1_ffelim(:,:,:)=0.0
+    allocate(wombat%bacf1_rq(isd:ied, jsd:jed, 1:nk)); wombat%bacf1_rq(:,:,:)=0.0
+    allocate(wombat%bacf1morl(isd:ied, jsd:jed, 1:nk)); wombat%bacf1morl(:,:,:)=0.0
+    allocate(wombat%bacf1morq(isd:ied, jsd:jed, 1:nk)); wombat%bacf1morq(:,:,:)=0.0
+    allocate(wombat%bacf1deni(isd:ied, jsd:jed, 1:nk)); wombat%bacf1deni(:,:,:)=0.0
+    allocate(wombat%bacf2grow(isd:ied, jsd:jed, 1:nk)); wombat%bacf2grow(:,:,:)=0.0
+    allocate(wombat%bacf2resp(isd:ied, jsd:jed, 1:nk)); wombat%bacf2resp(:,:,:)=0.0
+    allocate(wombat%bacf2pco2(isd:ied, jsd:jed, 1:nk)); wombat%bacf2pco2(:,:,:)=0.0
+    allocate(wombat%bacf2pnh4(isd:ied, jsd:jed, 1:nk)); wombat%bacf2pnh4(:,:,:)=0.0
+    allocate(wombat%bacf2ufer(isd:ied, jsd:jed, 1:nk)); wombat%bacf2ufer(:,:,:)=0.0
+    allocate(wombat%bacf2_mu(isd:ied, jsd:jed, 1:nk)); wombat%bacf2_mu(:,:,:)=0.0
+    allocate(wombat%bacf2_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%bacf2_fanaer(:,:,:)=0.0
+    allocate(wombat%bacf2_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%bacf2_ffelim(:,:,:)=0.0
+    allocate(wombat%bacf2_rq(isd:ied, jsd:jed, 1:nk)); wombat%bacf2_rq(:,:,:)=0.0
+    allocate(wombat%bacf2morl(isd:ied, jsd:jed, 1:nk)); wombat%bacf2morl(:,:,:)=0.0
+    allocate(wombat%bacf2morq(isd:ied, jsd:jed, 1:nk)); wombat%bacf2morq(:,:,:)=0.0
+    allocate(wombat%bacf2deni(isd:ied, jsd:jed, 1:nk)); wombat%bacf2deni(:,:,:)=0.0
     allocate(wombat%aox_lnh4(isd:ied, jsd:jed, 1:nk)); wombat%aox_lnh4(:,:,:)=0.0
     allocate(wombat%aox_mu(isd:ied, jsd:jed, 1:nk)); wombat%aox_mu(:,:,:)=0.0
     allocate(wombat%nitrfix(isd:ied, jsd:jed, 1:nk)); wombat%nitrfix(:,:,:)=0.0
@@ -9176,9 +9126,9 @@ module generic_WOMBATmid
         wombat%f_doh, &
         wombat%f_doo, &
         wombat%f_don, &
-        wombat%f_bac1, &
-        wombat%f_bac2, &
-        wombat%f_bac3, &
+        wombat%f_bacp, &
+        wombat%f_bacf1, &
+        wombat%f_bacf2, &
         wombat%f_aoa, &
         wombat%f_n2o, &
         wombat%f_o2, &
@@ -9267,48 +9217,48 @@ module generic_WOMBATmid
         wombat%diadoc, &
         wombat%diamorl, &
         wombat%diamorq, &
-        wombat%zooprefbac1, &
-        wombat%zooprefbac2, &
-        wombat%zooprefbac3, &
+        wombat%zooprefbacp, &
+        wombat%zooprefbacf1, &
+        wombat%zooprefbacf2, &
         wombat%zooprefaoa, &
         wombat%zooprefphy, &
         wombat%zooprefdia, &
         wombat%zooprefdet, &
-        wombat%zoograzbac1, &
-        wombat%zoograzbac2, &
-        wombat%zoograzbac3, &
+        wombat%zoograzbacp, &
+        wombat%zoograzbacf1, &
+        wombat%zoograzbacf2, &
         wombat%zoograzaoa, &
         wombat%zoograzphy, &
         wombat%zoograzdia, &
         wombat%zoograzdet, &
         wombat%zoomorl, &
         wombat%zoomorq, &
-        wombat%zooexcrbac1, &
-        wombat%zooexcrbac2, &
-        wombat%zooexcrbac3, &
+        wombat%zooexcrbacp, &
+        wombat%zooexcrbacf1, &
+        wombat%zooexcrbacf2, &
         wombat%zooexcraoa, &
         wombat%zooexcrphy, &
         wombat%zooexcrdia, &
         wombat%zooexcrdet, &
-        wombat%zooegesbac1, &
-        wombat%zooegesbac2, &
-        wombat%zooegesbac3, &
+        wombat%zooegesbacp, &
+        wombat%zooegesbacf1, &
+        wombat%zooegesbacf2, &
         wombat%zooegesaoa, &
         wombat%zooegesphy, &
         wombat%zooegesdia, &
         wombat%zooegesdet, &
-        wombat%mesprefbac1, &
-        wombat%mesprefbac2, &
-        wombat%mesprefbac3, &
+        wombat%mesprefbacp, &
+        wombat%mesprefbacf1, &
+        wombat%mesprefbacf2, &
         wombat%mesprefaoa, &
         wombat%mesprefphy, &
         wombat%mesprefdia, &
         wombat%mesprefdet, &
         wombat%mesprefbdet, &
         wombat%mesprefzoo, &
-        wombat%mesgrazbac1, &
-        wombat%mesgrazbac2, &
-        wombat%mesgrazbac3, &
+        wombat%mesgrazbacp, &
+        wombat%mesgrazbacf1, &
+        wombat%mesgrazbacf2, &
         wombat%mesgrazaoa, &
         wombat%mesgrazphy, &
         wombat%mesgrazdia, &
@@ -9317,18 +9267,18 @@ module generic_WOMBATmid
         wombat%mesgrazzoo, &
         wombat%mesmorl, &
         wombat%mesmorq, &
-        wombat%mesexcrbac1, &
-        wombat%mesexcrbac2, &
-        wombat%mesexcrbac3, &
+        wombat%mesexcrbacp, &
+        wombat%mesexcrbacf1, &
+        wombat%mesexcrbacf2, &
         wombat%mesexcraoa, &
         wombat%mesexcrphy, &
         wombat%mesexcrdia, &
         wombat%mesexcrdet, &
         wombat%mesexcrbdet, &
         wombat%mesexcrzoo, &
-        wombat%mesegesbac1, &
-        wombat%mesegesbac2, &
-        wombat%mesegesbac3, &
+        wombat%mesegesbacp, &
+        wombat%mesegesbacf1, &
+        wombat%mesegesbacf2, &
         wombat%mesegesaoa, &
         wombat%mesegesphy, &
         wombat%mesegesdia, &
@@ -9363,45 +9313,45 @@ module generic_WOMBATmid
         wombat%doc2prod, &
         wombat%doc3remi, &
         wombat%doc3prod, &
-        wombat%bac1_ypoc, &
-        wombat%bac2_ydoc, &
-        wombat%bac3_ydoc, &
-        wombat%bac1grow, &
-        wombat%bac1resp, &
-        wombat%bac1pco2, &
-        wombat%bac1pnh4, &
-        wombat%bac1ufer, &
-        wombat%bac1_mu, &
-        wombat%bac1_fanaer, &
-        wombat%bac1_ffelim, &
-        wombat%bac1_rq, &
-        wombat%bac1morl, &
-        wombat%bac1morq, &
-        wombat%bac1deni, &
-        wombat%bac2grow, &
-        wombat%bac2resp, &
-        wombat%bac2pco2, &
-        wombat%bac2pnh4, &
-        wombat%bac2ufer, &
-        wombat%bac2_mu, &
-        wombat%bac2_fanaer, &
-        wombat%bac2_ffelim, &
-        wombat%bac2_rq, &
-        wombat%bac2morl, &
-        wombat%bac2morq, &
-        wombat%bac2deni, &
-        wombat%bac3grow, &
-        wombat%bac3resp, &
-        wombat%bac3pco2, &
-        wombat%bac3pnh4, &
-        wombat%bac3ufer, &
-        wombat%bac3_mu, &
-        wombat%bac3_fanaer, &
-        wombat%bac3_ffelim, &
-        wombat%bac3_rq, &
-        wombat%bac3morl, &
-        wombat%bac3morq, &
-        wombat%bac3deni, &
+        wombat%bacp_ypoc, &
+        wombat%bacf1_ydoc, &
+        wombat%bacf2_ydoc, &
+        wombat%bacpgrow, &
+        wombat%bacpresp, &
+        wombat%bacppco2, &
+        wombat%bacppnh4, &
+        wombat%bacpufer, &
+        wombat%bacp_mu, &
+        wombat%bacp_fanaer, &
+        wombat%bacp_ffelim, &
+        wombat%bacp_rq, &
+        wombat%bacpmorl, &
+        wombat%bacpmorq, &
+        wombat%bacpdeni, &
+        wombat%bacf1grow, &
+        wombat%bacf1resp, &
+        wombat%bacf1pco2, &
+        wombat%bacf1pnh4, &
+        wombat%bacf1ufer, &
+        wombat%bacf1_mu, &
+        wombat%bacf1_fanaer, &
+        wombat%bacf1_ffelim, &
+        wombat%bacf1_rq, &
+        wombat%bacf1morl, &
+        wombat%bacf1morq, &
+        wombat%bacf1deni, &
+        wombat%bacf2grow, &
+        wombat%bacf2resp, &
+        wombat%bacf2pco2, &
+        wombat%bacf2pnh4, &
+        wombat%bacf2ufer, &
+        wombat%bacf2_mu, &
+        wombat%bacf2_fanaer, &
+        wombat%bacf2_ffelim, &
+        wombat%bacf2_rq, &
+        wombat%bacf2morl, &
+        wombat%bacf2morq, &
+        wombat%bacf2deni, &
         wombat%aox_lnh4, &
         wombat%aox_mu, &
         wombat%nitrfix, &
