@@ -284,7 +284,6 @@ module generic_WOMBATmid
         mesFeassim, &
         mesexcrdom, &
         fgutdiss, &
-        meskz, &
         mesgmax, &
         mesepsbacp, &
         mesepsbacf1, &
@@ -2965,10 +2964,6 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('fgutdiss', wombat%fgutdiss, 0.80)
 
-    ! Mesozooplankton half saturation coefficient for linear mortality [mmol C m-3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('meskz', wombat%meskz, 0.30)
-
     ! Mesozooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesgmax', wombat%mesgmax, 1.00/86400.0)
@@ -4278,7 +4273,6 @@ module generic_WOMBATmid
     real                                    :: theta_opt
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe
-    real                                    :: mes_slmor
     real                                    :: hco3
     real                                    :: dzt_bot, dzt_bot_os
     real                                    :: nosc, f2_doc, f3_doc, m2_doc, m3_doc
@@ -5521,9 +5515,6 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      ! reduce linear mortality (respiration losses) of zooplankton when there is low biomass
-      mes_slmor = biomes / (biomes + wombat%meskz)
-
       ! Mortality terms
       if (biophy>1e-3) then
         wombat%phymorl(i,j,k) = wombat%phylmor * fbc * wombat%f_phy(i,j,k) ! [molC/kg/s]
@@ -5547,7 +5538,7 @@ module generic_WOMBATmid
         wombat%zoomorq(i,j,k) = 0.0
       endif
       if (biomes>1e-3) then
-        wombat%mesmorl(i,j,k) = wombat%meslmor * fbc * wombat%f_mes(i,j,k) * mes_slmor ! [molC/kg/s]
+        wombat%mesmorl(i,j,k) = wombat%meslmor * fbc * wombat%f_mes(i,j,k) ! [molC/kg/s]
         wombat%mesmorq(i,j,k) = wombat%mesqmor / mmol_m3_to_mol_kg * wombat%f_mes(i,j,k) * wombat%f_mes(i,j,k) ! [molC/kg/s]
       else
         wombat%mesmorl(i,j,k) = 0.0
