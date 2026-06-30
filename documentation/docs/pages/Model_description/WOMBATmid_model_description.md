@@ -1828,7 +1828,7 @@ $$
 \begin{align}
 CH_{h_S}O_{o_S}N_{n_S} + (2 - o_{S} + n_{S})H_{2}O \rightarrow& n_{S} NH_{4}^{+} + (1-n_{S})CO_{2} + n_{S}HCO_{3}^{-} + d_{S}H^{+} + d_{S}e^{-} \\
 (1-f)d_{S} [ \dfrac{1}{4}O_{2} + H^{+} + e^{-} \rightarrow& \dfrac{1}{2} H_{2}O ] \\
-\dfrac{f\cdot d_{S}}{d_{B}} [ n_{B} NH_{4}^{+} + (1-n_{B})CO_{2} + n_{B}HCO_{3}^{-} + d_{B} H^{+} + d_{B} e^{-} \rightarrow& CH_{h_{B}}O_{o_{B}}N_{n_{B}} + (2 - o_{B} + n_{B})H_{2}O \\
+\dfrac{f\cdot d_{S}}{d_{B}} [ n_{B} NH_{4}^{+} + (1-n_{B})CO_{2} + n_{B}HCO_{3}^{-} + d_{B} H^{+} + d_{B} e^{-} \rightarrow& CH_{h_{B}}O_{o_{B}}N_{n_{B}} + (2 - o_{B} + n_{B})H_{2}O 
 \end{align}
 $$
 
@@ -1845,7 +1845,7 @@ If we sum these three equations and treat S as $CH_{h_S}O_{o_S}N_{n_S}$ and B as
 
 $$
 \begin{align}
-S + \dfrac{(1 - f)d_{S}}{4} O_{2} \rightarrow& \dfrac{f\cdot d_{S}}{d_{B}} B + (1 - \dfrac{f \cdot d_{S}}{d_{B}})CO_{2} + (n_{S} - \dfrac{n_{B} \cdot f \cdot d_{S}}{d_{B}}) NH_{4}^{+} \\
+S + \dfrac{(1 - f)d_{S}}{4} O_{2} \rightarrow& \dfrac{f\cdot d_{S}}{d_{B}} B + (1 - \dfrac{f \cdot d_{S}}{d_{B}})CO_{2} + (n_{S} - \dfrac{n_{B} \cdot f \cdot d_{S}}{d_{B}}) NH_{4}^{+} 
 \end{align}
 $$
 
@@ -1854,7 +1854,7 @@ We calculate $d_{S}$ and $d_{B}$ as equal to:
 $$
 \begin{align}
 d_{S} =& 4 + h_{S} - 2 o_{S} - 3 n_{S} \\
-d_{B} =& 4 + h_{B} - 2 o_{B} - 3 n_{B} \\
+d_{B} =& 4 + h_{B} - 2 o_{B} - 3 n_{B} 
 \end{align}
 $$
 
@@ -1868,7 +1868,7 @@ For the particle-associated bacteria, we assume labile marine organic matter wit
 
 $$
 \begin{align}
-S + \dfrac{(1 - f)4.45}{4} O_{2} \rightarrow& \dfrac{f\cdot 4.45}{4} B + (1 - \dfrac{f \cdot 4.45}{4})CO_{2} + (0.131 - \dfrac{0.2 \cdot 4.45 f }{4}) NH_{4}^{+} \\
+S + \dfrac{(1 - f)4.45}{4} O_{2} \rightarrow& \dfrac{f\cdot 4.45}{4} B + (1 - \dfrac{f \cdot 4.45}{4})CO_{2} + (0.131 - \dfrac{0.2 \cdot 4.45 f }{4}) NH_{4}^{+} 
 \end{align}
 $$
 
@@ -1904,8 +1904,8 @@ The first half reaction is the electron donor oxidation, where organic matter is
 
 $$
 \begin{align}
-x =& 2 - o_{S} + n_{S} + \alpha (o_{P} - 2 - n_{P})
-y =& (1 - \alpha - n_{S} + \alpha n_{P})
+x =& 2 - o_{S} + n_{S} + \alpha (o_{P} - 2 - n_{P}) \\
+y =& (1 - \alpha - n_{S} + \alpha n_{P}) \\
 z =& (n_{S} - \alpha n_{P})   
 \end{align}
 $$
@@ -1914,12 +1914,12 @@ If we sum the half reactions with partial oxidation (ignoring H<sub>2</sub>O), t
 
 $$
 \begin{align}
-S + \dfrac{(1 - f)D}{4} O_{2} \rightarrow& \dfrac{f D}{d_{B}} B + \alpha P + (1 - \alpha - \dfrac{f D}{d_{B}})CO_{2} + (n_{S} - \alpha n_{P} - n_{B} \cdot \dfrac{f D}{d_{B}}) NH_{4}^{+} \\
+S + \dfrac{(1 - f)D}{4} O_{2} \rightarrow& \dfrac{f D}{d_{B}} B + \alpha P + (1 - \alpha - \dfrac{f D}{d_{B}})CO_{2} + (n_{S} - \alpha n_{P} - n_{B} \cdot \dfrac{f D}{d_{B}}) NH_{4}^{+} 
 \end{align}
 $$
 
 _where_ <br>
-- $D$ is the number of electrons released per carbon atom during oxidation (`e1_res`; `e2_res`; `e3_res`, [e])
+- $D$ is the number of electrons released per carbon atom during oxidation (`e1_res`; `e2_res`; `e3_res`, [e]) <br>
 
 and is equal to
 
@@ -1962,9 +1962,9 @@ d_{P} =& \quad 4 + h_{P} - 2 o_{P} - 3 n_{P}
 $$
 
 _where_ <br>
-- $h_{P} = \quad h_{S} H_{ox}$ 
-- $o_{P} = \quad o_{S} O_{ox}$ 
-- $n_{P} = \quad n_{S} N_{ox}$ 
+- $h_{P} = \quad h_{S} H_{ox}$ <br>
+- $o_{P} = \quad o_{S} O_{ox}$ <br>
+- $n_{P} = \quad n_{S} N_{ox}$ <br>
 
 As a result, both particle-associated and free-living types produce more oxidized dissolved organic matter and preferentially release nitrogen to ammonium when performing partial oxidation.
 
@@ -1976,27 +1976,27 @@ The fractional availability of dissolved organic carbon, $f_{b}^{[DOC]}$, that i
 
 $$
 \begin{align}
-f_{b}^{[DOC]} =& \quad \dfrac{1}{\sigma_{b}^{NOSC} \sqrt{2 \pi}} e^{ -\dfrac{1}{2} \left(\dfrac{NOSC - \rho_{b}^{NOSC}}{\sigma_{b}^{NOSC}}\right)^{2}} \\
+f_{b}^{[DOC]} =& \quad \dfrac{1}{\sigma_{b}^{NOSC} \sqrt{2 \pi}} e^{ -\dfrac{1}{2} \left(\dfrac{NOSC - \rho_{b}^{NOSC}}{\sigma_{b}^{NOSC}}\right)^{2}} 
 \end{align}
 $$
 
 _where_ <br>
-- $NOSC$ is the nominal oxidation state of dissolved organic carbon (`nosc`, [dimensionless])
-- $\rho_{b}^{NOSC}$ is the target NOSC of bacterial type $b$ (`bacf1_nosc_opt`; `bacf2_nosc_opt`, [dimensionless])
-- $\sigma_{b}^{NOSC}$ is the standard deviation around the optimal NOSC of bacterial type $b$ (`bacf1_nosc_sig`; `bacf2_nosc_sig`, [dimensionless])
+- $NOSC$ is the nominal oxidation state of dissolved organic carbon (`nosc`, [dimensionless]) <br>
+- $\rho_{b}^{NOSC}$ is the target NOSC of bacterial type $b$ (`bacf1_nosc_opt`; `bacf2_nosc_opt`, [dimensionless]) <br>
+- $\sigma_{b}^{NOSC}$ is the standard deviation around the optimal NOSC of bacterial type $b$ (`bacf1_nosc_sig`; `bacf2_nosc_sig`, [dimensionless]) <br>
 
 Here, the nominal oxidation state of carbon ([La Rowe & Van Cappellen, 2011](https://www.sciencedirect.com/science/article/pii/S0016703711000378)) in organic matter substrate $S$ is equal to 
 
 $$
 \begin{align}
-NOSC =& \quad \max \left(-4, \min \left(4, -\left(h_{S} - 2 o_{S} - 3 n_{S} \right) \right) \right) \\
+NOSC =& \quad \max \left(-4, \min \left(4, -\left(h_{S} - 2 o_{S} - 3 n_{S} \right) \right) \right)
 \end{align}
 $$
 
 _where_ <br>
-- $h_{S}$ is the H:C ratio of the organic matter substrate (`dom_H2C`, [mol H (mol C)<sup>-1</sup>])
-- $o_{S}$ is the O:C ratio of the organic matter substrate (`dom_O2C`, [mol O (mol C)<sup>-1</sup>])
-- $n_{S}$ is the N:C ratio of the organic matter substrate (`dom_N2C`, [mol N (mol C)<sup>-1</sup>])
+- $h_{S}$ is the H:C ratio of the organic matter substrate (`dom_H2C`, [mol H (mol C)<sup>-1</sup>]) <br>
+- $o_{S}$ is the O:C ratio of the organic matter substrate (`dom_O2C`, [mol O (mol C)<sup>-1</sup>]) <br>
+- $n_{S}$ is the N:C ratio of the organic matter substrate (`dom_N2C`, [mol N (mol C)<sup>-1</sup>]) <br>
 
 The relative availability of DOC to each free-living bacterial type $b$ is then
 
@@ -2100,15 +2100,14 @@ $$
 \end{align}
 $$
 
-where <br>
-
-$V_{b-p}^{NO_3}$ is the potential nitrate uptake rate by particle-associated bacteria (`bac_Vno3`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
-$V_{b-f1}^{NO_3}$ is the potential nitrate uptake rate by the first free-living bacterial type (`bac_Vno3`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
-$V_{b-f2}^{N_{2}O}$ is the potential nitrous oxide uptake rate by the second free-living bacterial type (`bac_Vn2o`, [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
-$y_{b}^{ana(OC)}$ is the anaerobic biomass yield on organic carbon substrate (`bacp_ypoc_ana`; `bacf1_ydoc_ana`; `bacf2_ydoc_ana`, [mol C biomass (mol C substrate)<sup>-1</sup>]) <br>
-$c_{b-p}^{NO_{3} \rightarrow N_{2}}$ is the nitrate requirement for complete denitrification by particle-associated bacteria (`bacp_cno3_ana`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup>]) <br>
-$c_{b-f1}^{NO_{3} \rightarrow N_{2}O}$ is the nitrate requirement for N<sub>2</sub>O production by the first free-living bacterial type (`bacf1_cno3_ana`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup>]) <br>
-$c_{b-f2}^{N_{2}O \rightarrow N_{2}}$ is the nitrous oxide requirement for N<sub>2</sub>O reduction by the second free-living bacterial type (`bacf2_cn2o_ana`, [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>]) <br>
+_where_ <br>
+- $V_{b-p}^{NO_3}$ is the potential nitrate uptake rate by particle-associated bacteria (`bac_Vno3`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b-f1}^{NO_3}$ is the potential nitrate uptake rate by the first free-living bacterial type (`bac_Vno3`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b-f2}^{N_{2}O}$ is the potential nitrous oxide uptake rate by the second free-living bacterial type (`bac_Vn2o`, [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $y_{b}^{ana(OC)}$ is the anaerobic biomass yield on organic carbon substrate (`bacp_ypoc_ana`; `bacf1_ydoc_ana`; `bacf2_ydoc_ana`, [mol C biomass (mol C substrate)<sup>-1</sup>]) <br>
+- $c_{b-p}^{NO_{3} \rightarrow N_{2}}$ is the nitrate requirement for complete denitrification by particle-associated bacteria (`bacp_cno3_ana`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup>]) <br>
+- $c_{b-f1}^{NO_{3} \rightarrow N_{2}O}$ is the nitrate requirement for N<sub>2</sub>O production by the first free-living bacterial type (`bacf1_cno3_ana`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup>]) <br>
+- $c_{b-f2}^{N_{2}O \rightarrow N_{2}}$ is the nitrous oxide requirement for N<sub>2</sub>O reduction by the second free-living bacterial type (`bacf2_cn2o_ana`, [mol N<sub>2</sub>O (mol C biomass)<sup>-1</sup>]) <br>
 
 Whether aerobic or anaerobic metabolism results in higher bacterial growth therefore depends on both substrate uptake rates and the stoichiometric cost of converting those substrates into biomass. The model does not mix aerobic and anaerobic metabolism fractionally. Instead, it uses a binary anaerobic pathway selector:
 
