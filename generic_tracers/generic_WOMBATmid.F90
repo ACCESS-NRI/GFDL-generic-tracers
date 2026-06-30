@@ -558,7 +558,6 @@ module generic_WOMBATmid
         felig, &
         ligK, &
         fecol, &
-        fescaven, &
         fescaafe, &
         fescabafe, &
         fecoag2afe, &
@@ -805,7 +804,6 @@ module generic_WOMBATmid
         id_felig = -1, &
         id_ligK = -1, &
         id_fecol = -1, &
-        id_fescaven = -1, &
         id_fescaafe = -1, &
         id_fescabafe = -1, &
         id_fecoag2afe = -1, &
@@ -1642,11 +1640,6 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'fecol', 'Colloidal dissolved iron', 'h', 'L', 's', 'mol/kg', 'f')
     wombat%id_fecol = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
-        'fescaven', 'Scavenging of free Fe onto detritus (organic + inorganic)', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_fescaven = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -4556,7 +4549,6 @@ module generic_WOMBATmid
     wombat%felig(:,:,:) = 0.0
     wombat%ligK(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
-    wombat%fescaven(:,:,:) = 0.0
     wombat%fescaafe(:,:,:) = 0.0
     wombat%fescabafe(:,:,:) = 0.0
     wombat%fesources(:,:,:) = 0.0
@@ -5399,9 +5391,9 @@ module generic_WOMBATmid
 
       ! Scavenging of Fe` onto biogenic particles
       partic = (biodet*2 + biobdet*2 + biobdetsi*2 + biocaco3*8.3) ! total particle concentration [mmol/m3]
-      wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7/86400.0 + wombat%kscav_dfe * partic)
-      wombat%fescaafe(i,j,k) = wombat%fescaven(i,j,k) * (biodet*2 + biocaco3*8.3) / (partic+epsi)
-      wombat%fescabafe(i,j,k) = wombat%fescaven(i,j,k) * (biobdet*2 + biobdetsi*2) / (partic+epsi)
+      fescaven = wombat%feIII(i,j,k) * (1e-7/86400.0 + wombat%kscav_dfe * partic)
+      wombat%fescaafe(i,j,k) = fescaven * (biodet*2 + biocaco3*8.3) / (partic+epsi)
+      wombat%fescabafe(i,j,k) = fescaven * (biobdet*2 + biobdetsi*2) / (partic+epsi)
 
       ! Coagulation of colloidal Fe (umol/m3) to form sinking particles (mmol/m3)
       ! Following Tagliabue et al. (2023), make coagulation rate dependent on DOC and Phytoplankton biomass
@@ -5431,7 +5423,6 @@ module generic_WOMBATmid
       wombat%bafediss(i,j,k) = wombat%kbafe_dfe * wombat%f_bafe(i,j,k)
 
       ! Convert the terms back to mol/kg
-      wombat%fescaven(i,j,k) = wombat%fescaven(i,j,k) * umol_m3_to_mol_kg
       wombat%fescaafe(i,j,k) = wombat%fescaafe(i,j,k) * umol_m3_to_mol_kg
       wombat%fescabafe(i,j,k) = wombat%fescabafe(i,j,k) * umol_m3_to_mol_kg
       wombat%fecoag2afe(i,j,k) = wombat%fecoag2afe(i,j,k) * umol_m3_to_mol_kg
@@ -6826,7 +6817,8 @@ module generic_WOMBATmid
                          - wombat%bacf1ufer(i,j,k) &
                          - wombat%bacf2ufer(i,j,k) &
                          - wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
-                         - wombat%fescaven(i,j,k) &
+                         - wombat%fescaafe(i,j,k) &
+                         - wombat%fescabafe(i,j,k) &
                          - wombat%fecoag2afe(i,j,k) &
                          - wombat%fecoag2bafe(i,j,k) )
 
@@ -6871,7 +6863,8 @@ module generic_WOMBATmid
                               + wombat%bacf1ufer(i,j,k) &
                               + wombat%bacf2ufer(i,j,k) &
                               + wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
-                              + wombat%fescaven(i,j,k) &
+                              + wombat%fescaafe(i,j,k) &
+                              + wombat%fescabafe(i,j,k) &
                               + wombat%fecoag2afe(i,j,k) &
                               + wombat%fecoag2bafe(i,j,k))
 
@@ -7707,10 +7700,6 @@ module generic_WOMBATmid
 
     if (wombat%id_fecol > 0) &
       used = g_send_data(wombat%id_fecol, wombat%fecol, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
-    if (wombat%id_fescaven > 0) &
-      used = g_send_data(wombat%id_fescaven, wombat%fescaven, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_fescaafe > 0) &
@@ -8855,7 +8844,6 @@ module generic_WOMBATmid
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
     allocate(wombat%ligK(isd:ied, jsd:jed, 1:nk)); wombat%ligK(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
-    allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
     allocate(wombat%fescaafe(isd:ied, jsd:jed, 1:nk)); wombat%fescaafe(:,:,:)=0.0
     allocate(wombat%fescabafe(isd:ied, jsd:jed, 1:nk)); wombat%fescabafe(:,:,:)=0.0
     allocate(wombat%fecoag2afe(isd:ied, jsd:jed, 1:nk)); wombat%fecoag2afe(:,:,:)=0.0
@@ -9186,7 +9174,6 @@ module generic_WOMBATmid
         wombat%felig, &
         wombat%ligK, &
         wombat%fecol, &
-        wombat%fescaven, &
         wombat%fescaafe, &
         wombat%fescabafe, &
         wombat%fecoag2afe, &
