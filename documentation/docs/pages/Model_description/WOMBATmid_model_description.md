@@ -52,9 +52,9 @@ The following are the active tracers in WOMBAT-mid
 | 27   | B<sub>DOM</sub><sup>O</sup>   | `p_doo`    | Dissolved organic oxygen                            | mol N kg<sup>-1</sup>     | Yes         |
 | 28   | B<sub>DOM</sub><sup>N</sup>   | `p_don`    | Dissolved organic nitrogen                          | mol N kg<sup>-1</sup>     | Yes         |
 | 29   | B<sub>aoa</sub><sup>C</sup>   | `p_aoa`    | Ammonia oxidizing archaea                           | mol C kg<sup>-1</sup>     | Yes         |
-| 30   | B<sub>b1</sub><sup>C</sup>    | `p_bacp`   | Particle-associated heterotrophic bacteria1         | mol C kg<sup>-1</sup>     | Yes         |
-| 31   | B<sub>b2</sub><sup>C</sup>    | `p_bacf1`   | Free-living heterotrophic bacterial type            | mol C kg<sup>-1</sup>     | Yes         |
-| 32   | B<sub>b3</sub><sup>C</sup>    | `p_bacf2`   | Free-living heterotrophic bacterial type            | mol C kg<sup>-1</sup>     | Yes         |
+| 30   | B<sub>b-p</sub><sup>C</sup>   | `p_bacp`   | Particle-associated heterotrophic bacteria          | mol C kg<sup>-1</sup>     | Yes         |
+| 31   | B<sub>b-f1</sub><sup>C</sup>  | `p_bacf1`  | Free-living heterotrophic bacterial type #1         | mol C kg<sup>-1</sup>     | Yes         |
+| 32   | B<sub>b-f2</sub><sup>C</sup>  | `p_bacf2`  | Free-living heterotrophic bacterial type #2         | mol C kg<sup>-1</sup>     | Yes         |
 | 33   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
 | 34   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
 | 35   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
@@ -1504,7 +1504,7 @@ _where_ <br>
 
 Mortality of ecological functional types are affected by both linear ($\gamma$) and quadratic ($\Gamma$) terms. Linear terms are per-capita losses associated with the costs of basal metabolism. Quadratic, and thus density-dependent losses, are associated with disease, aggregation and coagulation, viruses, infection and cannibalism. None of these processes are represented explicitly within the model, so we represent them implicitly.
 
-**Linear losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
+**Linear losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative heterotrophic bacterial types (<sub>b-p</sub>, <sub>b-f1</sub>, <sub>b-f2</sub>), and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
 $$
 \begin{align}
@@ -1512,9 +1512,9 @@ $$
 \gamma_{mp}^{\rightarrow C} =& \quad \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
 \gamma_{mz}^{\rightarrow C} =& \quad \gamma_{mz}^{0ºC} (β_{hete})^{T} B_{mz}^{C} \\
 \gamma_{Mz}^{\rightarrow C} =& \quad \gamma_{Mz}^{0ºC} (β_{hete})^{T} B_{Mz}^{C} \\
-\gamma_{b-p}^{\rightarrow C} =& \quad \gamma_{b1}^{0ºC} (β_{hete})^{T} B_{b-p}^{C} \\
-\gamma_{b-f1}^{\rightarrow C} =& \quad \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b-f1}^{C} \\
-\gamma_{b-f2}^{\rightarrow C} =& \quad \gamma_{b2}^{0ºC} (β_{hete})^{T} B_{b-f2}^{C} \\
+\gamma_{b-p}^{\rightarrow C} =& \quad \gamma_{b}^{0ºC} (β_{hete})^{T} B_{b-p}^{C} \\
+\gamma_{b-f1}^{\rightarrow C} =& \quad \gamma_{b}^{0ºC} (β_{hete})^{T} B_{b-f1}^{C} \\
+\gamma_{b-f2}^{\rightarrow C} =& \quad \gamma_{b}^{0ºC} (β_{hete})^{T} B_{b-f2}^{C} \\
 \gamma_{aoa}^{\rightarrow C} =& \quad \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C}
 \end{align}
 $$
@@ -1524,9 +1524,7 @@ _where_ <br>
 - $\gamma_{mp}^{0ºC}$ is the rate of linear mortality of micro-phytoplankton at 0ºC (`dialmor`, [s<sup>-1</sup>]) <br>
 - $\gamma_{mz}^{0ºC}$ is the rate of linear mortality of micro-zooplankton at 0ºC (`zoolmor`, [s<sup>-1</sup>]) <br>
 - $\gamma_{Mz}^{0ºC}$ is the rate of linear mortality of meso-zooplankton at 0ºC (`meslmor`, [s<sup>-1</sup>]) <br>
-- $\gamma_{b-p}^{0ºC}$ is the rate of linear mortality of facultative NO<sub>3</sub>-reducing, particle-associated bacteria at 0ºC (`bacplmor`, [s<sup>-1</sup>]) <br>
-- $\gamma_{b-f1}^{0ºC}$ is the rate of linear mortality of facultative NO<sub>3</sub>-reducing free-living bacteria at 0ºC (`bacf1lmor`, [s<sup>-1</sup>]) <br>
-- $\gamma_{b-f2}^{0ºC}$ is the rate of linear mortality of facultative N<sub>2</sub>O-reducing free-living bacteria at 0ºC (`bacplmor`, [s<sup>-1</sup>]) <br>
+- $\gamma_{b}^{0ºC}$ is the rate of linear mortality of all heterotrophic bacterial types at 0ºC (`baclmor`, [s<sup>-1</sup>]) <br>
 - $\gamma_{aoa}^{0ºC}$ is the rate of linear mortality of ammonia oxidizing archaea at 0ºC (`aoalmor`, [s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
@@ -1540,7 +1538,7 @@ _where_ <br>
 - $B_{aoa}^{C}$ is the concentration of ammonia oxidizing archaea carbon biomass (`f_aoa(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 
 
-**Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), facultative nitrate-reducing bacteria (<sub>b1</sub>), facultative nitrous oxide-reducing bacteria (<sub>b2</sub>) and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
+**Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>), meso-zooplankton (<sub>Mz</sub>), ffacultative heterotrophic bacterial types (<sub>b-p</sub>, <sub>b-f1</sub>, <sub>b-f2</sub>), and ammonia oxidizing archaea (<sub>aoa</sub>) in [mol kg<sup>-1</sup> s<sup>-1</sup>] are modelled as
 
 $$
 \begin{align}
@@ -1548,9 +1546,9 @@ $$
 \Gamma_{mp}^{\rightarrow C} =& \quad \Gamma_{mp}^{0ºC} (β_{hete})^{T} \left(B_{mp}^{C}\right)^{2} \\
 \Gamma_{mz}^{\rightarrow C} =& \quad \Gamma_{mz}^{0ºC} (β_{hete})^{T} \left(B_{mz}^{C}\right)^{2} \\
 \Gamma_{Mz}^{\rightarrow C} =& \quad \Gamma_{Mz}^{0ºC} (β_{hete})^{T} \left(B_{Mz}^{C}\right)^{2} \\
-\Gamma_{b-p}^{\rightarrow C} =& \quad \Gamma_{b1}^{0ºC} (β_{hete})^{T} \left(B_{b-p}^{C}\right)^{2} \\
-\Gamma_{b-f1}^{\rightarrow C} =& \quad \Gamma_{b1}^{0ºC} (β_{hete})^{T} \left(B_{b-f1}^{C}\right)^{2} \\
-\Gamma_{b-f2}^{\rightarrow C} =& \quad \Gamma_{b2}^{0ºC} (β_{hete})^{T} \left(B_{b-f2}^{C}\right)^{2} \\
+\Gamma_{b-p}^{\rightarrow C} =& \quad \Gamma_{b}^{0ºC} (β_{hete})^{T} \left(B_{b-p}^{C}\right)^{2} \\
+\Gamma_{b-f1}^{\rightarrow C} =& \quad \Gamma_{b}^{0ºC} (β_{hete})^{T} \left(B_{b-f1}^{C}\right)^{2} \\
+\Gamma_{b-f2}^{\rightarrow C} =& \quad \Gamma_{b}^{0ºC} (β_{hete})^{T} \left(B_{b-f2}^{C}\right)^{2} \\
 \Gamma_{aoa}^{\rightarrow C} =& \quad \Gamma_{aoa}^{0ºC} (β_{hete})^{T} \left(B_{aoa}^{C}\right)^{2}
 \end{align}
 $$
@@ -1560,9 +1558,7 @@ _where_ <br>
 - $\Gamma_{mp}^{0ºC}$ is the rate of quadratic mortality of micro-phytoplankton at 0ºC (`diaqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\Gamma_{mz}^{0ºC}$ is the rate of quadratic mortality of micro-zooplankton at 0ºC (`zooqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\Gamma_{Mz}^{0ºC}$ is the rate of quadratic mortality of meso-zooplankton at 0ºC (`mesqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\Gamma_{b1}^{0ºC}$ is the rate of quadratic mortality of facultative NO<sub>3</sub>-reducing particle-associated bacteria at 0ºC (`bacpqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\Gamma_{b-f1}^{0ºC}$ is the rate of quadratic mortality of facultative NO<sub>3</sub>-reducing free-living bacteria at 0ºC (`bacf1qmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\Gamma_{b-f2}^{0ºC}$ is the rate of quadratic mortality of facultative N<sub>2</sub>O-reducing free-living bacteria at 0ºC (`bacf2qmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\Gamma_{b}^{0ºC}$ is the rate of quadratic mortality of all heterotrophic bacterial types at 0ºC (`bacqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\Gamma_{aoa}^{0ºC}$ is the rate of quadratic mortality of ammonia oxidizing archaea at 0ºC (`aoaqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
@@ -2411,7 +2407,7 @@ _where_ <br>
 
 $$
 \begin{aligned}
-\dfrac{\Delta NO_3}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow NO_3} - \mu_{b1}^{\leftarrow NO_3} \\
+\dfrac{\Delta NO_3}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow NO_3} - \mu_{b-p}^{\leftarrow NO_3} - \mu_{b-f1}^{\leftarrow NO_3} \\
                                &  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
 \end{aligned}
 $$
@@ -2439,8 +2435,9 @@ $$
                                & + \bigg( \gamma_{mz}^{\rightarrow C}  
                                         + \gamma_{Mz}^{\rightarrow C} \bigg) \cdot \dfrac{16}{122} \\
                                & + \mu_{diazo}^{\rightarrow NH_4} 
-                                + \mu_{b1}^{\rightarrow NH_4} 
-                                 + \mu_{b2}^{\rightarrow NH_4} \\
+                                 + \mu_{b-p}^{\rightarrow NH_4} 
+                                 + \mu_{b-f1}^{\rightarrow NH_4} 
+                                 + \mu_{b-f2}^{\rightarrow NH_4} \\
                                & - \mu_{aox}^{NH_4 \rightarrow N_2} 
                                  - \mu_{aoa}^{\leftarrow NH_4} \\
                                & - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
@@ -2461,7 +2458,7 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta N_{2}O}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow N_{2}O} + \mu_{b1}^{\rightarrow N_{2}O} - \mu_{b2}^{\leftarrow N_{2}O}
+\dfrac{\Delta N_{2}O}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow N_{2}O} + \mu_{b-f1}^{\rightarrow N_{2}O} - \mu_{b-f2}^{\leftarrow N_{2}O}
 \end{align}
 $$
 
@@ -2475,8 +2472,9 @@ $$
                                             + \gamma_{Mz}^{\rightarrow C} \\
                               &             - \mu_{np}^{\leftarrow C}
                                             - \mu_{mp}^{\leftarrow C} \bigg) \dfrac{-132}{122} \\
-                              & - \mu_{b1}^{\leftarrow O_2}
-                                - \mu_{b2}^{\leftarrow O_2}
+                              & - \mu_{b-p}^{\leftarrow O_2}
+                                - \mu_{b-f1}^{\leftarrow O_2}
+                                - \mu_{b-f2}^{\leftarrow O_2}
                                 - \mu_{aoa}^{\leftarrow O_2}
 \end{align}
 $$
@@ -2491,8 +2489,9 @@ $$
                                     + \gamma_{mp}^{\rightarrow C} Q_{mp}^{Fe:C} \\
                               &     + \gamma_{mz}^{\rightarrow C} Q_{mz}^{Fe:C} 
                                     + \gamma_{Mz}^{\rightarrow C} Q_{Mz}^{Fe:C} \\
-                              &     + \dfrac{\gamma_{b1}^{\rightarrow C} + \Gamma_{b1}^{\rightarrow C}}{R_{b1}^{C:Fe}}
-                                    + \dfrac{\gamma_{b2}^{\rightarrow C} + \Gamma_{b2}^{\rightarrow C}}{R_{b2}^{C:Fe}}
+                              &     + \dfrac{\gamma_{b-p}^{\rightarrow C} + \Gamma_{b-p}^{\rightarrow C}}{R_{b}^{C:Fe}}
+                                    + \dfrac{\gamma_{b-f1}^{\rightarrow C} + \Gamma_{b-f1}^{\rightarrow C}}{R_{b}^{C:Fe}}
+                                    + \dfrac{\gamma_{b-f2}^{\rightarrow C} + \Gamma_{b-f2}^{\rightarrow C}}{R_{b}^{C:Fe}}
                                     + \dfrac{\gamma_{aoa}^{\rightarrow C} + \Gamma_{aoa}^{\rightarrow C}}{R_{aoa}^{C:Fe}} \\
                               &     + X_{mz}^{\leftarrow Fe} 
                                     + X_{Mz}^{\leftarrow Fe} \\
@@ -2500,8 +2499,9 @@ $$
                                     + D_{Fe_{lA}}^{\rightarrow dFe} \\
                               &     - \mu_{np}^{\leftarrow dFe} 
                                     - \mu_{mp}^{\leftarrow dFe}
-                                    - \mu_{b1}^{\leftarrow dFe}
-                                    - \mu_{b2}^{\leftarrow dFe}
+                                    - \mu_{b-p}^{\leftarrow dFe}
+                                    - \mu_{b-f1}^{\leftarrow dFe}
+                                    - \mu_{b-f2}^{\leftarrow dFe}
                                     - \mu_{aoa}^{\leftarrow dFe} \\
                               &     - Sc_{dFe}^{\rightarrow Fe_{sA}} 
                                     - Sc_{dFe}^{\rightarrow Fe_{lA}}
@@ -2763,43 +2763,103 @@ $$
 $$
 \begin{align}
 \dfrac{\Delta B_{DOM}^{C}}{\Delta t} =& \quad \mu_{np}^{\rightarrow DOC} 
-                                            + \mu_{mp}^{\rightarrow DOC}
-                                            + \Gamma_{sd}^{\rightarrow C}
-                                            + \Gamma_{ld}^{\rightarrow C} \\
+                                            + \mu_{mp}^{\rightarrow DOC} \\
                                       &     + \gamma_{np}^{\rightarrow C}
                                             + \gamma_{mp}^{\rightarrow C}
-                                            + \Gamma_{b1}^{\rightarrow C}
-                                            + \gamma_{b1}^{\rightarrow C} \\
-                                      &     + \Gamma_{b2}^{\rightarrow C}
-                                            + \gamma_{b2}^{\rightarrow C}
+                                            + \gamma_{b-p}^{\rightarrow C}
+                                            + \gamma_{b-f1}^{\rightarrow C}
+                                            + \gamma_{b-f2}^{\rightarrow C} \\
+                                      &     + \Gamma_{b-p}^{\rightarrow C}
+                                            + \Gamma_{b-f1}^{\rightarrow C}
+                                            + \Gamma_{b-f2}^{\rightarrow C}
                                             + \Gamma_{aoa}^{\rightarrow C}
                                             + \gamma_{aoa}^{\rightarrow C} \\
                                       &     + X_{mz}^{\leftarrow C} f_{mz}^{X \rightarrow DOM} 
                                             + X_{Mz}^{\leftarrow C} f_{Mz}^{X \rightarrow DOM} \\
-                                      &     - \mu_{b1}^{\leftarrow B_{DOM}^{C}} 
-                                            - \mu_{b2}^{\leftarrow B_{DOM}^{C}}
+                                      &     + \mu_{b-p}^{\rightarrow B_{DOM}^{C}}
+                                            + \mu_{b-f1}^{\rightarrow B_{DOM}^{C}}
+                                            + \mu_{b-f2}^{\rightarrow B_{DOM}^{C}} \\
+                                      &     - \mu_{b-f1}^{\leftarrow B_{DOM}^{C}}
+                                            - \mu_{b-f2}^{\leftarrow B_{DOM}^{C}}
 \end{align}
 $$
 
+**Dissolved organic hydrogen** (`f_doh(i,j,k)`, $B_{DOM}^{H}$, [mol H kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{DOM}^{H}}{\Delta t} =& \quad \bigg( \mu_{np}^{\rightarrow DOC}
+                                                   + \mu_{mp}^{\rightarrow DOC} \bigg) \cdot 2.0 \\
+                                      &     + \bigg( \gamma_{np}^{\rightarrow C}
+                                                   + \gamma_{mp}^{\rightarrow C} \\
+                                      &            + X_{mz}^{\leftarrow C} f_{mz}^{X \rightarrow DOM} 
+                                                   + X_{Mz}^{\leftarrow C} f_{Mz}^{X \rightarrow DOM} \bigg) \cdot 1.65 \\
+                                      &     + \bigg( \gamma_{b-p}^{\rightarrow C}
+                                                   + \gamma_{b-f1}^{\rightarrow C}
+                                                   + \gamma_{b-f2}^{\rightarrow C} \\
+                                      &            + \Gamma_{b-p}^{\rightarrow C}
+                                                   + \Gamma_{b-f1}^{\rightarrow C}
+                                                   + \Gamma_{b-f2}^{\rightarrow C} \\
+                                      &            + \Gamma_{aoa}^{\rightarrow C}
+                                                   + \gamma_{aoa}^{\rightarrow C} \bigg) \cdot 1.40 \\
+                                      &     + \bigg( \mu_{b-p}^{\rightarrow B_{DOM}^{C}} \cdot 1.65 
+                                                   + \mu_{b-f1}^{\rightarrow B_{DOM}^{C}} \cdot \dfrac{B_{DOM}^{H}}{B_{DOM}^{C}}
+                                                   + \mu_{b-f2}^{\rightarrow B_{DOM}^{C}} \cdot \dfrac{B_{DOM}^{H}}{B_{DOM}^{C}} \bigg) \cdot H_{ox}\\
+                                      &     - \bigg( \mu_{b-f1}^{\leftarrow B_{DOM}^{C}} 
+                                                   + \mu_{b-f2}^{\leftarrow B_{DOM}^{C}} \bigg) \dfrac{B_{DOM}^{H}}{B_{DOM}^{C}}
+ 
+\end{align}
+$$
+
+**Dissolved organic oxygen** (`f_doo(i,j,k)`, $B_{DOM}^{O}$, [mol O kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{DOM}^{O}}{\Delta t} =& \quad \bigg( \mu_{np}^{\rightarrow DOC}
+                                                   + \mu_{mp}^{\rightarrow DOC} \bigg) \cdot 1.0 \\
+                                      &     + \bigg( \gamma_{np}^{\rightarrow C}
+                                                   + \gamma_{mp}^{\rightarrow C} \\
+                                      &            + X_{mz}^{\leftarrow C} f_{mz}^{X \rightarrow DOM} 
+                                                   + X_{Mz}^{\leftarrow C} f_{Mz}^{X \rightarrow DOM} \bigg) \cdot 0.40 \\
+                                      &     + \bigg( \gamma_{b-p}^{\rightarrow C}
+                                                   + \gamma_{b-f1}^{\rightarrow C}
+                                                   + \gamma_{b-f2}^{\rightarrow C} \\
+                                      &            + \Gamma_{b-p}^{\rightarrow C}
+                                                   + \Gamma_{b-f1}^{\rightarrow C}
+                                                   + \Gamma_{b-f2}^{\rightarrow C} \\
+                                      &            + \Gamma_{aoa}^{\rightarrow C}
+                                                   + \gamma_{aoa}^{\rightarrow C} \bigg) \cdot 0.40 \\
+                                      &     + \bigg( \mu_{b-p}^{\rightarrow B_{DOM}^{C}} \cdot 0.4 
+                                                   + \mu_{b-f1}^{\rightarrow B_{DOM}^{C}} \cdot \dfrac{B_{DOM}^{O}}{B_{DOM}^{C}}
+                                                   + \mu_{b-f2}^{\rightarrow B_{DOM}^{C}} \cdot \dfrac{B_{DOM}^{O}}{B_{DOM}^{C}} \bigg) \cdot O_{ox}\\
+                                      &     - \bigg( \mu_{b-f1}^{\leftarrow B_{DOM}^{C}} 
+                                                   + \mu_{b-f2}^{\leftarrow B_{DOM}^{C}} \bigg) \dfrac{B_{DOM}^{O}}{B_{DOM}^{C}}
+ 
+\end{align}
+$$
 
 **Dissolved organic nitrogen** (`f_don(i,j,k)`, $B_{DOM}^{N}$, [mol N kg<sup>-1</sup>])
 
 $$
 \begin{align}
-\dfrac{\Delta B_{DOM}^{N}}{\Delta t} =& \quad \bigg( \Gamma_{b1}^{\rightarrow C} + \gamma_{b1}^{\rightarrow C}
-                                                   + \Gamma_{b2}^{\rightarrow C} + \gamma_{b2}^{\rightarrow C}
+\dfrac{\Delta B_{DOM}^{N}}{\Delta t} =& \quad \bigg( \Gamma_{b-p}^{\rightarrow C} + \gamma_{b-p}^{\rightarrow C}
+                                                   + \Gamma_{b-f1}^{\rightarrow C} + \gamma_{b-f1}^{\rightarrow C}
+                                                   + \Gamma_{b-f2}^{\rightarrow C} + \gamma_{b-f2}^{\rightarrow C}
                                                    + \Gamma_{aoa}^{\rightarrow C} + \gamma_{aoa}^{\rightarrow C} \\
                                       &            + X_{mz}^{\leftarrow B_{b-p}^{C}} + X_{mz}^{\leftarrow B_{b-f1}^{C}} + X_{mz}^{\leftarrow B_{b-f2}^{C}}
                                                    + X_{mz}^{\leftarrow B_{aoa}^{C}} + X_{Mz}^{\leftarrow B_{b-p}^{C}} + X_{Mz}^{\leftarrow B_{b-f1}^{C}}
-                                                   + X_{Mz}^{\leftarrow B_{b-f2}^{C}} + X_{Mz}^{\leftarrow B_{aoa}^{C}} \bigg) \cdot \dfrac{1}{5} \\
-                                      & \quad + \Bigg( \Gamma_{sd}^{\rightarrow C} + \Gamma_{ld}^{\rightarrow C}
-                                                     + \gamma_{np}^{\rightarrow C} + \gamma_{mp}^{\rightarrow C} \\
-                                      &  \qquad + \bigg( X_{mz}^{\leftarrow B_{np}^{C}} + X_{mz}^{\leftarrow B_{mp}^{C}}
-                                                       + X_{mz}^{\leftarrow B_{sd}^{C}} \bigg) f_{mz}^{X \rightarrow DOM} \\
-                                      &  \qquad + \bigg( X_{Mz}^{\leftarrow B_{np}^{C}} + X_{Mz}^{\leftarrow B_{mp}^{C}}
-                                                       + X_{Mz}^{\leftarrow B_{sd}^{C}} + X_{Mz}^{\leftarrow B_{ld}^{C}}
-                                                    + X_{Mz}^{\leftarrow B_{mz}^{C}} \bigg) f_{Mz}^{X \rightarrow DOM} \Bigg) \cdot \dfrac{16}{122} \\
-                                      & - \mu_{b1}^{\leftarrow B_{DOM}^{N}} - \mu_{b2}^{\leftarrow B_{DOM}^{N}} 
+                                                   + X_{Mz}^{\leftarrow B_{b-f2}^{C}} + X_{Mz}^{\leftarrow B_{aoa}^{C}} \bigg) \cdot \dfrac{1}{R_{b}^{C:N}} \\
+                                      &  \quad + \Bigg( \bigg( X_{mz}^{\leftarrow B_{np}^{C}} + X_{mz}^{\leftarrow B_{mp}^{C}}
+                                                             + X_{mz}^{\leftarrow B_{sd}^{C}} \bigg) f_{mz}^{X \rightarrow DOM} \\
+                                      &  \qquad       + \bigg( X_{Mz}^{\leftarrow B_{np}^{C}} + X_{Mz}^{\leftarrow B_{mp}^{C}}
+                                                             + X_{Mz}^{\leftarrow B_{sd}^{C}} + X_{Mz}^{\leftarrow B_{ld}^{C}}
+                                                             + X_{Mz}^{\leftarrow B_{mz}^{C}} \bigg) f_{Mz}^{X \rightarrow DOM} \Bigg) \cdot \dfrac{16}{122} \\
+                                      &     + \bigg( \mu_{b-p}^{\rightarrow B_{DOM}^{C}} \cdot \dfrac{16}{122} 
+                                                   + \mu_{b-f1}^{\rightarrow B_{DOM}^{C}} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{C}}
+                                                   + \mu_{b-f2}^{\rightarrow B_{DOM}^{C}} \cdot \dfrac{B_{DOM}^{N}}{B_{DOM}^{C}} \bigg) \cdot N_{ox}\\
+                                      &     - \bigg( \mu_{b-f1}^{\leftarrow B_{DOM}^{C}} 
+                                                   + \mu_{b-f2}^{\leftarrow B_{DOM}^{C}} \bigg) \dfrac{B_{DOM}^{N}}{B_{DOM}^{C}}
+ 
 \end{align}
 $$
 
@@ -2828,8 +2888,9 @@ $$
                                     + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
                               &     + \gamma_{mz}^{\rightarrow C}
                                     + \gamma_{Mz}^{\rightarrow C}
-                                    + \mu_{b1}^{\rightarrow DIC}
-                                    + \mu_{b2}^{\rightarrow DIC} \\
+                                    + \mu_{b-p}^{\rightarrow DIC}
+                                    + \mu_{b-f1}^{\rightarrow DIC}
+                                    + \mu_{b-f2}^{\rightarrow DIC} \\
                               &     + D_{CaCO_3}^{\Omega_{cal}}
                                     + D_{CaCO_3}^{\Omega_{ara}}
                                     + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
@@ -2875,9 +2936,11 @@ $$
                               &            + X_{Mz}^{\leftarrow B_{b-f1}^{N}}
                                            + X_{Mz}^{\leftarrow B_{b-f2}^{N}}
                                            + X_{Mz}^{\leftarrow B_{aoa}^{N}} \bigg) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
-                              &            + \mu_{b1}^{\rightarrow NH_4} 
-                                           + \mu_{b2}^{\rightarrow NH_4}
-                                           + \mu_{b1}^{\leftarrow NO_{3}}
+                              &            + \mu_{b-p}^{\rightarrow NH_4} 
+                                           + \mu_{b-f1}^{\rightarrow NH_4}
+                                           + \mu_{b-f2}^{\rightarrow NH_4}
+                                           + \mu_{b-p}^{\leftarrow NO_{3}}
+                                           + \mu_{b-f1}^{\leftarrow NO_{3}}
                                            - \mu_{aoa}^{\leftarrow NH_{4}}
                                            - \mu_{aoa}^{\rightarrow NO_{3}}
                                            - \mu_{aox}^{NH_4 \rightarrow N_2} \\
