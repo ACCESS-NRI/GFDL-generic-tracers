@@ -18,6 +18,27 @@ _Pearse.Buchanan@csiro.au_
 
 ![schematic](/assets/schematic-lite.png)
 
+## Executive summary
+
+- Currency of biomasses are in carbon units <br>
+- Phytoplankton perform photo-acclimation by altering the chlorophyll to carbon ratios dynamically according to the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation. <br>
+- Phytoplankton nutrient affinities vary as a function of mean cell size via observed allometric relationships ([Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901)). <br>
+- Light is split into blue, green and red wavelengths and attenuated at rates dependent on ambient chlorophyll and detrital concentrations. <br>
+- Phytoplankton growth is limited by an internal quota model for iron (Fe) ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)), with minimum quotas varying dynamically in response to the cellular demands for nitrate reduction, respiration and chlorophyll content of the cell. This also allows for luxury uptake. <br>
+- The iron (Fe) cycle follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5) to reflect Fe chemistry (solubility, ligand binding), scavenging and colloidal coagulation. <br>
+- Zooplankton grazing assumes a Holling Type III functional form ([Holling, 1959](https://doi.org/10.4039/Ent91385-7)) and active switching between phytoplankton and particulate detrital prey types ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)). <br>
+- Iron (Fe) cycling through zooplankton routes Fe preferentially to egestion (i.e., faecal pellets) following [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597), enriching detritus in Fe. <br>
+- Calcium carbonate cycling includes dynamic production and dissolution mechanics as a function of the ambient seawater carbonate chemistry. Production is affected by the substrate-inhibitor ratio following [Lehmann & Bach (2025)](https://www.nature.com/articles/s41561-025-01644-0). Dissolution occurs in both saturated (reducing particle micro-environments) and undersaturated waters following [Kwon et al. (2024)](https://www.science.org/doi/full/10.1126/sciadv.adl0779). <br>
+- The nitrogen cycle can be made to be open, with implicit schemes for nitrogen fixation and denitrification switched on or off at run time. <br>
+- Sinking of particulates varies as a function of mean community cell/body size using the insights of [Cael et al. (2021)](https://doi.org/10.1029/2020GL091771) and [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901), with CaCO<sub>3</sub> concentrations also adding a ballasting effect ([Bach et al., 2016](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2016GB005372)). <br>
+- External sources of nitrate, DIC, alkalinity and detritus via rivers. <br>
+- Permanent burial of organics in sediments via [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907). <br>
+- External source of dissolved iron from aeolian deposition that includes mineral, fire and anthropogenic sources ([Hamilton et al., 2020](https://doi.org/10.1029/2019GB006448)). <br>
+- Major calibration and optimization of the model parameters to 8 global observational datasets ([Buchanan et al., 2025](https://doi.org/10.5194/egusphere-2024-4026)). <br>
+
+---
+
+
 ## Tracers
 
 The following are the active tracers in WOMBAT-lite
