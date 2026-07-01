@@ -21,7 +21,7 @@ _Pearse.Buchanan@csiro.au_
 ## Executive summary
 
 - Currency of biomasses are in carbon units <br>
-- Carbon chemistry uses the `mocsy` system ([Orr & Epitalon, 2015](https://gmd.copernicus.org/articles/8/485/2015/))
+- Carbon chemistry uses the `mocsy` system by default ([Orr & Epitalon, 2015](https://gmd.copernicus.org/articles/8/485/2015/))
 - Phytoplankton perform photo-acclimation by altering the chlorophyll to carbon ratios dynamically according to the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation. <br>
 - Phytoplankton nutrient affinities vary as a function of mean cell size via observed allometric relationships ([Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901)). <br>
 - Light is split into blue, green and red wavelengths and attenuated at rates dependent on ambient chlorophyll and detrital concentrations. <br>
