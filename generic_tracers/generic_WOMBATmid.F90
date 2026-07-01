@@ -5904,9 +5904,6 @@ module generic_WOMBATmid
       m2_doc = f2_doc / (f2_doc + f3_doc + epsi) * biodoc
       m3_doc = f3_doc / (f2_doc + f3_doc + epsi) * biodoc
 
-      ! PJB
-      m2_doc = biodoc * 1.0
-
       ! Compute carbon-normalized electron contents, biomass yields and source-sink stoichiometric coefficients
       !  [ Zakem et al., 2020 ISME; Buchanan et al., 2025 Science]
       !  1. Find electron potential of the bacterial biomass and DOM per carbon atom
