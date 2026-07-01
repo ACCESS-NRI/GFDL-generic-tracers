@@ -4260,7 +4260,7 @@ module generic_WOMBATmid
     real                                    :: ztemk, I_ztemk, fe_sfe, partic, inv1, inv2, fe3, ligW_K, FeL1_mid, FeL2_mid
     real                                    :: fesol1, fesol2, fesol3, fesol4, fesol5, hp, fe3sol
     real                                    :: feagg1, feagg2, feagg3, feagg4, feagg5
-    real                                    :: biof, shear
+    real                                    :: biof, shear, fescaven
     real                                    :: phy_Fe2C, dia_Fe2C, zoo_Fe2C, mes_Fe2C, det_Fe2C, bdet_Fe2C
     real                                    :: dom_H2C, dom_O2C, dom_N2C, dia_Si2C
     real                                    :: theta_opt
@@ -5903,6 +5903,9 @@ module generic_WOMBATmid
       f3_doc = 1.0 / (wombat%bacf2_nosc_sig * 2.5066) * exp( -0.5 * ((nosc - wombat%bacf2_nosc_opt)/wombat%bacf2_nosc_sig)**2 )
       m2_doc = f2_doc / (f2_doc + f3_doc + epsi) * biodoc
       m3_doc = f3_doc / (f2_doc + f3_doc + epsi) * biodoc
+
+      ! PJB
+      m2_doc = biodoc * 1.0
 
       ! Compute carbon-normalized electron contents, biomass yields and source-sink stoichiometric coefficients
       !  [ Zakem et al., 2020 ISME; Buchanan et al., 2025 Science]

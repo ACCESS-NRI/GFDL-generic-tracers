@@ -17,6 +17,36 @@ _Dougie.Squire@anu.edu.au_
 
 ---
 
+## Executive summary
+
+- Currency of biomasses are in carbon units <br>
+- Carbon chemistry uses the `mocsy` system by default ([Orr & Epitalon, 2015](https://gmd.copernicus.org/articles/8/485/2015/))
+- Light is split into blue, green and red wavelengths and attenuated at rates dependent on ambient chlorophyll, organic particulate and inorganic particulate  (CaCO<sub>3</sub>) concentrations. <br>
+- Nano- and Micro-phytoplankton perform photo-acclimation by altering their chlorophyll to carbon ratios according to the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation. <br>
+- Nano- and Micro-phytoplankton nutrient affinities for nitrogen, iron and silicic acid vary as a function of mean cell size via allometric relationships ([Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901)). <br>
+- Nano- and Micro-phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, but micro-phytoplankton have a growth advantage over nano-phytoplankton in high NO<sub>3<sub> conditions ([Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/))
+- Nano- and Micro-phytoplankton growth is limited by an internal quota model for iron (Fe) ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)) that responds to the cellular demands for nitrate reduction, respiration and chlorophyll, and represents luxury uptake. <br>
+- Micro-phytoplankton growth is limited by an internal Si quota that gates division and varies Si:C ratios ([Liu et al., 2016](https://doi.org/10.3389/fmars.2016.00089); [Hutchins & Bruland 1998](https://doi.org/10.1038/31203); [Takeda 1998](https://doi.org/10.1038/31674)).
+- Nano- and Micro-phytoplankton exude dissolved organic matter in the form of carbohydrate (CH<sub>2</sub>O) when under high light and nutrient limited conditions ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)).
+- The iron (Fe) cycle follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5) to reflect varying Fe chemistry (solubility, ligand binding), scavenging and colloidal coagulation to sinking authigenic phases. <br>
+- Biogenic silica (BSi) dissolution is informed by thermodynamics ([Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431]()), temperature ([Kamatani, 1982](https://doi.org/10.1007/BF00393146)) and the activitiy of particle-associated heterotrophic bacteria ([Bidle & Azam, 1999](https://doi.org/10.1038/17351)).
+- Micro- and Meso-zooplankton grazing assumes a Holling Type III functional form ([Holling, 1959](https://doi.org/10.4039/Ent91385-7)) and active switching between prey types (phytoplankton, ammonia oxidizing archaea, detritus and heterotrophic bacteria) ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)). <br>
+- Micro- and Meso-zooplankton routes Fe preferentially to egestion (i.e., faecal pellets) following [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597), enriching detritus in Fe. <br>
+- Micro- and Meso-zooplankton dissolve CaCO<sub>3</sub> ([Smith et al., 2024](https://doi.org/10.1126/sciadv.adr5453); [White et al., 2018](https://doi.org/10.1038/s41598-018-28073-x); [Harris, 1994](https://doi.org/10.1007/BF00347540)) but conserve biogenic silica due to acidic conditions in their gut ([Dagg et al., 2003](https://doi.org/10.1016/S0967-0645(02)00590-8); [Taucher et al., 2022](https://www.nature.com/articles/s41586-022-04687-0)).
+- The nitrogen cycle can be made to be open, with schemes for nitrogen fixation, anammox, sedimentary denitrification and water column denitrification that can be switched on or off at run time. <br>
+- Ammonia oxidizing archaea are an explicit biomass type that performs nitrification of NH<sub>4</sub> to NO<sub>3</sub> and produces N<sub>2</sub>O as a byproduct ([Kelly et al., 2024](https://doi.org/10.5194/bg-21-3215-2024)).
+- Particle-associated and free-living heterotrophic bacteria drive remineralisation, the attenuation of sinking particulate carbon and the seasonal accumulation and oxidation state of dissolved organic carbon. Their metabolism and growth yields are controlled by electron balance ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Rittman & McCarty, 2001](https://books.google.com.au/books/about/Environmental_Biotechnology_Principles_a.html?id=1PMeAQAAIAAJ&redir_esc=y)).
+- Dissolved organic matter oxidation state and thus its energy is tracked through variations in its stoichiometry, specifically C-H, C-O and C-N bonds ([[Anderson et al., 1995]]((https://doi.org/10.1016/0967-0637(95)00072-E)); [La Rowe & Van Cappellen, 2011](https://www.sciencedirect.com/science/article/pii/S0016703711000378)).
+- Heterotrophic bacteria are facultative, meaning that they can switch to anaerobic metabolism and use NO<sub>3</sub> and N<sub>2</sub>O as electron acceptors for growth in low O<sub>2</sub> conditions ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Sun et al., 2024](https://doi.org/10.1073/pnas.2417421121)).
+- Nitrous oxide (N<sub>2</sub>O) sources and sinks are explicitly represented and driven by microbial metabolisms.
+- CaCO<sub>3</sub> cycling is a function of the ambient seawater carbonate chemistry: production is affected by the substrate-inhibitor ratio ([Lehmann & Bach, 2025](https://www.nature.com/articles/s41561-025-01644-0)); dissolution occurs in saturated waters ($\Omega$ > 1) due to reducing micro-environments and undersaturated waters ($\Omega$ < 1) ([Kwon et al., 2024](https://www.science.org/doi/full/10.1126/sciadv.adl0779)). <br>
+- Sinking of small and large particulates is a function of mean radius, seawater dynamic viscosity and their excess density ([Rubey, 1933](https://doi.org/10.2475/ajs.s5-25.148.325)). Radius varies via allometric scalings (e.g., [Wickman et al., 2024]((https://www.science.org/doi/10.1126/science.adk6901))), dynamic viscosity via thermohaline properties, and excess density by CaCO<sub>3</sub> and biogenic silica contents of the particles. <br>
+- External sources of nitrate, DIC, alkalinity silicic acid, DOM (DOC, DOH, DOO and DON) via rivers. <br>
+- Permanent burial of organics in sediments via [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907). <br>
+- External source of dissolved iron from aeolian deposition that includes mineral, fire and anthropogenic sources ([Hamilton et al., 2020](https://doi.org/10.1029/2019GB006448)). <br>
+- Major calibration and optimization of the model parameters... incoming. <br>
+
+
 ## Tracers
 
 The following are the active tracers in WOMBAT-mid
