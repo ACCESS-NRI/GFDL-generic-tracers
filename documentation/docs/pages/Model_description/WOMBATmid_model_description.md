@@ -1396,7 +1396,7 @@ $$
 \end{align}
 $$
 
-The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{H_{4}SiO_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the solubility of H<sub>4</sub>SiO<sub>4</sub> decreases predictably with salinity according to
+The activity of seawater is slightly less than 1 due to dissolved salts lowering its chemical potential and so we set $a_{H_{2}O}$ equal to 0.999 ([IOC, SCOR & IAPSO, 2010](https://www.teos-10.org/pubs/TEOS-10_Manual.pdf)). For $\gamma_{H_{4}SiO_{4}^{0}}$ we follow [Savenko 2014](https://doi.org/10.1134/S0001437014020222) who demonstrated that the activity ratio of H<sub>4</sub>SiO<sub>4</sub> decreases predictably with salinity according to
 
 $$
 \begin{align}
@@ -1416,7 +1416,7 @@ K(T,P^{1}) =& \quad 10^{ \left( -8.476 - \frac{485.24}{T_{K}} - 2.268 \times 10^
 $$
 
 _where_ <br>
-- $T_{K}$ is the in situ temperature of seawater ([`zval`, [ºK]]) <br>
+- $T_{K}$ is the in situ temperature of seawater (`zval`, [ºK]) <br>
 
 We add a classic pressure correction to $K(T,P^{1})$ to retrieve $K(T,P)$ of the form:
 
@@ -1432,7 +1432,7 @@ _where_ <br>
 - $T_{K}$ is the in situ temperature of seawater ([`zval`, [ºK]]) <br>
 - $P$ is the in situ pressure [`zm(i,j,k) * 1.0e4`, [Pa]] <br>
 
-We obtain $\Delta V^{0}$ from [Willey, 1982](https://doi.org/10.1016/0016-7037(82)90015-1) and [Loucaides et al., 2012](https://doi.org/10.1016/j.marchem.2012.04.003) of roughly -9.0 [cm<sup>3</sup> mol<sup>-1</sup>], which we convert to [m<sup>3</sup> mol<sup>-1</sup>] by multiplying by $10^{-6}$. The negative value of $\Delta V^{0}$ implies an increase in dissolution of silica at higher pressures. These value return equilibrium concentrations of silicic acid on the order of 1000 to 1800 mmol m<sup>-3</sup>. Temperature increases are the largest control, while pressure increases from the surface to the ocean bottom increase solubility by 15-20%. 
+We obtain $\Delta V^{0}$ from [Willey, 1982](https://doi.org/10.1016/0016-7037(82)90015-1) and [Loucaides et al., 2012](https://doi.org/10.1016/j.marchem.2012.04.003) of roughly -9.0 [cm<sup>3</sup> mol<sup>-1</sup>], which we convert to [m<sup>3</sup> mol<sup>-1</sup>] by multiplying by $10^{-6}$. The negative value of $\Delta V^{0}$ implies an increase in solubility of silica at higher pressures. These value return equilibrium concentrations of silicic acid on the order of 1000 to 1800 mmol m<sup>-3</sup>. Temperature increases are the largest control, while pressure increases from the surface to the ocean bottom increase solubility by 15-20%. 
 
 
 **Biogenic silica dissolution**
@@ -1462,7 +1462,7 @@ _where_ <br>
 - $S_{B_{ld}^{Si}}^{Sat}$ is a scaling factor that decelerates dissolution as the in situ concentration approachs the equilibrium concentration (`disssi_usat`, [dimenionless]) <br>
 - $S_{B_{ld}^{Si}}^{bio}$ is a scaling factor that accelerates dissolution in the presence of heterotrophic bacterial biomass (`disssi_bact`, [dimenionless]) <br>
 
-First, we solve for $d_{B_{ld}^{Si}}^{T}$. [Kamatani, 1982](https://doi.org/10.1007/BF00393146) measured dissolution rates of biogenic silica collected in Tokyo Bay between 8ºC and 30ºC and identified that these roughly obeyed the equation:
+First, we solve for $d_{B_{ld}^{Si}}^{T}$. [Kamatani, 1982](https://doi.org/10.1007/BF00393146) measured dissolution rates of both acid-cleaned and non-cleaned biogenic silica collected in Tokyo Bay between 8ºC and 30ºC and identified that these roughly obeyed the equation:
 
 $$
 \begin{align}
@@ -1471,16 +1471,16 @@ d_{B_{ld}^{Si}}^{T} =& \quad \dfrac{e^{\left(\alpha + β T\right)}}{3600}
 $$
 
 _where_ <br>
-- $\alpha$ is a species-dependent dissolution intercept that ranges between -7.35 and -10.38. We set $\alpha$ = -8.0 <br>
+- $\alpha$ is the natural log biogenic silica dissolution rate at 0ºC (`bsi_alpha`, [hr<sup>-1</sup>]) <br>
 - $β$ is the slope common to all species and is equal to 0.0833 <br>
 - $T$ is the in situ temperature of seawater ([`Temp(i,j,k)`, [ºC]]) <br>
 - $3600$ converts the rate from [hour<sup>-1</sup>] to [s<sup>-1</sup>] <br>
 
-Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of H<sub>4</sub>SiO<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, H<sub>4</sub>SiO<sub>4</sub> is always undersaturated. We therefore assume that H<sub>4</sub>SiO<sub>4</sub> is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf):
+Next, we apply scaling terms that either decelerate or accelerate dissolution. Given that equilibrium concentrations of H<sub>4</sub>SiO<sub>4</sub> vary between 1000 to 1800 mmol m<sup>-3</sup> in the ocean, while actual in situ concentrations rarely exceed 200 mmol m<sup>-3</sup>, H<sub>4</sub>SiO<sub>4</sub> is always undersaturated. We therefore assume that H<sub>4</sub>SiO<sub>4</sub> is highly undersaturated everywhere in the ocean. According to [Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431) "Detailed kinetic studies of biogenic silica dissolution conducted in flow-through reactors demonstrate that at very high degrees of undersaturation the dissolution kinetics switch from a linear dependence on the degree of undersaturation to an exponential one". However, for acid-cleaned biogenic silica, the chemical dissolution should thermodynamically proceed according to a linear dependence on undersaturation, which is clear from Table 3.4 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf). Hence, we apply equation 2.13 from [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf) but with an exponent of 1:
 
 $$
 \begin{align}
-S_{B_{ld}^{Si}}^{Sat} =& \quad \left(1 - \dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{2}
+S_{B_{ld}^{Si}}^{Sat} =& \quad \left(1 - \dfrac{[H_{4}SiO_{4}]}{[H_{4}SiO_{4}]^{eq}}\right)^{1}
 \end{align}
 $$
 
