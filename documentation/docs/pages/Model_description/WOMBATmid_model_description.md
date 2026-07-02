@@ -1430,7 +1430,7 @@ K(T,P^{1}) =& \quad 10^{ \left( -8.476 - \frac{485.24}{T_{K}} - 2.268 \times 10^
 $$
 
 _where_ <br>
-- $T_{K}$ is the in situ temperature of seawater ([`zval`, [ºK]) <br>
+- $T_{K}$ is the in situ temperature of seawater (`zval`, [ºK]) <br>
 
 We add a classic pressure correction to $K(T,P^{1})$ to retrieve $K(T,P)$ of the form:
 
