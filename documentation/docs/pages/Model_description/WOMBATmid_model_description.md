@@ -57,9 +57,8 @@ The following are the active tracers in WOMBAT-mid
 | 30   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
 | 31   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
 | 32   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
-| 33   | DOM<sup>NOSC</sup>            | `p_nosdoc` | Nominal oxidation state of dissolved organic carbon | [0-1]                     | No          |
-| 34   | DICp                          | -          | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
-| 35   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
+| 33   | DICp                          | -          | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
+| 34   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
 
 ---
 
@@ -79,7 +78,6 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_benthic_denitrification` | Do implicit reduction of NO<sub>3</sub> in the sediment                                    | .true.    |
 | `do_tracer_dicp`             | Carry preformed dissolved inorganic carbon (dicp) as a tracer                              | .false.   |
 | `do_tracer_dicr`             | Carry remineralised dissolved inorganic carbon (dicr) as a tracer                          | .false.   |
-| `do_tracer_nosdoc`           | Carry nominal oxidation state of dissolved organic carbon (nosdoc) as a tracer           | .false.   |
 | `do_viscous_sinking`         | Rubey's formula uses a non-constant dynamic viscosity of seawater                          | .true.    |
 | `do_check_n_conserve`        | Checks that the ecosystem calculations are conserving the mass of nitrogen                 | .false.   |
 | `do_check_c_conserve`        | Checks that the ecosystem calculations are conserving the mass of carbon                   | .false.   |
@@ -322,7 +320,6 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 | `doc2remi`         | Remineralisation of dissolved organic carbon by bacteria #2                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `don2remi`         | Remineralisation of dissolved organic nitrogen by bacteria #2                      | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
 | `bac2nupt`         | Total uptake of dissolved nitrogen by bacteria #2                                  | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
-| `bac_ydon`         | Biomass yield of bacteria (mol DON+NH<sub>4</sub> per mol C biomass)               | mol N (mol C biomass)<sup>-1</sup>              |
 | `bac1_ydoc`        | Biomass yield of bacteria #1 (mol DOC per mol C biomass)                           | mol DOC (mol C biomass)<sup>-1</sup>            |
 | `bac2_ydoc`        | Biomass yield of bacteria #2 (mol DOC per mol C biomass)                           | mol DOC (mol C biomass)<sup>-1</sup>            |
 | `bac1grow`         | Growth of facultative heterotrophic bacteria 1                                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
@@ -347,12 +344,6 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 | `bac2morl`         | Linear mortality of facultative heterotrophic bacteria 2                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `bac2morq`         | Quadratic mortality of facultative heterotrophic bacteria 2                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `bac2deni`         | Bacterial denitrification rate (N<sub>2</sub>O consumption)                        | mol N2O kg<sup>-1</sup> s<sup>-1</sup>          |
-| `nosdoc_overflow`  | Rate of change to local NOSC by phytoplankton exudation of DOC                     | NOSC s<sup>-1</sup>                             |
-| `nosdoc_excretion` | Rate of change to local NOSC by zooplankton excretion of DOC                       | NOSC s<sup>-1</sup>                             |
-| `nosdoc_phylysis`  | Rate of change to local NOSC by phytoplankton lysis                                | NOSC s<sup>-1</sup>                             |
-| `nosdoc_baclysis`  | Rate of change to local NOSC by bacterial/archaeal lysis                           | NOSC s<sup>-1</sup>                             |
-| `nosdoc_dethydro`  | Rate of change to local NOSC by detrital hydrolysis                                | NOSC s<sup>-1</sup>                             |
-| `nosdoc_docconsu`  | Rate of change to local NOSC by DOC consumption                                    | NOSC s<sup>-1</sup>                             |
 | `det_density`      | Mean density of small detrital particles                                           | kg m<sup>-3</sup>                               |
 | `bdet_density`     | Mean density of large detrital particles                                           | kg m<sup>-3</sup>                               |
 | `det_vmove`        | Sinking rate of small detritus                                                     | m s<sup>-1</sup>                                |
@@ -536,8 +527,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `aoalmor`          | AOA linear mortality rate                                                   | 0.005/86400   | s<sup>-1</sup>                                                       |
 | `aoaqmor`          | AOA quadratic mortality rate                                                | 0.001/86400   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `bacanapen`        | Anaerobic penalty for heterotrophic bacteria                                | 0.9           | dimensionless                                                        |
-| `bac_ydonmin`      | Minimum bacterial biomass yield (N units)                                   | 0.15          | mol N biomass (mol N)<sup>-1</sup>                                   |
-| `bac_ydonmax`      | Maximum bacterial biomass yield (N units)                                   | 0.65          | mol N biomass (mol N)<sup>-1</sup>                                   |
+| `bac_ydon`         | Bacterial biomass yield (N units)                                           | 0.25          | mol N biomass (mol N)<sup>-1</sup>                                   |
 | `bac1_Vmax_doc`    | Bacteria type #1 DOC uptake maximum                                         | 6.7/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                                 |
 | `bac1_Vmax_don`    | Bacteria type #1 DON uptake maximum                                         | 1.0/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                                 |
 | `bac1_Vmax_nh4`    | Bacteria type #1 NH<sub>4</sub> uptake maximum                              | 1.0/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                                 |
@@ -569,12 +559,6 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `bac2qmor`         | Bacteria type #2 quadratic mortality rate                                   | 0.05/86400    | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `aoxkn`            | Anammox NH<sub>4</sub> half-saturation coefficient                          | 0.5           | mmol N m<sup>-3</sup>                                                |
 | `aoxmumax`         | Anammox maximum growth rate                                                 | 0.0025/86400  | s<sup>-1</sup>                                                       |
-| `noscphyover`      | NOSC value of phytoplankton overflow production                             | 1.0 - 0.0     | dimensionless                                                        |
-| `nosczooexcr`      | NOSC value of zooplankton excretion                                         | 1.0 - 0.20    | dimensionless                                                        |
-| `noscphylyse`      | NOSC value of phytoplankton lysis                                           | 1.0 - 0.35    | dimensionless                                                        |
-| `noscbaclyse`      | NOSC value of bacterial lysis                                               | 1.0 - 0.03    | dimensionless                                                        |
-| `noscdethydr`      | NOSC value of detritus hydrolysis                                           | 1.0 - 0.40    | dimensionless                                                        |
-| `noscdocproc`      | NOSC bacterial processing offset                                            | 0.9           | dimensionless                                                        |
 | `bottom_thickness` | Bottom layer thickness                                                      | 1.0           | m                                                                    |
 
 
@@ -2064,32 +2048,7 @@ _where_ <br>
 
 **Biomass yields**
 
-If `do_tracer_nosdoc == .true.`, we further expand on bacterial heterotrophic dynamics by also integrating the findings of [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) to solve for biomass yields as a function of the nominal oxidation state of carbon (NOSC) of DOM (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimensionless]). [Wang & Kuzyakov (2023)](https://doi.org/10.1111/gcb.16925) conceptually link the carbon use efficiency (i.e., yield) of bacteria to the NOSC. They identify a theoretical positive relationship between yield and NOSC and suggest that more oxidized compounds offer a greater energy of content per carbon atom because more reduced compounds require greater processing costs. To account for this dynamic, we scale the biomass yield of heterotrophic bacteria (`bac_ydon(i,j,k)`, $y_{b}^{DON}$, [mol N biomass (mol DON)<sup>-1</sup>]) as:
-
-$$
-\begin{align}
-y_{b}^{DON} =& \quad \max\bigg( y_{b}^{min(DON)}, \\
-             & \qquad      \min\bigg( y_{b}^{max(DON)}, \\
-             & \qquad \qquad          y_{b}^{min(DON)} + DOM^{NOSC} \cdot \left(y_{b}^{max(DON)} - y_{b}^{min(DON)} \right) \bigg) \bigg)
-\end{align}
-$$
-
-_where_ <br>
-- $y_{b}^{min(DON)}$ is the minimum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmin`, [mol N biomass (mol DON)<sup>-1</sup>])  <br>
-- $y_{b}^{max(DON)}$ is the maximum biomass yield of bacterial functional type $b$ growing on DON (`bac_ydonmax`, [mol N biomass (mol DON)<sup>-1</sup>])  <br>
-- $DOM^{NOSC}$ is the in situ nominal oxidation state of dissolved organic carbon that is normalized to vary between 0 (most reduced) and 1 (most oxidised) (`f_nosdoc(i,j,k)`, [dimensionless]) <br>
-
-If `do_tracer_nosdoc == .false.`, then the biomass yield of heterotrophic bacteria remains constant and is equal to
-
-$$
-\begin{align}
-y_{b}^{DON} =& \quad y_{b}^{min(DON)} + 0.5 \cdot \left(y_{b}^{max(DON)} - y_{b}^{min(DON)} \right)
-\end{align}
-$$
-
-meaning that the yield can be controlled through the input parameters `bac_ydonmin` and `bac_ydonmax`.
-
-From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on O<sub>2</sub> [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
+The biomass yield of heterotrophic bacteria is set as a constant at runtime (`bac_ydon`, $y_{b}^{DON}$, [mol N-biomass (mol N)<sup>-1</sup>]). From this base biomass yield on N, we can compute growth yields on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, $y_{b}^{DOC}$, [mol C biomass (mol DOC)<sup>-1</sup>]), for growth on O<sub>2</sub> [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>] and for anaerobic growth on alternative electron acceptors. We do so by first finding the electron potential (`e_dom`; `e_bac`, $\kappa$) per mole of N of the bacterial biomass and the in situ DOM from basic stoichiometry ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)):
 
 $$
 \begin{align}
@@ -2138,7 +2097,7 @@ y_{b}^{N_{2}O \rightarrow N_{2}} =& \quad \dfrac{\left(f_{b}^{ana(\kappa)} / \ka
 $$
 
 _where_ <br>
-- $y_{b}^{aer(DON)}$ is the aerobic growth yield of bacterial functional type $b$ on DON (`bac1_ydonC`; `bac2_ydon`, [mol C biomass (mol DON)<sup>-1</sup>]) <br>
+- $y_{b}^{aer(DON)}$ is the aerobic growth yield of bacterial functional type $b$ on DON (`bac1_ydonC`; `bac2_ydonC`, [mol C biomass (mol DON)<sup>-1</sup>]) <br>
 - $y_{b}^{aer(DOC)}$ is the aerobic growth yield of bacterial functional type $b$ on DOC (`bac1_ydoc(i,j,k)`; `bac2_ydoc(i,j,k)`, [mol C biomass (mol DOC)<sup>-1</sup>]) <br>
 - $y_{b}^{ana(DOC)}$ is the anaerobic growth yield of bacterial functional type $b$ on DOC (`bac1_yana`; `bac2_yana`, [mol C biomass (mol DOC)<sup>-1</sup>]) <br>
 - $y_{b}^{O_2}$ is the aerobic growth yield of bacterial functional type $b$ on O<sub>2</sub> (`bac1_yoxyC`; `bac2_yoxyC`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>]) <br>
@@ -2394,77 +2353,7 @@ _where_ <br>
 ---
 
 
-### 18. Nominal oxidation state of dissolved organic carbon.
-
-In addition to DOC and DON, dissolved organic matter is also affected by changes to the nominal oxidation state of carbon, which we carry as a tracer (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless]) when `do_tracer_nosdoc == .true.`. The nominal oxidation state of carbon (NOSC) is estimated by [La Rowe & Van Cappellen (2011)](https://doi.org/10.1016/j.gca.2011.01.020) from stoichiometry:
-
-$$
-\begin{align}
-NOSC =& \quad 4 - \dfrac{\left( 4 \cdot C + H - 3 \cdot N - 2 \cdot O + 5\cdot P - 2 \cdot S\right)}{C}
-\end{align}
-$$
-
-This characteristic describes how oxidized or reduced the average carbon atoms are within organic molecules. The NOSC acts as a measure of the energetic potential of organic matter oxidation, where the Gibbs energy released is correlated to the NOSC ([La Rowe & Van Cappellen, 2011](https://doi.org/10.1016/j.gca.2011.01.020)). The more reduced the molecule, the more negative the NOSC value and the more energy is held within the material. The scale varies from -4 to +4, with $CH_4$ representing fully reduced carbon and $CO_2$ representing fully oxidized carbon. 
-
-In WOMBAT-mid, we do not carry information of changes in the stoichiometry of marine organic matter, either dissolved or particulate. We therefore estimate how certian processes affect the NOSC of DOM ($DOM^{NOSC}$). To do so, we changes in $DOM^{NOSC}$ occur as a result of sources and sinks to the $B_{DOM}^{C}$ pool. Sources of $B_{DOM}^{C}$ alter $DOM^{NOSC}$ via:
-
-$$
-\begin{align}
-\dfrac{\partial DOM^{NOSC}}{\partial t} &= \quad \dfrac{\partial B_{DOM}^{C}}{\partial t} \dfrac{NOSC_{source} - NOSC}{B_{DOM}^{C}}
-\end{align}
-$$
-
-_where_ <br>
-- $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`f_doc(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
-- $DOM^{NOSC}$ is the in situ value of the normalized nominal oxidation state of carbon (`f_nosdoc(i,j,k)`, [dimensionless]) <br>
-- $DOM_{source}^{NOSC}$ is the source value of $DOM^{NOSC}$ added to the $B_{DOM}^{C}$ pool during a given process ([dimensionless]) <br>
-
-Sources of $B_{DOM}^{C}$ include (1) phytoplankton overflow production (`nosdoc_overflow(i,j,k)`, $\Delta DOM_{overflow}^{NOSC}$, [NOSC s<sup>-1</sup>]), (2) excretion by zooplankton (`nosdoc_excretion(i,j,k)`, $\Delta DOM_{excretion}^{NOSC}$, [NOSC s<sup>-1</sup>]), (3) phytoplankton cell death and lysis (`nosdoc_phylysis(i,j,k)`, $\Delta DOM_{photolyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), (4) bacterial cell death and lysis (`nosdoc_baclysis(i,j,k)`, $\Delta DOM_{bacterlyse}^{NOSC}$, [NOSC s<sup>-1</sup>]), and (5) hydrolysation of particulate organic matter (`nosdoc_dethydro(i,j,k)`, $\Delta DOM_{dethydro}^{NOSC}$, [NOSC s<sup>-1</sup>]). The equations describing the effect on $DOM^{NOSC}$ of each process are:
-
-$$
-\begin{align}
-(1) & \Delta DOM_{overflow}^{NOSC} = \quad \left(\sum_{p} \mu_{p}^{\rightarrow DOC} \right) \cdot \dfrac{NOSC_{overflow} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(2) & \Delta DOM_{excretion}^{NOSC} = \quad \left(\sum_{z,i} \left( X_{z}^{\rightarrow i^{C}} \cdot f_{z}^{X \rightarrow DOM} \right) \right) \cdot \dfrac{NOSC_{excretion} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(3) & \Delta DOM_{photolyse}^{NOSC} = \quad \left(\sum_{p} \gamma_{p}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{phytolyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(4) & \Delta DOM_{bacterlyse}^{NOSC} = \quad \left(\sum_{b} \gamma_{b}^{\rightarrow C} + \Gamma_{b}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{bacterlyse} - DOM^{NOSC}}{B_{DOM}^{C}} \\
-(5) & \Delta DOM_{dethydro}^{NOSC} = \quad \left(\sum_{d} \Gamma_{d}^{\rightarrow C} \right) \cdot \dfrac{NOSC_{dethydro} - DOM^{NOSC}}{B_{DOM}^{C}}
-\end{align}
-$$
-
-_where_ <br>
-- $\mu_{p}^{\rightarrow DOC}$ is the overflow production of DOC by phytoplankton type $p$ ([mol C kg<sup>-1</sup>]) <br>
-- $X_{z}^{\rightarrow i^{C}}$ is the excretion of carbon by zooplankton type $z$ feeding on prey type $i$ ([mol C kg<sup>-1</sup>]) <br>
-- $f_{z}^{X \rightarrow DOM}$ is the fraction of excreted carbon that is directed to DOC by zooplankton type $z$ ([mol C (mol C)<sup>-1</sup>]) <br>
-- $\gamma_{p}^{\rightarrow C}$ is the linear mortality rate of phytoplankton type $p$ ([mol C kg<sup>-1</sup>]) <br>
-- $\gamma_{b}^{\rightarrow C}$ is the linear mortality rate of bacteria type $b$ (includes ammonia oxidizing archaea) ([mol C kg<sup>-1</sup>]) <br>
-- $\Gamma_{d}^{\rightarrow C}$ is the hydrolysation rate of particulate carbon type $d$ ([mol C kg<sup>-1</sup>]) <br>
-- $NOSC_{overflow}$ is the NOSC associated with overflow production of DOC by phytoplankton (`noscphyover`, [dimenionless]) <br>
-- $NOSC_{excretion}$ is the NOSC associated with excretion of DOC by zooplankton (`nosczooexcr`, [dimenionless]) <br>
-- $NOSC_{phytolyse}$ is the NOSC associated with lysis of cell contents of phytoplankton (`noscphylyse`, [dimenionless]) <br>
-- $NOSC_{bacterlyse}$ is the NOSC associated with lysis of cell contents of bacteria and archaea (`noscbaclyse`, [dimenionless]) <br>
-- $NOSC_{dethydro}$ is the NOSC associated with hydrolysation of sinking particulate detritus (`noscdethydr`, [dimenionless]) <br>
-- $DOM^{NOSC}$ is the in situ normalized value of NOSC (`f_nosdoc(i,j,k)`, [dimenionless]) <br>
-- $B_{DOM}^{C}$ is the in situ concentration of DOC (`f_doc(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
-
-In WOMBAT-mid the only sink of $B_{DOM}^{C}$ is consumption by bacteria (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]). We acknowledge that abiotic photooxidation of DOC does occur in sunlit waters and can be a substantial contributor to total DOC oxidation to DIC ([Cory et al., 2014](https://www.science.org/doi/full/10.1126/science.1253119); [Aarnos et al., 2018](https://doi.org/10.1002/2017GB005698)). Moreover, the photo-oxidation of DOC is shown to make recalcitrant, high-molecular weight molecules more bioavailable to microbes ([Gonsior et al., 2014](https://doi.org/10.1016/j.marchem.2014.04.002)), which seems an important process to capture. However, in this version of WOMBAT-mid we include only bacteria-mediated breakdown of DOC to DIC and its effects on NOSC and leave photo-oxidation for a later version.
-
-Consumption of $B_{DOM}^{C}$ by bacteria alters $DOM^{NOSC}$ (`nosdoc_docconsu(i,j,k)`, $\Delta DOM_{DOCconsume}^{NOSC}$, [NOSC s<sup>-1</sup>]) via:
-
-$$
-\begin{align}
-\Delta DOM_{DOCconsume}^{NOSC} &= \quad \left(\sum_{b} \mu_{b}^{\leftarrow B_{DOM}^{C}} \right) \cdot \dfrac{- NOSC_{DOCconsume}}{B_{DOM}^{C}}
-\end{align}
-$$
-
-_where_ <br>
-- $\mu_{b}^{\leftarrow B_{DOM}^{C}}$ is the consumption of DOC by bacterial type $b$ (`doc1remi(i,j,k)`; `doc2remi(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
-- $NOSC_{DOCconsume}$ is the effect (i.e., offset) to existing NOSC associated with bacterial reworking of DOC (`noscdocproc`, [dimenionless]) <br>
-- $B_{DOM}^{C}$ is the in situ concentration of DOC (`f_doc(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
-
----
-
-
-### 19. Tracer tendencies
+### 18. Tracer tendencies
 
 **Nitrate** (`f_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
@@ -2848,21 +2737,6 @@ $$
 \end{align}
 $$
 
-
-**Nominal oxidation state of dissolved organic carbon** (`f_nosdoc(i,j,k)`, $DOM^{NOSC}$, [dimenionless])
-
-$$
-\begin{align}
-\dfrac{\Delta DOM^{NOSC}}{\Delta t} =& \quad \Delta DOM_{overflow}^{NOSC}
-                                           + \Delta DOM_{excretion}^{NOSC}
-                                           + \Delta DOM_{photolyse}^{NOSC} \\
-                                     &     + \Delta DOM_{bacterlyse}^{NOSC}
-                                           + \Delta DOM_{dethydro}^{NOSC}
-                                           + \Delta DOM_{DOCconsume}^{NOSC}
-\end{align}
-$$
-
-
 **Calcium Carbonate** (`f_caco3(i,j,k)`, $CaCO_3$, [mol C kg<sup>-1</sup>])
 
 $$
@@ -2956,13 +2830,13 @@ $$
 ---
 
 
-### 20. Check for conservation of mass
+### 19. Check for conservation of mass
 
 When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.` or `do_check_si_conserve = .true.`), the model will calculate the budget of nitrogen or carbon or silicon before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of both nitrogen and carbon within the ocean. In WOMBAT-mid, both nitrogen and carbon and silicon should be perfectly conserved during ecosystem cycling. The only exception to this is for nitrogen, where if any of `do_nitrogen_fixation = .true.`, `do_anammox = .true.`, `do_wc_denitrification = .true.` or `do_benthic_denitrification = .true.` then the model does not and should not be expected to conserve nitrogen.
 
 ---
 
-### 21. Additional operations on tracers
+### 20. Additional operations on tracers
 
 **First**, dissolved iron concentrations are set to equal 1 nM everywhere where the depth of the water column is less than 200 metres deep. WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we universally set the dissolved iron concentration in these waters to 1 nM.
 
@@ -2979,7 +2853,7 @@ This resetting of minimum dFe concentration essentially copies what is done in t
 ---
 
 
-### 22. Sinking rate of particulates.
+### 21. Sinking rate of particulates.
 
 WOMBAT-mid functions with a spatially variable sinking rate of organic detritus (`f_det(i,j,k)`; `f_bdet(i,j,k)`), calcium carbonate (`f_caco3(i,j,k)`) and biogenic silica (`f_bdetsi(i,j,k)`). Sinking of organic iron (`f_detfe(i,j,k)`; `f_bdetfe(i,j,k)`)occurs at the same rate as their respective organic particulate carbon types, while small and large authigenic iron particles (`f_afe(i,j,k)`; `f_bafe(i,j,k)`) sink at their own unique rates. The algorithm to compute sinking rates functions by computing:
 
@@ -3242,7 +3116,7 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 ---
 
 
-### 23. Sedimentary processes.
+### 22. Sedimentary processes.
 
 WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), dissolved organic nitrogen (DON), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
