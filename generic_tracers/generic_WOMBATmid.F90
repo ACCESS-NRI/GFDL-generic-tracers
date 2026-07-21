@@ -706,6 +706,7 @@ module generic_WOMBATmid
         bacf1morl, &
         bacf1morq, &
         bacf1deni, &
+        bacf1alpha, &
         bacf2grow, &
         bacf2resp, &
         bacf2pco2, &
@@ -718,6 +719,7 @@ module generic_WOMBATmid
         bacf2morl, &
         bacf2morq, &
         bacf2deni, &
+        bacf2alpha, &
         aox_lnh4, &
         aox_mu, &
         nitrfix, &
@@ -950,6 +952,7 @@ module generic_WOMBATmid
         id_bacf1morl = -1, &
         id_bacf1morq = -1, &
         id_bacf1deni = -1, &
+        id_bacf1alpha = -1, &
         id_bacf2grow = -1, &
         id_bacf2resp = -1, &
         id_bacf2pco2 = -1, &
@@ -962,6 +965,7 @@ module generic_WOMBATmid
         id_bacf2morl = -1, &
         id_bacf2morq = -1, &
         id_bacf2deni = -1, &
+        id_bacf2alpha = -1, &
         id_aox_lnh4 = -1, &
         id_aox_mu = -1, &
         id_nitrfix = -1, &
@@ -2375,6 +2379,11 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'bacf1alpha', 'free-living bacteria #1 partial oxidation rate', 'h', 'L', 's', '[molC/molC]', 'f')
+    wombat%id_bacf1alpha = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'bacf2grow', 'Growth of facultative heterotrophic bacteria 3', 'h', 'L', 's', 'molC/kg/s', 'f')
     wombat%id_bacf2grow = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
@@ -2432,6 +2441,11 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'bacf2deni', 'bacterial denitrification rate (N2O --> N2 consumption)', 'h', 'L', 's', '[molN2O/kg/s]', 'f')
     wombat%id_bacf2deni = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'bacf2alpha', 'free-living bacteria #1 partial oxidation rate', 'h', 'L', 's', '[molC/molC]', 'f')
+    wombat%id_bacf2alpha = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -3277,11 +3291,11 @@ module generic_WOMBATmid
 
     ! Change in hydrogen content of organic matter due to partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('Hox_fac', wombat%Hox_fac, 0.5)
+    call g_tracer_add_param('Hox_fac', wombat%Hox_fac, 0.8)
 
     ! Change in oxygen content of organic matter due to partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('Oox_fac', wombat%Oox_fac, 1.5)
+    call g_tracer_add_param('Oox_fac', wombat%Oox_fac, 1.2)
 
     ! Change in nitrogen content of organic matter due to partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
@@ -3322,7 +3336,7 @@ module generic_WOMBATmid
 
     ! Facultative particle-associated heterotrophic bacteria degree of partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bacp_alpha', wombat%bacp_alpha, 0.25)
+    call g_tracer_add_param('bacp_alpha', wombat%bacp_alpha, 0.50)
 
     ! Facultative particle-associated heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
@@ -3375,7 +3389,7 @@ module generic_WOMBATmid
 
     ! Facultative free-living heterotrophic bacteria #1 fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bacf1_fele', wombat%bacf1_fele, 0.45)
+    call g_tracer_add_param('bacf1_fele', wombat%bacf1_fele, 0.35)
 
     ! Facultative free-living heterotrophic bacteria #2 maximum rate of uptake of DOC [mmolC (mol C)-1 s-1]
     !-----------------------------------------------------------------------
@@ -4695,6 +4709,7 @@ module generic_WOMBATmid
     wombat%bacf1morl(:,:,:) = 0.0
     wombat%bacf1morq(:,:,:) = 0.0
     wombat%bacf1deni(:,:,:) = 0.0
+    wombat%bacf1alpha(:,:,:) = 0.0
     wombat%bacf2grow(:,:,:) = 0.0
     wombat%bacf2resp(:,:,:) = 0.0
     wombat%bacf2pco2(:,:,:) = 0.0
@@ -4706,6 +4721,8 @@ module generic_WOMBATmid
     wombat%bacf2_rq(:,:,:) = 0.0
     wombat%bacf2morl(:,:,:) = 0.0
     wombat%bacf2morq(:,:,:) = 0.0
+    wombat%bacf2deni(:,:,:) = 0.0
+    wombat%bacf2alpha(:,:,:) = 0.0
     wombat%aox_lnh4(:,:,:) = 0.0
     wombat%aox_mu(:,:,:) = 0.0
     wombat%ammox(:,:,:) = 0.0
@@ -5912,15 +5929,18 @@ module generic_WOMBATmid
       e_dom = max(0.0, 4.0 + dom_H2C - 2.0*dom_O2C - 3.0*dom_N2C )  ! [Anderson et al., 1995]
       e_domp = max(0.0, 4.0 + dom_H2C * wombat%Hox_fac - 2.0 * dom_O2C * wombat%Oox_fac - 3.0 * dom_N2C * wombat%Nox_fac ) ! Partially oxidized product
       e_bac = 4.0 + 1.4 - 2.0*0.4 - 3.0/wombat%bac_C2N ! [Zimmerman et al., 2014]
+      ! Scale down partial oxidation as NOSC approaches 3
+      wombat%bacf1alpha(i,j,k) = wombat%bacf1_alpha * min(1.0, max(0.0, 1.0 - (2.0 - nosc)/(2.0 - 3.0)  ))
+      wombat%bacf2alpha(i,j,k) = wombat%bacf2_alpha * min(1.0, max(0.0, 1.0 - (2.0 - nosc)/(2.0 - 3.0)  ))
       ! Determine the residual electrons remaining after partial oxidation
       e1_res = max(0.0, e_pom - wombat%bacp_alpha * e_pomp)
-      e2_res = max(0.0, e_dom - wombat%bacf1_alpha * e_domp)
-      e3_res = max(0.0, e_dom - wombat%bacf2_alpha * e_domp)
+      e2_res = max(0.0, e_dom - wombat%bacf1alpha(i,j,k) * e_domp)
+      e3_res = max(0.0, e_dom - wombat%bacf2alpha(i,j,k) * e_domp)
 
       ! Determine the biomass yield in terms of carbon (mol C-biomass per mol DOC consumed)
       wombat%bacp_ypoc(i,j,k) = min(1.0 - wombat%bacp_alpha, wombat%bacp_fele * e1_res/e_bac)
-      wombat%bacf1_ydoc(i,j,k) = min(1.0 - wombat%bacf1_alpha, wombat%bacf1_fele * e2_res/e_bac)
-      wombat%bacf2_ydoc(i,j,k) = min(1.0 - wombat%bacf2_alpha, wombat%bacf2_fele * e3_res/e_bac)
+      wombat%bacf1_ydoc(i,j,k) = min(1.0 - wombat%bacf1alpha(i,j,k), wombat%bacf1_fele * e2_res/e_bac)
+      wombat%bacf2_ydoc(i,j,k) = min(1.0 - wombat%bacf2alpha(i,j,k), wombat%bacf2_fele * e3_res/e_bac)
       ! Determine all other yields during bacterial growth
       bacp_cpoc = 0.0; bacf1_cdoc = 0.0; bacf2_cdoc = 0.0 ! reinitialise these values for safety
       if (wombat%bacp_ypoc(i,j,k) > 0.0) bacp_cpoc = 1.0 / wombat%bacp_ypoc(i,j,k) ! The amount of POC consumed per mol of bacterial C-biomass produced
@@ -5930,16 +5950,16 @@ module generic_WOMBATmid
       bacf1_coxy = max(0.0, e2_res - wombat%bacf1_ydoc(i,j,k)*e_bac)/4.0 * bacf1_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
       bacf2_coxy = max(0.0, e3_res - wombat%bacf2_ydoc(i,j,k)*e_bac)/4.0 * bacf2_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
       bacp_pdoc = wombat%bacp_alpha * bacp_cpoc ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bacf1_pdoc = wombat%bacf1_alpha * bacf1_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bacf2_pdoc = wombat%bacf2_alpha * bacf2_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf1_pdoc = wombat%bacf1alpha(i,j,k) * bacf1_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf2_pdoc = wombat%bacf2alpha(i,j,k) * bacf2_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
       bacp_pco2 = (1.0 - wombat%bacp_alpha - wombat%bacp_ypoc(i,j,k)) * bacp_cpoc ! The amount of CO2 produced per mol of C-biomass produced
-      bacf1_pco2 = (1.0 - wombat%bacf1_alpha - wombat%bacf1_ydoc(i,j,k)) * bacf1_cdoc ! The amount of CO2 produced per mol of C-biomass produced
-      bacf2_pco2 = (1.0 - wombat%bacf2_alpha - wombat%bacf2_ydoc(i,j,k)) * bacf2_cdoc ! The amount of CO2 produced per mol of C-biomass produced
+      bacf1_pco2 = (1.0 - wombat%bacf1alpha(i,j,k) - wombat%bacf1_ydoc(i,j,k)) * bacf1_cdoc ! The amount of CO2 produced per mol of C-biomass produced
+      bacf2_pco2 = (1.0 - wombat%bacf2alpha(i,j,k) - wombat%bacf2_ydoc(i,j,k)) * bacf2_cdoc ! The amount of CO2 produced per mol of C-biomass produced
       bacp_pnh4 = (16./122. - wombat%bacp_alpha * 16./122.*wombat%Nox_fac &
                    - 1.0/wombat%bac_C2N * wombat%bacp_ypoc(i,j,k)) * bacp_cpoc ! The amount of NH4 produced per mol of C-biomass produced
-      bacf1_pnh4 = (dom_N2C - wombat%bacf1_alpha * dom_N2C*wombat%Nox_fac &
+      bacf1_pnh4 = (dom_N2C - wombat%bacf1alpha(i,j,k) * dom_N2C*wombat%Nox_fac &
                    - 1.0/wombat%bac_C2N * wombat%bacf1_ydoc(i,j,k)) * bacf1_cdoc ! The amount of NH4 produced per mol of C-biomass produced
-      bacf2_pnh4 = (dom_N2C - wombat%bacf2_alpha * dom_N2C*wombat%Nox_fac &
+      bacf2_pnh4 = (dom_N2C - wombat%bacf2alpha(i,j,k) * dom_N2C*wombat%Nox_fac &
                    - 1.0/wombat%bac_C2N * wombat%bacf2_ydoc(i,j,k)) * bacf2_cdoc ! The amount of NH4 produced per mol of C-biomass produced
 
       ! Save the respiratory quotient as a diagnostic
@@ -5949,8 +5969,8 @@ module generic_WOMBATmid
 
       ! Consider anaerobic conditions
       bacp_ypoc_ana = min(1.0 - wombat%bacp_alpha, wombat%bacp_fele * 0.9 * e1_res/e_bac)
-      bacf1_ydoc_ana = min(1.0 - wombat%bacf1_alpha, wombat%bacf1_fele * 0.9 * e2_res/e_bac)
-      bacf2_ydoc_ana = min(1.0 - wombat%bacf2_alpha, wombat%bacf2_fele * 0.9 * e3_res/e_bac)
+      bacf1_ydoc_ana = min(1.0 - wombat%bacf1alpha(i,j,k), wombat%bacf1_fele * 0.9 * e2_res/e_bac)
+      bacf2_ydoc_ana = min(1.0 - wombat%bacf2alpha(i,j,k), wombat%bacf2_fele * 0.9 * e3_res/e_bac)
       bacp_cpoc_ana = 0.0; bacf1_cdoc_ana = 0.0; bacf2_cdoc_ana = 0.0 ! reinitialise these values for safety
       if (bacp_ypoc_ana > 0.0) bacp_cpoc_ana = 1.0 / bacp_ypoc_ana ! The amount of POC consumed per mol of bacterial C-biomass produced
       if (bacf1_ydoc_ana > 0.0) bacf1_cdoc_ana = 1.0 / bacf1_ydoc_ana ! The amount of DOC consumed per mol of bacterial C-biomass produced
@@ -5959,16 +5979,16 @@ module generic_WOMBATmid
       bacf1_cno3_ana = max(0.0, e2_res * bacf1_ydoc_ana*e_bac)/4.0 * bacf1_cdoc_ana ! The amount of N (NO3 --> N2O) molecules consumed per mol of C-biomass produced
       bacf2_cn2o_ana = max(0.0, e3_res * bacf2_ydoc_ana*e_bac)/2.0 * bacf2_cdoc_ana ! The amount of N2O molecules consumed per mol of C-biomass produced
       bacp_pdoc_ana = wombat%bacp_alpha * bacp_cpoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bacf1_pdoc_ana = wombat%bacf1_alpha * bacf1_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
-      bacf2_pdoc_ana = wombat%bacf2_alpha * bacf2_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf1_pdoc_ana = wombat%bacf1alpha(i,j,k) * bacf1_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
+      bacf2_pdoc_ana = wombat%bacf2alpha(i,j,k) * bacf2_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
       bacp_pco2_ana = (1.0 - wombat%bacp_alpha - bacp_ypoc_ana) * bacp_cpoc_ana ! The amount of CO2 produced per mol of C-biomass produced
-      bacf1_pco2_ana = (1.0 - wombat%bacf1_alpha - bacf1_ydoc_ana) * bacf1_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
-      bacf2_pco2_ana = (1.0 - wombat%bacf2_alpha - bacf2_ydoc_ana) * bacf2_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
+      bacf1_pco2_ana = (1.0 - wombat%bacf1alpha(i,j,k) - bacf1_ydoc_ana) * bacf1_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
+      bacf2_pco2_ana = (1.0 - wombat%bacf2alpha(i,j,k) - bacf2_ydoc_ana) * bacf2_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
       bacp_pnh4_ana = (16./122. - wombat%bacp_alpha * 16./122.*wombat%Nox_fac &
                        - 1.0/wombat%bac_C2N * bacp_ypoc_ana) * bacp_cpoc_ana ! The amount of NH4 produced per mol of C-biomass produced
-      bacf1_pnh4_ana = (dom_N2C - wombat%bacf1_alpha * dom_N2C*wombat%Nox_fac &
+      bacf1_pnh4_ana = (dom_N2C - wombat%bacf1alpha(i,j,k) * dom_N2C*wombat%Nox_fac &
                        - 1.0/wombat%bac_C2N * bacf1_ydoc_ana) * bacf1_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
-      bacf2_pnh4_ana = (dom_N2C - wombat%bacf2_alpha * dom_N2C*wombat%Nox_fac &
+      bacf2_pnh4_ana = (dom_N2C - wombat%bacf2alpha(i,j,k) * dom_N2C*wombat%Nox_fac &
                        - 1.0/wombat%bac_C2N * bacf2_ydoc_ana) * bacf2_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
 
       !!!~~~ Particle-associated bacteria ~~~!!!
@@ -8278,6 +8298,10 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_bacf1deni, wombat%bacf1deni, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
+    if (wombat%id_bacf1alpha > 0) &
+      used = g_send_data(wombat%id_bacf1alpha, wombat%bacf1alpha, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
         if (wombat%id_bacf2grow > 0) &
       used = g_send_data(wombat%id_bacf2grow, wombat%bacf2grow, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -8320,6 +8344,10 @@ module generic_WOMBATmid
 
     if (wombat%id_bacf2deni > 0) &
       used = g_send_data(wombat%id_bacf2deni, wombat%bacf2deni, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_bacf2alpha > 0) &
+      used = g_send_data(wombat%id_bacf2alpha, wombat%bacf2alpha, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_aox_lnh4 > 0) &
@@ -8990,6 +9018,7 @@ module generic_WOMBATmid
     allocate(wombat%bacf1morl(isd:ied, jsd:jed, 1:nk)); wombat%bacf1morl(:,:,:)=0.0
     allocate(wombat%bacf1morq(isd:ied, jsd:jed, 1:nk)); wombat%bacf1morq(:,:,:)=0.0
     allocate(wombat%bacf1deni(isd:ied, jsd:jed, 1:nk)); wombat%bacf1deni(:,:,:)=0.0
+    allocate(wombat%bacf1alpha(isd:ied, jsd:jed, 1:nk)); wombat%bacf1alpha(:,:,:)=0.0
     allocate(wombat%bacf2grow(isd:ied, jsd:jed, 1:nk)); wombat%bacf2grow(:,:,:)=0.0
     allocate(wombat%bacf2resp(isd:ied, jsd:jed, 1:nk)); wombat%bacf2resp(:,:,:)=0.0
     allocate(wombat%bacf2pco2(isd:ied, jsd:jed, 1:nk)); wombat%bacf2pco2(:,:,:)=0.0
@@ -9002,6 +9031,7 @@ module generic_WOMBATmid
     allocate(wombat%bacf2morl(isd:ied, jsd:jed, 1:nk)); wombat%bacf2morl(:,:,:)=0.0
     allocate(wombat%bacf2morq(isd:ied, jsd:jed, 1:nk)); wombat%bacf2morq(:,:,:)=0.0
     allocate(wombat%bacf2deni(isd:ied, jsd:jed, 1:nk)); wombat%bacf2deni(:,:,:)=0.0
+    allocate(wombat%bacf2alpha(isd:ied, jsd:jed, 1:nk)); wombat%bacf2alpha(:,:,:)=0.0
     allocate(wombat%aox_lnh4(isd:ied, jsd:jed, 1:nk)); wombat%aox_lnh4(:,:,:)=0.0
     allocate(wombat%aox_mu(isd:ied, jsd:jed, 1:nk)); wombat%aox_mu(:,:,:)=0.0
     allocate(wombat%nitrfix(isd:ied, jsd:jed, 1:nk)); wombat%nitrfix(:,:,:)=0.0
@@ -9318,6 +9348,7 @@ module generic_WOMBATmid
         wombat%bacf1morl, &
         wombat%bacf1morq, &
         wombat%bacf1deni, &
+        wombat%bacf1alpha, &
         wombat%bacf2grow, &
         wombat%bacf2resp, &
         wombat%bacf2pco2, &
@@ -9330,6 +9361,7 @@ module generic_WOMBATmid
         wombat%bacf2morl, &
         wombat%bacf2morq, &
         wombat%bacf2deni, &
+        wombat%bacf2alpha, &
         wombat%aox_lnh4, &
         wombat%aox_mu, &
         wombat%nitrfix, &
