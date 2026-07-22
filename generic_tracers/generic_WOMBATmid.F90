@@ -4257,9 +4257,9 @@ module generic_WOMBATmid
     !    11. Biogenic silica dissolution                                    !
     !    12. Mortality terms                                                !
     !    13. Zooplankton grazing, egestion, excretion, assimilation         !
-    !    14. Calcium carbonate production and dissolution                   !
-    !    15. Implicit nitrogen fixation                                     !
-    !    16. Facultative bacterial heterotrophy                             !
+    !    14. Implicit nitrogen fixation                                     !
+    !    15. Facultative bacterial heterotrophy                             !
+    !    16. Calcium carbonate production and dissolution                   !
     !    17. Chemoautotrophy                                                !
     !    18. Tracer tendencies                                              !
     !    19. Check for conservation of mass                                 !
@@ -5172,53 +5172,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 14] Calcium carbonate production and dissolution               !
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-
-      if (do_caco3_dynamics) then
-        ! PIC:POC ratio is a function of the substrate:inhibitor ratio, which is the
-        !  HCO3- to free H+ ions ratio (mol/umol), following Lehmann & Bach (2024).
-        !  We also add a T-dependent function to scale down CaCO3 production in waters colder
-        !  than 3 degrees C based off the observation of no E hux growth beneath this (Fielding 2013; L&O)
-        hco3 = wombat%f_dic(i,j,k) - wombat%co3(i,j,k) - wombat%co2_star(i,j,k)
-        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(min(2.0, -3.0 + 4.31e-6 * &
-                                          hco3 / wombat%htotal(i,j,k)))) * &
-                                         (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
-
-        ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
-        !  concentration of POC, following Kwon et al., 2024, Science Advances; Table S1, and
-        !  we account for the dissolution due to zooplankton grazing on particulates
-        wombat%dissratcal(i,j,k) = (wombat%disscal * max(0.0, 1.0 - wombat%omega_cal(i,j,k))**2.2)
-        wombat%dissratara(i,j,k) = (wombat%dissara * max(0.0, 1.0 - wombat%omega_ara(i,j,k))**1.5)
-        wombat%dissratpoc(i,j,k) = (wombat%dissdet * wombat%reminr(i,j,k) * biodet**2.0)
-      else
-        wombat%pic2poc(i,j,k) = wombat%f_inorg + 0.025
-        wombat%dissratcal(i,j,k) = wombat%caco3lrem
-        wombat%dissratara(i,j,k) = 0.0
-        wombat%dissratpoc(i,j,k) = 0.0
-      endif
-
-      if (wombat%f_caco3(i,j,k) > epsi) then
-        wombat%zoodiss(i,j,k) = wombat%zoograzdet(i,j,k) * wombat%fgutdiss * biocaco3/biodet
-        wombat%mesdiss(i,j,k) = wombat%mesgrazdet(i,j,k) * wombat%fgutdiss * biocaco3/biodet
-        wombat%caldiss(i,j,k) = wombat%dissratcal(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
-        wombat%aradiss(i,j,k) = wombat%dissratara(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
-        wombat%pocdiss(i,j,k) = wombat%dissratpoc(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
-      else
-        wombat%zoodiss(i,j,k) = 0.0
-        wombat%mesdiss(i,j,k) = 0.0
-        wombat%caldiss(i,j,k) = 0.0
-        wombat%aradiss(i,j,k) = 0.0
-        wombat%pocdiss(i,j,k) = 0.0
-      endif
-
-
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !-----------------------------------------------------------------------!
-      !  [Step 15] Implicit nitrogen fixation                                 !
+      !  [Step 14] Implicit nitrogen fixation                                 !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5243,7 +5197,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 16] Facultative bacterial heterotrophy                         !
+      !  [Step 15] Facultative bacterial heterotrophy                         !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -5304,6 +5258,52 @@ module generic_WOMBATmid
       wombat%bacufer(i,j,k) = wombat%bacgrow(i,j,k) / wombat%bac_C2Fe ! [molFe/kg/s]
       wombat%bacresp(i,j,k) = wombat%bacgrow(i,j,k) / bac_yoxyC * (1. - wombat%bac_fanaer(i,j,k)) ! [molO2/kg/s]
       wombat%bacdeni(i,j,k) = wombat%bacgrow(i,j,k) / bac_yno3C * wombat%bac_fanaer(i,j,k) ! [molNO3/kg/s]
+
+
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !  [Step 16] Calcium carbonate production and dissolution               !
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+      !-----------------------------------------------------------------------!
+
+      if (do_caco3_dynamics) then
+        ! PIC:POC ratio is a function of the substrate:inhibitor ratio, which is the
+        !  HCO3- to free H+ ions ratio (mol/umol), following Lehmann & Bach (2024).
+        !  We also add a T-dependent function to scale down CaCO3 production in waters colder
+        !  than 3 degrees C based off the observation of no E hux growth beneath this (Fielding 2013; L&O)
+        hco3 = wombat%f_dic(i,j,k) - wombat%co3(i,j,k) - wombat%co2_star(i,j,k)
+        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(min(2.0, -3.0 + 4.31e-6 * &
+                                          hco3 / wombat%htotal(i,j,k)))) * &
+                                         (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
+
+        ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
+        !  concentration of POC, following Kwon et al., 2024, Science Advances; Table S1, and
+        !  we account for the dissolution due to zooplankton grazing on particulates
+        wombat%dissratcal(i,j,k) = (wombat%disscal * max(0.0, 1.0 - wombat%omega_cal(i,j,k))**2.2)
+        wombat%dissratara(i,j,k) = (wombat%dissara * max(0.0, 1.0 - wombat%omega_ara(i,j,k))**1.5)
+        wombat%dissratpoc(i,j,k) = (wombat%dissdet * wombat%reminr(i,j,k) * biodet**2.0)
+      else
+        wombat%pic2poc(i,j,k) = wombat%f_inorg + 0.025
+        wombat%dissratcal(i,j,k) = wombat%caco3lrem
+        wombat%dissratara(i,j,k) = 0.0
+        wombat%dissratpoc(i,j,k) = 0.0
+      endif
+
+      if (wombat%f_caco3(i,j,k) > epsi) then
+        wombat%zoodiss(i,j,k) = wombat%zoograzdet(i,j,k) * wombat%fgutdiss * biocaco3/biodet
+        wombat%mesdiss(i,j,k) = wombat%mesgrazdet(i,j,k) * wombat%fgutdiss * biocaco3/biodet
+        wombat%caldiss(i,j,k) = wombat%dissratcal(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
+        wombat%aradiss(i,j,k) = wombat%dissratara(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
+        wombat%pocdiss(i,j,k) = wombat%dissratpoc(i,j,k) * wombat%f_caco3(i,j,k) ! [mol/kg/s]
+      else
+        wombat%zoodiss(i,j,k) = 0.0
+        wombat%mesdiss(i,j,k) = 0.0
+        wombat%caldiss(i,j,k) = 0.0
+        wombat%aradiss(i,j,k) = 0.0
+        wombat%pocdiss(i,j,k) = 0.0
+      endif
 
 
       !-----------------------------------------------------------------------!
