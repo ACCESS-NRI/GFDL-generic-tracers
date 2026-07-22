@@ -40,16 +40,13 @@
 !  based on a NPZD (nutrient–phytoplankton–zooplankton–detritus) model.
 !  This is the "mid" version of WOMBAT which includes two classes each of
 !  phytoplankton, zooplankton and sinking detritus, as well as nitrate
-!  (NO3), ammonium (NH4), nitrous oxide (N2O), dissolved iron (Fe),
-!  silicic acid (SIL), dissolved organic matter that is split into carbon
-!  (DOC) and nitrogen (DON), two explicit heterotrophic bacterial types
-!  (BAC1 & BAC2) and ammonia oxidizing archaea (AOA), dissolved inorganic
-!  carbon (DIC), calcium carbonate (CaCO3), alkalinity (ALK), and oxygen
-!  (O2). Fe is carried through all exosystem biomass pools except bacteria
-!  and AOA, who have constant C:N:Fe ratios. Fe is additionally routed to
-!  small and large authigenic Fe particle pools (AFe and bAFe) via the
-!  "colloidal shunt". C:N ratios are fixed in all biomass pools except
-!  for dissolved organics, since we represent both DOC and DON. Si is
+!  (NO3), ammonium (NH4), dissolved iron (Fe), silicic acid (SIL),
+!  dissolved organic matter that is split into carbon (DOC) and nitrogen
+!  (DON), dissolved inorganic carbon (DIC), calcium carbonate (CaCO3),
+!  alkalinity (ALK), and oxygen (O2). Fe is carried through all exosystem
+!  biomass pools. Fe is additionally routed to small and large authigenic
+!  Fe particle pools (AFe and bAFe) via the "colloidal shunt". C:N ratios
+!  are fixed in all biomass pools except for dissolved organics. Si is
 !  carried through microphytoplankton, large detrtis and, like for carbon
 !  and Fe, is deposited into a sediment pool.
 !  Gas exchange follows MOCSY protocols.
@@ -391,10 +388,7 @@ module generic_WOMBATmid
         a_0, a_1, a_2, a_3, a_4, a_5, &
         b_0, b_1, b_2, b_3, c_0, &
         a1_co2, a2_co2, a3_co2, a4_co2, a5_co2, &
-        a1_o2, a2_o2, a3_o2, a4_o2, a5_o2, &
-        a_1_n2o, a_2_n2o, a_3_n2o, a_4_n2o, &
-        b_1_n2o, b_2_n2o, b_3_n2o, &
-        a1_n2o, a2_n2o, a3_n2o, a4_n2o, a5_n2o
+        a1_o2, a2_o2, a3_o2, a4_o2, a5_o2
 
     character(len=fm_string_len) :: ice_restart_file
     character(len=fm_string_len) :: ocean_restart_file
@@ -407,7 +401,6 @@ module generic_WOMBATmid
         htotallo, htotalhi,  &
         co2_csurf, co2_alpha, co2_sc_no, pco2_csurf, &
         o2_csurf, o2_alpha, o2_sc_no, &
-        n2o_csurf, n2o_alpha, n2o_sc_no, &
         no3_vstf, nh4_vstf, dic_vstf, alk_vstf
 
 
@@ -494,7 +487,6 @@ module generic_WOMBATmid
         f_bac1, &
         f_bac2, &
         f_aoa, &
-        f_n2o, &
         f_o2, &
         f_caco3, &
         f_fe, &
@@ -692,7 +684,7 @@ module generic_WOMBATmid
         zm
 
     real, dimension(:,:,:,:), pointer :: &
-        p_o2, p_n2o
+        p_o2
 
     real, dimension(:,:,:), pointer :: &
         p_det_sediment, &
@@ -2449,24 +2441,6 @@ module generic_WOMBATmid
     call g_tracer_add_param('a4_o2', wombat%a4_o2, -0.10939)
     call g_tracer_add_param('a5_o2', wombat%a5_o2, 0.00093777)
 
-    ! Coefficients for N2O solubility [1] (Weiss & Price, 1980, Marine Chemistry, 8, 347-359)
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('a_1_n2o', wombat%a_1_n2o, -168.2459)
-    call g_tracer_add_param('a_2_n2o', wombat%a_2_n2o, 226.0894)
-    call g_tracer_add_param('a_3_n2o', wombat%a_3_n2o, 93.2817)
-    call g_tracer_add_param('a_4_n2o', wombat%a_4_n2o, -1.48693)
-    call g_tracer_add_param('b_1_n2o', wombat%b_1_n2o, -0.060361)
-    call g_tracer_add_param('b_2_n2o', wombat%b_2_n2o, 0.033765)
-    call g_tracer_add_param('b_3_n2o', wombat%b_3_n2o, -0.0051862)
-
-    ! Compute the Schmidt number of N2O in seawater using the
-    ! formulation proposed by Wanninkof (2014) Limnology and Oceanography: Methods, 12, 351-362.
-    call g_tracer_add_param('a1_n2o', wombat%a1_n2o, 2356.2)
-    call g_tracer_add_param('a2_n2o', wombat%a2_n2o, -166.38)
-    call g_tracer_add_param('a3_n2o', wombat%a3_n2o, 6.3952)
-    call g_tracer_add_param('a4_n2o', wombat%a4_n2o, -0.13422)
-    call g_tracer_add_param('a5_n2o', wombat%a5_n2o, 0.0011506)
-
     ! Initial H+ concentration [mol/kg]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('htotal_in', wombat%htotal_in, 1.e-8) ! dts: default conc from COBALT
@@ -3562,20 +3536,6 @@ module generic_WOMBATmid
         units = 'mol/kg', &
         prog = .true.)
 
-    ! Nitrous oxide (N2O)
-    !-----------------------------------------------------------------------
-    call g_tracer_add(tracer_list, package_name, &
-        name = 'n2o', &
-        longname = 'Nitrous oxide', &
-        units = 'mol/kg', &
-        prog = .true., &
-        flux_gas = .true., &
-        flux_gas_name = 'n2o_flux', &
-        flux_gas_type = 'air_sea_gas_flux_generic', &
-        flux_gas_molwt = WTMCO2, & !pjb: N2O molar mass is 44.01 g/mol, same as CO2
-        flux_gas_param = [ as_coeff_wombatmid, 9.7561e-06 ], & ! dts: param(2) converts Pa -> atm
-        flux_gas_restart_file = 'ocean_wombatmid_airsea_flux.res.nc')
-
     ! CaCO3
     !-----------------------------------------------------------------------
     call g_tracer_add(tracer_list, package_name, &
@@ -3980,7 +3940,7 @@ module generic_WOMBATmid
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
     real                                    :: g_zoo, g_mes, Xzoo, I_Xzoo, Xmes, I_Xmes
-    real                                    :: biono3, bion2o, bionh4, biooxy, biofer, biosil, biodoc, biodon, biocaco3
+    real                                    :: biono3, bionh4, biooxy, biofer, biosil, biodoc, biodon, biocaco3
     real                                    :: biophy, biodia, biozoo, biomes, biodet, biobdet, biobdetsi, biobac1, biobac2, bioaoa
     real                                    :: biophyfe, biodiafe
     real                                    :: I_denom, wzbac1, wzbac2, wzaoa, wzphy, wzdia, wzdet, wzbdet, wzzoo, I_wzsum
@@ -4556,8 +4516,6 @@ module generic_WOMBATmid
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
-    call g_tracer_get_values(tracer_list, 'n2o', 'field', wombat%f_n2o, isd, jsd, ntau=tau, &
-        positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau, &
         positive=.true.) ! [mol/kg]
     call g_tracer_get_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau, &
@@ -4767,7 +4725,6 @@ module generic_WOMBATmid
       biobac2  = max(epsi, wombat%f_bac2(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       bioaoa   = max(epsi, wombat%f_aoa(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biono3   = max(epsi, wombat%f_no3(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
-      bion2o   = max(epsi, wombat%f_n2o(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       bionh4   = max(epsi, wombat%f_nh4(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biooxy   = max(epsi, wombat%f_o2(i,j,k) ) / mmol_m3_to_mol_kg  ![mmol/m3]
       biofer   = max(epsi, wombat%f_fe(i,j,k)  ) / umol_m3_to_mol_kg  ![umol/m3]
@@ -5703,7 +5660,7 @@ module generic_WOMBATmid
       if (bac_gN<min(bac_gC,bac_gFe,bac_gEA)) wombat%bac2_fnlim(i,j,k) = 1.0
       if (bac_gFe<min(bac_gC,bac_gN,bac_gEA)) wombat%bac2_ffelim(i,j,k) = 1.0
       ! Anaerobic growth
-      bac_Vn2o = bion2o * wombat%bac2_pn2o
+      bac_Vn2o = 0.0 * wombat%bac2_pn2o
       bac_gC = bac_Vdoc * bac2_yanaC ! Growth of C biomass due to DOC uptake
       bac_gN = (bac2_Vdon + bac2_Vnh4) * bac2_ydonC * wombat%bacanapen ! Growth of C biomass due to N uptake
       bac_gFe = bac_VdFe * wombat%bac2_C2Fe * wombat%bacanapen ! Growth of C biomass due to Fe uptake
@@ -5843,15 +5800,6 @@ module generic_WOMBATmid
                           - wombat%dia_silupt(i,j,k) &
                           + wombat%zoograzdia(i,j,k) * dia_Si2C &
                           + wombat%bsidiss(i,j,k) )
-
-
-      ! Nitrous oxide equation ! [molN2/kg]
-      !  pjb: note that we track N2O in units of mol N2/kg, accounting for the two N atoms
-      !----------------------------------------------------------------------
-      wombat%f_n2o(i,j,k) = wombat%f_n2o(i,j,k) + dtsb * ( &
-                            wombat%aoagrow(i,j,k) * wombat%aoa_en2o(i,j,k) &
-                          + wombat%bac1deni(i,j,k)/2.0 &
-                          - wombat%bac2deni(i,j,k) )
 
       ! Phytoplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -6422,7 +6370,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      n_pools(i,j,k,2) = wombat%f_no3(i,j,k) + wombat%f_nh4(i,j,k) + wombat%f_don(i,j,k) + 2*wombat%f_n2o(i,j,k) &
+      n_pools(i,j,k,2) = wombat%f_no3(i,j,k) + wombat%f_nh4(i,j,k) + wombat%f_don(i,j,k) &
                           + ( wombat%f_phy(i,j,k) + wombat%f_det(i,j,k) + wombat%f_bdet(i,j,k) &
                           +   wombat%f_zoo(i,j,k) + wombat%f_mes(i,j,k) + wombat%f_dia(i,j,k) ) * 16/122.0 &
                           + ( wombat%f_bac1(i,j,k) / wombat%bac1_C2N + wombat%f_bac2(i,j,k) / wombat%bac2_C2N &
@@ -6448,7 +6396,6 @@ module generic_WOMBATmid
             print *, " "
             print *, "       NO3 (molNO3/kg) =", wombat%f_no3(i,j,k)
             print *, "       NH4 (molNH4/kg) =", wombat%f_nh4(i,j,k)
-            print *, "       N2O (molN2/kg) =", wombat%f_n2o(i,j,k)
             print *, "       PHY (molN/kg) =", wombat%f_phy(i,j,k) * 16.0 / 122.0
             print *, "       DIA (molN/kg) =", wombat%f_dia(i,j,k) * 16.0 / 122.0
             print *, "       ZOO (molN/kg) =", wombat%f_zoo(i,j,k) * 16.0 / 122.0
@@ -6589,7 +6536,6 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'bac1', 'field', wombat%f_bac1, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'bac2', 'field', wombat%f_bac2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'aoa', 'field', wombat%f_aoa, isd, jsd, ntau=tau)
-    call g_tracer_set_values(tracer_list, 'n2o', 'field', wombat%f_n2o, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'o2', 'field', wombat%f_o2, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'caco3', 'field', wombat%f_caco3, isd, jsd, ntau=tau)
     call g_tracer_set_values(tracer_list, 'fe', 'field', wombat%f_fe, isd, jsd, ntau=tau)
@@ -7907,7 +7853,7 @@ module generic_WOMBATmid
     real, dimension(ilb:,jlb:,:), optional, intent(in) :: dzt
 
     integer                                 :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
-    real                                    :: sal, ST, o2_solubility, n2o_solubility
+    real                                    :: sal, ST, o2_solubility
     real                                    :: tt, tk, tk100, ts, ts2, ts3, ts4, ts5
     real                                    :: mmol_m3_to_mol_kg
     real, dimension(:,:,:), pointer         :: grid_tmask
@@ -7918,7 +7864,6 @@ module generic_WOMBATmid
         grid_tmask=grid_tmask)
 
     call g_tracer_get_pointer(tracer_list, 'o2', 'field', wombat%p_o2)
-    call g_tracer_get_pointer(tracer_list, 'n2o', 'field', wombat%p_n2o)
 
     ! Some unit conversion factors
     mmol_m3_to_mol_kg = 1.e-3 / wombat%Rho_0
@@ -8049,54 +7994,6 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'o2', 'csurf', wombat%o2_csurf, isd, jsd)
     call g_tracer_set_values(tracer_list, 'o2', 'sc_no', wombat%o2_sc_no, isd, jsd)
 
-    call g_tracer_get_values(tracer_list, 'n2o', 'alpha', wombat%n2o_alpha, isd, jsd)
-    call g_tracer_get_values(tracer_list, 'n2o', 'csurf', wombat%n2o_csurf ,isd, jsd)
-
-    do j=jsc,jec ; do i=isc,iec
-      !-----------------------------------------------------------------------
-      ! Compute the nitrous oxide saturation concentration at 1 atm total
-      ! pressure in mol/kg given the temperature (t, in deg C) and
-      ! salinity (s, in permil)
-      !
-      ! From Weiss and Price (1980), Marine Chemistry.
-      ! The formula used is from page 353, eq (13). We use coefficients from
-      ! their Table 2, column 4, for "F" in units of mol/kg/atm.
-      !
-      ! n2o_solubility is defined between T(freezing) <= T <= 40 deg C
-      ! We impose these bounds here.
-      !
-      ! check value: T = 20 deg C, S = 35 permil,
-      !     n2o_solubility = 0.026883995 mol kg-1 atm-1
-      !-----------------------------------------------------------------------
-      sal = SSS(i,j) ; ST = SST(i,j)
-
-      sal = min(40.0, max(0.0, sal))
-      tk = 273.15 + min(40.0, max(0.0, ST))
-      tk100 = tk/100.0
-
-      ! mol kg-1 atm-1
-      n2o_solubility = exp( wombat%a_1_n2o + wombat%a_2_n2o*(100.0/tk) &
-                            + wombat%a_3_n2o*log(tk100) + wombat%a_4_n2o*tk100**2 &
-                            + sal * ( wombat%b_1_n2o + wombat%b_2_n2o*tk100 &
-                                      + wombat%b_3_n2o*tk100**2 ) ) * grid_tmask(i,j,1)
-
-      !-----------------------------------------------------------------------
-      !  Compute the Schmidt number of N2o in seawater using the
-      !  formulation proposed by Wanninkhof (2014) Limnology and Oceanography: Methods, 12, 351-362.
-      !-----------------------------------------------------------------------
-      wombat%n2o_sc_no(i,j) = wombat%a1_n2o + ST * (wombat%a2_n2o + ST * (wombat%a3_n2o + ST &
-          * (wombat%a4_n2o + ST * wombat%a5_n2o))) * grid_tmask(i,j,1)
-
-      wombat%n2o_alpha(i,j) = n2o_solubility * wombat%Rho_0 ! Converts from mol/kg to mol/m3
-      wombat%n2o_csurf(i,j) = wombat%p_n2o(i,j,1,tau) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
-    enddo; enddo
-
-    ! Set %csurf, %alpha and %sc_no for these tracers. This will mark them
-    ! for sending fluxes to coupler
-    call g_tracer_set_values(tracer_list, 'n2o', 'alpha', wombat%n2o_alpha, isd, jsd)
-    call g_tracer_set_values(tracer_list, 'n2o', 'csurf', wombat%n2o_csurf, isd, jsd)
-    call g_tracer_set_values(tracer_list, 'n2o', 'sc_no', wombat%n2o_sc_no, isd, jsd)
-
   end subroutine generic_WOMBATmid_set_boundary_values
 
   !#######################################################################
@@ -8152,9 +8049,6 @@ module generic_WOMBATmid
     allocate(wombat%o2_csurf(isd:ied, jsd:jed)); wombat%o2_csurf(:,:)=0.0
     allocate(wombat%o2_alpha(isd:ied, jsd:jed)); wombat%o2_alpha(:,:)=0.0
     allocate(wombat%o2_sc_no(isd:ied, jsd:jed)); wombat%o2_sc_no(:,:)=0.0
-    allocate(wombat%n2o_csurf(isd:ied, jsd:jed)); wombat%n2o_csurf(:,:)=0.0
-    allocate(wombat%n2o_alpha(isd:ied, jsd:jed)); wombat%n2o_alpha(:,:)=0.0
-    allocate(wombat%n2o_sc_no(isd:ied, jsd:jed)); wombat%n2o_sc_no(:,:)=0.0
     allocate(wombat%no3_vstf(isd:ied, jsd:jed)); wombat%no3_vstf(:,:)=0.0
     allocate(wombat%nh4_vstf(isd:ied, jsd:jed)); wombat%nh4_vstf(:,:)=0.0
     allocate(wombat%dic_vstf(isd:ied, jsd:jed)); wombat%dic_vstf(:,:)=0.0
@@ -8187,7 +8081,6 @@ module generic_WOMBATmid
     allocate(wombat%f_bac1(isd:ied, jsd:jed, 1:nk)); wombat%f_bac1(:,:,:)=0.0
     allocate(wombat%f_bac2(isd:ied, jsd:jed, 1:nk)); wombat%f_bac2(:,:,:)=0.0
     allocate(wombat%f_aoa(isd:ied, jsd:jed, 1:nk)); wombat%f_aoa(:,:,:)=0.0
-    allocate(wombat%f_n2o(isd:ied, jsd:jed, 1:nk)); wombat%f_n2o(:,:,:)=0.0
     allocate(wombat%f_o2(isd:ied, jsd:jed, 1:nk)); wombat%f_o2(:,:,:)=0.0
     allocate(wombat%f_caco3(isd:ied, jsd:jed, 1:nk)); wombat%f_caco3(:,:,:)=0.0
     allocate(wombat%f_fe(isd:ied, jsd:jed, 1:nk)); wombat%f_fe(:,:,:)=0.0
@@ -8455,9 +8348,6 @@ module generic_WOMBATmid
         wombat%o2_csurf, &
         wombat%o2_alpha, &
         wombat%o2_sc_no, &
-        wombat%n2o_csurf, &
-        wombat%n2o_alpha, &
-        wombat%n2o_sc_no, &
         wombat%no3_vstf, &
         wombat%nh4_vstf, &
         wombat%dic_vstf, &
@@ -8491,7 +8381,6 @@ module generic_WOMBATmid
         wombat%f_bac1, &
         wombat%f_bac2, &
         wombat%f_aoa, &
-        wombat%f_n2o, &
         wombat%f_o2, &
         wombat%f_caco3, &
         wombat%f_fe, &
