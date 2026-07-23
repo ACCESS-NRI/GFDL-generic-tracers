@@ -336,7 +336,6 @@ module generic_WOMBATmid
         aoa_poxy, &
         aoa_ynh4, &
         aoa_yoxy, &
-        aoa_en2omin, &
         aoa_C2N, &
         aoa_C2Fe, &
         aoalmor, &
@@ -609,7 +608,6 @@ module generic_WOMBATmid
         mesdiss, &
         aoa_loxy, &
         aoa_lnh4, &
-        aoa_en2o, &
         aoa_eno3, &
         aoa_mumax, &
         aoa_mu, &
@@ -807,7 +805,6 @@ module generic_WOMBATmid
         id_mesdiss = -1, &
         id_aoa_loxy = -1, &
         id_aoa_lnh4 = -1, &
-        id_aoa_en2o = -1, &
         id_aoa_eno3 = -1, &
         id_aoa_mumax = -1, &
         id_aoa_mu = -1, &
@@ -1893,7 +1890,7 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'docrremi', 'Remineralisation of recalcitrant dissolved organic carbon by bacteria', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'docrremi', 'Conversion of recalcitrant to labile dissolved organic carbon', 'h', 'L', 's', 'molC/kg/s', 'f')
     wombat%id_docrremi = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -1965,12 +1962,6 @@ module generic_WOMBATmid
     vardesc_temp = vardesc( &
         'aoa_lnh4', 'Limitation of Ammonia Oxidizing Archaea by ammonium', 'h', 'L', 's', '[0-1]', 'f')
     wombat%id_aoa_lnh4 = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
-        'aoa_en2o', 'Excretion of N2O produced by Ammonia Oxidizing Archaea during oxidation', 'h', 'L', 's', &
-        'mol N / mol Biomass', 'f')
-    wombat%id_aoa_en2o = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2830,15 +2821,6 @@ module generic_WOMBATmid
     !       of what it is here in the code, in units of mol Biomass per mol O2
     call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5)
 
-    ! Ammonia Oxidizing Archaea minimum biomass yield of N2O [mol N2O (mol NH4 oxidized)-1]
-    !  Frey et al. (2023) find a baseline yield of ~0.5% in oxic conditions
-    !  (i.e., when O2 is not limiting), which we note here is in excess of the baseline
-    !  yields of other studies (Ji et al., 2018; Santoro et al., 2011; Qin et al., 2017;
-    !  Kelly et al., 2024) that place the baseline near 0.05% - 0.1%. We set it at
-    !  0.08% to align with Kelly et al., 2024.
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoa_en2omin', wombat%aoa_en2omin, 0.0008)
-
     ! Ammonia Oxidizing Archaea biomass carbon to nitrogen ratio [mol C (mol N)-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_C2N', wombat%aoa_C2N, 5.0)
@@ -2890,7 +2872,7 @@ module generic_WOMBATmid
 
     ! Facultative free-living heterotrophic bacteria degree of partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bac_alpha', wombat%bac_alpha, 0.10)
+    call g_tracer_add_param('bac_alpha', wombat%bac_alpha, 0.25)
 
     ! Facultative free-living heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
@@ -3704,7 +3686,7 @@ module generic_WOMBATmid
     real                                    :: bac_Voc, bac_VdFe, bac_Voxy, bac_Vno3
     real                                    :: bac_gC, bac_gFe, bac_gEA
     real                                    :: bac_muana, bac_muaer
-    real                                    :: aoa_Vnh4, aoa_Voxy, aoa_en2o_nh4, aoa_en2o_hyb
+    real                                    :: aoa_Vnh4, aoa_Voxy
     real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect
     real                                    :: disssi_temp, disssi_usat, disssi_bact
     real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools, si_pools, fe_pools
@@ -4066,7 +4048,6 @@ module generic_WOMBATmid
     wombat%mesdiss(:,:,:) = 0.0
     wombat%aoa_loxy(:,:,:) = 0.0
     wombat%aoa_lnh4(:,:,:) = 0.0
-    wombat%aoa_en2o(:,:,:) = 0.0
     wombat%aoa_eno3(:,:,:) = 0.0
     wombat%aoa_mumax(:,:,:) = 0.0
     wombat%aoa_mu(:,:,:) = 0.0
@@ -5316,13 +5297,7 @@ module generic_WOMBATmid
       aoa_Vnh4 = wombat%aoa_ynh4 * wombat%aoa_mumax(i,j,k) * wombat%aoa_lnh4(i,j,k)  ! Note: yield * max growth rate = Vmax
       ! 3. Redefine growth rate based on these limitations
       wombat%aoa_mu(i,j,k) = min( (aoa_Voxy/wombat%aoa_yoxy), (aoa_Vnh4/wombat%aoa_ynh4) )
-
-      ! 4. Determine N2O yield from ammonia oxidation as a dependence on ambient O2
-      !    We follow McCoy et al. 2026 PNAS who implemented Kelly et al. 2024 Biogeosciences
-      aoa_en2o_nh4 = 0.022 * exp(-1.5 * biooxy) + wombat%aoa_en2omin
-      aoa_en2o_hyb = 0.204 * exp(-0.58 * biooxy)
-      wombat%aoa_en2o(i,j,k) = (wombat%aoa_ynh4 - 1.0/wombat%aoa_C2N) * (0.5 * aoa_en2o_nh4 + aoa_en2o_hyb)
-      wombat%aoa_eno3(i,j,k) = (wombat%aoa_ynh4 - 1.0/wombat%aoa_C2N) * (1.0 - aoa_en2o_nh4 - 2*aoa_en2o_hyb)
+      wombat%aoa_eno3(i,j,k) = wombat%aoa_ynh4 - 1.0/wombat%aoa_C2N
 
       if (do_anammox) then
         ! Anaerobic ammonium oxidation (anammox)
@@ -5631,7 +5606,8 @@ module generic_WOMBATmid
                             + wombat%mesexcrdet(i,j,k) &
                             + wombat%mesexcrbdet(i,j,k) &
                             + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom &
-                          - wombat%docremi(i,j,k) )
+                          - wombat%docremi(i,j,k) &
+                          + wombat%docrremi(i,j,k) )
 
       ! Recalcitrant dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
@@ -5740,7 +5716,6 @@ module generic_WOMBATmid
                           + wombat%zoomorl(i,j,k) &
                           + wombat%mesmorl(i,j,k) &
                           + wombat%bacpco2(i,j,k) &
-                          + wombat%docrremi(i,j,k) &
                           + wombat%zoodiss(i,j,k) &
                           + wombat%mesdiss(i,j,k) &
                           + wombat%caldiss(i,j,k) &
@@ -5776,7 +5751,6 @@ module generic_WOMBATmid
                             + wombat%zoomorl(i,j,k) &
                             + wombat%mesmorl(i,j,k) &
                             + wombat%bacpco2(i,j,k) &
-                            + wombat%docrremi(i,j,k) &
                             + wombat%zoodiss(i,j,k) &
                             + wombat%mesdiss(i,j,k) &
                             + wombat%caldiss(i,j,k) &
@@ -7094,10 +7068,6 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_aoa_lnh4, wombat%aoa_lnh4, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_aoa_en2o > 0) &
-      used = g_send_data(wombat%id_aoa_en2o, wombat%aoa_en2o, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
     if (wombat%id_aoa_eno3 > 0) &
       used = g_send_data(wombat%id_aoa_eno3, wombat%aoa_eno3, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
@@ -7731,7 +7701,6 @@ module generic_WOMBATmid
     allocate(wombat%pocdiss(isd:ied, jsd:jed, 1:nk)); wombat%pocdiss(:,:,:)=0.0
     allocate(wombat%aoa_loxy(isd:ied, jsd:jed, 1:nk)); wombat%aoa_loxy(:,:,:)=0.0
     allocate(wombat%aoa_lnh4(isd:ied, jsd:jed, 1:nk)); wombat%aoa_lnh4(:,:,:)=0.0
-    allocate(wombat%aoa_en2o(isd:ied, jsd:jed, 1:nk)); wombat%aoa_en2o(:,:,:)=0.0
     allocate(wombat%aoa_eno3(isd:ied, jsd:jed, 1:nk)); wombat%aoa_eno3(:,:,:)=0.0
     allocate(wombat%aoa_mumax(isd:ied, jsd:jed, 1:nk)); wombat%aoa_mumax(:,:,:)=0.0
     allocate(wombat%aoa_mu(isd:ied, jsd:jed, 1:nk)); wombat%aoa_mu(:,:,:)=0.0
@@ -8005,7 +7974,6 @@ module generic_WOMBATmid
         wombat%pocdiss, &
         wombat%aoa_loxy, &
         wombat%aoa_lnh4, &
-        wombat%aoa_en2o, &
         wombat%aoa_eno3, &
         wombat%aoa_mumax, &
         wombat%aoa_mu, &
