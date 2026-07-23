@@ -254,7 +254,6 @@ module generic_WOMBATmid
         zooFeingest, &
         zooFeassim, &
         zooexcrdom, &
-        zookz, &
         zoogmax, &
         zooepsbac, &
         zooepsaoa, &
@@ -274,7 +273,6 @@ module generic_WOMBATmid
         mesFeassim, &
         mesexcrdom, &
         fgutdiss, &
-        meskz, &
         mesgmax, &
         mesepsbac, &
         mesepsaoa, &
@@ -2454,10 +2452,6 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zooexcrdom', wombat%zooexcrdom, 0.70)
 
-    ! Zooplankton half saturation coefficient for linear mortality [mmol C m-3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('zookz', wombat%zookz, 0.25)
-
     ! Zooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zoogmax', wombat%zoogmax, 3.3/86400.0)
@@ -2545,10 +2539,6 @@ module generic_WOMBATmid
     ! Zooplankton dissolution efficiency of CaCO3 within guts [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('fgutdiss', wombat%fgutdiss, 0.80)
-
-    ! Mesozooplankton half saturation coefficient for linear mortality [mmol C m-3]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('meskz', wombat%meskz, 0.30)
 
     ! Mesozooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
@@ -3695,7 +3685,6 @@ module generic_WOMBATmid
     real                                    :: theta_opt
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe
-    real                                    :: zoo_slmor, mes_slmor
     real                                    :: hco3
     real                                    :: dzt_bot, dzt_bot_os
     real                                    :: e_dom, e_domp, e_bac, e_res
@@ -4871,10 +4860,6 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      ! reduce linear mortality (respiration losses) of zooplankton when there is low biomass
-      zoo_slmor = biozoo / (biozoo + wombat%zookz)
-      mes_slmor = biomes / (biomes + wombat%meskz)
-
       ! Mortality terms
       if (biophy>1e-3) then
         wombat%phymorl(i,j,k) = wombat%phylmor * fbc * wombat%f_phy(i,j,k) ! [molC/kg/s]
@@ -4891,14 +4876,14 @@ module generic_WOMBATmid
         wombat%diamorq(i,j,k) = 0.0
       endif
       if (biozoo>1e-3) then
-        wombat%zoomorl(i,j,k) = wombat%zoolmor * fbc * wombat%f_zoo(i,j,k) * zoo_slmor ! [molC/kg/s]
+        wombat%zoomorl(i,j,k) = wombat%zoolmor * fbc * wombat%f_zoo(i,j,k) ! [molC/kg/s]
         wombat%zoomorq(i,j,k) = wombat%zooqmor / mmol_m3_to_mol_kg * wombat%f_zoo(i,j,k) * wombat%f_zoo(i,j,k) ! [molC/kg/s]
       else
         wombat%zoomorl(i,j,k) = 0.0
         wombat%zoomorq(i,j,k) = 0.0
       endif
       if (biomes>1e-3) then
-        wombat%mesmorl(i,j,k) = wombat%meslmor * fbc * wombat%f_mes(i,j,k) * mes_slmor ! [molC/kg/s]
+        wombat%mesmorl(i,j,k) = wombat%meslmor * fbc * wombat%f_mes(i,j,k) ! [molC/kg/s]
         wombat%mesmorq(i,j,k) = wombat%mesqmor / mmol_m3_to_mol_kg * wombat%f_mes(i,j,k) * wombat%f_mes(i,j,k) ! [molC/kg/s]
       else
         wombat%mesmorl(i,j,k) = 0.0
