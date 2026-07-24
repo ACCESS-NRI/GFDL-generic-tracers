@@ -66,6 +66,14 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
   set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g3 -O2 -xCORE-AVX2 -debug all -check none")
   set(CMAKE_Fortran_FLAGS_DEBUG "-g3 -O0 -debug all -check -check noarg_temp_created -check nopointer -warn -warn noerrors -ftrapuv")
 
+elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+
+  # NVIDIA HPC SDK (nvfortran)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -i4 -r8 -Mcray=pointer -Mbyteswapio -Ktrap=fp -traceback")
+  set(CMAKE_Fortran_FLAGS_RELEASE "-O2")
+  set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g -O2")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -Mbounds -Mchkptr")
+
 else()
   message(WARNING "Fortran compiler with ID ${CMAKE_Fortran_COMPILER_ID} will be used with CMake default options")
 endif()
