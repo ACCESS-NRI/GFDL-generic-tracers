@@ -348,20 +348,24 @@ module generic_WOMBATmid
         aoaqmor, &
         lbac_Vmax_doc, &
         lbac_Vmax_dfe, &
+        lbac_Vmax_nh4, &
         lbac_Vmax_no3, &
         lbac_poxy, &
         lbac_kno3, &
         lbac_kdoc, &
         lbac_kfer, &
+        lbac_knh4, &
         lbac_alpha, &
         lbac_fele, &
         sbac_Vmax_doc, &
         sbac_Vmax_dfe, &
+        sbac_Vmax_nh4, &
         sbac_Vmax_no3, &
         sbac_poxy, &
         sbac_kno3, &
         sbac_kdoc, &
         sbac_kfer, &
+        sbac_knh4, &
         sbac_fele, &
         bac_C2N, &
         bac_C2Fe, &
@@ -616,8 +620,9 @@ module generic_WOMBATmid
         lbacpco2, &
         lbacufer, &
         lbac_mu, &
-        lbac_fanaer, &
-        lbac_ffelim, &
+        lbac_anaer, &
+        lbac_felim, &
+        lbac_nlim, &
         lbacmorl, &
         lbacmorq, &
         lbacdeni, &
@@ -628,8 +633,9 @@ module generic_WOMBATmid
         sbacpco2, &
         sbacufer, &
         sbac_mu, &
-        sbac_fanaer, &
-        sbac_ffelim, &
+        sbac_anaer, &
+        sbac_felim, &
+        sbac_nlim, &
         sbacmorl, &
         sbacmorq, &
         sbacdeni, &
@@ -863,8 +869,9 @@ module generic_WOMBATmid
         id_lbacpco2 = -1, &
         id_lbacufer = -1, &
         id_lbac_mu = -1, &
-        id_lbac_fanaer = -1, &
-        id_lbac_ffelim = -1, &
+        id_lbac_anaer = -1, &
+        id_lbac_felim = -1, &
+        id_lbac_nlim = -1, &
         id_lbacmorl = -1, &
         id_lbacmorq = -1, &
         id_lbacdeni = -1, &
@@ -875,8 +882,9 @@ module generic_WOMBATmid
         id_sbacpco2 = -1, &
         id_sbacufer = -1, &
         id_sbac_mu = -1, &
-        id_sbac_fanaer = -1, &
-        id_sbac_ffelim = -1, &
+        id_sbac_anaer = -1, &
+        id_sbac_felim = -1, &
+        id_sbac_nlim = -1, &
         id_sbacmorl = -1, &
         id_sbacmorq = -1, &
         id_sbacdeni = -1, &
@@ -2132,13 +2140,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'lbac_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_lbac_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'lbac_anaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_lbac_anaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'lbac_ffelim', 'Bacteria growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_lbac_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'lbac_felim', 'Bacteria growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_lbac_felim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'lbac_nlim', 'Bacteria growth limited by nitrogen?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_lbac_nlim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -2192,13 +2205,18 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sbac_fanaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_sbac_fanaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'sbac_anaer', 'Fraction of growth supported by anaerobic metabolism', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_sbac_anaer = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'sbac_ffelim', 'Bacteria growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
-    wombat%id_sbac_ffelim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        'sbac_felim', 'Bacteria growth limited by iron?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_sbac_felim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'sbac_nlim', 'Bacteria growth limited by nitrogen?', 'h', 'L', 's', '[0-1]', 'f')
+    wombat%id_sbac_nlim = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -3030,6 +3048,10 @@ module generic_WOMBATmid
     ! in unfiltered seawater when they added Fe+C
     call g_tracer_add_param('lbac_Vmax_dFe', wombat%lbac_Vmax_dFe, 0.00010/86400.0)
 
+    ! Large heterotrophic bacteria maximum rate of uptake of NH4 [mmol N m-3 s-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('lbac_Vmax_nh4', wombat%lbac_Vmax_nh4, 0.5/86400.0)
+
     ! Large heterotrophic bacteria diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('lbac_poxy', wombat%lbac_poxy, 450.0/86400.0)
@@ -3047,6 +3069,10 @@ module generic_WOMBATmid
     ! Large heterotrophic bacteria half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('lbac_kfer', wombat%lbac_kfer, 0.35)
+
+    ! Large heterotrophic bacteria half saturation constant for dissolved NH4 uptake [mmolN/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('lbac_knh4', wombat%lbac_knh4, 0.20)
 
     ! Large heterotrophic bacteria degree of partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
@@ -3071,6 +3097,10 @@ module generic_WOMBATmid
     ! in unfiltered seawater when they added Fe+C
     call g_tracer_add_param('sbac_Vmax_dFe', wombat%sbac_Vmax_dFe, 0.00010/86400.0)
 
+    ! Small heterotrophic bacteria maximum rate of uptake of NH4 [mmol N m-3 s-1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('sbac_Vmax_nh4', wombat%sbac_Vmax_nh4, 0.10/86400.0)
+
     ! Small heterotrophic bacteria diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('sbac_poxy', wombat%sbac_poxy, 450.0/86400.0)
@@ -3088,6 +3118,10 @@ module generic_WOMBATmid
     ! Small heterotrophic bacteria half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('sbac_kfer', wombat%sbac_kfer, 0.35)
+
+    ! Small heterotrophic bacteria half saturation constant for dissolved NH4 uptake [mmolN/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('sbac_knh4', wombat%sbac_knh4, 0.10)
 
     ! Small heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
@@ -3914,8 +3948,8 @@ module generic_WOMBATmid
     real                                    :: lbac_cdoc_ana, lbac_cno3_ana, lbac_pdoc_ana, lbac_pco2_ana, lbac_pnh4_ana
     real                                    :: sbac_cdoc, sbac_coxy, sbac_pco2, sbac_pnh4, sbacydoc_ana
     real                                    :: sbac_cdoc_ana, sbac_cno3_ana, sbac_pco2_ana, sbac_pnh4_ana
-    real                                    :: bac_Voc, bac_VdFe, bac_Voxy, bac_Vno3
-    real                                    :: bac_gC, bac_gFe, bac_gEA
+    real                                    :: bac_Voc, bac_VdFe, bac_Vnh4, bac_Voxy, bac_Vno3
+    real                                    :: bac_gC, bac_gFe, bac_gEA, bac_gN
     real                                    :: bac_muana, bac_muaer
     real                                    :: aoa_Vnh4, aoa_Voxy
     real                                    :: K_am_silica, gamma0, alphaH2O, deltaV0, spmvcorrect
@@ -4304,8 +4338,9 @@ module generic_WOMBATmid
     wombat%lbacpco2(:,:,:) = 0.0
     wombat%lbacufer(:,:,:) = 0.0
     wombat%lbac_mu(:,:,:) = 0.0
-    wombat%lbac_fanaer(:,:,:) = 0.0
-    wombat%lbac_ffelim(:,:,:) = 0.0
+    wombat%lbac_anaer(:,:,:) = 0.0
+    wombat%lbac_felim(:,:,:) = 0.0
+    wombat%lbac_nlim(:,:,:) = 0.0
     wombat%lbacmorl(:,:,:) = 0.0
     wombat%lbacmorq(:,:,:) = 0.0
     wombat%lbacdeni(:,:,:) = 0.0
@@ -4316,8 +4351,9 @@ module generic_WOMBATmid
     wombat%sbacpco2(:,:,:) = 0.0
     wombat%sbacufer(:,:,:) = 0.0
     wombat%sbac_mu(:,:,:) = 0.0
-    wombat%sbac_fanaer(:,:,:) = 0.0
-    wombat%sbac_ffelim(:,:,:) = 0.0
+    wombat%sbac_anaer(:,:,:) = 0.0
+    wombat%sbac_felim(:,:,:) = 0.0
+    wombat%sbac_nlim(:,:,:) = 0.0
     wombat%sbacmorl(:,:,:) = 0.0
     wombat%sbacmorq(:,:,:) = 0.0
     wombat%sbacdeni(:,:,:) = 0.0
@@ -5444,7 +5480,7 @@ module generic_WOMBATmid
       e_sdom = max(epsi, 4.0 + 1.0 - 2.0*0.6 - 3.0*ldom_N2C*0.0)  ! [Lechtenfeld et al., 2014] - CRAM has H:C of ~1.0, O:C of ~0.6
       e_bac = max(epsi, 4.0 + 1.4 - 2.0*0.4 - 3.0/wombat%bac_C2N) ! [Zimmerman et al., 2014]
       e_lres = max(epsi, e_ldom - wombat%lbac_alpha * e_sdom)
-      sdom_N2C = 0.0
+      sdom_N2C = 0.0 ! pjb - currently no sDON, but there could be (e.g., amino acids)
 
       ! Determine the biomass yield in terms of carbon (mol C-biomass per mol DOC consumed)
       wombat%lbacydoc(i,j,k) = min(1.0 - wombat%lbac_alpha, wombat%lbac_fele * e_lres/e_bac)
@@ -5452,6 +5488,10 @@ module generic_WOMBATmid
 
       lbac_cdoc = 0.0; sbac_cdoc = 0.0 ! reinitialise for safety
       lbac_cdoc_ana = 0.0; sbac_cdoc_ana = 0.0 ! reinitialise for safety
+      wombat%lbac_anaer(i,j,k) = 0.0; wombat%sbac_anaer(i,j,k) = 0.0
+      wombat%lbac_felim(i,j,k) = 0.0; wombat%sbac_felim(i,j,k) = 0.0
+      wombat%lbac_nlim(i,j,k) = 0.0; wombat%sbac_nlim(i,j,k) = 0.0
+
 
       ! Determine other resource yields during bacterial growth
       !!!~~~ Large, sharing bacteria ~~~!!!
@@ -5488,26 +5528,37 @@ module generic_WOMBATmid
       ! Aerobic
       bac_Voxy = oxy_mmolm3 * wombat%lbac_poxy ! Uptake of O2 (i.e., O2-limited growth)
       bac_VdFe = wombat%lbac_Vmax_dfe * fe_umolm3 / (fe_umolm3 + wombat%lbac_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
+      bac_Vnh4 = wombat%lbac_Vmax_nh4 * nh4_mmolm3 / (nh4_mmolm3 + wombat%lbac_knh4 + epsi) ! Uptake of NH4 (i.e., NH4-limited growth)
       bac_Voc = wombat%lbac_Vmax_doc * ldoc_mmolm3 / (ldoc_mmolm3 + wombat%lbac_kdoc + epsi) ! Uptake of DOC (i.e., DOC-limited growth)
       bac_gEA = bac_Voxy / (lbac_coxy + epsi) ! Growth of C biomass due to electron acceptor (O2) uptake
       bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gN = bac_Vnh4 / max(epsi, -lbac_pnh4) ! Growth of C biomass due to NH4 uptake
       bac_gC = bac_Voc * wombat%lbacydoc(i,j,k) ! Growth of C biomass due to DOC uptake
-      bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
-      if (bac_gFe<min(bac_gC,bac_gEA)) then
-        wombat%lbac_ffelim(i,j,k) = 1.0
+      if (lbac_pnh4 >= 0.0) then
+        bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gEA)) wombat%lbac_felim(i,j,k) = 1.0
       else
-        wombat%lbac_ffelim(i,j,k) = 0.0
+        bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA, bac_gN ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gN,bac_gEA)) wombat%lbac_felim(i,j,k) = 1.0
+        if (bac_gN<min(bac_gC,bac_gFe,bac_gEA)) wombat%lbac_nlim(i,j,k) = 1.0
       endif
       ! Anaerobic
       bac_Vno3 = wombat%lbac_Vmax_no3 * no3_mmolm3 / (no3_mmolm3 + wombat%lbac_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
       bac_gEA = bac_Vno3 / (lbac_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
       bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gN = bac_Vnh4 / max(epsi, -lbac_pnh4_ana) ! Growth of C biomass due to NH4 uptake
       bac_gC = bac_Voc * lbacydoc_ana ! Growth of C biomass due to DOC uptake
-      bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
+      if (lbac_pnh4_ana >= 0.0) then
+        bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gEA)) wombat%lbac_felim(i,j,k) = 1.0
+      else
+        bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA, bac_gN ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gN,bac_gEA)) wombat%lbac_felim(i,j,k) = 1.0
+        if (bac_gN<min(bac_gC,bac_gFe,bac_gEA)) wombat%lbac_nlim(i,j,k) = 1.0
+      endif
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
       ! Save occurance of anaerobic growth to array
-      if (bac_muana>bac_muaer) then; wombat%lbac_fanaer(i,j,k) = 1.0
-      else; wombat%lbac_fanaer(i,j,k) = 0.0; endif
+      if (bac_muana>bac_muaer) wombat%lbac_anaer(i,j,k) = 1.0
       ! Take the maximum growth rate as the realised growth rate
       wombat%lbac_mu(i,j,k) = max(bac_muaer, bac_muana)
 
@@ -5515,56 +5566,64 @@ module generic_WOMBATmid
       ! Aerobic
       bac_Voxy = oxy_mmolm3 * wombat%sbac_poxy ! Uptake of O2 (i.e., O2-limited growth)
       bac_VdFe = wombat%sbac_Vmax_dfe * fe_umolm3 / (fe_umolm3 + wombat%sbac_kfer + epsi) ! Uptake of dFe (i.e., Fe-limited growth)
+      bac_Vnh4 = wombat%sbac_Vmax_nh4 * nh4_mmolm3 / (nh4_mmolm3 + wombat%sbac_knh4 + epsi) ! Uptake of NH4 (i.e., NH4-limited growth)
       bac_Voc = wombat%sbac_Vmax_doc * sdoc_mmolm3 / (sdoc_mmolm3 + wombat%sbac_kdoc + epsi) ! Uptake of DOC (i.e., DOC-limited growth)
       bac_gEA = bac_Voxy / (sbac_coxy + epsi) ! Growth of C biomass due to electron acceptor (O2) uptake
       bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gN = bac_Vnh4 / max(epsi, -sbac_pnh4) ! Growth of C biomass due to NH4 uptake
       bac_gC = bac_Voc * wombat%sbacydoc(i,j,k) ! Growth of C biomass due to DOC uptake
-      bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
-      if (bac_gFe<min(bac_gC,bac_gEA)) then
-        wombat%sbac_ffelim(i,j,k) = 1.0
+      if (sbac_pnh4 >= 0.0) then
+        bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gEA)) wombat%sbac_felim(i,j,k) = 1.0
       else
-        wombat%sbac_ffelim(i,j,k) = 0.0
+        bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA, bac_gN ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gN,bac_gEA)) wombat%sbac_felim(i,j,k) = 1.0
+        if (bac_gN<min(bac_gC,bac_gFe,bac_gEA)) wombat%sbac_nlim(i,j,k) = 1.0
       endif
       ! Anaerobic
       bac_Vno3 = wombat%sbac_Vmax_no3 * no3_mmolm3 / (no3_mmolm3 + wombat%sbac_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
       bac_gEA = bac_Vno3 / (sbac_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
       bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
+      bac_gN = bac_Vnh4 / max(epsi, -sbac_pnh4_ana) ! Growth of C biomass due to NH4 uptake
       bac_gC = bac_Voc * sbacydoc_ana ! Growth of C biomass due to DOC uptake
-      bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
+      if (sbac_pnh4_ana >= 0.0) then
+        bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gEA)) wombat%sbac_felim(i,j,k) = 1.0
+      else
+        bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA, bac_gN ) ) * fbc
+        if (bac_gFe<min(bac_gC,bac_gN,bac_gEA)) wombat%sbac_felim(i,j,k) = 1.0
+        if (bac_gN<min(bac_gC,bac_gFe,bac_gEA)) wombat%sbac_nlim(i,j,k) = 1.0
+      endif
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
       ! Save occurance of anaerobic growth to array
-      if (bac_muana>bac_muaer) then
-        wombat%sbac_fanaer(i,j,k) = 1.0
-      else
-        wombat%sbac_fanaer(i,j,k) = 0.0
-      endif
+      if (bac_muana>bac_muaer) wombat%sbac_anaer(i,j,k) = 1.0
       ! Take the maximum growth rate as the realised growth rate
       wombat%sbac_mu(i,j,k) = max(bac_muaer, bac_muana)
 
       ! Sources and sinks due to heterotrophic bacterial activity
       wombat%lbacgrow(i,j,k) = wombat%lbac_mu(i,j,k) * lbac_p ! [molC/kg/s]
-      wombat%ldocremi(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_cdoc * (1. - wombat%lbac_fanaer(i,j,k)) &
-                             + wombat%lbacgrow(i,j,k) * lbac_cdoc_ana * wombat%lbac_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%sdocprod(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_pdoc * (1. - wombat%lbac_fanaer(i,j,k)) &
-                             + wombat%lbacgrow(i,j,k) * lbac_pdoc_ana * wombat%lbac_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%lbacresp(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_coxy * (1. - wombat%lbac_fanaer(i,j,k)) ! [molO2/kg/s]
-      wombat%lbacpco2(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_pco2 * (1. - wombat%lbac_fanaer(i,j,k)) &
-                            + wombat%lbacgrow(i,j,k) * lbac_pco2_ana * wombat%lbac_fanaer(i,j,k) ! [molCO2/kg/s]
-      wombat%lbacdeni(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_cno3_ana * wombat%lbac_fanaer(i,j,k) ! [molNO3/kg/s]
+      wombat%ldocremi(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_cdoc * (1. - wombat%lbac_anaer(i,j,k)) &
+                             + wombat%lbacgrow(i,j,k) * lbac_cdoc_ana * wombat%lbac_anaer(i,j,k) ! [molC/kg/s]
+      wombat%sdocprod(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_pdoc * (1. - wombat%lbac_anaer(i,j,k)) &
+                             + wombat%lbacgrow(i,j,k) * lbac_pdoc_ana * wombat%lbac_anaer(i,j,k) ! [molC/kg/s]
+      wombat%lbacresp(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_coxy * (1. - wombat%lbac_anaer(i,j,k)) ! [molO2/kg/s]
+      wombat%lbacpco2(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_pco2 * (1. - wombat%lbac_anaer(i,j,k)) &
+                             + wombat%lbacgrow(i,j,k) * lbac_pco2_ana * wombat%lbac_anaer(i,j,k) ! [molCO2/kg/s]
+      wombat%lbacdeni(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_cno3_ana * wombat%lbac_anaer(i,j,k) ! [molNO3/kg/s]
       wombat%lbacufer(i,j,k) = wombat%lbacgrow(i,j,k) / wombat%bac_C2Fe ! [molFe/kg/s]
-      wombat%lbacpnh4(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_pnh4 * (1. - wombat%lbac_fanaer(i,j,k)) &
-                            + wombat%lbacgrow(i,j,k) * lbac_pnh4_ana * wombat%lbac_fanaer(i,j,k) ! [molN/kg/s]
+      wombat%lbacpnh4(i,j,k) = wombat%lbacgrow(i,j,k) * lbac_pnh4 * (1. - wombat%lbac_anaer(i,j,k)) &
+                             + wombat%lbacgrow(i,j,k) * lbac_pnh4_ana * wombat%lbac_anaer(i,j,k) ! [molN/kg/s]
 
       wombat%sbacgrow(i,j,k) = wombat%sbac_mu(i,j,k) * sbac_p ! [molC/kg/s]
-      wombat%sdocremi(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_cdoc * (1. - wombat%sbac_fanaer(i,j,k)) &
-                             + wombat%sbacgrow(i,j,k) * sbac_cdoc_ana * wombat%sbac_fanaer(i,j,k) ! [molC/kg/s]
-      wombat%sbacresp(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_coxy * (1. - wombat%sbac_fanaer(i,j,k)) ! [molO2/kg/s]
-      wombat%sbacpco2(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_pco2 * (1. - wombat%sbac_fanaer(i,j,k)) &
-                            + wombat%sbacgrow(i,j,k) * sbac_pco2_ana * wombat%sbac_fanaer(i,j,k) ! [molCO2/kg/s]
-      wombat%sbacdeni(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_cno3_ana * wombat%sbac_fanaer(i,j,k) ! [molNO3/kg/s] !pjb - change this to N2O
+      wombat%sdocremi(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_cdoc * (1. - wombat%sbac_anaer(i,j,k)) &
+                             + wombat%sbacgrow(i,j,k) * sbac_cdoc_ana * wombat%sbac_anaer(i,j,k) ! [molC/kg/s]
+      wombat%sbacresp(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_coxy * (1. - wombat%sbac_anaer(i,j,k)) ! [molO2/kg/s]
+      wombat%sbacpco2(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_pco2 * (1. - wombat%sbac_anaer(i,j,k)) &
+                             + wombat%sbacgrow(i,j,k) * sbac_pco2_ana * wombat%sbac_anaer(i,j,k) ! [molCO2/kg/s]
+      wombat%sbacdeni(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_cno3_ana * wombat%sbac_anaer(i,j,k) ! [molNO3/kg/s] !pjb - change this to N2O
       wombat%sbacufer(i,j,k) = wombat%sbacgrow(i,j,k) / wombat%bac_C2Fe ! [molFe/kg/s]
-      wombat%sbacpnh4(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_pnh4 * (1. - wombat%sbac_fanaer(i,j,k)) &
-                            + wombat%sbacgrow(i,j,k) * sbac_pnh4_ana * wombat%sbac_fanaer(i,j,k) ! [molN/kg/s]
+      wombat%sbacpnh4(i,j,k) = wombat%sbacgrow(i,j,k) * sbac_pnh4 * (1. - wombat%sbac_anaer(i,j,k)) &
+                             + wombat%sbacgrow(i,j,k) * sbac_pnh4_ana * wombat%sbac_anaer(i,j,k) ! [molN/kg/s]
 
 
 
@@ -5623,7 +5682,7 @@ module generic_WOMBATmid
         ! Anaerobic ammonium oxidation (anammox)
         wombat%aox_lnh4(i,j,k) = nh4_mmolm3 / (nh4_mmolm3 + wombat%aoxkn)
         wombat%aox_mu(i,j,k) = wombat%aoxmumax * wombat%bbioh**(Temp(i,j,k)) &
-                               * wombat%lbac_fanaer(i,j,k) * wombat%aox_lnh4(i,j,k)
+                               * wombat%lbac_anaer(i,j,k) * wombat%aox_lnh4(i,j,k)
       endif
 
       ! Chemoautotrophy
@@ -7583,12 +7642,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_lbac_mu, wombat%lbac_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_lbac_fanaer > 0) &
-      used = g_send_data(wombat%id_lbac_fanaer, wombat%lbac_fanaer, model_time, &
+    if (wombat%id_lbac_anaer > 0) &
+      used = g_send_data(wombat%id_lbac_anaer, wombat%lbac_anaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_lbac_ffelim > 0) &
-      used = g_send_data(wombat%id_lbac_ffelim, wombat%lbac_ffelim, model_time, &
+    if (wombat%id_lbac_felim > 0) &
+      used = g_send_data(wombat%id_lbac_felim, wombat%lbac_felim, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_lbac_nlim > 0) &
+      used = g_send_data(wombat%id_lbac_nlim, wombat%lbac_nlim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_lbacmorl > 0) &
@@ -7631,12 +7694,16 @@ module generic_WOMBATmid
       used = g_send_data(wombat%id_sbac_mu, wombat%sbac_mu, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_sbac_fanaer > 0) &
-      used = g_send_data(wombat%id_sbac_fanaer, wombat%sbac_fanaer, model_time, &
+    if (wombat%id_sbac_anaer > 0) &
+      used = g_send_data(wombat%id_sbac_anaer, wombat%sbac_anaer, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
-    if (wombat%id_sbac_ffelim > 0) &
-      used = g_send_data(wombat%id_sbac_ffelim, wombat%sbac_ffelim, model_time, &
+    if (wombat%id_sbac_felim > 0) &
+      used = g_send_data(wombat%id_sbac_felim, wombat%sbac_felim, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_sbac_nlim > 0) &
+      used = g_send_data(wombat%id_sbac_nlim, wombat%sbac_nlim, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_sbacmorl > 0) &
@@ -8204,8 +8271,9 @@ module generic_WOMBATmid
     allocate(wombat%lbacpco2(isd:ied, jsd:jed, 1:nk)); wombat%lbacpco2(:,:,:)=0.0
     allocate(wombat%lbacufer(isd:ied, jsd:jed, 1:nk)); wombat%lbacufer(:,:,:)=0.0
     allocate(wombat%lbac_mu(isd:ied, jsd:jed, 1:nk)); wombat%lbac_mu(:,:,:)=0.0
-    allocate(wombat%lbac_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%lbac_fanaer(:,:,:)=0.0
-    allocate(wombat%lbac_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%lbac_ffelim(:,:,:)=0.0
+    allocate(wombat%lbac_anaer(isd:ied, jsd:jed, 1:nk)); wombat%lbac_anaer(:,:,:)=0.0
+    allocate(wombat%lbac_felim(isd:ied, jsd:jed, 1:nk)); wombat%lbac_felim(:,:,:)=0.0
+    allocate(wombat%lbac_nlim(isd:ied, jsd:jed, 1:nk)); wombat%lbac_nlim(:,:,:)=0.0
     allocate(wombat%lbacmorl(isd:ied, jsd:jed, 1:nk)); wombat%lbacmorl(:,:,:)=0.0
     allocate(wombat%lbacmorq(isd:ied, jsd:jed, 1:nk)); wombat%lbacmorq(:,:,:)=0.0
     allocate(wombat%lbacdeni(isd:ied, jsd:jed, 1:nk)); wombat%lbacdeni(:,:,:)=0.0
@@ -8216,8 +8284,9 @@ module generic_WOMBATmid
     allocate(wombat%sbacpco2(isd:ied, jsd:jed, 1:nk)); wombat%sbacpco2(:,:,:)=0.0
     allocate(wombat%sbacufer(isd:ied, jsd:jed, 1:nk)); wombat%sbacufer(:,:,:)=0.0
     allocate(wombat%sbac_mu(isd:ied, jsd:jed, 1:nk)); wombat%sbac_mu(:,:,:)=0.0
-    allocate(wombat%sbac_fanaer(isd:ied, jsd:jed, 1:nk)); wombat%sbac_fanaer(:,:,:)=0.0
-    allocate(wombat%sbac_ffelim(isd:ied, jsd:jed, 1:nk)); wombat%sbac_ffelim(:,:,:)=0.0
+    allocate(wombat%sbac_anaer(isd:ied, jsd:jed, 1:nk)); wombat%sbac_anaer(:,:,:)=0.0
+    allocate(wombat%sbac_felim(isd:ied, jsd:jed, 1:nk)); wombat%sbac_felim(:,:,:)=0.0
+    allocate(wombat%sbac_nlim(isd:ied, jsd:jed, 1:nk)); wombat%sbac_nlim(:,:,:)=0.0
     allocate(wombat%sbacmorl(isd:ied, jsd:jed, 1:nk)); wombat%sbacmorl(:,:,:)=0.0
     allocate(wombat%sbacmorq(isd:ied, jsd:jed, 1:nk)); wombat%sbacmorq(:,:,:)=0.0
     allocate(wombat%sbacdeni(isd:ied, jsd:jed, 1:nk)); wombat%sbacdeni(:,:,:)=0.0
@@ -8467,8 +8536,9 @@ module generic_WOMBATmid
         wombat%lbacpco2, &
         wombat%lbacufer, &
         wombat%lbac_mu, &
-        wombat%lbac_fanaer, &
-        wombat%lbac_ffelim, &
+        wombat%lbac_anaer, &
+        wombat%lbac_felim, &
+        wombat%lbac_nlim, &
         wombat%lbacmorl, &
         wombat%lbacmorq, &
         wombat%lbacdeni, &
@@ -8479,8 +8549,9 @@ module generic_WOMBATmid
         wombat%sbacpco2, &
         wombat%sbacufer, &
         wombat%sbac_mu, &
-        wombat%sbac_fanaer, &
-        wombat%sbac_ffelim, &
+        wombat%sbac_anaer, &
+        wombat%sbac_felim, &
+        wombat%sbac_nlim, &
         wombat%sbacmorl, &
         wombat%sbacmorq, &
         wombat%sbacdeni, &
