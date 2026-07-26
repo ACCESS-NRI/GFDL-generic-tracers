@@ -3850,6 +3850,7 @@ module generic_WOMBATmid
     real                                    :: rdtts ! 1 / dt
     real, dimension(nbands)                 :: sw_pen
     real                                    :: swpar
+    real                                    :: zval, sqrt_zval, zval1, zval2
     real                                    :: g_zoo, g_mes, Xzoo, I_Xzoo, Xmes, I_Xmes
     real                                    :: no3_p, nh4_p, oxy_p, fe_p, sil_p, sdoc_p, ldoc_p, ldon_p, caco3_p, safe_p
     real                                    :: phy_p, dia_p, zoo_p, mes_p, sdet_p, ldet_p, ldetsi_p, lbac_p, sbac_p, aoa_p, lafe_p
@@ -3860,6 +3861,7 @@ module generic_WOMBATmid
     real                                    :: ldetsi_mmolm3, lbac_mmolm3, sbac_mmolm3, aoa_mmolm3, phyfe_mmolm3, diafe_mmolm3
     real                                    :: I_denom, wzlbac, wzsbac, wzaoa, wzphy, wzdia, wzsdet, wzldet, wzzoo, I_wzsum
     real                                    :: fbc
+    real                                    :: P_expl, k_loss, k_loss_zoodiss, k_loss_mesdiss
     real, parameter                         :: epsi = 1.0e-30
     real, parameter                         :: pi = 3.14159265358979
     real, parameter                         :: Rgas = 8.314462168 ! J/(K mol)
@@ -3877,7 +3879,7 @@ module generic_WOMBATmid
     real                                    :: mass_sdet, mass_ldet, mass_caco3, mass_bsi, mass_small, mass_large
     real                                    :: w1, w2, rho_small, rho_large
     real                                    :: par_phy_mldsum, par_z_mldsum
-    real                                    :: chl, ndet, carb, zchl, zval, sqrt_zval, phy_chlc, dia_chlc
+    real                                    :: chl, ndet, carb, zchl, phy_chlc, dia_chlc
     real                                    :: phy_limnh4, phy_limno3, phy_limdin
     real                                    :: dia_limnh4, dia_limno3, dia_limdin
     real                                    :: phy_pisl, dia_pisl
@@ -4603,9 +4605,13 @@ module generic_WOMBATmid
       diafe_p    = max(0.0, wombat%p_diafe(i,j,k,tau))
       diasi_p    = max(0.0, wombat%p_diasi(i,j,k,tau))
       zoo_p      = max(0.0, wombat%p_zoo(i,j,k,tau) )
+      zoofe_p    = max(0.0, wombat%p_zoofe(i,j,k,tau) )
       mes_p      = max(0.0, wombat%p_mes(i,j,k,tau) )
+      mesfe_p    = max(0.0, wombat%p_mesfe(i,j,k,tau) )
       sdet_p     = max(0.0, wombat%p_sdet(i,j,k,tau) )
+      sdetfe_p   = max(0.0, wombat%p_sdetfe(i,j,k,tau) )
       ldet_p     = max(0.0, wombat%p_ldet(i,j,k,tau) )
+      ldetfe_p   = max(0.0, wombat%p_ldetfe(i,j,k,tau) )
       ldetsi_p   = max(0.0, wombat%p_ldetsi(i,j,k,tau) )
       ldoc_p     = max(0.0, wombat%p_ldoc(i,j,k,tau) )
       ldon_p     = max(0.0, wombat%p_ldon(i,j,k,tau) )
@@ -4740,7 +4746,7 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 3] Temperature-dependent heterotrophy and POM-->DOM            !
+      !  [Step 3] Temperature-dependent heterotrophy                          !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
@@ -4750,10 +4756,6 @@ module generic_WOMBATmid
 
       ! Variable rates of remineralisation
       wombat%reminr(i,j,k) = wombat%sdetlrem * fbc
-
-      ! remineralisation of POM --> lDOM
-      wombat%sdetremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * sdet_p * sdet_p ! [molC/kg/s]
-      wombat%ldetremi(i,j,k) = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * ldet_p * ldet_p ! [molC/kg/s]
 
 
       !-----------------------------------------------------------------------!
@@ -5123,61 +5125,19 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
-      !  [Step 12] Mortality terms (will need to make implicit later)         !
+      !  [Step 12] Mortality terms (note that quadratics are implicit)        !
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
-      ! Mortality terms
-      if (phy_mmolm3>1e-3) then
-        wombat%phymorl(i,j,k) = wombat%phylmor * fbc * phy_p ! [molC/kg/s]
-        wombat%phymorq(i,j,k) = wombat%phyqmor / mmol_m3_to_mol_kg * phy_p * phy_p ! [molC/kg/s]
-      else
-        wombat%phymorl(i,j,k) = 0.0
-        wombat%phymorq(i,j,k) = 0.0
-      endif
-      if (dia_mmolm3>1e-3) then
-        wombat%diamorl(i,j,k) = wombat%dialmor * fbc * dia_p ! [molC/kg/s]
-        wombat%diamorq(i,j,k) = wombat%diaqmor / mmol_m3_to_mol_kg * dia_p * dia_p ! [molC/kg/s]
-      else
-        wombat%diamorl(i,j,k) = 0.0
-        wombat%diamorq(i,j,k) = 0.0
-      endif
-      if (zoo_mmolm3>1e-3) then
-        wombat%zoomorl(i,j,k) = wombat%zoolmor * fbc * zoo_p ! [molC/kg/s]
-        wombat%zoomorq(i,j,k) = wombat%zooqmor / mmol_m3_to_mol_kg * zoo_p * zoo_p ! [molC/kg/s]
-      else
-        wombat%zoomorl(i,j,k) = 0.0
-        wombat%zoomorq(i,j,k) = 0.0
-      endif
-      if (mes_mmolm3>1e-3) then
-        wombat%mesmorl(i,j,k) = wombat%meslmor * fbc * mes_p ! [molC/kg/s]
-        wombat%mesmorq(i,j,k) = wombat%mesqmor / mmol_m3_to_mol_kg * mes_p * mes_p ! [molC/kg/s]
-      else
-        wombat%mesmorl(i,j,k) = 0.0
-        wombat%mesmorq(i,j,k) = 0.0
-      endif
-      if (lbac_mmolm3>1e-3) then
-        wombat%lbacmorl(i,j,k) = wombat%baclmor * fbc * lbac_p ! [molC/kg/s]
-        wombat%lbacmorq(i,j,k) = wombat%bacqmor / mmol_m3_to_mol_kg * lbac_p * lbac_p ! [molC/kg/s]
-      else
-        wombat%lbacmorl(i,j,k) = 0.0
-        wombat%lbacmorq(i,j,k) = 0.0
-      endif
-      if (sbac_mmolm3>1e-3) then
-        wombat%sbacmorl(i,j,k) = wombat%baclmor * fbc * sbac_p ! [molC/kg/s]
-        wombat%sbacmorq(i,j,k) = wombat%bacqmor / mmol_m3_to_mol_kg * sbac_p * sbac_p ! [molC/kg/s]
-      else
-        wombat%sbacmorl(i,j,k) = 0.0
-        wombat%sbacmorq(i,j,k) = 0.0
-      endif
-      if (aoa_mmolm3>1e-3) then
-        wombat%aoamorl(i,j,k) = wombat%aoalmor * fbc * aoa_p ! [molC/kg/s]
-        wombat%aoamorq(i,j,k) = wombat%aoaqmor / mmol_m3_to_mol_kg * aoa_p * aoa_p ! [molC/kg/s]
-      else
-        wombat%aoamorl(i,j,k) = 0.0
-        wombat%aoamorq(i,j,k) = 0.0
-      endif
+      ! Linear mortality terms
+      wombat%phymorl(i,j,k) = wombat%phylmor * fbc * phy_p ! [molC/kg/s]
+      wombat%diamorl(i,j,k) = wombat%dialmor * fbc * dia_p ! [molC/kg/s]
+      wombat%zoomorl(i,j,k) = wombat%zoolmor * fbc * zoo_p ! [molC/kg/s]
+      wombat%mesmorl(i,j,k) = wombat%meslmor * fbc * mes_p ! [molC/kg/s]
+      wombat%lbacmorl(i,j,k) = wombat%baclmor * fbc * lbac_p ! [molC/kg/s]
+      wombat%sbacmorl(i,j,k) = wombat%baclmor * fbc * sbac_p ! [molC/kg/s]
+      wombat%aoamorl(i,j,k) = wombat%aoalmor * fbc * aoa_p ! [molC/kg/s]
 
 
       !-----------------------------------------------------------------------!
@@ -5490,8 +5450,8 @@ module generic_WOMBATmid
       wombat%lbacydoc(i,j,k) = min(1.0 - wombat%lbac_alpha, wombat%lbac_fele * e_lres/e_bac)
       wombat%sbacydoc(i,j,k) = wombat%sbac_fele * e_sdom/e_bac
 
-      lbac_cdoc = 0.0; !sbac_cdoc = 0.0 ! reinitialise for safety
-      lbac_cdoc_ana = 0.0; !sbac_cdoc_ana = 0.0 ! reinitialise for safety
+      lbac_cdoc = 0.0; sbac_cdoc = 0.0 ! reinitialise for safety
+      lbac_cdoc_ana = 0.0; sbac_cdoc_ana = 0.0 ! reinitialise for safety
 
       ! Determine other resource yields during bacterial growth
       !!!~~~ Large, sharing bacteria ~~~!!!
@@ -5533,7 +5493,11 @@ module generic_WOMBATmid
       bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
       bac_gC = bac_Voc * wombat%lbacydoc(i,j,k) ! Growth of C biomass due to DOC uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
-      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%lbac_ffelim(i,j,k) = 1.0
+      if (bac_gFe<min(bac_gC,bac_gEA)) then
+        wombat%lbac_ffelim(i,j,k) = 1.0
+      else
+        wombat%lbac_ffelim(i,j,k) = 0.0
+      endif
       ! Anaerobic
       bac_Vno3 = wombat%lbac_Vmax_no3 * no3_mmolm3 / (no3_mmolm3 + wombat%lbac_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
       bac_gEA = bac_Vno3 / (lbac_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
@@ -5542,7 +5506,8 @@ module generic_WOMBATmid
       bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
       ! Save occurance of anaerobic growth to array
-      if (bac_muana>bac_muaer) wombat%lbac_fanaer(i,j,k) = 1.0
+      if (bac_muana>bac_muaer) then; wombat%lbac_fanaer(i,j,k) = 1.0
+      else; wombat%lbac_fanaer(i,j,k) = 0.0; endif
       ! Take the maximum growth rate as the realised growth rate
       wombat%lbac_mu(i,j,k) = max(bac_muaer, bac_muana)
 
@@ -5555,7 +5520,11 @@ module generic_WOMBATmid
       bac_gFe = bac_VdFe * wombat%bac_C2Fe ! Growth of C biomass due to Fe uptake
       bac_gC = bac_Voc * wombat%sbacydoc(i,j,k) ! Growth of C biomass due to DOC uptake
       bac_muaer = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
-      if (bac_gFe<min(bac_gC,bac_gEA)) wombat%sbac_ffelim(i,j,k) = 1.0
+      if (bac_gFe<min(bac_gC,bac_gEA)) then
+        wombat%sbac_ffelim(i,j,k) = 1.0
+      else
+        wombat%sbac_ffelim(i,j,k) = 0.0
+      endif
       ! Anaerobic
       bac_Vno3 = wombat%sbac_Vmax_no3 * no3_mmolm3 / (no3_mmolm3 + wombat%sbac_kno3 + epsi) ! Uptake of NO3 (i.e., NO3-limited growth)
       bac_gEA = bac_Vno3 / (sbac_cno3_ana + epsi) ! Growth of C biomass due to electron acceptor (NO3) uptake
@@ -5564,7 +5533,11 @@ module generic_WOMBATmid
       bac_muana = max(0.0, min( bac_gC, bac_gFe, bac_gEA ) ) * fbc
       if (.not.do_wc_denitrification) bac_muana = 0.0 ! If no denitrification, anaerobic growth is zero
       ! Save occurance of anaerobic growth to array
-      if (bac_muana>bac_muaer) wombat%sbac_fanaer(i,j,k) = 1.0
+      if (bac_muana>bac_muaer) then
+        wombat%sbac_fanaer(i,j,k) = 1.0
+      else
+        wombat%sbac_fanaer(i,j,k) = 0.0
+      endif
       ! Take the maximum growth rate as the realised growth rate
       wombat%sbac_mu(i,j,k) = max(bac_muaer, bac_muana)
 
@@ -5618,20 +5591,13 @@ module generic_WOMBATmid
         !  we account for the dissolution due to zooplankton grazing on particulates
         wombat%dissratcal(i,j,k) = (wombat%disscal * max(0.0, 1.0 - wombat%omega_cal(i,j,k))**2.2)
         wombat%dissratara(i,j,k) = (wombat%dissara * max(0.0, 1.0 - wombat%omega_ara(i,j,k))**1.5)
-        wombat%dissratpoc(i,j,k) = (wombat%dissdet * wombat%reminr(i,j,k) * sdet_mmolm3**2.0)
+        wombat%dissratpoc(i,j,k) = (wombat%dissdet * wombat%reminr(i,j,k) * sdet_mmolm3*sdet_mmolm3)
       else
         wombat%pic2poc(i,j,k) = wombat%f_inorg + 0.025
         wombat%dissratcal(i,j,k) = wombat%caco3lrem
         wombat%dissratara(i,j,k) = 0.0
         wombat%dissratpoc(i,j,k) = 0.0
       endif
-      if (sdet_p > epsi) then
-        wombat%zoodiss(i,j,k) = wombat%zoograzsdet(i,j,k) * wombat%fgutdiss * caco3_mmolm3/sdet_mmolm3
-        wombat%mesdiss(i,j,k) = wombat%mesgrazsdet(i,j,k) * wombat%fgutdiss * caco3_mmolm3/sdet_mmolm3
-      endif
-      wombat%caldiss(i,j,k) = wombat%dissratcal(i,j,k) * caco3_p ! [mol/kg/s]
-      wombat%aradiss(i,j,k) = wombat%dissratara(i,j,k) * caco3_p ! [mol/kg/s]
-      wombat%pocdiss(i,j,k) = wombat%dissratpoc(i,j,k) * caco3_p ! [mol/kg/s]
 
 
       !-----------------------------------------------------------------------!
@@ -5698,28 +5664,28 @@ module generic_WOMBATmid
       ! Ammonium equation ! [molN/kg]
       !----------------------------------------------------------------------
       wombat%p_nh4(i,j,k,tau) = wombat%p_nh4(i,j,k,tau) + dtsb * ( &
-                            ( zooexcrlbacn &
-                            + zooexcrsbacn &
-                            + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
-                          + ( mesexcrlbacn &
-                            + mesexcrsbacn &
-                            + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
-                          + wombat%lbacpnh4(i,j,k) &
-                          + wombat%sbacpnh4(i,j,k) &
-                          - wombat%ammox(i,j,k) &
-                          - wombat%anammox(i,j,k) ) + dtsb * 16./122. * ( &
-                            wombat%zoomorl(i,j,k) &
-                          + wombat%mesmorl(i,j,k) &
-                          + ( wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                          + ( wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrsdet(i,j,k) &
-                            + wombat%mesexcrldet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
-                          - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
-                          - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
+                                ( zooexcrlbacn &
+                                + zooexcrsbacn &
+                                + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
+                              + ( mesexcrlbacn &
+                                + mesexcrsbacn &
+                                + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
+                              + wombat%lbacpnh4(i,j,k) &
+                              + wombat%sbacpnh4(i,j,k) &
+                              - wombat%ammox(i,j,k) &
+                              - wombat%anammox(i,j,k) ) + dtsb * 16./122. * ( &
+                                wombat%zoomorl(i,j,k) &
+                              + wombat%mesmorl(i,j,k) &
+                              + ( wombat%zooexcrphy(i,j,k) &
+                                + wombat%zooexcrdia(i,j,k) &
+                                + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
+                              + ( wombat%mesexcrphy(i,j,k) &
+                                + wombat%mesexcrdia(i,j,k) &
+                                + wombat%mesexcrsdet(i,j,k) &
+                                + wombat%mesexcrldet(i,j,k) &
+                                + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                              - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                              - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
       if (do_nitrogen_fixation) &
         wombat%p_nh4(i,j,k,tau) = wombat%p_nh4(i,j,k,tau) + dtsb * wombat%nitrfix(i,j,k)
 
@@ -5728,136 +5694,164 @@ module generic_WOMBATmid
       !   pieces of biogenic silica prone to rapid dissolution [Krause et al., 2010 L&O]
       !----------------------------------------------------------------------
       wombat%p_sil(i,j,k,tau) = wombat%p_sil(i,j,k,tau) + dtsb * ( &
-                            wombat%diamorl(i,j,k) * dia_Si2C &
-                          - wombat%dia_silupt(i,j,k) &
-                          + wombat%zoograzdia(i,j,k) * dia_Si2C &
-                          + wombat%bsidiss(i,j,k) )
+                                wombat%diamorl(i,j,k) * dia_Si2C &
+                              - wombat%dia_silupt(i,j,k) &
+                              + wombat%zoograzdia(i,j,k) * dia_Si2C &
+                              + wombat%bsidiss(i,j,k) )
 
-      ! Phytoplankton equation ! [molC/kg]
+      ! Nano-phytoplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_phy(i,j,k,tau) = wombat%p_phy(i,j,k,tau) + dtsb * ( &
-                            wombat%phygrow(i,j,k) &
-                          - wombat%phymorl(i,j,k) &
-                          - wombat%phymorq(i,j,k) &
-                          - wombat%zoograzphy(i,j,k) &
-                          - wombat%mesgrazphy(i,j,k) )
+      ! Here we treat phymorq semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = wombat%phygrow(i,j,k) &
+             - wombat%phymorl(i,j,k) &
+             - wombat%zoograzphy(i,j,k) &
+             - wombat%mesgrazphy(i,j,k)
+      ! Treat phymorq semi-implicitly
+      zval1 = max(0.0, wombat%p_phy(i,j,k,tau) + dtsb * P_expl)
+      zval2 = min(0.0, wombat%p_phy(i,j,k,tau) + dtsb * P_expl)
+      k_loss = wombat%phyqmor / mmol_m3_to_mol_kg * zval1
+      wombat%p_phy(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate phymorq for use below and for diagnostic output
+      wombat%phymorq(i,j,k) = k_loss * wombat%p_phy(i,j,k,tau) ! [molC/kg/s]
 
       ! Phytoplankton chlorophyll equation ! [molChl/kg]
       !-----------------------------------------------------------------------
       wombat%p_pchl(i,j,k,tau) = wombat%p_pchl(i,j,k,tau) + dtsb * ( &
-                             wombat%pchl_mu(i,j,k) &
-                           - ( wombat%phymorl(i,j,k) &
-                             + wombat%phymorq(i,j,k) &
-                             + wombat%zoograzphy(i,j,k) &
-                             + wombat%mesgrazphy(i,j,k) ) * phy_chlc )
+                                 wombat%pchl_mu(i,j,k) &
+                               - ( wombat%phymorl(i,j,k) &
+                                 + wombat%phymorq(i,j,k) &
+                                 + wombat%zoograzphy(i,j,k) &
+                                 + wombat%mesgrazphy(i,j,k) ) * phy_chlc )
 
       ! Phytoplankton iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%p_phyfe(i,j,k,tau) = wombat%p_phyfe(i,j,k,tau) + dtsb * ( &
-                              wombat%phy_dfeupt(i,j,k) &
-                            - ( wombat%phymorl(i,j,k) &
-                              + wombat%phymorq(i,j,k) &
-                              + wombat%zoograzphy(i,j,k) &
-                              + wombat%mesgrazphy(i,j,k) ) * phy_Fe2C )
+                                  wombat%phy_dfeupt(i,j,k) &
+                                - ( wombat%phymorl(i,j,k) &
+                                  + wombat%phymorq(i,j,k) &
+                                  + wombat%zoograzphy(i,j,k) &
+                                  + wombat%mesgrazphy(i,j,k) ) * phy_Fe2C )
 
       ! Microphytoplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_dia(i,j,k,tau)  = wombat%p_dia(i,j,k,tau) + dtsb * ( &
-                             wombat%diagrow(i,j,k) &
-                           - wombat%diamorl(i,j,k) &
-                           - wombat%diamorq(i,j,k) &
-                           - wombat%mesgrazdia(i,j,k) &
-                           - wombat%zoograzdia(i,j,k) )
+      ! Here we treat diamorq semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = wombat%diagrow(i,j,k) &
+             - wombat%diamorl(i,j,k) &
+             - wombat%zoograzdia(i,j,k) &
+             - wombat%mesgrazdia(i,j,k)
+      ! Treat diamorq semi-implicitly
+      zval1 = max(0.0, (wombat%p_dia(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_dia(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%diaqmor / mmol_m3_to_mol_kg * zval1
+      wombat%p_dia(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate diamorq for use below and for diagnostic output
+      wombat%diamorq(i,j,k) = k_loss * wombat%p_dia(i,j,k,tau) ! [molC/kg/s]
 
       ! Microphytoplankton chlorophyll equation ! [molChl/kg]
       !-----------------------------------------------------------------------
       wombat%p_dchl(i,j,k,tau) = wombat%p_dchl(i,j,k,tau) + dtsb * ( &
-                             wombat%dchl_mu(i,j,k) &
-                           - ( wombat%diamorl(i,j,k) &
-                             + wombat%diamorq(i,j,k) &
-                             + wombat%zoograzdia(i,j,k) &
-                             + wombat%mesgrazdia(i,j,k) ) * dia_chlc )
+                                 wombat%dchl_mu(i,j,k) &
+                               - ( wombat%diamorl(i,j,k) &
+                                 + wombat%diamorq(i,j,k) &
+                                 + wombat%zoograzdia(i,j,k) &
+                                 + wombat%mesgrazdia(i,j,k) ) * dia_chlc )
 
       ! Microphytoplankton iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%p_diafe(i,j,k,tau) = wombat%p_diafe(i,j,k,tau) + dtsb * ( &
-                              wombat%dia_dfeupt(i,j,k) &
-                            - ( wombat%diamorl(i,j,k) &
-                              + wombat%diamorq(i,j,k) &
-                              + wombat%zoograzdia(i,j,k) &
-                              + wombat%mesgrazdia(i,j,k) ) * dia_Fe2C )
+                                  wombat%dia_dfeupt(i,j,k) &
+                                - ( wombat%diamorl(i,j,k) &
+                                  + wombat%diamorq(i,j,k) &
+                                  + wombat%zoograzdia(i,j,k) &
+                                  + wombat%mesgrazdia(i,j,k) ) * dia_Fe2C )
 
       ! Microphytoplankton silicon equation ! [molSi/kg]
       !----------------------------------------------------------------------
       wombat%p_diasi(i,j,k,tau) = wombat%p_diasi(i,j,k,tau) + dtsb * ( &
-                              wombat%dia_silupt(i,j,k) &
-                            - ( wombat%diamorl(i,j,k) &
-                              + wombat%diamorq(i,j,k) &
-                              + wombat%mesgrazdia(i,j,k) &
-                              + wombat%zoograzdia(i,j,k) ) * dia_Si2C )
+                                  wombat%dia_silupt(i,j,k) &
+                                - ( wombat%diamorl(i,j,k) &
+                                  + wombat%diamorq(i,j,k) &
+                                  + wombat%mesgrazdia(i,j,k) &
+                                  + wombat%zoograzdia(i,j,k) ) * dia_Si2C )
 
       ! Estimate primary productivity from phytoplankton growth ! [molC/kg/s]
       wombat%rpp3d(i,j,k) = wombat%rpp3d(i,j,k) + dtsb * ( &
-                              wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
-                            + wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
+                            wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                          + wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
 
       ! Net primary productivity (gross PP minus linear mortality) ! [molC/kg/s]
       wombat%npp3d(i,j,k) = wombat%npp3d(i,j,k) + dtsb * ( &
                             wombat%phygrow(i,j,k) + wombat%diagrow(i,j,k) )
 
-      ! Zooplankton equation ! [molC/kg]
+      ! Micro-zooplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_zoo(i,j,k,tau) = wombat%p_zoo(i,j,k,tau) + dtsb * ( &
-                            ( wombat%zoograzlbac(i,j,k) &
-                            + wombat%zoograzsbac(i,j,k) &
-                            + wombat%zoograzaoa(i,j,k) &
-                            + wombat%zoograzphy(i,j,k) &
-                            + wombat%zoograzdia(i,j,k) &
-                            + wombat%zoograzsdet(i,j,k) ) * wombat%zooCingest*wombat%zooCassim &
-                          - wombat%mesgrazzoo(i,j,k) &
-                          - wombat%zoomorl(i,j,k) &
-                          - wombat%zoomorq(i,j,k) )
+      ! Here we treat zoomorq semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = ( wombat%zoograzlbac(i,j,k) &
+               + wombat%zoograzsbac(i,j,k) &
+               + wombat%zoograzaoa(i,j,k) &
+               + wombat%zoograzphy(i,j,k) &
+               + wombat%zoograzdia(i,j,k) &
+               + wombat%zoograzsdet(i,j,k) ) * wombat%zooCingest*wombat%zooCassim &
+               - wombat%mesgrazzoo(i,j,k) &
+               - wombat%zoomorl(i,j,k)
+      ! Treat zoomorq semi-implicitly
+      zval1 = max(0.0, (wombat%p_zoo(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_zoo(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%zooqmor / mmol_m3_to_mol_kg * zval1
+      wombat%p_zoo(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate zoomorq for use below and for diagnostic output
+      wombat%zoomorq(i,j,k) = k_loss * wombat%p_zoo(i,j,k,tau) ! [molC/kg/s]
 
-      ! Zooplankton iron equation ! [molFe/kg]
+      ! Micro-zooplankton iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%p_zoofe(i,j,k,tau) = wombat%p_zoofe(i,j,k,tau) + dtsb * ( &
-                              zooassilbacfe &
-                            + zooassisbacfe &
-                            + zooassiaoafe &
-                            + zooassiphyfe &
-                            + zooassidiafe &
-                            + zooassisdetfe &
-                            - ( wombat%mesgrazzoo(i,j,k) &
-                              + wombat%zoomorl(i,j,k) &
-                              + wombat%zoomorq(i,j,k) ) * zoo_Fe2C )
+                                  zooassilbacfe &
+                                + zooassisbacfe &
+                                + zooassiaoafe &
+                                + zooassiphyfe &
+                                + zooassidiafe &
+                                + zooassisdetfe &
+                                - ( wombat%mesgrazzoo(i,j,k) &
+                                  + wombat%zoomorl(i,j,k) &
+                                  + wombat%zoomorq(i,j,k) ) * zoo_Fe2C )
 
       ! Mesozooplankton equation ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_mes(i,j,k,tau) = wombat%p_mes(i,j,k,tau) + dtsb * ( &
-                            ( wombat%mesgrazlbac(i,j,k) &
-                            + wombat%mesgrazsbac(i,j,k) &
-                            + wombat%mesgrazaoa(i,j,k) &
-                            + wombat%mesgrazphy(i,j,k) &
-                            + wombat%mesgrazdia(i,j,k) &
-                            + wombat%mesgrazsdet(i,j,k) &
-                            + wombat%mesgrazldet(i,j,k) &
-                            + wombat%mesgrazzoo(i,j,k) ) * wombat%mesCingest*wombat%mesCassim &
-                           - wombat%mesmorl(i,j,k) &
-                           - wombat%mesmorq(i,j,k) )
+      ! Here we treat mesmorq semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = ( wombat%mesgrazlbac(i,j,k) &
+               + wombat%mesgrazsbac(i,j,k) &
+               + wombat%mesgrazaoa(i,j,k) &
+               + wombat%mesgrazphy(i,j,k) &
+               + wombat%mesgrazdia(i,j,k) &
+               + wombat%mesgrazsdet(i,j,k) &
+               + wombat%mesgrazldet(i,j,k) &
+               + wombat%mesgrazzoo(i,j,k) ) * wombat%mesCingest*wombat%mesCassim &
+               - wombat%mesmorl(i,j,k)
+      ! Treat mesmorq semi-implicitly
+      zval1 = max(0.0, (wombat%p_mes(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_mes(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%mesqmor / mmol_m3_to_mol_kg * zval1
+      wombat%p_mes(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate mesmorq for use below and for diagnostic output
+      wombat%mesmorq(i,j,k) = k_loss * wombat%p_mes(i,j,k,tau) ! [molC/kg/s]
 
       ! Mesozooplankton iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%p_mesfe(i,j,k,tau) = wombat%p_mesfe(i,j,k,tau) + dtsb * ( &
-                              mesassilbacfe &
-                            + mesassisbacfe &
-                            + mesassiaoafe &
-                            + mesassiphyfe &
-                            + mesassidiafe &
-                            + mesassisdetfe &
-                            + mesassildetfe &
-                            + mesassizoofe &
-                            - ( wombat%mesmorl(i,j,k) &
-                              + wombat%mesmorq(i,j,k) ) * mes_Fe2C )
+                                  mesassilbacfe &
+                                + mesassisbacfe &
+                                + mesassiaoafe &
+                                + mesassiphyfe &
+                                + mesassidiafe &
+                                + mesassisdetfe &
+                                + mesassildetfe &
+                                + mesassizoofe &
+                                - ( wombat%mesmorl(i,j,k) &
+                                  + wombat%mesmorq(i,j,k) ) * mes_Fe2C )
 
       ! Estimate secondary productivity from zooplankton growth ! [molC/kg/s]
       wombat%zsp3d(i,j,k) = wombat%zsp3d(i,j,k) + dtsb * ( &
@@ -5878,65 +5872,79 @@ module generic_WOMBATmid
 
       ! Small detritus equation ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_sdet(i,j,k,tau) = wombat%p_sdet(i,j,k,tau) + dtsb * ( &
-                            wombat%zooegeslbac(i,j,k) &
-                          + wombat%zooegessbac(i,j,k) &
-                          + wombat%zooegesaoa(i,j,k) &
-                          + wombat%zooegesphy(i,j,k) &
-                          + wombat%zooegesdia(i,j,k) &
-                          + wombat%zooegessdet(i,j,k) &
-                          + wombat%phymorq(i,j,k) &
-                          + wombat%zoomorq(i,j,k) &
-                          - wombat%zoograzsdet(i,j,k) &
-                          - wombat%mesgrazsdet(i,j,k) &
-                          - wombat%sdetremi(i,j,k) )
+      ! Here we treat sdetremi semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = wombat%zooegeslbac(i,j,k) &
+             + wombat%zooegessbac(i,j,k) &
+             + wombat%zooegesaoa(i,j,k) &
+             + wombat%zooegesphy(i,j,k) &
+             + wombat%zooegesdia(i,j,k) &
+             + wombat%zooegessdet(i,j,k) &
+             + wombat%phymorq(i,j,k) &
+             + wombat%zoomorq(i,j,k) &
+             - wombat%zoograzsdet(i,j,k) &
+             - wombat%mesgrazsdet(i,j,k)
+      ! Treat sdetremi semi-implicitly
+      zval1 = max(0.0, (wombat%p_sdet(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_sdet(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * zval1
+      wombat%p_sdet(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate sdetremi for use below and for diagnostic output
+      wombat%sdetremi(i,j,k) = k_loss * wombat%p_sdet(i,j,k,tau) ! [molC/kg/s]
 
       ! Small detrital iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%p_sdetfe(i,j,k,tau) = wombat%p_sdetfe(i,j,k,tau) + dtsb * ( &
-                              zooegeslbacfe &
-                            + zooegessbacfe &
-                            + zooegesaoafe &
-                            + zooegesphyfe &
-                            + zooegesdiafe &
-                            + zooegessdetfe &
-                            + wombat%phymorq(i,j,k) * phy_Fe2C &
-                            + wombat%zoomorq(i,j,k) * zoo_Fe2C &
-                            - ( wombat%zoograzsdet(i,j,k) &
-                              + wombat%mesgrazsdet(i,j,k) &
-                              + wombat%sdetremi(i,j,k) ) * sdet_Fe2C )
+                                   zooegeslbacfe &
+                                 + zooegessbacfe &
+                                 + zooegesaoafe &
+                                 + zooegesphyfe &
+                                 + zooegesdiafe &
+                                 + zooegessdetfe &
+                                 + wombat%phymorq(i,j,k) * phy_Fe2C &
+                                 + wombat%zoomorq(i,j,k) * zoo_Fe2C &
+                                 - ( wombat%zoograzsdet(i,j,k) &
+                                   + wombat%mesgrazsdet(i,j,k) &
+                                   + wombat%sdetremi(i,j,k) ) * sdet_Fe2C )
 
       ! Large detritus equation ! [molC/kg]
       !-----------------------------------------------------------------------
-      wombat%p_ldet(i,j,k,tau) = wombat%p_ldet(i,j,k,tau) + dtsb * ( &
-                             wombat%mesegeslbac(i,j,k) &
-                           + wombat%mesegessbac(i,j,k) &
-                           + wombat%mesegesaoa(i,j,k) &
-                           + wombat%mesegesphy(i,j,k) &
-                           + wombat%mesegesdia(i,j,k) &
-                           + wombat%mesegessdet(i,j,k) &
-                           + wombat%mesegesldet(i,j,k) &
-                           + wombat%mesegeszoo(i,j,k) &
-                           + wombat%diamorq(i,j,k) &
-                           + wombat%mesmorq(i,j,k) &
-                           - wombat%mesgrazldet(i,j,k) &
-                           - wombat%ldetremi(i,j,k) )
+      ! Here we treat ldetremi semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = wombat%mesegeslbac(i,j,k) &
+             + wombat%mesegessbac(i,j,k) &
+             + wombat%mesegesaoa(i,j,k) &
+             + wombat%mesegesphy(i,j,k) &
+             + wombat%mesegesdia(i,j,k) &
+             + wombat%mesegessdet(i,j,k) &
+             + wombat%mesegesldet(i,j,k) &
+             + wombat%mesegeszoo(i,j,k) &
+             + wombat%diamorq(i,j,k) &
+             + wombat%mesmorq(i,j,k) &
+             - wombat%mesgrazldet(i,j,k)
+      ! Treat ldetremi semi-implicitly
+      zval1 = max(0.0, (wombat%p_ldet(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_ldet(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%reminr(i,j,k) / mmol_m3_to_mol_kg * zval1
+      wombat%p_ldet(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate ldetremi for use below and for diagnostic output
+      wombat%ldetremi(i,j,k) = k_loss * wombat%p_ldet(i,j,k,tau) ! [molC/kg/s]
 
       ! Compact, fast sinking detrital iron equation ! [molFe/kg]
       !-----------------------------------------------------------------------
       wombat%p_ldetfe(i,j,k,tau) = wombat%p_ldetfe(i,j,k,tau) + dtsb * ( &
-                               mesegeslbacfe &
-                             + mesegessbacfe &
-                             + mesegesaoafe &
-                             + mesegesphyfe &
-                             + mesegesdiafe &
-                             + mesegessdetfe &
-                             + mesegesldetfe &
-                             + mesegeszoofe &
-                             + wombat%diamorq(i,j,k) * dia_Fe2C &
-                             + wombat%mesmorq(i,j,k) * mes_Fe2C &
-                             - ( wombat%mesgrazldet(i,j,k) &
-                               + wombat%ldetremi(i,j,k) ) * ldet_Fe2C )
+                                   mesegeslbacfe &
+                                 + mesegessbacfe &
+                                 + mesegesaoafe &
+                                 + mesegesphyfe &
+                                 + mesegesdiafe &
+                                 + mesegessdetfe &
+                                 + mesegesldetfe &
+                                 + mesegeszoofe &
+                                 + wombat%diamorq(i,j,k) * dia_Fe2C &
+                                 + wombat%mesmorq(i,j,k) * mes_Fe2C &
+                                 - ( wombat%mesgrazldet(i,j,k) &
+                                   + wombat%ldetremi(i,j,k) ) * ldet_Fe2C )
 
       ! Compact, fast sinking detrital silicon equation ! [molSi/kg]
       !   Copepod egestion (fecal pellets) represented 42-107% of biogenic silica export at
@@ -5944,361 +5952,397 @@ module generic_WOMBATmid
       !   All mesozooplankton grazing on diatoms goes to egestion, no dissolution and no assimilation
       !----------------------------------------------------------------------
       wombat%p_ldetsi(i,j,k,tau) = wombat%p_ldetsi(i,j,k,tau) + dtsb * ( &
-                               ( wombat%diamorq(i,j,k) &
-                               + wombat%mesgrazdia(i,j,k) ) * dia_Si2C &
-                             - wombat%bsidiss(i,j,k)  )
+                                   ( wombat%diamorq(i,j,k) &
+                                   + wombat%mesgrazdia(i,j,k) ) * dia_Si2C &
+                                   - wombat%bsidiss(i,j,k) )
+
+      ! Large, sharing heterotrophic bacteria ! [molC/kg]
+      !-----------------------------------------------------------------------
+      ! Here we treat lbacmorq semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = wombat%lbacgrow(i,j,k) &
+             - wombat%lbacmorl(i,j,k) &
+             - wombat%zoograzlbac(i,j,k) &
+             - wombat%mesgrazlbac(i,j,k)
+      ! Treat diamorq semi-implicitly
+      zval1 = max(0.0, (wombat%p_lbac(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_lbac(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%bacqmor / mmol_m3_to_mol_kg * zval1
+      wombat%p_lbac(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate lbacmorq for use below and for diagnostic output
+      wombat%lbacmorq(i,j,k) = k_loss * wombat%p_lbac(i,j,k,tau) ! [molC/kg/s]
+
+      ! Small, selfish heterotrophic bacteria ! [molC/kg]
+      !-----------------------------------------------------------------------
+      ! Here we treat sbacmorq semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = wombat%sbacgrow(i,j,k) - wombat%sbacmorl(i,j,k) - &
+               wombat%zoograzsbac(i,j,k) - wombat%mesgrazsbac(i,j,k)
+      ! Treat diamorq semi-implicitly
+      zval1 = max(0.0, (wombat%p_sbac(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_sbac(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%bacqmor / mmol_m3_to_mol_kg * zval1
+      wombat%p_sbac(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate sbacmorq for use below and for diagnostic output
+      wombat%sbacmorq(i,j,k) = k_loss * wombat%p_sbac(i,j,k,tau) ! [molC/kg/s]
+
+      ! AOA ! [molC/kg]
+      !-----------------------------------------------------------------------
+      ! Here we treat aoamorq semi-implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      P_expl = wombat%aoagrow(i,j,k) - wombat%aoamorl(i,j,k) - &
+               wombat%zoograzaoa(i,j,k) - wombat%mesgrazaoa(i,j,k)
+      ! Treat aoamorq semi-implicitly
+      zval1 = max(0.0, (wombat%p_aoa(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_aoa(i,j,k,tau) + dtsb * P_expl))
+      k_loss = wombat%aoaqmor / mmol_m3_to_mol_kg * zval1
+      wombat%p_aoa(i,j,k,tau) = zval2 + zval1 / (1.0 + dtsb * k_loss)
+      ! Back-calculate aoamorq for use below and for diagnostic output
+      wombat%aoamorq(i,j,k) = k_loss * wombat%p_aoa(i,j,k,tau) ! [molC/kg/s]
 
       ! Large dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%p_ldoc(i,j,k,tau) = wombat%p_ldoc(i,j,k,tau) + dtsb * ( &
-                             wombat%sdetremi(i,j,k) &
-                           + wombat%ldetremi(i,j,k) &
-                           + wombat%phymorl(i,j,k) &
-                           + wombat%diamorl(i,j,k) &
-                           + wombat%lbacmorl(i,j,k) &
-                           + wombat%lbacmorq(i,j,k) &
-                           + wombat%sbacmorl(i,j,k) &
-                           + wombat%sbacmorq(i,j,k) &
-                           + wombat%aoamorl(i,j,k) &
-                           + wombat%aoamorq(i,j,k) &
-                           + ( wombat%zooexcrlbac(i,j,k) &
-                             + wombat%zooexcrsbac(i,j,k) &
-                             + wombat%zooexcraoa(i,j,k) &
-                             + wombat%zooexcrphy(i,j,k) &
-                             + wombat%zooexcrdia(i,j,k) &
-                             + wombat%zooexcrsdet(i,j,k) ) * wombat%zooexcrdom &
-                           + ( wombat%mesexcrlbac(i,j,k) &
-                             + wombat%mesexcrsbac(i,j,k) &
-                             + wombat%mesexcraoa(i,j,k) &
-                             + wombat%mesexcrphy(i,j,k) &
-                             + wombat%mesexcrdia(i,j,k) &
-                             + wombat%mesexcrsdet(i,j,k) &
-                             + wombat%mesexcrldet(i,j,k) &
-                             + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom &
-                           - wombat%ldocremi(i,j,k) )
+                                 wombat%sdetremi(i,j,k) &
+                               + wombat%ldetremi(i,j,k) &
+                               + wombat%phymorl(i,j,k) &
+                               + wombat%diamorl(i,j,k) &
+                               + wombat%lbacmorl(i,j,k) &
+                               + wombat%lbacmorq(i,j,k) &
+                               + wombat%sbacmorl(i,j,k) &
+                               + wombat%sbacmorq(i,j,k) &
+                               + wombat%aoamorl(i,j,k) &
+                               + wombat%aoamorq(i,j,k) &
+                               + ( wombat%zooexcrlbac(i,j,k) &
+                                 + wombat%zooexcrsbac(i,j,k) &
+                                 + wombat%zooexcraoa(i,j,k) &
+                                 + wombat%zooexcrphy(i,j,k) &
+                                 + wombat%zooexcrdia(i,j,k) &
+                                 + wombat%zooexcrsdet(i,j,k) ) * wombat%zooexcrdom &
+                               + ( wombat%mesexcrlbac(i,j,k) &
+                                 + wombat%mesexcrsbac(i,j,k) &
+                                 + wombat%mesexcraoa(i,j,k) &
+                                 + wombat%mesexcrphy(i,j,k) &
+                                 + wombat%mesexcrdia(i,j,k) &
+                                 + wombat%mesexcrsdet(i,j,k) &
+                                 + wombat%mesexcrldet(i,j,k) &
+                                 + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom &
+                               - wombat%ldocremi(i,j,k) )
 
       ! Large dissolved organic nitrogen equation ! [molN/kg]
       !-----------------------------------------------------------------------
       wombat%p_ldon(i,j,k,tau) = wombat%p_ldon(i,j,k,tau) + dtsb * ( &
-                            ( wombat%lbacmorl(i,j,k) &
-                            + wombat%lbacmorq(i,j,k) &
-                            + wombat%sbacmorl(i,j,k) &
-                            + wombat%sbacmorq(i,j,k) ) / wombat%bac_C2N &
-                          + ( wombat%aoamorl(i,j,k) &
-                            + wombat%aoamorq(i,j,k) ) / wombat%aoa_C2N &
-                          + ( zooexcrlbacn &
-                            + zooexcrsbacn &
-                            + zooexcraoan ) * wombat%zooexcrdom &
-                          + ( mesexcrlbacn &
-                            + mesexcrsbacn &
-                            + mesexcraoan ) * wombat%mesexcrdom &
-                          - wombat%ldocremi(i,j,k) * ldom_N2C ) &
-                          + dtsb * 16./122.0 * ( &
-                            wombat%sdetremi(i,j,k) &
-                          + wombat%ldetremi(i,j,k) &
-                          + wombat%phymorl(i,j,k) &
-                          + wombat%diamorl(i,j,k) &
-                          + ( wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrsdet(i,j,k) ) *wombat%zooexcrdom &
-                          + ( wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrsdet(i,j,k) &
-                            + wombat%mesexcrldet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom )
+                                 ( wombat%lbacmorl(i,j,k) &
+                                 + wombat%lbacmorq(i,j,k) &
+                                 + wombat%sbacmorl(i,j,k) &
+                                 + wombat%sbacmorq(i,j,k) ) / wombat%bac_C2N &
+                               + ( wombat%aoamorl(i,j,k) &
+                                 + wombat%aoamorq(i,j,k) ) / wombat%aoa_C2N &
+                               + ( zooexcrlbacn &
+                                 + zooexcrsbacn &
+                                 + zooexcraoan ) * wombat%zooexcrdom &
+                               + ( mesexcrlbacn &
+                                 + mesexcrsbacn &
+                                 + mesexcraoan ) * wombat%mesexcrdom &
+                               - wombat%ldocremi(i,j,k) * ldom_N2C ) &
+                               + dtsb * 16./122.0 * ( &
+                                 wombat%sdetremi(i,j,k) &
+                               + wombat%ldetremi(i,j,k) &
+                               + wombat%phymorl(i,j,k) &
+                               + wombat%diamorl(i,j,k) &
+                               + ( wombat%zooexcrphy(i,j,k) &
+                                 + wombat%zooexcrdia(i,j,k) &
+                                 + wombat%zooexcrsdet(i,j,k) ) *wombat%zooexcrdom &
+                               + ( wombat%mesexcrphy(i,j,k) &
+                                 + wombat%mesexcrdia(i,j,k) &
+                                 + wombat%mesexcrsdet(i,j,k) &
+                                 + wombat%mesexcrldet(i,j,k) &
+                                 + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom )
 
       ! Small dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%p_sdoc(i,j,k,tau) = wombat%p_sdoc(i,j,k,tau) + dtsb * ( &
-                             wombat%phydoc(i,j,k) &
-                           + wombat%diadoc(i,j,k) &
-                           + wombat%sdocprod(i,j,k) &
-                           - wombat%sdocremi(i,j,k) )
-
-      ! Large, sharing heterotrophic bacteria ! [molC/kg]
-      !-----------------------------------------------------------------------
-      wombat%p_lbac(i,j,k,tau) = wombat%p_lbac(i,j,k,tau) + dtsb * ( &
-                             wombat%lbacgrow(i,j,k) &
-                           - wombat%zoograzlbac(i,j,k) &
-                           - wombat%mesgrazlbac(i,j,k) &
-                           - wombat%lbacmorl(i,j,k) &
-                           - wombat%lbacmorq(i,j,k) )
-
-      ! Small, selfish heterotrophic bacteria ! [molC/kg]
-      !-----------------------------------------------------------------------
-      wombat%p_sbac(i,j,k,tau) = wombat%p_sbac(i,j,k,tau) + dtsb * ( &
-                             wombat%sbacgrow(i,j,k) &
-                           - wombat%zoograzsbac(i,j,k) &
-                           - wombat%mesgrazsbac(i,j,k) &
-                           - wombat%sbacmorl(i,j,k) &
-                           - wombat%sbacmorq(i,j,k) )
-
-      ! AOA ! [molC/kg]
-      !-----------------------------------------------------------------------
-      wombat%p_aoa(i,j,k,tau) = wombat%p_aoa(i,j,k,tau) + dtsb * ( &
-                            wombat%aoagrow(i,j,k) &
-                          - wombat%zoograzaoa(i,j,k) &
-                          - wombat%mesgrazaoa(i,j,k) &
-                          - wombat%aoamorl(i,j,k) &
-                          - wombat%aoamorq(i,j,k) )
+                                 wombat%phydoc(i,j,k) &
+                               + wombat%diadoc(i,j,k) &
+                               + wombat%sdocprod(i,j,k) &
+                               - wombat%sdocremi(i,j,k) )
 
       ! Oxygen equation ! [molO2/kg]
       !-----------------------------------------------------------------------
       if (wombat%p_o2(i,j,k,tau) > epsi) &
         wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) - 132./122. * dtsb * ( &
-                             ( wombat%zooexcrlbac(i,j,k) &
-                             + wombat%zooexcrsbac(i,j,k) &
-                             + wombat%zooexcraoa(i,j,k) &
-                             + wombat%zooexcrphy(i,j,k) &
-                             + wombat%zooexcrdia(i,j,k) &
-                             + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                           + ( wombat%mesexcrlbac(i,j,k) &
-                             + wombat%mesexcrsbac(i,j,k) &
-                             + wombat%mesexcraoa(i,j,k) &
-                             + wombat%mesexcrphy(i,j,k) &
-                             + wombat%mesexcrdia(i,j,k) &
-                             + wombat%mesexcrsdet(i,j,k) &
-                             + wombat%mesexcrldet(i,j,k) &
-                             + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
-                           + wombat%zoomorl(i,j,k) &
-                           + wombat%mesmorl(i,j,k) &
-                           - wombat%phygrow(i,j,k) &
-                           - wombat%diagrow(i,j,k) ) &
-                           - dtsb * ( &
-                             wombat%lbacresp(i,j,k) &
-                           + wombat%sbacresp(i,j,k) &
-                           + wombat%aoaresp(i,j,k) )
+                                 ( wombat%zooexcrlbac(i,j,k) &
+                                 + wombat%zooexcrsbac(i,j,k) &
+                                 + wombat%zooexcraoa(i,j,k) &
+                                 + wombat%zooexcrphy(i,j,k) &
+                                 + wombat%zooexcrdia(i,j,k) &
+                                 + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
+                               + ( wombat%mesexcrlbac(i,j,k) &
+                                 + wombat%mesexcrsbac(i,j,k) &
+                                 + wombat%mesexcraoa(i,j,k) &
+                                 + wombat%mesexcrphy(i,j,k) &
+                                 + wombat%mesexcrdia(i,j,k) &
+                                 + wombat%mesexcrsdet(i,j,k) &
+                                 + wombat%mesexcrldet(i,j,k) &
+                                 + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                               + wombat%zoomorl(i,j,k) &
+                               + wombat%mesmorl(i,j,k) &
+                               - wombat%phygrow(i,j,k) &
+                               - wombat%diagrow(i,j,k) ) &
+                               - dtsb * ( &
+                                 wombat%lbacresp(i,j,k) &
+                               + wombat%sbacresp(i,j,k) &
+                               + wombat%aoaresp(i,j,k) )
 
 
       ! Equation for CaCO3 ! [molCaCO3/kg]
       !-----------------------------------------------------------------------
-      wombat%p_caco3(i,j,k,tau) = wombat%p_caco3(i,j,k,tau) + dtsb * ( &
-                              ( ( wombat%zoograzphy(i,j,k) &
-                                + wombat%mesgrazphy(i,j,k) &
-                                + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
-                              + wombat%phymorq(i,j,k)  &
-                              + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) &
-                            - wombat%zoodiss(i,j,k) &
-                            - wombat%mesdiss(i,j,k) &
-                            - wombat%caldiss(i,j,k) &
-                            - wombat%aradiss(i,j,k) &
-                            - wombat%pocdiss(i,j,k) )
+      ! Here we treat the loss terms implicitly to ensure numerical stability
+      ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
+      ! Treat the production terms explicitly
+      P_expl = ( wombat%phymorq(i,j,k) &
+               + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) &
+             + ( wombat%zoograzphy(i,j,k) &
+               + wombat%mesgrazphy(i,j,k) &
+               + wombat%mesgrazzoo(i,j,k) ) * (1. - wombat%fgutdiss) * wombat%pic2poc(i,j,k)
+      ! Treat loss terms that are proportional to CaCO3 concentration implicitly
+      zval1 = max(0.0, (wombat%p_caco3(i,j,k,tau) + dtsb * P_expl))
+      zval2 = min(0.0, (wombat%p_caco3(i,j,k,tau) + dtsb * P_expl))
+      k_loss_zoodiss = 0.0
+      k_loss_mesdiss = 0.0
+      if (sdet_p > epsi) then
+        k_loss_zoodiss = max(0.0, wombat%zoograzsdet(i,j,k) * wombat%fgutdiss / sdet_p)
+        k_loss_mesdiss = max(0.0, wombat%mesgrazsdet(i,j,k) * wombat%fgutdiss / sdet_p)
+      endif
+      k_loss = wombat%dissratcal(i,j,k) &
+             + wombat%dissratara(i,j,k) &
+             + wombat%dissratpoc(i,j,k) &
+             + k_loss_zoodiss &
+             + k_loss_mesdiss
+      zval = zval1 / (1.0 + dtsb * k_loss)
+      wombat%p_caco3(i,j,k,tau) = zval2 + zval
+      ! Back-calculate the dissolution terms for use below and diagnostic output
+      wombat%zoodiss(i,j,k) = k_loss_zoodiss * zval
+      wombat%mesdiss(i,j,k) = k_loss_mesdiss * zval
+      wombat%caldiss(i,j,k) = wombat%dissratcal(i,j,k) * zval
+      wombat%aradiss(i,j,k) = wombat%dissratara(i,j,k) * zval
+      wombat%pocdiss(i,j,k) = wombat%dissratpoc(i,j,k) * zval
 
       ! Equation for DIC ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%p_dic(i,j,k,tau) = wombat%p_dic(i,j,k,tau) + dtsb * ( &
-                            ( wombat%zooexcrlbac(i,j,k) &
-                            + wombat%zooexcrsbac(i,j,k) &
-                            + wombat%zooexcraoa(i,j,k) &
-                            + wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                          + ( wombat%mesexcrlbac(i,j,k) &
-                            + wombat%mesexcrsbac(i,j,k) &
-                            + wombat%mesexcraoa(i,j,k) &
-                            + wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrsdet(i,j,k) &
-                            + wombat%mesexcrldet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
-                          + wombat%zoomorl(i,j,k) &
-                          + wombat%mesmorl(i,j,k) &
-                          + wombat%lbacpco2(i,j,k) &
-                          + wombat%sbacpco2(i,j,k) &
-                          + wombat%zoodiss(i,j,k) &
-                          + wombat%mesdiss(i,j,k) &
-                          + wombat%caldiss(i,j,k) &
-                          + wombat%aradiss(i,j,k) &
-                          + wombat%pocdiss(i,j,k) &
-                          - wombat%phygrow(i,j,k) &
-                          - wombat%diagrow(i,j,k) &
-                          - wombat%aoagrow(i,j,k) &
-                          - wombat%phydoc(i,j,k) &
-                          - wombat%diadoc(i,j,k) &
-                          - ( ( wombat%zoograzphy(i,j,k) &
-                              + wombat%mesgrazphy(i,j,k) &
-                              + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
-                              + wombat%phymorq(i,j,k) &
-                              + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) )
-
-      ! Equation for DICr ! [molC/kg]
-      !-----------------------------------------------------------------------
-      if (do_tracer_dicr) then
-        wombat%p_dicr(i,j,k,tau) = wombat%p_dicr(i,j,k,tau) + dtsb * ( &
                                 ( wombat%zooexcrlbac(i,j,k) &
                                 + wombat%zooexcrsbac(i,j,k) &
                                 + wombat%zooexcraoa(i,j,k) &
                                 + wombat%zooexcrphy(i,j,k) &
                                 + wombat%zooexcrdia(i,j,k) &
                                 + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                            + ( wombat%mesexcrlbac(i,j,k) &
-                              + wombat%mesexcrsbac(i,j,k) &
-                              + wombat%mesexcraoa(i,j,k) &
-                              + wombat%mesexcrphy(i,j,k) &
-                              + wombat%mesexcrdia(i,j,k) &
-                              + wombat%mesexcrsdet(i,j,k) &
-                              + wombat%mesexcrldet(i,j,k) &
-                              + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
-                            + wombat%zoomorl(i,j,k) &
-                            + wombat%mesmorl(i,j,k) &
-                            + wombat%lbacpco2(i,j,k) &
-                            + wombat%sbacpco2(i,j,k) &
-                            + wombat%zoodiss(i,j,k) &
-                            + wombat%mesdiss(i,j,k) &
-                            + wombat%caldiss(i,j,k) &
-                            + wombat%aradiss(i,j,k) &
-                            + wombat%pocdiss(i,j,k) &
-                            - wombat%phygrow(i,j,k) &
-                            - wombat%diagrow(i,j,k) &
-                            - wombat%aoagrow(i,j,k) &
-                            - wombat%phydoc(i,j,k) &
-                            - wombat%diadoc(i,j,k) &
-                            - ( ( wombat%zoograzphy(i,j,k) &
-                                + wombat%mesgrazphy(i,j,k) &
-                                + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
+                              + ( wombat%mesexcrlbac(i,j,k) &
+                                + wombat%mesexcrsbac(i,j,k) &
+                                + wombat%mesexcraoa(i,j,k) &
+                                + wombat%mesexcrphy(i,j,k) &
+                                + wombat%mesexcrdia(i,j,k) &
+                                + wombat%mesexcrsdet(i,j,k) &
+                                + wombat%mesexcrldet(i,j,k) &
+                                + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                              + wombat%zoomorl(i,j,k) &
+                              + wombat%mesmorl(i,j,k) &
+                              + wombat%lbacpco2(i,j,k) &
+                              + wombat%sbacpco2(i,j,k) &
+                              + wombat%zoodiss(i,j,k) &
+                              + wombat%mesdiss(i,j,k) &
+                              + wombat%caldiss(i,j,k) &
+                              + wombat%aradiss(i,j,k) &
+                              + wombat%pocdiss(i,j,k) &
+                              - wombat%phygrow(i,j,k) &
+                              - wombat%diagrow(i,j,k) &
+                              - wombat%aoagrow(i,j,k) &
+                              - wombat%phydoc(i,j,k) &
+                              - wombat%diadoc(i,j,k) &
+                              - ( ( wombat%zoograzphy(i,j,k) &
+                                  + wombat%mesgrazphy(i,j,k) &
+                                  + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
                                 + wombat%phymorq(i,j,k) &
                                 + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) )
+
+      ! Equation for DICr ! [molC/kg]
+      !-----------------------------------------------------------------------
+      if (do_tracer_dicr) then
+        wombat%p_dicr(i,j,k,tau) = wombat%p_dicr(i,j,k,tau) + dtsb * ( &
+                                   ( wombat%zooexcrlbac(i,j,k) &
+                                   + wombat%zooexcrsbac(i,j,k) &
+                                   + wombat%zooexcraoa(i,j,k) &
+                                   + wombat%zooexcrphy(i,j,k) &
+                                   + wombat%zooexcrdia(i,j,k) &
+                                   + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
+                                 + ( wombat%mesexcrlbac(i,j,k) &
+                                   + wombat%mesexcrsbac(i,j,k) &
+                                   + wombat%mesexcraoa(i,j,k) &
+                                   + wombat%mesexcrphy(i,j,k) &
+                                   + wombat%mesexcrdia(i,j,k) &
+                                   + wombat%mesexcrsdet(i,j,k) &
+                                   + wombat%mesexcrldet(i,j,k) &
+                                   + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                                 + wombat%zoomorl(i,j,k) &
+                                 + wombat%mesmorl(i,j,k) &
+                                 + wombat%lbacpco2(i,j,k) &
+                                 + wombat%sbacpco2(i,j,k) &
+                                 + wombat%zoodiss(i,j,k) &
+                                 + wombat%mesdiss(i,j,k) &
+                                 + wombat%caldiss(i,j,k) &
+                                 + wombat%aradiss(i,j,k) &
+                                 + wombat%pocdiss(i,j,k) &
+                                 - wombat%phygrow(i,j,k) &
+                                 - wombat%diagrow(i,j,k) &
+                                 - wombat%aoagrow(i,j,k) &
+                                 - wombat%phydoc(i,j,k) &
+                                 - wombat%diadoc(i,j,k) &
+                                 - ( ( wombat%zoograzphy(i,j,k) &
+                                     + wombat%mesgrazphy(i,j,k) &
+                                     + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
+                                   + wombat%phymorq(i,j,k) &
+                                   + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) )
       endif
 
 
       ! Equation for ALK ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%p_alk(i,j,k,tau) = wombat%p_alk(i,j,k,tau) + dtsb * 16.0/122.0 * ( &
-                            wombat%phygrow(i,j,k) * wombat%phy_lno3(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
-                          + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
-                          - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
-                          - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
-                          + wombat%zoomorl(i,j,k) &
-                          + wombat%mesmorl(i,j,k) &
-                          + ( wombat%zooexcrphy(i,j,k) &
-                            + wombat%zooexcrdia(i,j,k) &
-                            + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                          + ( wombat%mesexcrphy(i,j,k) &
-                            + wombat%mesexcrdia(i,j,k) &
-                            + wombat%mesexcrsdet(i,j,k) &
-                            + wombat%mesexcrldet(i,j,k) &
-                            + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) ) &
-                          + dtsb * ( &
-                            wombat%lbacpnh4(i,j,k) &
-                          + wombat%sbacpnh4(i,j,k) &
-                          + ( zooexcrlbacn &
-                            + zooexcrsbacn &
-                            + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
-                          + ( mesexcrlbacn &
-                            + mesexcrsbacn &
-                            + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
-                          + wombat%lbacdeni(i,j,k) &
-                          + wombat%sbacdeni(i,j,k) &
-                          - 2.0 * wombat%ammox(i,j,k) + wombat%aoagrow(i,j,k)/wombat%aoa_C2N &
-                          - wombat%anammox(i,j,k) ) &
-                          + dtsb * 2.0 * ( &
-                            wombat%zoodiss(i,j,k) &
-                          + wombat%mesdiss(i,j,k) &
-                          + wombat%caldiss(i,j,k) &
-                          + wombat%aradiss(i,j,k) &
-                          + wombat%pocdiss(i,j,k) &
-                          - ( ( wombat%zoograzphy(i,j,k) &
-                              + wombat%mesgrazphy(i,j,k) &
-                              + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
-                            + wombat%phymorq(i,j,k) &
-                            + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) )
+                                wombat%phygrow(i,j,k) * wombat%phy_lno3(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                              + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
+                              - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                              - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
+                              + wombat%zoomorl(i,j,k) &
+                              + wombat%mesmorl(i,j,k) &
+                              + ( wombat%zooexcrphy(i,j,k) &
+                                + wombat%zooexcrdia(i,j,k) &
+                                + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
+                              + ( wombat%mesexcrphy(i,j,k) &
+                                + wombat%mesexcrdia(i,j,k) &
+                                + wombat%mesexcrsdet(i,j,k) &
+                                + wombat%mesexcrldet(i,j,k) &
+                                + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) ) &
+                              + dtsb * ( &
+                                wombat%lbacpnh4(i,j,k) &
+                              + wombat%sbacpnh4(i,j,k) &
+                              + ( zooexcrlbacn &
+                                + zooexcrsbacn &
+                                + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
+                              + ( mesexcrlbacn &
+                                + mesexcrsbacn &
+                                + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
+                              + wombat%lbacdeni(i,j,k) &
+                              + wombat%sbacdeni(i,j,k) &
+                              - 2.0 * wombat%ammox(i,j,k) + wombat%aoagrow(i,j,k)/wombat%aoa_C2N &
+                              - wombat%anammox(i,j,k) ) &
+                              + dtsb * 2.0 * ( &
+                                wombat%zoodiss(i,j,k) &
+                              + wombat%mesdiss(i,j,k) &
+                              + wombat%caldiss(i,j,k) &
+                              + wombat%aradiss(i,j,k) &
+                              + wombat%pocdiss(i,j,k) &
+                              - ( ( wombat%zoograzphy(i,j,k) &
+                                  + wombat%mesgrazphy(i,j,k) &
+                                  + wombat%mesgrazzoo(i,j,k) ) * (1.0-wombat%fgutdiss) &
+                                + wombat%phymorq(i,j,k) &
+                                + wombat%zoomorq(i,j,k) ) * wombat%pic2poc(i,j,k) )
 
 
       ! Equation for dissolved iron ! [molFe/kg]
       !----------------------------------------------------------------------
       wombat%p_fe(i,j,k,tau) = wombat%p_fe(i,j,k,tau) + dtsb * ( &
-                           wombat%sdetremi(i,j,k) * sdet_Fe2C &
-                         + wombat%ldetremi(i,j,k) * ldet_Fe2C &
-                         + wombat%phymorl(i,j,k) * phy_Fe2C &
-                         + wombat%diamorl(i,j,k) * dia_Fe2C &
-                         + wombat%zoomorl(i,j,k) * zoo_Fe2C &
-                         + wombat%mesmorl(i,j,k) * mes_Fe2C &
-                         + ( wombat%lbacmorl(i,j,k) &
-                           + wombat%lbacmorq(i,j,k) &
-                           + wombat%sbacmorl(i,j,k) &
-                           + wombat%sbacmorq(i,j,k) ) / wombat%bac_C2Fe &
-                         + ( wombat%aoamorl(i,j,k) &
-                           + wombat%aoamorq(i,j,k) ) / wombat%aoa_C2Fe &
-                         + zooexcrlbacfe &
-                         + zooexcrsbacfe &
-                         + zooexcraoafe &
-                         + zooexcrphyfe &
-                         + zooexcrdiafe &
-                         + zooexcrsdetfe &
-                         + mesexcrlbacfe &
-                         + mesexcrsbacfe &
-                         + mesexcraoafe &
-                         + mesexcrphyfe &
-                         + mesexcrdiafe &
-                         + mesexcrsdetfe &
-                         + mesexcrldetfe &
-                         + mesexcrzoofe &
-                         + wombat%safediss(i,j,k) &
-                         + wombat%lafediss(i,j,k) &
-                         - wombat%phy_dfeupt(i,j,k) &
-                         - wombat%dia_dfeupt(i,j,k) &
-                         - wombat%lbacufer(i,j,k) &
-                         - wombat%sbacufer(i,j,k) &
-                         - wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
-                         - wombat%fescasafe(i,j,k) &
-                         - wombat%fescalafe(i,j,k) &
-                         - wombat%fecoag2safe(i,j,k) &
-                         - wombat%fecoag2lafe(i,j,k) )
+                               wombat%sdetremi(i,j,k) * sdet_Fe2C &
+                             + wombat%ldetremi(i,j,k) * ldet_Fe2C &
+                             + wombat%phymorl(i,j,k) * phy_Fe2C &
+                             + wombat%diamorl(i,j,k) * dia_Fe2C &
+                             + wombat%zoomorl(i,j,k) * zoo_Fe2C &
+                             + wombat%mesmorl(i,j,k) * mes_Fe2C &
+                             + ( wombat%lbacmorl(i,j,k) &
+                               + wombat%lbacmorq(i,j,k) &
+                               + wombat%sbacmorl(i,j,k) &
+                               + wombat%sbacmorq(i,j,k) ) / wombat%bac_C2Fe &
+                             + ( wombat%aoamorl(i,j,k) &
+                               + wombat%aoamorq(i,j,k) ) / wombat%aoa_C2Fe &
+                             + zooexcrlbacfe &
+                             + zooexcrsbacfe &
+                             + zooexcraoafe &
+                             + zooexcrphyfe &
+                             + zooexcrdiafe &
+                             + zooexcrsdetfe &
+                             + mesexcrlbacfe &
+                             + mesexcrsbacfe &
+                             + mesexcraoafe &
+                             + mesexcrphyfe &
+                             + mesexcrdiafe &
+                             + mesexcrsdetfe &
+                             + mesexcrldetfe &
+                             + mesexcrzoofe &
+                             + wombat%safediss(i,j,k) &
+                             + wombat%lafediss(i,j,k) &
+                             - wombat%phy_dfeupt(i,j,k) &
+                             - wombat%dia_dfeupt(i,j,k) &
+                             - wombat%lbacufer(i,j,k) &
+                             - wombat%sbacufer(i,j,k) &
+                             - wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
+                             - wombat%fescasafe(i,j,k) &
+                             - wombat%fescalafe(i,j,k) &
+                             - wombat%fecoag2safe(i,j,k) &
+                             - wombat%fecoag2lafe(i,j,k) )
 
       ! Collect dFe sources and sinks for diagnostic output
       wombat%fesources(i,j,k) = wombat%fesources(i,j,k) + dtsb * ( &
-                                  wombat%sdetremi(i,j,k) * sdet_Fe2C &
-                                + wombat%ldetremi(i,j,k) * ldet_Fe2C &
-                                + wombat%zoomorl(i,j,k) * zoo_Fe2C &
-                                + wombat%mesmorl(i,j,k) * mes_Fe2C &
-                                + wombat%lbacmorl(i,j,k) / wombat%bac_C2Fe &
-                                + wombat%lbacmorq(i,j,k) / wombat%bac_C2Fe &
-                                + wombat%sbacmorl(i,j,k) / wombat%bac_C2Fe &
-                                + wombat%sbacmorq(i,j,k) / wombat%bac_C2Fe &
-                                + wombat%aoamorl(i,j,k) / wombat%aoa_C2Fe &
-                                + wombat%aoamorq(i,j,k) / wombat%aoa_C2Fe &
-                                + zooexcrlbacfe &
-                                + zooexcrsbacfe &
-                                + zooexcraoafe &
-                                + zooexcrphyfe &
-                                + zooexcrdiafe &
-                                + zooexcrsdetfe &
-                                + mesexcrlbacfe &
-                                + mesexcrsbacfe &
-                                + mesexcraoafe &
-                                + mesexcrphyfe &
-                                + mesexcrdiafe &
-                                + mesexcrsdetfe &
-                                + mesexcrldetfe &
-                                + mesexcrzoofe &
-                                + wombat%phymorl(i,j,k) * phy_Fe2C &
-                                + wombat%diamorl(i,j,k) * dia_Fe2C &
-                                + wombat%safediss(i,j,k) &
-                                + wombat%lafediss(i,j,k))
+                                wombat%sdetremi(i,j,k) * sdet_Fe2C &
+                              + wombat%ldetremi(i,j,k) * ldet_Fe2C &
+                              + wombat%zoomorl(i,j,k) * zoo_Fe2C &
+                              + wombat%mesmorl(i,j,k) * mes_Fe2C &
+                              + wombat%lbacmorl(i,j,k) / wombat%bac_C2Fe &
+                              + wombat%lbacmorq(i,j,k) / wombat%bac_C2Fe &
+                              + wombat%sbacmorl(i,j,k) / wombat%bac_C2Fe &
+                              + wombat%sbacmorq(i,j,k) / wombat%bac_C2Fe &
+                              + wombat%aoamorl(i,j,k) / wombat%aoa_C2Fe &
+                              + wombat%aoamorq(i,j,k) / wombat%aoa_C2Fe &
+                              + zooexcrlbacfe &
+                              + zooexcrsbacfe &
+                              + zooexcraoafe &
+                              + zooexcrphyfe &
+                              + zooexcrdiafe &
+                              + zooexcrsdetfe &
+                              + mesexcrlbacfe &
+                              + mesexcrsbacfe &
+                              + mesexcraoafe &
+                              + mesexcrphyfe &
+                              + mesexcrdiafe &
+                              + mesexcrsdetfe &
+                              + mesexcrldetfe &
+                              + mesexcrzoofe &
+                              + wombat%phymorl(i,j,k) * phy_Fe2C &
+                              + wombat%diamorl(i,j,k) * dia_Fe2C &
+                              + wombat%safediss(i,j,k) &
+                              + wombat%lafediss(i,j,k))
       wombat%fesinks(i,j,k) = wombat%fesinks(i,j,k) + dtsb * ( &
-                                wombat%phy_dfeupt(i,j,k) &
-                              + wombat%dia_dfeupt(i,j,k) &
-                              + wombat%lbacufer(i,j,k) &
-                              + wombat%sbacufer(i,j,k) &
-                              + wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
-                              + wombat%fescasafe(i,j,k) &
-                              + wombat%fescalafe(i,j,k) &
-                              + wombat%fecoag2safe(i,j,k) &
-                              + wombat%fecoag2lafe(i,j,k))
+                              wombat%phy_dfeupt(i,j,k) &
+                            + wombat%dia_dfeupt(i,j,k) &
+                            + wombat%lbacufer(i,j,k) &
+                            + wombat%sbacufer(i,j,k) &
+                            + wombat%aoagrow(i,j,k) / wombat%aoa_C2Fe &
+                            + wombat%fescasafe(i,j,k) &
+                            + wombat%fescalafe(i,j,k) &
+                            + wombat%fecoag2safe(i,j,k) &
+                            + wombat%fecoag2lafe(i,j,k))
 
       ! Equation for small authigenic iron (oxyhydroxide) ! [molFe/kg]
       !----------------------------------------------------------------------
       wombat%p_safe(i,j,k,tau) = wombat%p_safe(i,j,k,tau) + dtsb * ( &
-                              wombat%fecoag2safe(i,j,k) &
-                            + wombat%fescasafe(i,j,k) &
-                            - wombat%safediss(i,j,k) )
+                                 wombat%fecoag2safe(i,j,k) &
+                               + wombat%fescasafe(i,j,k) &
+                               - wombat%safediss(i,j,k) )
 
       ! Equation for large authigenic iron (oxyhydroxide) ! [molFe/kg]
       !----------------------------------------------------------------------
       wombat%p_lafe(i,j,k,tau) = wombat%p_lafe(i,j,k,tau) + dtsb * ( &
-                               wombat%fecoag2lafe(i,j,k) &
-                             + wombat%fescalafe(i,j,k) &
-                             - wombat%lafediss(i,j,k) )
+                                 wombat%fecoag2lafe(i,j,k) &
+                               + wombat%fescalafe(i,j,k) &
+                               - wombat%lafediss(i,j,k) )
 
 
       !-----------------------------------------------------------------------!
