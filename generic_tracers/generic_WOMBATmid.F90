@@ -2635,19 +2635,19 @@ module generic_WOMBATmid
     !  - e.g., protozoans feeding on large bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepslbac', wombat%zooepslbac, 0.10/86400.0)
+    call g_tracer_add_param('zooepslbac', wombat%zooepslbac, 0.40/86400.0)
 
     ! Zooplankton prey capture rate constant for small bacteria [(mmol C m-3)-2 s-1]
     !  - e.g., protozoans feeding on large bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepssbac', wombat%zooepssbac, 0.10/86400.0)
+    call g_tracer_add_param('zooepssbac', wombat%zooepssbac, 0.40/86400.0)
 
     ! Zooplankton prey capture rate constant for ammonia oxidizing archaea [(mmol C m-3)-2 s-1]
     !  - e.g., ciliates feeding on ammonia oxidizing archaea (similar size or larger than pico)
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsaoa', wombat%zooepsaoa, 0.25/86400.0)
+    call g_tracer_add_param('zooepsaoa', wombat%zooepsaoa, 0.40/86400.0)
 
     ! Zooplankton prey capture rate constant for nanophytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., ciliates feeding on small (nano/pico)phytoplankton
@@ -2665,23 +2665,23 @@ module generic_WOMBATmid
     !  - e.g., protozoa grazing on slowly sinking detrital particles
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepssdet', wombat%zooepssdet, 0.25/86400.0)
+    call g_tracer_add_param('zooepssdet', wombat%zooepssdet, 0.40/86400.0)
 
     ! Zooplankton preference for large bacteria [dimensionless]
     ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
     !  of microzooplankton grazing/biomass gain comes from large bacterivory
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zpreflbac', wombat%zpreflbac, 0.50)
+    call g_tracer_add_param('zpreflbac', wombat%zpreflbac, 1.00)
 
     ! Zooplankton preference for small bacteria [dimensionless]
     ! Landry (2025) J. Plankton Res. --> find that ~100 mg C m-2 day-1 of ~500 mg C m-2 d-1
     !  of microzooplankton grazing/biomass gain comes from large bacterivory
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefsbac', wombat%zprefsbac, 0.50)
+    call g_tracer_add_param('zprefsbac', wombat%zprefsbac, 1.00)
 
     ! Zooplankton preference for ammonia oxidizing archaea [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefaoa', wombat%zprefaoa, 0.50)
+    call g_tracer_add_param('zprefaoa', wombat%zprefaoa, 1.00)
 
     ! Zooplankton preference for nano-phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
@@ -5496,32 +5496,30 @@ module generic_WOMBATmid
       ! Determine other resource yields during bacterial growth
       !!!~~~ Large, sharing bacteria ~~~!!!
       ! aerobic conditions
-      if (wombat%lbacydoc(i,j,k) > 0.0) lbac_cdoc = 1.0 / wombat%lbacydoc(i,j,k) ! The amount of DOC consumed per mol of large bacterial C-biomass produced
-      lbac_coxy = max(0.0, e_lres - wombat%lbacydoc(i,j,k)*e_bac)/4.0 * lbac_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
-      lbac_pdoc = wombat%lbac_alpha * lbac_cdoc ! The amount of partially oxidized product produced per mol of C-biomass produced
-      lbac_pco2 = (1.0 - wombat%lbac_alpha - wombat%lbacydoc(i,j,k)) * lbac_cdoc ! The amount of CO2 produced per mol of C-biomass produced
-      lbac_pnh4 = (ldom_N2C - wombat%lbac_alpha * ldom_N2C*0.0 &
-                 - 1.0/wombat%bac_C2N * wombat%lbacydoc(i,j,k)) * lbac_cdoc ! The amount of NH4 produced per mol of C-biomass produced
+      if (wombat%lbacydoc(i,j,k) > 0.0) lbac_cdoc = 1.0 / wombat%lbacydoc(i,j,k) ! DOC consumed per mol C-biomass
+      lbac_coxy = max(0.0, e_lres - wombat%lbacydoc(i,j,k)*e_bac)/4.0 * lbac_cdoc ! O2 consumed per mol of C-biomass
+      lbac_pdoc = wombat%lbac_alpha * lbac_cdoc ! partially oxidized product produced per mol of C-biomas
+      lbac_pco2 = (1.0 - wombat%lbac_alpha) * lbac_cdoc - 1.0 ! CO2 produced per mol of C-biomass
+      lbac_pnh4 = (ldom_N2C - wombat%lbac_alpha*ldom_N2C*0.0) * lbac_cdoc - 1.0/wombat%bac_C2N  ! NH4 produced
       ! anaerobic conditions
       lbacydoc_ana = min(1.0 - wombat%lbac_alpha, wombat%lbac_fele * 0.9 * e_lres/e_bac)
-      if (lbacydoc_ana > 0.0) lbac_cdoc_ana = 1.0 / lbacydoc_ana ! The amount of DOC consumed per mol of lbacterial C-biomass produced
-      lbac_cno3_ana = max(0.0, e_lres * lbacydoc_ana*e_bac)/4.0 * lbac_cdoc_ana ! The amount of N (NO3 --> N2O) molecules consumed per mol of C-biomass produced
-      lbac_pdoc_ana = wombat%lbac_alpha * lbac_cdoc_ana ! The amount of partially oxidized product produced per mol of C-biomass produced
-      lbac_pco2_ana = (1.0 - wombat%lbac_alpha - lbacydoc_ana) * lbac_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
-      lbac_pnh4_ana = (ldom_N2C - wombat%lbac_alpha * ldom_N2C*0.0 &
-                     - 1.0/wombat%bac_C2N * lbacydoc_ana) * lbac_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
+      if (lbacydoc_ana > 0.0) lbac_cdoc_ana = 1.0 / lbacydoc_ana ! DOC consumed per mol of C-biomass
+      lbac_cno3_ana = max(0.0, e_lres - lbacydoc_ana*e_bac)/4.0 * lbac_cdoc_ana ! N (NO3 --> N2O) molecules consumed per mol C-biomass
+      lbac_pdoc_ana = wombat%lbac_alpha * lbac_cdoc_ana ! partially oxidized product produced per mol of C-biomass
+      lbac_pco2_ana = (1.0 - wombat%lbac_alpha) * lbac_cdoc_ana - 1.0 ! CO2 produced per mol of C-biomass
+      lbac_pnh4_ana = (ldom_N2C - wombat%lbac_alpha * ldom_N2C*0.0 ) * lbac_cdoc_ana - 1.0/wombat%bac_C2N  ! NH4 produced
       !!!~~~ Small, selfish bacteria ~~~!!!
       ! aerobic conditions
-      if (wombat%sbacydoc(i,j,k) > 0.0) sbac_cdoc = 1.0 / wombat%sbacydoc(i,j,k) ! The amount of DOC consumed per mol of small bacterial C-biomass produced
-      sbac_coxy = max(0.0, e_sdom - wombat%sbacydoc(i,j,k)*e_bac)/4.0 * sbac_cdoc ! The amount of oxygen consumed per mol of C-biomass produced
-      sbac_pco2 = (1.0 - wombat%sbacydoc(i,j,k)) * sbac_cdoc ! The amount of CO2 produced per mol of C-biomass produced
-      sbac_pnh4 = (sdom_N2C - 1.0/wombat%bac_C2N * wombat%sbacydoc(i,j,k)) * sbac_cdoc ! The amount of NH4 produced per mol of C-biomass produced
+      if (wombat%sbacydoc(i,j,k) > 0.0) sbac_cdoc = 1.0 / wombat%sbacydoc(i,j,k) ! DOC consumed per mol C-biomass
+      sbac_coxy = max(0.0, e_sdom - wombat%sbacydoc(i,j,k)*e_bac)/4.0 * sbac_cdoc ! O2 consumed per mol of C-biomass
+      sbac_pco2 = sbac_cdoc - 1.0 ! CO2 produced per mol of C-biomass
+      sbac_pnh4 = sdom_N2C*sbac_cdoc - 1.0/wombat%bac_C2N ! NH4 produced per mol of C-biomass
       ! anaerobic conditions
       sbacydoc_ana = wombat%sbac_fele * 0.9 * e_sdom/e_bac
-      if (sbacydoc_ana > 0.0) sbac_cdoc_ana = 1.0 / sbacydoc_ana ! The amount of DOC consumed per mol of lbacterial C-biomass produced
-      sbac_cno3_ana = max(0.0, e_sdom * sbacydoc_ana*e_bac)/4.0 * sbac_cdoc_ana ! The amount of N (NO3 --> N2O) molecules consumed per mol of C-biomass produced
-      sbac_pco2_ana = (1.0 - sbacydoc_ana) * sbac_cdoc_ana ! The amount of CO2 produced per mol of C-biomass produced
-      sbac_pnh4_ana = (sdom_N2C - 1.0/wombat%bac_C2N * sbacydoc_ana) * sbac_cdoc_ana ! The amount of NH4 produced per mol of C-biomass produced
+      if (sbacydoc_ana > 0.0) sbac_cdoc_ana = 1.0 / sbacydoc_ana ! DOC consumed per mol C-biomass
+      sbac_cno3_ana = max(0.0, e_sdom - sbacydoc_ana*e_bac)/4.0 * sbac_cdoc_ana ! N (NO3 --> N2O) molecules consumed per mol of C-biomass
+      sbac_pco2_ana = sbac_cdoc_ana - 1.0 ! CO2 produced per mol of C-biomass
+      sbac_pnh4_ana = sdom_N2C*sbac_cdoc_ana - 1.0/wombat%bac_C2N ! NH4 produced per mol of C-biomass
 
       ! Determine growth rates
       !!!~~~ Large, sharing bacteria ~~~!!!
