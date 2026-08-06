@@ -459,10 +459,6 @@ module generic_WOMBATmid
         sedomega_cal
 
     real, dimension(:,:,:), allocatable :: &
-        f_dic, &
-        f_alk, &
-        f_no3, &
-        f_sil, &
         radbio, &
         radmid, &
         radmld, &
@@ -4129,14 +4125,10 @@ module generic_WOMBATmid
     ! and pco2surf, so it makes sense to set these values here rather than
     ! recalculating them in set_boundary_values.
 
-    call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=tau, &
-        positive=.true.)
-    call g_tracer_get_values(tracer_list, 'no3', 'field', wombat%f_no3, isd, jsd, ntau=tau, &
-        positive=.true.)
-    call g_tracer_get_values(tracer_list, 'sil', 'field', wombat%f_sil, isd, jsd, ntau=tau, &
-        positive=.true.)
-    call g_tracer_get_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=tau, &
-        positive=.true.)
+    call g_tracer_get_pointer(tracer_list, 'dic', 'field', wombat%p_dic) ! [mol/kg]
+    call g_tracer_get_pointer(tracer_list, 'no3', 'field', wombat%p_no3) ! [mol/kg]
+    call g_tracer_get_pointer(tracer_list, 'sil', 'field', wombat%p_sil) ! [mol/kg]
+    call g_tracer_get_pointer(tracer_list, 'alk', 'field', wombat%p_alk) ! [mol/kg]
 
     do k = 1,nk !{
      do j = jsc,jec; do i = isc,iec
@@ -4147,10 +4139,10 @@ module generic_WOMBATmid
      if (k==1) then !{
        call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,k), &
            Temp(:,:,k), Salt(:,:,k), &
-           wombat%f_dic(:,:,k), &
-           wombat%f_no3(:,:,k) / 16., &
-           wombat%f_sil(:,:,k), &
-           wombat%f_alk(:,:,k), &
+           max(0.0, wombat%p_dic(:,:,k,tau)), &
+           max(0.0, wombat%p_no3(:,:,k,tau) / 16.), &
+           max(0.0, wombat%p_sil(:,:,k,tau)), &
+           max(0.0, wombat%p_alk(:,:,k,tau)), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
            wombat%htotal(:,:,k), &
            co2_calc=trim(co2_calc), &
@@ -4167,10 +4159,10 @@ module generic_WOMBATmid
 
        call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,k), &
            Temp(:,:,k), Salt(:,:,k), &
-           wombat%f_dic(:,:,k), &
-           wombat%f_no3(:,:,k) / 16., &
-           wombat%f_sil(:,:,k), &
-           wombat%f_alk(:,:,k), &
+           max(0.0, wombat%p_dic(:,:,k,tau)), &
+           max(0.0, wombat%p_no3(:,:,k,tau) / 16.), &
+           max(0.0, wombat%p_sil(:,:,k,tau)), &
+           max(0.0, wombat%p_alk(:,:,k,tau)), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
            wombat%htotal(:,:,k), &
            co2_calc=trim(co2_calc), &
@@ -4894,7 +4886,7 @@ module generic_WOMBATmid
                     * max(0.01, min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) ) )
       theta_opt = max(wombat%phyminqc, theta_opt)
       wombat%pchl_mu(i,j,k) = wombat%phy_mu(i,j,k) * pchl_p &
-                            + max(0.0, theta_opt - phy_chlc) / wombat%chltau * phy_p
+                            + (theta_opt - phy_chlc) / wombat%chltau * phy_p
 
       !!!~~~ Microphytoplankton ~~~!!!
       theta_opt = wombat%diamaxqc / (1.0 + &
@@ -4903,7 +4895,7 @@ module generic_WOMBATmid
                     * max(0.01, min(wombat%dia_lnit(i,j,k), wombat%dia_lfer(i,j,k))) ) )
       theta_opt = max(wombat%diaminqc, theta_opt)
       wombat%dchl_mu(i,j,k) = wombat%dia_mu(i,j,k) * dchl_p &
-                            + max(0.0, theta_opt - dia_chlc) / wombat%chltau * dia_p
+                            + (theta_opt - dia_chlc) / wombat%chltau * dia_p
 
 
       !-----------------------------------------------------------------------!
@@ -5483,8 +5475,8 @@ module generic_WOMBATmid
       sdom_N2C = 0.0 ! pjb - currently no sDON, but there could be (e.g., amino acids)
 
       ! Determine the biomass yield in terms of carbon (mol C-biomass per mol DOC consumed)
-      wombat%lbacydoc(i,j,k) = min(1.0 - wombat%lbac_alpha, wombat%lbac_fele * e_lres/e_bac)
-      wombat%sbacydoc(i,j,k) = wombat%sbac_fele * e_sdom/e_bac
+      wombat%lbacydoc(i,j,k) = max(0.0, min(1.0 - wombat%lbac_alpha, wombat%lbac_fele * e_lres/e_bac))
+      wombat%sbacydoc(i,j,k) = max(0.0, wombat%sbac_fele * e_sdom/e_bac)
 
       lbac_cdoc = 0.0; sbac_cdoc = 0.0 ! reinitialise for safety
       lbac_cdoc_ana = 0.0; sbac_cdoc_ana = 0.0 ! reinitialise for safety
@@ -6847,11 +6839,11 @@ module generic_WOMBATmid
     enddo; enddo
 
     call FMS_ocmip2_co2calc(CO2_dope_vec, wombat%sedmask(:,:), &
-        wombat%sedtemp(:,:), max(1.0, wombat%sedsalt(:,:)), &
-        wombat%seddic(:,:), &
-        max(wombat%sedno3(:,:) / 16., 1e-9), &
-        wombat%sedsil(:,:), &
-        wombat%sedalk(:,:), &
+        wombat%sedtemp(:,:), wombat%sedsalt(:,:), &
+        max(0.0, wombat%seddic(:,:)), &
+        max(0.0, wombat%sedno3(:,:) / 16.), &
+        max(0.0, wombat%sedsil(:,:)), &
+        max(0.0, wombat%sedalk(:,:)), &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_lo, &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_hi, &
         wombat%sedhtotal(:,:), &
@@ -7913,14 +7905,10 @@ module generic_WOMBATmid
     ! Since the coupler values here are non-cumulative there is no need to zero them out anyway.
     if (wombat%init .OR. wombat%force_update_fluxes) then
       ! Get necessary fields
-      call g_tracer_get_values(tracer_list, 'dic', 'field', wombat%f_dic, isd, jsd, ntau=1, &
-          positive=.true.)
-      call g_tracer_get_values(tracer_list, 'no3', 'field', wombat%f_no3, isd, jsd, ntau=1, &
-          positive=.true.)
-      call g_tracer_get_values(tracer_list, 'sil', 'field', wombat%f_sil, isd, jsd, ntau=1, &
-          positive=.true.)
-      call g_tracer_get_values(tracer_list, 'alk', 'field', wombat%f_alk, isd, jsd, ntau=1, &
-          positive=.true.)
+      call g_tracer_get_pointer(tracer_list, 'dic', 'field', wombat%p_dic) ! [mol/kg]
+      call g_tracer_get_pointer(tracer_list, 'no3', 'field', wombat%p_no3) ! [mol/kg]
+      call g_tracer_get_pointer(tracer_list, 'sil', 'field', wombat%p_sil) ! [mol/kg]
+      call g_tracer_get_pointer(tracer_list, 'alk', 'field', wombat%p_alk) ! [mol/kg]
 
       do j = jsc, jec; do i = isc, iec
           wombat%htotallo(i,j) = wombat%htotal_scale_lo * wombat%htotal(i,j,1)
@@ -7934,10 +7922,10 @@ module generic_WOMBATmid
 
       call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,1), &
           SST(:,:), SSS(:,:), &
-          wombat%f_dic(:,:,1), &
-          wombat%f_no3(:,:,1) / 16., &
-          wombat%f_sil(:,:,1), &
-          wombat%f_alk(:,:,1), &
+          max(0.0, wombat%p_dic(:,:,1,tau)), &
+          max(0.0, wombat%p_no3(:,:,1,tau) / 16.), &
+          max(0.0, wombat%p_sil(:,:,1,tau)), &
+          max(0.0, wombat%p_alk(:,:,1,tau)), &
           wombat%htotallo(:,:), wombat%htotalhi(:,:), &
           wombat%htotal(:,:,1), &
           co2_calc=trim(co2_calc), &
@@ -8091,11 +8079,6 @@ module generic_WOMBATmid
     allocate(wombat%nh4_vstf(isd:ied, jsd:jed)); wombat%nh4_vstf(:,:)=0.0
     allocate(wombat%dic_vstf(isd:ied, jsd:jed)); wombat%dic_vstf(:,:)=0.0
     allocate(wombat%alk_vstf(isd:ied, jsd:jed)); wombat%alk_vstf(:,:)=0.0
-
-    allocate(wombat%f_dic(isd:ied, jsd:jed, 1:nk)); wombat%f_dic(:,:,:)=0.0
-    allocate(wombat%f_alk(isd:ied, jsd:jed, 1:nk)); wombat%f_alk(:,:,:)=0.0
-    allocate(wombat%f_no3(isd:ied, jsd:jed, 1:nk)); wombat%f_no3(:,:,:)=0.0
-    allocate(wombat%f_sil(isd:ied, jsd:jed, 1:nk)); wombat%f_sil(:,:,:)=0.0
 
     allocate(wombat%b_ldoc(isd:ied, jsd:jed)); wombat%b_ldoc(:,:)=0.0
     allocate(wombat%b_sdoc(isd:ied, jsd:jed)); wombat%b_sdoc(:,:)=0.0
@@ -8358,12 +8341,6 @@ module generic_WOMBATmid
         wombat%nh4_vstf, &
         wombat%dic_vstf, &
         wombat%alk_vstf)
-
-    deallocate( &
-        wombat%f_dic, &
-        wombat%f_alk, &
-        wombat%f_no3, &
-        wombat%f_sil )
 
     deallocate( &
         wombat%b_ldoc, &
