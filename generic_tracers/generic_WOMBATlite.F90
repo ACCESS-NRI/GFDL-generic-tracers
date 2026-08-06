@@ -2237,7 +2237,7 @@ module generic_WOMBATlite
        call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,k), &
            Temp(:,:,k), Salt(:,:,k), &
            max(0.0, wombat%p_dic(:,:,k,tau)), &
-           max(1e-9, wombat%p_no3(:,:,k,tau) / 16.), &
+           max(0.0, wombat%p_no3(:,:,k,tau) / 16.), &
            wombat%sio2(:,:), &
            max(0.0, wombat%p_alk(:,:,k,tau)), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
@@ -2257,7 +2257,7 @@ module generic_WOMBATlite
        call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,k), &
            Temp(:,:,k), Salt(:,:,k), &
            max(0.0, wombat%p_dic(:,:,k,tau)), &
-           max(1e-9, wombat%p_no3(:,:,k,tau) / 16.), &
+           max(0.0, wombat%p_no3(:,:,k,tau) / 16.), &
            wombat%sio2(:,:), &
            max(0.0, wombat%p_alk(:,:,k,tau)), &
            wombat%htotallo(:,:), wombat%htotalhi(:,:), &
@@ -3418,7 +3418,7 @@ module generic_WOMBATlite
     call FMS_ocmip2_co2calc(CO2_dope_vec, wombat%sedmask(:,:), &
         wombat%sedtemp(:,:), wombat%sedsalt(:,:), &
         max(0.0, wombat%seddic(:,:)), &
-        max(1e-9, wombat%sedno3(:,:) / 16.), &
+        max(0.0, wombat%sedno3(:,:) / 16.), &
         wombat%sio2(:,:), & ! dts: This is currently constant, equal to wombat%sio2_surf
         max(0.0, wombat%sedalk(:,:)), &
         wombat%sedhtotal(:,:)*wombat%htotal_scale_lo, &
@@ -3924,7 +3924,7 @@ module generic_WOMBATlite
       call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,1), &
           SST(:,:), SSS(:,:), &
           max(0.0, wombat%p_dic(:,:,1,1)), &
-          max(1e-9, wombat%p_no3(:,:,1,1) / 16.), &
+          max(0.0, wombat%p_no3(:,:,1,1) / 16.), &
           wombat%sio2(:,:), &
           max(0.0, wombat%p_alk(:,:,1,1)), &
           wombat%htotallo(:,:), wombat%htotalhi(:,:), &
