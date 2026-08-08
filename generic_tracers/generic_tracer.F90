@@ -115,6 +115,11 @@ module generic_tracer
   use generic_WOMBATmid, only : generic_WOMBATmid_update_from_bottom, generic_WOMBATmid_update_from_coupler
   use generic_WOMBATmid, only : generic_WOMBATmid_set_boundary_values, generic_WOMBATmid_end, do_generic_WOMBATmid
 
+  use generic_WOMBATfull, only : generic_WOMBATfull_register
+  use generic_WOMBATfull, only : generic_WOMBATfull_init, generic_WOMBATfull_update_from_source, generic_WOMBATfull_register_diag
+  use generic_WOMBATfull, only : generic_WOMBATfull_update_from_bottom, generic_WOMBATfull_update_from_coupler
+  use generic_WOMBATfull, only : generic_WOMBATfull_set_boundary_values, generic_WOMBATfull_end, do_generic_WOMBATfull
+
   implicit none ; private
 
   character(len=fm_string_len), parameter :: mod_name       = 'generic_tracer'
@@ -153,7 +158,7 @@ module generic_tracer
 
   namelist /generic_tracer_nml/ do_generic_tracer, do_generic_abiotic, do_generic_age, do_generic_argon, do_generic_CFC, &
       do_generic_SF6, do_generic_TOPAZ,do_generic_ERGOM, do_generic_BLING, do_generic_miniBLING, do_generic_COBALT, &
-      do_generic_WOMBATlite, do_generic_WOMBATmid, force_update_fluxes, do_generic_blres, as_param
+      do_generic_WOMBATlite, do_generic_WOMBATmid, do_generic_WOMBATfull, force_update_fluxes, do_generic_blres, as_param
 
 contains
 
@@ -227,6 +232,9 @@ contains
     if(do_generic_WOMBATmid) &
          call generic_WOMBATmid_register(tracer_list)
     
+    if(do_generic_WOMBATfull) &
+         call generic_WOMBATfull_register(tracer_list)
+    
     call g_tracer_print_info(tracer_list, verbosity)
 
     generic_tracer_register_called = .true.
@@ -277,7 +285,7 @@ contains
     !JGJ 2013/05/31  merged COBALT into siena_201303
     if(do_generic_abiotic .or. do_generic_age .or. do_generic_argon .or. do_generic_CFC .or. do_generic_SF6 .or. do_generic_TOPAZ &
        .or. do_generic_ERGOM .or. do_generic_BLING .or. do_generic_miniBLING .or. do_generic_COBALT .or. do_generic_WOMBATlite &
-       .or. do_generic_WOMBATmid .or. do_generic_blres) then
+       .or. do_generic_WOMBATmid .or. do_generic_WOMBATfull .or. do_generic_blres) then
        g_tracer => tracer_list        
        !Go through the list of tracers 
        do  
@@ -331,6 +339,9 @@ contains
     if(do_generic_WOMBATmid) &
          call generic_WOMBATmid_init(tracer_list, force_update_fluxes)
 
+    if(do_generic_WOMBATfull) &
+         call generic_WOMBATfull_init(tracer_list, force_update_fluxes)
+
   end subroutine generic_tracer_init
 
   subroutine generic_tracer_register_diag
@@ -342,7 +353,7 @@ contains
 
     if(do_generic_abiotic .or. do_generic_age .or. do_generic_argon .or. do_generic_CFC .or. do_generic_SF6 .or. do_generic_TOPAZ &
        .or. do_generic_ERGOM .or. do_generic_BLING .or. do_generic_miniBLING .or. do_generic_COBALT .or. do_generic_WOMBATlite &
-       .or. do_generic_WOMBATmid .or. do_generic_blres) then
+       .or. do_generic_WOMBATmid .or. do_generic_WOMBATfull .or. do_generic_blres) then
 
        g_tracer => tracer_list        
        !Go through the list of tracers 
@@ -378,6 +389,8 @@ contains
     if(do_generic_WOMBATlite)  call generic_WOMBATlite_register_diag(diag_list)
 
     if(do_generic_WOMBATmid)  call generic_WOMBATmid_register_diag(diag_list)
+
+    if(do_generic_WOMBATfull)  call generic_WOMBATfull_register_diag(diag_list)
 
   end subroutine generic_tracer_register_diag
 
@@ -596,6 +609,10 @@ contains
          hblt_depth,ilb,jlb,tau,dtts,grid_dat,model_time,&
          nbands,max_wavelength_band,sw_pen_band,opacity_band)
 
+    if(do_generic_WOMBATfull)  call generic_WOMBATfull_update_from_source(tracer_list,Temp,Salt,rho_dzt,dzt,&
+         hblt_depth,ilb,jlb,tau,dtts,grid_dat,model_time,&
+         nbands,max_wavelength_band,sw_pen_band,opacity_band)
+
     return
 
   end subroutine generic_tracer_source
@@ -649,6 +666,8 @@ contains
 
     if(do_generic_WOMBATmid)  call generic_WOMBATmid_update_from_bottom(tracer_list,dt, tau, model_time)
 
+    if(do_generic_WOMBATfull)  call generic_WOMBATfull_update_from_bottom(tracer_list,dt, tau, model_time)
+
     return
 
   end subroutine generic_tracer_update_from_bottom
@@ -700,6 +719,8 @@ contains
 
     if(do_generic_WOMBATmid)  call generic_WOMBATmid_update_from_coupler(tracer_list, ilb, jlb, salt_flux_added)
 
+    if(do_generic_WOMBATfull)  call generic_WOMBATfull_update_from_coupler(tracer_list, ilb, jlb, salt_flux_added)
+
     return
 
    end subroutine generic_tracer_update_from_coupler
@@ -731,7 +752,7 @@ contains
     !JGJ 2013/05/31  merged COBALT into siena_201303
     if(do_generic_abiotic .or. do_generic_age .or. do_generic_argon .or. do_generic_CFC .or. do_generic_SF6 .or. do_generic_TOPAZ &
        .or. do_generic_ERGOM .or. do_generic_BLING .or. do_generic_miniBLING .or. do_generic_COBALT .or. do_generic_WOMBATlite &
-       .or. do_generic_WOMBATmid .or. do_generic_blres) then
+       .or. do_generic_WOMBATmid .or. do_generic_WOMBATfull .or. do_generic_blres) then
 
        g_tracer => tracer_list        
        !Go through the list of tracers 
@@ -773,7 +794,7 @@ contains
     !JGJ 2013/05/31  merged COBALT into siena_201303
     if(do_generic_age .or. do_generic_argon .or. do_generic_CFC .or. do_generic_TOPAZ .or. do_generic_ERGOM &
        .or. do_generic_BLING .or. do_generic_miniBLING .or. do_generic_COBALT .or. do_generic_WOMBATlite &
-       .or. do_generic_WOMBATmid .or. do_generic_blres) then
+       .or. do_generic_WOMBATmid .or. do_generic_WOMBATfull .or. do_generic_blres) then
 
        g_tracer => tracer_list        
        !Go through the list of tracers 
@@ -878,6 +899,9 @@ contains
     if(do_generic_WOMBATmid) &
          call generic_WOMBATmid_set_boundary_values(tracer_list,ST,SS,rho,ilb,jlb,tau,dzt)
 
+    if(do_generic_WOMBATfull) &
+         call generic_WOMBATfull_set_boundary_values(tracer_list,ST,SS,rho,ilb,jlb,tau,dzt)
+
     !
     !Set coupler fluxes from tracer boundary values (%alpha and %csurf)
     !for each tracer in the tracer_list that has been marked by the user routine above
@@ -885,7 +909,7 @@ contains
     !
     if(do_generic_abiotic .or. do_generic_age .or. do_generic_argon .or. do_generic_CFC .or. do_generic_SF6 .or. do_generic_TOPAZ &
       .or. do_generic_ERGOM .or. do_generic_BLING .or. do_generic_miniBLING .or. do_generic_COBALT .or. do_generic_WOMBATlite &
-      .or. do_generic_WOMBATmid .or. do_generic_blres) &
+      .or. do_generic_WOMBATmid .or. do_generic_WOMBATfull .or. do_generic_blres) &
        call g_tracer_coupler_set(tracer_list,IOB_struc)
 
   end subroutine generic_tracer_coupler_set
@@ -933,6 +957,7 @@ contains
     if(do_generic_COBALT)  call generic_COBALT_end
     if(do_generic_WOMBATlite)  call generic_WOMBATlite_end
     if(do_generic_WOMBATmid)  call generic_WOMBATmid_end
+    if(do_generic_WOMBATfull)  call generic_WOMBATfull_end
 
   end subroutine generic_tracer_end
 

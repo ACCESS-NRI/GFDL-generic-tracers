@@ -6,3 +6,4 @@ You can navigate this documentation using the pane on the left. Some pages that 
 
 - [WOMBATlite model description](Model_description/WOMBATlite_model_description/)
 - [WOMBATmid model description](Model_description/WOMBATmid_model_description/)
+- [WOMBATfull model description](Model_description/WOMBATfull_model_description/)
