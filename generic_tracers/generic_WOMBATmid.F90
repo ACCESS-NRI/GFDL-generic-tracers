@@ -319,14 +319,13 @@ module generic_WOMBATmid
         bsi_alpha, &
         bsi_fbac, &
         bsi_kbac, &
-        bsilrem_sed, &
         aoa_knh4, &
         aoa_poxy, &
         aoa_ynh4, &
         aoa_yoxy, &
         bac_C2N, &
-        aoxkn, &
-        aoxmumax, &
+        aox_kn, &
+        aox_mumax, &
         dt_npzd, &
         sal_global, &
         dic_global, &
@@ -2430,7 +2429,7 @@ module generic_WOMBATmid
     !            and 1/10000 per day in deep ocean
     call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400.0)
 
-    ! Rate of aggregation of colloidal iron into authigenic Fe particles [µmolFe/m3 s-1]
+    ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kagg_col', wombat%kagg_col, 0.1/86400.0)
 
@@ -2469,13 +2468,6 @@ module generic_WOMBATmid
     !-----------------------------------------------------------------------
     call g_tracer_add_param('bsi_kbac', wombat%bsi_kbac, 0.5)
 
-    ! Rate of biogenic silica dissolution in the sediments when at near-total undersaturation [s-1]
-    !-----------------------------------------------------------------------
-    !  Maximum rate of ~1.0 nmol/g biogenic silica s-1 at 0 degrees and 0 cm sediment depth at near-total
-    !  undersaturation, equivalent to 2.8e-8 /s dissolution rate [Fig. 11 in Van Cappellen & Qiu, 1997]
-    !  - this very low rate accounts for the factors in sediments that retard dissolution [Van Cappellen et al., 2002 GBC]
-    call g_tracer_add_param('bsilrem_sed', wombat%bsilrem_sed, 2.8e-8)
-
     ! Ammonia Oxidizing Archaea half saturation constant for NH4 uptake [mmolN/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoa_knh4', wombat%aoa_knh4, 0.1)
@@ -2494,11 +2486,11 @@ module generic_WOMBATmid
 
     ! Anammox bacteria half saturation constant for ammonium uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoxkn', wombat%aoxkn, 0.5)
+    call g_tracer_add_param('aox_kn', wombat%aox_kn, 0.5)
 
     ! Anammox bacteria maximum growth * biomass rate [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoxmumax', wombat%aoxmumax, 0.0025/86400.0)
+    call g_tracer_add_param('aox_mumax', wombat%aox_mumax, 0.0025/86400.0)
 
     ! Bottom thickness [m]
     !-----------------------------------------------------------------------
@@ -4287,7 +4279,7 @@ module generic_WOMBATmid
                + feagg4*(doc_mmolm3 + 40.0) + feagg5*sdet_mmolm3 ) * wombat%kcoag_dfe
       wombat%fecoag2safe(i,j,k) = wombat%fecol(i,j,k) * zval
       ! Include an aggregation of colloidal authigenic Fe when concentration of colloidal Fe is high
-      wombat%fecoag2safe(i,j,k) = wombat%fecoag2safe(i,j,k) + wombat%kagg_col &
+      wombat%fecoag2safe(i,j,k) = wombat%fecoag2safe(i,j,k) + wombat%fecol(i,j,k) * wombat%kagg_col &
                                  * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4)
       ! Colloidal shunt associated with big particles (Tagliabue et al., 2023)
       feagg1 = 1.37
@@ -4631,8 +4623,8 @@ module generic_WOMBATmid
 
       if (do_anammox) then
         ! Anaerobic ammonium oxidation (anammox)
-        wombat%aox_lnh4(i,j,k) = nh4_mmolm3 / (nh4_mmolm3 + wombat%aoxkn)
-        wombat%aox_mu(i,j,k) = wombat%aoxmumax * wombat%bbioh**(Temp(i,j,k)) &
+        wombat%aox_lnh4(i,j,k) = nh4_mmolm3 / (nh4_mmolm3 + wombat%aox_kn)
+        wombat%aox_mu(i,j,k) = wombat%aox_mumax * wombat%bbioh**(Temp(i,j,k)) &
                                * (1.0 - wombat%aoa_loxy(i,j,k)) * wombat%aox_lnh4(i,j,k)
       endif
 

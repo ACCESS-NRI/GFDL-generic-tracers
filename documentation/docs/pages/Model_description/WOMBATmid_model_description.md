@@ -26,7 +26,7 @@ _Dougie.Squire@anu.edu.au_
 - Light is split into blue, green and red wavelengths and attenuated at rates dependent on ambient chlorophyll, organic particulate and inorganic particulate  (CaCO<sub>3</sub>) concentrations. <br>
 - Nano- and Micro-phytoplankton perform photo-acclimation by altering their chlorophyll to carbon ratios according to the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation. <br>
 - Nano- and Micro-phytoplankton nutrient affinities for nitrogen, iron and silicic acid vary as a function of mean cell size via allometric relationships ([Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901)). <br>
-- Nano- and Micro-phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, but micro-phytoplankton have a growth advantage over nano-phytoplankton in high NO<sub>3<sub> conditions ([Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/))
+- Nano- and Micro-phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, but micro-phytoplankton have a growth advantage over nano-phytoplankton in high NO<sub>3</sub> conditions ([Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/))
 - Nano- and Micro-phytoplankton growth is limited by an internal quota model for iron (Fe) ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)) that responds to the cellular demands for nitrate reduction, respiration and chlorophyll, and represents luxury uptake. <br>
 - Micro-phytoplankton growth is limited by an internal Si quota that gates division and varies Si:C ratios ([Liu et al., 2016](https://doi.org/10.3389/fmars.2016.00089); [Hutchins & Bruland 1998](https://doi.org/10.1038/31203); [Takeda 1998](https://doi.org/10.1038/31674)).
 - Nano- and Micro-phytoplankton exude dissolved organic matter in the form of carbohydrate (CH<sub>2</sub>O) when under high light and nutrient limited conditions ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)).
@@ -210,7 +210,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 | `dia_lpar`         | Limitation of micro-phytoplankton by light                                         | dimensionless                                   |
 | `dia_kni`          | Half-saturation coefficient of nitrogen uptake by micro-phytoplankton              | mmol N m<sup>-3</sup>                           |
 | `dia_kfe`          | Half-saturation coefficient of iron uptake by micro-phytoplankton                  | µmol Fe m<sup>-3</sup>                          |
-| `dia_ksi`          | Half-saturation coefficient of silicic acid uptake by micro-phytoplankton          | µmol Si m<sup>-3</sup>                          |
+| `dia_ksi`          | Half-saturation coefficient of silicic acid uptake by micro-phytoplankton          | mmol Si m<sup>-3</sup>                          |
 | `dia_lnit`         | Limitation of micro-phytoplankton by nitrogen                                      | dimensionless                                   |
 | `dia_lnh4`         | Limitation of micro-phytoplankton by ammonium                                      | dimensionless                                   |
 | `dia_lno3`         | Limitation of micro-phytoplankton by nitrate                                       | dimensionless                                   |
@@ -405,7 +405,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `zooqmor`          | Micro-zooplankton quadratic mortality rate                                  | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `zoopreyswitch`    | Micro-zooplankton prey switching exponent                                   | 1.8           | dimensionless                                                        |
 | `mesCingest`       | Meso-zooplankton C ingestion                                                | 0.75          | mol C (mol C)<sup>-1</sup>                                           |
-| `mesCassim`        | Meso-zooplankton C assimilation                                             | 0.30          | mol C (mol C)<sup>-1</sup>                                           |
+| `mesCassim`        | Meso-zooplankton C assimilation                                             | 0.50          | mol C (mol C)<sup>-1</sup>                                           |
 | `mesFeingest`      | Meso-zooplankton Fe ingestion                                               | 0.43          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `mesFeassim`       | Meso-zooplankton Fe assimilation                                            | 0.75          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `mesexcrdom`       | Meso-zooplankton excretion fraction routed to DOM                           | 0.35          | dimensionless                                                        |
@@ -453,14 +453,14 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `klafe_dfe`        | Authigenic iron dissolution rate (large)                                    | 1e-4/86400    | s<sup>-1</sup>                                                       |
 | `wsafe`            | Authigenic iron sinking rate (small)                                        | 0.5/86400     | m s<sup>-1</sup>                                                     |
 | `wlafe`            | Authigenic iron sinking rate (large)                                        | 5.0/86400     | m s<sup>-1</sup>                                                     |
-| `bsi_alpha`        | Natural-log intercept of temperature-dependent biogenic silica dissolution  | -10           | ln(per hour)                                                    |
+| `bsi_alpha`        | Natural-log intercept of temperature-dependent biogenic silica dissolution  | -10           | ln(per hour)                                                         |
 | `bsi_fbac`         | Bacterial enhancement factor for silica dissolution                         | 10            | dimensionless                                                        |
 | `bsi_kbac`         | Half-saturation coefficient for bacterial enhancement of silica dissolution | 0.5           | mmol C m<sup>-3</sup>                                                |
 | `bsilrem_sed`      | Base sediment biogenic silica dissolution rate                              | 2.8e-8        | s<sup>-1</sup>                                                       |
 | `aoa_knh4`         | AOA NH<sub>4</sub> half-saturation coefficient                              | 0.1           | mmol N m<sup>-3</sup>                                                |
 | `aoa_poxy`         | AOA O<sub>2</sub> diffusive uptake limit                                    | 275/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
-| `aoa_ynh4`         | AOA NH<sub>4</sub> demand per C biomass                                     | 11.0          | mmol N (mol C)<sup>-1</sup>                                                |
-| `aoa_yoxy`         | AOA O<sub>2</sub> demand per C biomass                                      | 15.5          | mmol O<sub>2</sub> (mol C)<sup>-1</sup>                                                |
+| `aoa_ynh4`         | AOA NH<sub>4</sub> demand per C biomass                                     | 11.0          | mol N (mol C)<sup>-1</sup>                                           |
+| `aoa_yoxy`         | AOA O<sub>2</sub> demand per C biomass                                      | 15.5          | mol O<sub>2</sub> (mol C)<sup>-1</sup>                               |
 | `aoxkn`            | Anammox NH<sub>4</sub> half-saturation coefficient                          | 0.5           | mmol N m<sup>-3</sup>                                                |
 | `aoxmumax`         | Anammox maximum growth rate                                                 | 0.0025/86400  | s<sup>-1</sup>                                                       |
 | `bottom_thickness` | Bottom layer thickness                                                      | 0.1           | m                                                                    |
@@ -537,7 +537,7 @@ The euphotic depth (`zeuphot(i,j)`, [m]) is defined as the depth where `radbio` 
 
 ### 2. Nutrient limitation of phytoplankton.
 
-At the start of each vertical loop `k=1` through `k=kmax` the code computes the biomass of nano-phytoplankton (`phy_mmolm3`, $B_{np}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton (`dia_mmolm3`, $B_{mp}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how nitrogen in the form of nitrate (`no3_mmolm3`, NO<sub>3</sub>, [mmol N m<sup>-3</sup>]) and ammonium (`nh4_mmolm3`, NH<sub>4</sub>, [mmol N m<sup>-3</sup>]), dissolved iron (`fe_umolm3`, $dFe$, [µmol dFe m<sup>-3</sup>]) and silicic acid in the case of micro-phytoplankton (`sil_mmolm3`, H<sub>4</sub>SiO<sub>4</sub>, [mmol S m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
+At the start of each vertical loop `k=1` through `k=kmax` the code computes the biomass of nano-phytoplankton (`phy_mmolm3`, $B_{np}$, [mmol C m<sup>-3</sup>]) and micro-phytoplankton (`dia_mmolm3`, $B_{mp}$, [mmol C m<sup>-3</sup>]). Phytoplankton biomass is used to scale how nitrogen in the form of nitrate (`no3_mmolm3`, NO<sub>3</sub>, [mmol N m<sup>-3</sup>]) and ammonium (`nh4_mmolm3`, NH<sub>4</sub>, [mmol N m<sup>-3</sup>]), dissolved iron (`fe_umolm3`, $dFe$, [µmol dFe m<sup>-3</sup>]) and silicic acid in the case of micro-phytoplankton (`sil_mmolm3`, H<sub>4</sub>SiO<sub>4</sub>, [mmol Si m<sup>-3</sup>]) affect the growth of phytoplankton. Using compilations of marine phytoplankton and zooplankton communities, [Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901) show that the nutrient affinity, $aff$, of a phytoplankton cell is related to its volume, $V$, via
 
 $$
 \begin{align}
@@ -696,7 +696,7 @@ This formulation treats silicification as linearly limiting to growth between th
 
 **Autotrophy**
 
-The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\mu_{np}^{max}$, [day<sup>-1</sup>]) and micro-phytoplankton (`dia_mumax(i,j,k)`, $\mu_{mp}^{max}$, [day<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
+The maximum potential growth rate for nano-phytoplankton (`phy_mumax(i,j,k)`, $\mu_{np}^{max}$, [s<sup>-1</sup>]) and micro-phytoplankton (`dia_mumax(i,j,k)`, $\mu_{mp}^{max}$, [s<sup>-1</sup>]) is prescribed by the temperature-dependent Eppley curve ([Eppley, 1972](https://spo.nmfs.noaa.gov/content/temperature-and-phytoplankton-growth-sea)). This formulation scales a reference growth rate at 0ºC via a power-law scaling with temperature (`Temp(i,j,k)`, $T$, [ºC]).
 
 $$
 \begin{align}
@@ -1051,7 +1051,7 @@ $$
 \begin{align}
 T_K =& \quad \max(5.0, T) + 273.15 \\
 \left(T_K\right)^{-1} =& \quad \dfrac{1}{T_K} \\
-I_{S} =& \quad \dfrac{19.924,S}{1000 - 1.005,S}
+I_{S} =& \quad \dfrac{19.924 S}{1000 - 1.005 S}
 \end{align}
 $$
 
@@ -1059,11 +1059,11 @@ Solubility constants:
 
 $$
 \begin{align}
-Fe_{sol1} =& \quad 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254,\left(T_K\right)^{-1}\right)} \\
-Fe_{sol2} =& \quad 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320,\left(T_K\right)^{-1}\right)} \\
-Fe_{sol3} =& \quad 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996,\left(T_K\right)^{-1}\right)} \\
-Fe_{sol4} =& \quad 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086,\left(T_K\right)^{-1}\right)} \\
-Fe_{sol5} =& \quad 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980,\left(T_K\right)^{-1}\right)}
+Fe_{sol1} =& \quad 10^{\left(-13.486 - 0.1856\sqrt{I_S} + 0.3073 I_S + 5254 \left(T_K\right)^{-1}\right)} \\
+Fe_{sol2} =& \quad 10^{\left(2.517 - 0.8885\sqrt{I_S} + 0.2139 I_S - 1320 \left(T_K\right)^{-1}\right)} \\
+Fe_{sol3} =& \quad 10^{\left(0.4511 - 0.3305\sqrt{I_S} - 1996 \left(T_K\right)^{-1}\right)} \\
+Fe_{sol4} =& \quad 10^{\left(-0.2965 - 0.7881\sqrt{I_S} - 4086 \left(T_K\right)^{-1}\right)} \\
+Fe_{sol5} =& \quad 10^{\left(4.4466 - 0.8505\sqrt{I_S} - 7980 \left(T_K\right)^{-1}\right)}
 \end{align}
 $$
 
@@ -1108,7 +1108,7 @@ The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is 
 $$
 \begin{align}
 Lig_{s}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) \\
-             & \qquad                        - \left(-0.7 \dfrac{PAR}{PAR + 10}\right)} \\
+             & \qquad                        - \left(0.7 \dfrac{PAR}{PAR + 10}\right)} \\
              & \qquad                   + 10^{\left(-0.0002 \left(B_{DOM}^{C} + 40\right)^{2} + 0.034 \cdot \left(B_{DOM}^{C} + 40\right) - 1.67 \cdot pH + 24.36\right)} \bigg)
 \end{align}
 $$
@@ -1257,12 +1257,13 @@ The colloidal aggregation term:
 
 $$
 \begin{align}
-S_{agg}^{sA} =& \gamma_{dFe}^{agg} \cdot \dfrac{\left(dFe_{col}\right)^{4}}{\left(dFe_{col}\right)^{4} + \left(K_{dFe}^{agg}\right)^{4}} \\ 
+S_{agg}^{sA} =& \gamma_{dFe}^{agg} \cdot dFe_{col} \cdot \dfrac{\left(dFe_{col}\right)^{4}}{\left(dFe_{col}\right)^{4} + \left(K_{dFe}^{agg}\right)^{4}} \\ 
 \end{align}
 $$
 
 _where_ >br>
-- $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [µmol Fe m<sup>-3</sup> s<sup>-1</sup>]) <br>
+- $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
+- $dFe_{col}$ is the in situ concentration of dissolved colloidal iron (`fecol(i,j,k)`, [mol Fe kg<sup>-1</sup>]) <br>
 - $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
 
 is added directly on top of the small colloidal coagulation term, $Co_{dFe}^{\rightarrow Fe_{sA}}$.
@@ -1418,7 +1419,6 @@ $$
 _where_ <br>
 - $[H_{4}SiO_{4}]$ is the in situ concentration of H<sub>4</sub>SiO<sub>4</sub> (`p_sil(i,j,k)`, [mol Si kg<sup>-1</sup>]) <br>
 - $[H_{4}SiO_{4}]^{eq}$ is the equilibrium concentration of H<sub>4</sub>SiO<sub>4</sub> (`sileqc(i,j,k)`, [mol Si kg<sup>-1</sup>]) <br>
-- we use an exponent of $2$ informed by the organic carbon-rich biogenic silica dissolution kinetics reported in Table 3.4 of [Rickert, 2000](https://epic.awi.de/id/eprint/26530/1/BerPolarforsch2000351.pdf) <br>
 
 The scaling term associated with activity of heterotrophic bacteria is informed by substantial evidence. According to [Rickert et al., 2002](https://doi.org/10.1016/S0016-7037(01)00757-8) "The removal of organic or inorganic coatings enhance the reactivity by at least an order of magnitude". Order of magnitude increases in silica dissolution have been reported for diatom frustules in contact with bacteria ([Bidle & Azam, 1999](https://doi.org/10.1038/17351)), while anti-biotic treatments to mesocosms off Monterey Bay caused silica dissolution to reduced by 50% ([Bidle et al., 2003](https://doi.org/10.4319/lo.2003.48.5.1855)). We represent this bacterially-induced stimulation of dissolution with
 
@@ -1554,7 +1554,7 @@ $$
 
 The community average prey capture rate coefficients of micro-zooplankton (`zooeps(i,j,k)`, $\varepsilon_{mz}$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) and meso-zooplankton (`meseps(i,j,k)`, $\varepsilon_{Mz}$, [(mmol C m<sup>-3</sup>)<sup>-2</sup>]) vary as a function of the prey biomasses and the consequential variations in prey preferences associated with prey-switching, which is consistent with the prey-dependent behaviour described by [Rohr et al. (2024)](doi.org/10.1029/2023GL107732). 
 
-Total grazing of biomass by micro-zooplankton ([mol C kg<sup>-1</sup> day<sup>-1</sup>]) is therefore
+Total grazing of biomass by micro-zooplankton ([mol C kg<sup>-1</sup> s<sup>-1</sup>]) is therefore
 
 $$
 \begin{align}
@@ -2643,7 +2643,7 @@ D_{CaCO_{3},sed} =& \quad d_{CaCO_{3},sed} \left(β_{hete}\right)^{T} \left(1 - 
 $$
 
 _where_ <br>
-- $d_{CaCO_{3},sed}$ is a base rate of dissolution in units of [day<sup>-1</sup>] <br>
+- $d_{CaCO_{3},sed}$ is a base rate of dissolution in units of [s<sup>-1</sup>] <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
 - $\Omega_{cal,sed}$ is the calcite saturation state within sedimentary pore waters (`sedomega_cal(i,j)`, [dimensionless]) <br>
