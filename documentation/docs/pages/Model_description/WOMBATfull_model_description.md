@@ -1,4 +1,4 @@
-# Description of the WOMBATmid ocean biogeochemical model
+# Description of the WOMBATfull ocean biogeochemical model
 
 ```
         (\___/)  .-.   .-. .--. .-..-..---.  .--. .-----.
@@ -17,7 +17,7 @@ _Dougie.Squire@anu.edu.au_
 
 ---
 
-![schematic](/assets/schematic-mid.png)
+![schematic](/assets/schematic-full.png)
 
 ## Executive summary
 
@@ -47,7 +47,7 @@ _Dougie.Squire@anu.edu.au_
 
 ## Tracers
 
-The following are the active tracers in WOMBAT-mid
+The following are the active tracers in WOMBAT-full
 
 | #    | Tracer                        | Code name  | Description                                         | Units                     | Default on? |
 |------|-------------------------------|------------|-----------------------------------------------------|---------------------------|-------------|
@@ -110,7 +110,7 @@ We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic var
 
 ## Diagnostic outputs
 
-The following are all **2D** diagnostic output variables from WOMBAT-mid.
+The following are all **2D** diagnostic output variables from WOMBAT-full.
 
 | Diagnostic        | Description                                                                                          | Units                                |
 | ----------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------ |
@@ -171,7 +171,7 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `alk_btf`         | Bottom flux of alkalinity into ocean                                                                 | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
 
 
-The following are all **3D** diagnostic output variables from WOMBAT-mid.
+The following are all **3D** diagnostic output variables from WOMBAT-full.
 
 | Diagnostic         | Description                                                                        | Units                                           |
 | ------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -317,7 +317,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 
 ## Subroutine - "update_from_source"
 
-The subroutine `generic_WOMBATmid_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics (WOMBAT). Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, particulate detritus, dissolved and particulate iron, dissolved organics carbon, alkalinity, oxygen and carbon pools) at each time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
+The subroutine `generic_WOMBATfull_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics (WOMBAT). Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, particulate detritus, dissolved and particulate iron, dissolved organics carbon, alkalinity, oxygen and carbon pools) at each time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
 
 1. Light attenuation through the water column.
 2. Nutrient limitation of phytoplankton.
@@ -479,7 +479,7 @@ For chlorophyll, attenuation coefficients for each of blue, green and red light 
 
 For organic detritus, attenuation coefficients for blue, green and red light (`dbgr(b)`, [(mg N m<sup>-3</sup>)<sup>-1</sup> m<sup>-1</sup>]) are taken from [Dutkiewicz et al. (2015)](https://bg.copernicus.org/articles/12/4447/2015/bg-12-4447-2015.html) (their Fig. 1b), while for calcium carbonate (`cbgr(b)`, [(kg CaCO<sub>3</sub> m<sup>-3</sup>)<sup>-1</sup>m<sup>-1</sup>]) we take the coefficients defined in [Soja-Wozniak et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019JC014998). For both detritus and calcium carbonate, these studies provide concentration-normalized attenuation coefficients, which must be multiplied against concentrations to retrieve the correct units of [m<sup>-1</sup>].
 
-Because WOMBAT-mid has two forms of phytoplankton (nanophytoplankton and microphytoplankton) with their own chlorophyll quotas and two forms of particulate detritus (small and large), we sum both chlorophyll pools and particulate detritus pools to return the total chlorophyll and the total particulate detritus. 
+Because WOMBAT-full has two forms of phytoplankton (nanophytoplankton and microphytoplankton) with their own chlorophyll quotas and two forms of particulate detritus (small and large), we sum both chlorophyll pools and particulate detritus pools to return the total chlorophyll and the total particulate detritus. 
 
 As an example, the PAR in the blue band (`b=1`) at the top of level k is computed as
 
@@ -733,7 +733,7 @@ In the code, the combined term $\left(β_{hete}\right)^{T}$ is saved as `fbc`. S
 
 **POM --> DOM**
 
-WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM). The hydrolysation rate of small sinking organic detritus (`sdetremi(i,j,k)`, $\Gamma_{sd}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`ldetremi(i,j,k)`, $\Gamma_{ld}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
+WOMBAT-full considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM). The hydrolysation rate of small sinking organic detritus (`sdetremi(i,j,k)`, $\Gamma_{sd}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`ldetremi(i,j,k)`, $\Gamma_{ld}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
 
 $$
 \begin{align}
@@ -752,7 +752,7 @@ It is well appreciated that nitrogen is preferentially remineralised back to ino
 
 **DOM --> inorganic nutrients**
 
-WOMBAT-mid considers the remineralisation of the dissolved inorganic matter (`docremi(i,j,k)`, $\Gamma_{doc}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) as:
+WOMBAT-full considers the remineralisation of the dissolved inorganic matter (`docremi(i,j,k)`, $\Gamma_{doc}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) as:
 
 $$
 \begin{align}
@@ -939,7 +939,7 @@ This formulation elevates chlorophyll-to-carbon ratios in low light and supresse
 
 ### 8. Phytoplankton uptake of iron
 
-Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. First, a maximum quota is found based on the maximum Fe:C ratio of the phytoplankton type:
+Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-full. First, a maximum quota is found based on the maximum Fe:C ratio of the phytoplankton type:
 
 $$
 \begin{align}
@@ -1004,7 +1004,7 @@ _where_ <br>
 
 ### 9. Phytoplankton uptake of silicic acid.
 
-Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{\leftarrow Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
+Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-full. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{\leftarrow Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 $$
 \begin{align}
@@ -1103,7 +1103,7 @@ When `do_two_ligands == .false.`, we use a single ligand class and solve for the
 
 In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we solve for the stability constant of the strong (`ligK(i,j,k)`) and weak ligands (`ligW_K`), but take the concentration-weighted average binding strength to get the bulk ligand binding stregnth.
 
-The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-full, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
@@ -1724,7 +1724,7 @@ _where_ <br>
 
 When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model computes both particulate inorganic carbon production (via the PIC:POC ratio) and $CaCO_3$ dissolution rates as functions of carbonate chemistry, temperature, and organic matter availability.
 
-**Production** of $CaCO_3$ in WOMBAT-mid comes from five sources: (1) density-dependent mortality of nano-phytoplankton (i.e., coccolithophorids), (2) density-dependent mortality of micro-zooplankton (i.e., foraminifera), (3) micro-zooplankton egestion of grazed nano-phytoplankton, (4) meso-zooplankton egestion of grazed nano-phytoplankton, and (5) meso-zooplankton egestion of grazed micro-zooplankton. Each term is multiplied by the particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) to return a rate of $CaCO_3$ production in mol C kg<sup>-1</sup> s<sup>-1</sup>.
+**Production** of $CaCO_3$ in WOMBAT-full comes from five sources: (1) density-dependent mortality of nano-phytoplankton (i.e., coccolithophorids), (2) density-dependent mortality of micro-zooplankton (i.e., foraminifera), (3) micro-zooplankton egestion of grazed nano-phytoplankton, (4) meso-zooplankton egestion of grazed nano-phytoplankton, and (5) meso-zooplankton egestion of grazed micro-zooplankton. Each term is multiplied by the particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) to return a rate of $CaCO_3$ production in mol C kg<sup>-1</sup> s<sup>-1</sup>.
 
 $$
 \begin{align}
@@ -1823,7 +1823,7 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 
 ### 16. Chemoautotrophy.
 
-We consider two forms of chemoautotrophy carried out by two distinct forms of microbes: ammonia oxidizing archaea and anaerobic ammonia oxidizing (anammox) bacteria. Both are considered implicitly within WOMBAT-mid and therefore do not have varying biomasses (i.e., we only compute rates of inorganic nitrogen conversions). Anammox may be turned on when `do_anammox == .true.`.
+We consider two forms of chemoautotrophy carried out by two distinct forms of microbes: ammonia oxidizing archaea and anaerobic ammonia oxidizing (anammox) bacteria. Both are considered implicitly within WOMBAT-full and therefore do not have varying biomasses (i.e., we only compute rates of inorganic nitrogen conversions). Anammox may be turned on when `do_anammox == .true.`.
 
 **Ammonia oxidation**
 
@@ -1856,7 +1856,7 @@ _where_ <br>
 - NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`nh4_mmolm3`, [mmol N m<sup>-3</sup>]) <br>
 - O<sub>2</sub> is the in situ concentration of O<sub>2</sub>$ (`oxy_mmolm3`, [mmol O<sub>2</sub> m<sup>-3</sup>]) <br>
 
-In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-mid we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-mid we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> ([mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
+In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-full we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-full we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> ([mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
 
 $$
 \begin{align}
@@ -1873,7 +1873,7 @@ _where_ <br>
 
 **Anaerobic ammonia oxidizing (anammox) bacteria**
 
-Anammox bacteria are considered to be an implicit population within WOMBAT-mid when `do_anammox == .true.` and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. This nitrogen is then permanently lost from the ocean. We perform this metabolism as:
+Anammox bacteria are considered to be an implicit population within WOMBAT-full when `do_anammox == .true.` and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. This nitrogen is then permanently lost from the ocean. We perform this metabolism as:
 
 $$
 \begin{align}
@@ -1912,7 +1912,7 @@ The code treats multiple concentration-dependent losses semi-implicitly. These a
 - DOC remineralisation ($\Gamma_{doc}^{\rightarrow C}$ for `p_doc`);
 - CaCO<sub>3</sub> dissolution (all dissolution terms for `p_caco3`).
 
-All production terms for the involved tracers are evaluated explicitly using forward euler timestepping, while these concentration-dependent loss terms are solved implicitly using the backward euler timestepping (i.e., where the loss term is evaluated on the future (n+1) tracer concentration). This makes the the time-stepping scheme "semi-implicit" for these tracers. Please see the Tracer Tendency step in the `generic_WOMBATmid.F90` code for details.
+All production terms for the involved tracers are evaluated explicitly using forward euler timestepping, while these concentration-dependent loss terms are solved implicitly using the backward euler timestepping (i.e., where the loss term is evaluated on the future (n+1) tracer concentration). This makes the the time-stepping scheme "semi-implicit" for these tracers. Please see the Tracer Tendency step in the `generic_WOMBATfull.F90` code for details.
 
 **Nano-phytoplankton** (`p_phy(i,j,k)`, $B_{np}^{C}$, [mol C kg<sup>-1</sup>])
 
@@ -2298,13 +2298,13 @@ $$
 
 ### 18. Check for conservation of mass
 
-When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.` or `do_check_si_conserve = .true.` or `do_check_fe_conserve = .true.`), the model will calculate the budget of nitrogen or carbon or silicon or iron before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of these elements within the ocean. In WOMBAT-mid, these elements should be perfectly conserved during ecosystem cycling. The exception to this is for nitrogen, where if any of `do_nitrogen_fixation = .true.`, `do_anammox = .true.`, or `do_benthic_denitrification = .true.` then the model does not and should not be expected to conserve nitrogen.
+When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.` or `do_check_si_conserve = .true.` or `do_check_fe_conserve = .true.`), the model will calculate the budget of nitrogen or carbon or silicon or iron before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of these elements within the ocean. In WOMBAT-full, these elements should be perfectly conserved during ecosystem cycling. The exception to this is for nitrogen, where if any of `do_nitrogen_fixation = .true.`, `do_anammox = .true.`, or `do_benthic_denitrification = .true.` then the model does not and should not be expected to conserve nitrogen.
 
 ---
 
 ### 19. Additional operations on tracers
 
-**First**, dissolved iron concentrations are set to equal 1 nM in grid cells in contact with the sediment where the depth of the water column is less than 200 metres deep. WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we set the dissolved iron concentration in these bottom waters to 1 nM.
+**First**, dissolved iron concentrations are set to equal 1 nM in grid cells in contact with the sediment where the depth of the water column is less than 200 metres deep. WOMBAT-full is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we set the dissolved iron concentration in these bottom waters to 1 nM.
 
 **Second**, if dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)) in off-shelf waters, we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
 
@@ -2321,7 +2321,7 @@ This resetting of minimum dFe concentration functions as a constant source of dF
 
 ### 20. Sinking rate of particulates.
 
-WOMBAT-mid functions with a spatially variable sinking rate of organic detritus (`p_sdet(i,j,k)`; `p_ldet(i,j,k)`), calcium carbonate (`p_caco3(i,j,k)`) and biogenic silica (`p_ldetsi(i,j,k)`). Sinking of organic iron (`p_sdetfe(i,j,k)`; `p_ldetfe(i,j,k)`)occurs at the same rate as their respective organic particulate carbon types, while small and large authigenic iron particles (`p_safe(i,j,k)`; `p_lafe(i,j,k)`) sink at their own unique rates. The algorithm to compute sinking rates functions by computing:
+WOMBAT-full functions with a spatially variable sinking rate of organic detritus (`p_sdet(i,j,k)`; `p_ldet(i,j,k)`), calcium carbonate (`p_caco3(i,j,k)`) and biogenic silica (`p_ldetsi(i,j,k)`). Sinking of organic iron (`p_sdetfe(i,j,k)`; `p_ldetfe(i,j,k)`)occurs at the same rate as their respective organic particulate carbon types, while small and large authigenic iron particles (`p_safe(i,j,k)`; `p_lafe(i,j,k)`) sink at their own unique rates. The algorithm to compute sinking rates functions by computing:
 
 1. the average radii of particles in the community;
 2. the seawater dynamic viscosity (if `do_viscous_sinking =.true.`);
@@ -2496,7 +2496,7 @@ which we apply above to calculate the dynamic viscosity of seawater ($\eta_{sw}$
 
 **Mineral ballasting and excess density**
 
-WOMBAT-mid explicitly considers small organic carbon, large aggregates of organic carbon, $CaCO_3$ and biogenic silica. Each of these particulate types have unique densities. We compute the mass of each particulate type in [kg m</sup>-3</sup>]:
+WOMBAT-full explicitly considers small organic carbon, large aggregates of organic carbon, $CaCO_3$ and biogenic silica. Each of these particulate types have unique densities. We compute the mass of each particulate type in [kg m</sup>-3</sup>]:
 
 $$
 \begin{align}
@@ -2586,7 +2586,7 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 
 Sediment sources to the ocean are recorded as negative `btf` values.
 
-WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), ammonium (NH<sub>4</sub>), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
+WOMBAT-full tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), ammonium (NH<sub>4</sub>), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
 
 **Organics**
@@ -2700,7 +2700,7 @@ $$
 
 ## Subroutine - "update_from_bottom"
 
-The subroutine `generic_WOMBATmid_update_from_bottom` moves sinking organic material from the water column into the sediment pools.
+The subroutine `generic_WOMBATfull_update_from_bottom` moves sinking organic material from the water column into the sediment pools.
 It is at this point that the model performs permanent burial of sinking organic matter if desired.
 
 ---
