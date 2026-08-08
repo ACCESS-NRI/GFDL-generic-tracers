@@ -19,6 +19,32 @@ _Dougie.Squire@anu.edu.au_
 
 ![schematic](/assets/schematic-mid.png)
 
+## Executive summary
+
+- Currency of biomasses are in carbon units <br>
+- Carbon chemistry uses the `mocsy` system by default ([Orr & Epitalon, 2015](https://gmd.copernicus.org/articles/8/485/2015/))
+- Light is split into blue, green and red wavelengths and attenuated at rates dependent on ambient chlorophyll, organic particulate and inorganic particulate  (CaCO<sub>3</sub>) concentrations. <br>
+- Nano- and Micro-phytoplankton perform photo-acclimation by altering their chlorophyll to carbon ratios according to the [Geider, MacIntyre & Kana (1997)](https://doi.org/10.3354/meps148187) formulation. <br>
+- Nano- and Micro-phytoplankton nutrient affinities for nitrogen, iron and silicic acid vary as a function of mean cell size via allometric relationships ([Wickman et al. (2024)](https://www.science.org/doi/10.1126/science.adk6901)). <br>
+- Nano- and Micro-phytoplankton prefer NH<sub>4</sub> over NO<sub>3</sub>, but micro-phytoplankton have a growth advantage over nano-phytoplankton in high NO<sub>3<sub> conditions ([Buchanan et al., 2025](https://bg.copernicus.org/articles/22/4865/2025/))
+- Nano- and Micro-phytoplankton growth is limited by an internal quota model for iron (Fe) ([Droop, 1983](https://www.degruyterbrill.com/document/doi/10.1515/botm.1983.26.3.99/html)) that responds to the cellular demands for nitrate reduction, respiration and chlorophyll, and represents luxury uptake. <br>
+- Micro-phytoplankton growth is limited by an internal Si quota that gates division and varies Si:C ratios ([Liu et al., 2016](https://doi.org/10.3389/fmars.2016.00089); [Hutchins & Bruland 1998](https://doi.org/10.1038/31203); [Takeda 1998](https://doi.org/10.1038/31674)).
+- Nano- and Micro-phytoplankton exude dissolved organic matter in the form of carbohydrate (CH<sub>2</sub>O) when under high light and nutrient limited conditions ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)).
+- The iron (Fe) cycle follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5) to reflect varying Fe chemistry (solubility, ligand binding), scavenging and colloidal coagulation to sinking authigenic phases. <br>
+- Biogenic silica (BSi) dissolution is informed by thermodynamics ([Van Cappellen et al., 2002](https://doi.org/10.1029/2001GB001431]()), temperature ([Kamatani, 1982](https://doi.org/10.1007/BF00393146)) and the activitiy of an implicit particle-associated heterotrophic bacteria ([Bidle & Azam, 1999](https://doi.org/10.1038/17351)).
+- Micro- and Meso-zooplankton grazing assumes a Holling Type III functional form ([Holling, 1959](https://doi.org/10.4039/Ent91385-7)) and active switching between prey types ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)). <br>
+- Micro- and Meso-zooplankton routes Fe preferentially to egestion (i.e., faecal pellets) following [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597), enriching detritus in Fe. <br>
+- Micro- and Meso-zooplankton dissolve CaCO<sub>3</sub> ([Smith et al., 2024](https://doi.org/10.1126/sciadv.adr5453); [White et al., 2018](https://doi.org/10.1038/s41598-018-28073-x); [Harris, 1994](https://doi.org/10.1007/BF00347540)) but conserve biogenic silica due to acidic conditions in their gut ([Dagg et al., 2003](https://doi.org/10.1016/S0967-0645(02)00590-8); [Taucher et al., 2022](https://www.nature.com/articles/s41586-022-04687-0)).
+- The nitrogen cycle can be made to be open, with schemes for nitrogen fixation, anammox, and sedimentary denitrification that can be switched on or off at run time. <br>
+- Nitrification of NH<sub>4</sub> to NO<sub>3</sub> is performed by an implicit population of ammonia oxidizing archaea.
+- Hydrolysation of particulate organic matter releases dissolved iron, ammonium and dissolved organic carbon, reflecting the preferential remineralisation of iron and nitrogen to inorganic forms before carbon.
+- CaCO<sub>3</sub> cycling is a function of the ambient seawater carbonate chemistry: production is affected by the substrate-inhibitor ratio ([Lehmann & Bach, 2025](https://www.nature.com/articles/s41561-025-01644-0)); dissolution occurs in saturated waters ($\Omega$ > 1) due to reducing micro-environments and undersaturated waters ($\Omega$ < 1) ([Kwon et al., 2024](https://www.science.org/doi/full/10.1126/sciadv.adl0779)). <br>
+- Sinking of small and large particulates is a function of mean radius, seawater dynamic viscosity and their excess density ([Rubey, 1933](https://doi.org/10.2475/ajs.s5-25.148.325)). Radius varies via allometric scalings (e.g., [Wickman et al., 2024]((https://www.science.org/doi/10.1126/science.adk6901))), dynamic viscosity via thermohaline properties, and excess density by CaCO<sub>3</sub> and biogenic silica contents of the particles. <br>
+- External sources of nitrate, DIC, alkalinity silicic acid and DOC via rivers. <br>
+- Permanent burial of organics in sediments via [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907). <br>
+- External source of dissolved iron from aeolian deposition that includes mineral, fire and anthropogenic sources ([Hamilton et al., 2020](https://doi.org/10.1029/2019GB006448)). <br>
+- Major calibration and optimization of the model parameters... incoming. <br>
+
 ## Tracers
 
 The following are the active tracers in WOMBAT-mid
@@ -52,7 +78,7 @@ The following are the active tracers in WOMBAT-mid
 | 25   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
 | 26   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
 | 27   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
-| 28   | DICp                          | -          | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
+| 28   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
 | 29   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
 
 ---
@@ -110,6 +136,7 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `sedmask`         | Mask of active sediment points                                                                       | dimensionless                        |
 | `sedtemp`         | Temperature in the bottom layer                                                                      | °C                                   |
 | `sedsalt`         | Salinity in the bottom layer                                                                         | psu                                  |
+| `sedo2`           | Oxygen concentration in the bottom layer                                                             | mol O<sub>2</sub> kg<sup>-1</sup>    |
 | `sedno3`          | Nitrate concentration in the bottom layer                                                            | mol N kg<sup>-1</sup>                |
 | `sednh4`          | Ammonium concentration in the bottom layer                                                           | mol N kg<sup>-1</sup>                |
 | `sedsil`          | Silicic acid concentration in the bottom layer                                                       | mol Si kg<sup>-1</sup>               |
@@ -119,7 +146,6 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `sedco3`          | CO₃<sup>2−</sup> ion concentration in the bottom layer                                               | mol C kg<sup>-1</sup>                |
 | `sedomega_cal`    | Calcite saturation state in the bottom layer                                                         | dimensionless                        |
 | `o2_stf`          | Surface flux of dissolved oxygen into ocean                                                          | mol O2 m<sup>-2</sup> s<sup>-1</sup> |
-| `n2o_stf`         | Surface flux of nitrous oxide into ocean                                                             | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `nh4_stf`         | Surface flux of ammonium into ocean                                                                  | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `no3_stf`         | Surface flux of nitrate into ocean                                                                   | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `sil_stf`         | Surface flux of silicic acid into ocean                                                              | mol Si m<sup>-2</sup> s<sup>-1</sup> |
@@ -141,7 +167,7 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `doc_btf`         | Bottom flux of dissolved organic carbon into ocean                                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `fe_btf`          | Bottom flux of dissolved iron into ocean                                                             | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `dic_btf`         | Bottom flux of dissolved inorganic carbon into ocean                                                 | mol C m<sup>-2</sup> s<sup>-1</sup>  |
-| `dicr_btf`        | Bottom flux of preformed dissolved inorganic carbon into ocean                                       | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `dicr_btf`        | Bottom flux of remineralised dissolved inorganic carbon into ocean                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `alk_btf`         | Bottom flux of alkalinity into ocean                                                                 | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
 
 
@@ -212,7 +238,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 | `fecol`            | Colloidal dissolved iron                                                           | mol Fe kg<sup>-1</sup>                          |
 | `fescasafe`        | Scavenging of free Fe onto small authigenic particles due to smaller organics      | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `fescalafe`        | Scavenging of free Fe onto large authigenic particles due to larger organics       | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
-| `fecaog2safe`      | Coagulation of colloidal dFe onto small authigenic particles                       | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
+| `fecoag2safe`      | Coagulation of colloidal dFe onto small authigenic particles                       | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `fecoag2lafe`      | Coagulation of colloidal dFe onto large authigenic particles                       | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `safediss`         | Dissolution of small colloidal authigenic Fe particles                             | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `lafediss`         | Dissolution of large colloidal authigenic Fe particles                             | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
@@ -291,10 +317,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 
 ## Subroutine - "update_from_source"
 
-The subroutine `generic_WOMBATmid_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics. 
-Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, bacteria, particulate
-detritus, dissolved and particulate iron, dissolved organics, alkalinity, nitrous oxide, oxygen and carbon pools) at each time‑step. 
-The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
+The subroutine `generic_WOMBATmid_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics (WOMBAT). Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, particulate detritus, dissolved and particulate iron, dissolved organics carbon, alkalinity, oxygen and carbon pools) at each time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
 
 1. Light attenuation through the water column.
 2. Nutrient limitation of phytoplankton.
@@ -318,9 +341,7 @@ The subroutine is documented internally by a list of numbered steps (see code co
 20. Sinking rate of particulates.
 21. Sedimentary processes.
 
-Below is a step‑by‑step explanation of each section together with the key equations. Variable names in `grey` follow the Fortran code, while 
-variable names in $math font$ are pointers to the equations; `i,j,k` refer to horizontal and vertical indices; [square brackets] denote units. 
-If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
+Below is a step‑by‑step explanation of each section together with the key equations. Variable names in `grey` follow the Fortran code, while variable names in $math font$ are pointers to the equations; `i,j,k` refer to horizontal and vertical indices; [square brackets] denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
 The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kilogram of seawater (i.e., molality). Some calculations herein are performed by converting tracers to units of [mmol m-3] or in the case of dissolved iron [µmol m-3]. However, we stress that all tracer tendency terms are converted back to [mol kg-1 s-1] when sources and sinks are applied.
 
@@ -373,14 +394,13 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `zooFeingest`      | Micro-zooplankton Fe ingestion efficiency                                   | 0.06          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `zooFeassim`       | Micro-zooplankton Fe assimilation efficiency                                | 0.60          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `zooexcrdom`       | Micro-zooplankton excretion fraction routed to DOM                          | 0.70          | dimensionless                                                        |
-| `zookz`            | Micro-zooplankton mortality half-saturation coefficient                     | 0.25          | mmol C m<sup>-3</sup>                                                |
 | `zoogmax`          | Micro-zooplankton max grazing rate                                          | 3.3/86400.0   | s<sup>-1</sup>                                                       |
 | `zooepsphy`        | Micro-zooplankton prey capture efficiency (nano-phytoplankton)              | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `zooepsdia`        | Micro-zooplankton prey capture efficiency (micro-phytoplankton)             | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `zooepssdet`       | Micro-zooplankton prey capture efficiency (small detritus)                  | 0.25/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepssdet`       | Micro-zooplankton prey capture efficiency (small detritus)                  | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `zprefphy`         | Micro-zooplankton preference (nano-phytoplankton)                           | 1.0           | dimensionless                                                        |
 | `zprefdia`         | Micro-zooplankton preference (micro-phytoplankton)                          | 0.25          | dimensionless                                                        |
-| `zprefsdet`        | Micro-zooplankton preference (small detritus)                               | 0.80          | dimensionless                                                        |
+| `zprefsdet`        | Micro-zooplankton preference (small detritus)                               | 1.0           | dimensionless                                                        |
 | `zoolmor`          | Micro-zooplankton linear mortality rate                                     | 0.002/86400.0 | s<sup>-1</sup>                                                       |
 | `zooqmor`          | Micro-zooplankton quadratic mortality rate                                  | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `zoopreyswitch`    | Micro-zooplankton prey switching exponent                                   | 1.8           | dimensionless                                                        |
@@ -389,18 +409,17 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `mesFeingest`      | Meso-zooplankton Fe ingestion                                               | 0.43          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `mesFeassim`       | Meso-zooplankton Fe assimilation                                            | 0.75          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `mesexcrdom`       | Meso-zooplankton excretion fraction routed to DOM                           | 0.35          | dimensionless                                                        |
-| `meskz`            | Meso-zooplankton mortality half-saturation coefficient                      | 0.30          | mmol C m<sup>-3</sup>                                                |
 | `mesgmax`          | Meso-zooplankton maximum grazing rate                                       | 0.30/86400.0  | s<sup>-1</sup>                                                       |
 | `mesepsphy`        | Meso-zooplankton prey capture efficiency (nano-phytoplankton)               | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepsdia`        | Meso-zooplankton prey capture efficiency (micro-phytoplankton)              | 0.20/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepssdet`       | Meso-zooplankton prey capture efficiency (small detritus)                   | 0.05/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepsldet`       | Meso-zooplankton prey capture efficiency (large detritus)                   | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepszoo`        | Meso-zooplankton prey capture efficiency (micro-zooplankton)                | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mprefphy`         | Meso-zooplankton preference (nano-phytoplankton)                            | 0.1           | dimensionless                                                        |
-| `mprefdia`         | Meso-zooplankton preference (micro-phytoplankton)                           | 0.85          | dimensionless                                                        |
-| `mprefsdet`        | Meso-zooplankton preference (small detritus)                                | 0.80          | dimensionless                                                        |
-| `mprefldet`        | Meso-zooplankton preference (large detritus)                                | 0.80          | dimensionless                                                        |
-| `mprefzoo`         | Meso-zooplankton preference (micro-zooplankton)                             | 0.85          | dimensionless                                                        |
+| `mprefphy`         | Meso-zooplankton preference (nano-phytoplankton)                            | 0.5           | dimensionless                                                        |
+| `mprefdia`         | Meso-zooplankton preference (micro-phytoplankton)                           | 1.0           | dimensionless                                                        |
+| `mprefsdet`        | Meso-zooplankton preference (small detritus)                                | 1.0           | dimensionless                                                        |
+| `mprefldet`        | Meso-zooplankton preference (large detritus)                                | 1.0           | dimensionless                                                        |
+| `mprefzoo`         | Meso-zooplankton preference (micro-zooplankton)                             | 1.0           | dimensionless                                                        |
 | `meslmor`          | Meso-zooplankton linear mortality rate                                      | 0.002/86400.0 | s<sup>-1</sup>                                                       |
 | `mesqmor`          | Meso-zooplankton quadratic mortality rate                                   | 0.75/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `mespreyswitch`    | Meso-zooplankton prey switching exponent                                    | 1.8           | dimensionless                                                        |
@@ -427,21 +446,24 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
 | `dfefloor`         | Minimum open water concentration of dissolved iron (detection limit)        | 0.025         | µmol Fe m<sup>-3</sup>                                               |
 | `kscav_dfe`        | Free dissolved iron scavenging rate                                         | 0.01/86400.0  | (mmol mass of particle m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>   |
-| `kcoag_dfe`        | Colloidal dissolved iron coagulation rate                                   | 1e-6/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
+| `kcoag_dfe`        | Colloidal dissolved iron coagulation rate                                   | 1e-5/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `kagg_col`         | Colloidal dissolved iron aggregation rate                                   | 0.1/86400.0   | s<sup>-1</sup>                                                       |
 | `kagg_kcol`        | Half-saturation coefficient for colloidal iron aggregation                  | 2.0           | µmol Fe m<sup>-3</sup>                                               |
 | `ksafe_dfe`        | Authigenic iron dissolution rate (small)                                    | 1e-4/86400    | s<sup>-1</sup>                                                       |
 | `klafe_dfe`        | Authigenic iron dissolution rate (large)                                    | 1e-4/86400    | s<sup>-1</sup>                                                       |
 | `wsafe`            | Authigenic iron sinking rate (small)                                        | 0.5/86400     | m s<sup>-1</sup>                                                     |
 | `wlafe`            | Authigenic iron sinking rate (large)                                        | 5.0/86400     | m s<sup>-1</sup>                                                     |
-| `bsi_fbac`         | Bacterial enhancement factor for silica dissolution                         | 20            | dimensionless                                                        |
+| `bsi_alpha`        | Natural-log intercept of temperature-dependent biogenic silica dissolution  | -10           | ln(per hour)                                                    |
+| `bsi_fbac`         | Bacterial enhancement factor for silica dissolution                         | 10            | dimensionless                                                        |
 | `bsi_kbac`         | Half-saturation coefficient for bacterial enhancement of silica dissolution | 0.5           | mmol C m<sup>-3</sup>                                                |
 | `bsilrem_sed`      | Base sediment biogenic silica dissolution rate                              | 2.8e-8        | s<sup>-1</sup>                                                       |
 | `aoa_knh4`         | AOA NH<sub>4</sub> half-saturation coefficient                              | 0.1           | mmol N m<sup>-3</sup>                                                |
 | `aoa_poxy`         | AOA O<sub>2</sub> diffusive uptake limit                                    | 275/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
+| `aoa_ynh4`         | AOA NH<sub>4</sub> demand per C biomass                                     | 11.0          | mmol N (mol C)<sup>-1</sup>                                                |
+| `aoa_yoxy`         | AOA O<sub>2</sub> demand per C biomass                                      | 15.5          | mmol O<sub>2</sub> (mol C)<sup>-1</sup>                                                |
 | `aoxkn`            | Anammox NH<sub>4</sub> half-saturation coefficient                          | 0.5           | mmol N m<sup>-3</sup>                                                |
 | `aoxmumax`         | Anammox maximum growth rate                                                 | 0.0025/86400  | s<sup>-1</sup>                                                       |
-| `bottom_thickness` | Bottom layer thickness                                                      | 1.0           | m                                                                    |
+| `bottom_thickness` | Bottom layer thickness                                                      | 0.1           | m                                                                    |
 
 
 ---
@@ -694,7 +716,7 @@ In the above, $\mu_{np}^{0ºC}$, $\mu_{mp}^{0ºC}$, $β_{np}$ and $β_{mp}$ are 
 
 **Heterotrophy**
 
-Heterotrophic processes include mortality of ecosystem functional types, grazing rates of zooplankton, hydrolysation and remineralisation of particulate and dissolved organic material (POC and DOC)in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0ºC}$, [<sup>s-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$). Each heterotrophic process has a different $\mu_{het}^{0ºC}$ value and we expand on this later under the mortality, grazing and bacterial heterotrophy sections. However, the basic formulation for scaling heterotrophic metabolisms with temperature takes the form:
+Heterotrophic processes include mortality of ecosystem functional types, grazing rates of zooplankton, hydrolysation and remineralisation of particulate and dissolved organic material (POC and DOC)in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0ºC}$, [<sup>s-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$). Each heterotrophic process has a different $\mu_{het}^{0ºC}$ value and we expand on this later under the mortality and grazing sections. However, the basic formulation for scaling heterotrophic metabolisms with temperature takes the form:
 
 $$
 \begin{align}
@@ -987,7 +1009,7 @@ Like chlorophyll and iron, the silicon content of micro-phytoplankton is explici
 $$
 \begin{align}
 (i) & \quad \dfrac{H_{4}SiO_{4}}{H_{4}SiO_{4} + K_{mp}^{Si}} \\
-(ii) & \quad \left(1.0 - \max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5}
+(ii) & \quad \max\left(0.0, \left( 1.0 - \max\left(0.0, \dfrac{Q_{mp}^{Si:C} - Q_{mp}^{-Si:C}}{Q_{mp}^{+Si:C} - Q_{mp}^{-Si:C}} \right)\right)^{0.5} \right)
 \end{align}
 $$
 
@@ -1180,7 +1202,7 @@ B_{particles}^{M} =& \quad 2 \cdot B_{sd}^{C} + 2 \cdot B_{ld}^{C} + 2 \cdot B_{
 $$
 
 _where_ <br>
-- $B_{sd}^{C}$ is the in situ concentration of small organic carbon detritus (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{sd}^{C}$ is the in situ concentration of small organic carbon detritus (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{ld}^{C}$ is the in situ concentration of large organic carbon detritus (`ldet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{ld}^{Si}$ is the in situ concentration of biogenic silica detritus (`ldet_mmolm3si`, [mmol Si m<sup>-3</sup>]) <br>
 - $B_{CaCO_3}^{C}$ is the in situ concentration of calcium carbonate detritus (`caco3_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
@@ -1229,7 +1251,7 @@ _where_ <br>
 - $F_{coag}$ is a phytoplankton concentration dependent coagulation factor (`biof`, [dimensionless])  <br>
 - $B_{np}^{C}$ and $B_{mp}^{C}$ are the concentrations of nano- and micro-phytoplankton biomass (`phy_mmolm3`; `dia_mmolm3`, [mmol C m<sup>-3</sup>])  <br>
 - $B_{DOM}^{C}$ is the concentration of dissolved organic matter in carbon (`doc_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{sd}^{C}$ is the concentration of small organic detrital particles (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{sd}^{C}$ is the concentration of small organic detrital particles (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 The colloidal aggregation term:
 
@@ -1402,14 +1424,17 @@ The scaling term associated with activity of heterotrophic bacteria is informed 
 
 $$
 \begin{align}
-S_{B_{ld}^{Si}}^{bio} =& \quad 1 + F_{B_{ld}^{Si}}^{bac} \cdot \dfrac{B_{bac}^{C}}{B_{bac}^{C} + K_{B_{ld}^{Si}}^{bac}}
+S_{B_{ld}^{Si}}^{bio} =& \quad 1 + F_{B_{ld}^{Si}}^{bac} \cdot \dfrac{B_{sd}^{C} + B_{ld}^{C}}{B_{sd}^{C} + B_{ld}^{C} + K_{B_{ld}^{Si}}^{bac}}
 \end{align}
 $$
 
 _where_ <br>
 - $F_{B_{ld}^{Si}}^{bac}$ is the factor increase in dissolution caused by peak bacterial biomass (`bsi_fbac`, [dimenionless]) <br>
 - $K_{B_{ld}^{Si}}^{bac}$ is the half-saturation coefficient for stimulation of silica dissolution in the presence of bacterial biomass (`bsi_kbac`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{bac}^{C}$ is the in situ concentration of bacterial biomass (`biobac1` + `biobac2`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{sd}^{C}$ is the in situ concentration of small sinking detritus (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{ld}^{C}$ is the in situ concentration of large sinking detritus (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+
+and assume that the abundance of bacteria covaries strongly with the concentration of particulate organic matter in the water column.
 
 ---
 
@@ -1424,8 +1449,8 @@ $$
 \begin{align}
 \gamma_{np}^{\rightarrow C} =& \quad \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
 \gamma_{mp}^{\rightarrow C} =& \quad \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
-\gamma_{mz}^{\rightarrow C} =& \quad \gamma_{mz}^{0ºC} (β_{hete})^{T} F_{mz}^{\gamma} B_{mz}^{C} \\
-\gamma_{Mz}^{\rightarrow C} =& \quad \gamma_{Mz}^{0ºC} (β_{hete})^{T} F_{Mz}^{\gamma} B_{Mz}^{C}
+\gamma_{mz}^{\rightarrow C} =& \quad \gamma_{mz}^{0ºC} (β_{hete})^{T} B_{mz}^{C} \\
+\gamma_{Mz}^{\rightarrow C} =& \quad \gamma_{Mz}^{0ºC} (β_{hete})^{T} B_{Mz}^{C}
 \end{align}
 $$
 
@@ -1440,8 +1465,6 @@ _where_ <br>
 - $B_{mp}^{C}$ is the concentration of micro-phytoplankton carbon biomass (`p_dia(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`p_zoo(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{Mz}^{C}$ is the concentration of meso-zooplankton carbon biomass (`p_mes(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
-- $F_{mz}^{\gamma}$ is a scaling factor that reduces micro-zooplankton linear mortality at low biomass (`zoo_slmor`, [dimenionless]) <br>
-- $F_{Mz}^{\gamma}$ is a scaling factor that reduces meso-zooplankton linear mortality at low biomass (`mes_slmor`, [dimenionless]) <br>
 
 
 **Quadratic losses** of nano-phytoplankton (<sub>np</sub>), micro-phytoplankton (<sub>mp</sub>), micro-zooplankton (<sub>mz</sub>) and meso-zooplankton (<sub>Mz</sub>) are modelled as
@@ -1517,9 +1540,9 @@ _where_ <br>
 - $B_{i}^{C}$ is the concentration of prey type $i$ in carbon biomass <br>
 - $s_{z}$ is the prey-switching exponent of zooplankton type $z$ (`zoopreyswitch`; `mespreyswitch`) <br>
 
-When $s_{z} < 1$, zooplankton feed equally across all prey items irrespective of availability  <br>
-When $s_{z} = 1$, zooplankton feed according to pre-defined dietary fractions  <br>
-When $s_{z} > 1$, zooplankton exhibit prey-switching and feed disproportionately on most abundant prey  <br>
+When $s_{z} < 1$, zooplankton feed more equally across prey items despite preferences and biomass differences <br>
+When $s_{z} = 1$, zooplankton feed according to pre-defined dietary fractions and biomasses  <br>
+When $s_{z} > 1$, zooplankton exhibit prey-switching and feed disproportionately on most preferred and abundant prey  <br>
 
 Again, prey preferences are normalized to ensure 
 
@@ -1566,11 +1589,11 @@ $$
 Thus: <br>
 - $g_{mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{mz}^{\leftarrow B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by micro-zooplankton (`zoograzdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzsdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{Mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by meso-zooplankton (`mesgrazphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{Mz}^{\leftarrow B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by meso-zooplankton (`mesgrazdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{\leftarrow B_{ld}^{C}}$ is the grazing rate of large particulate detritus by meso-zooplankton (`mesgrazbdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazsdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{ld}^{C}}$ is the grazing rate of large particulate detritus by meso-zooplankton (`mesgrazldet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{Mz}^{\leftarrow B_{mz}^{C}}$ is the grazing rate of micro-zooplankton by meso-zooplankton (`mesgrazzoo(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 
 
@@ -1784,10 +1807,10 @@ $$
 $$
 
 _where_ <br>
-- $g_{mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $g_{Mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzsdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazsdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $F_{gut}$ is the fraction of $CaCO_3$ that is dissolved within zooplankton guts (`fgutdiss`, [mol C (mol C)<sup>-1</sup>]) <br>
-- $\dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}$ is the in situ ratio of $CaCO_3$ to small organic carbon detritus (`caco3_mmolm3/det_mmolm3`, [mol C (mol C)<sup>-1</sup>]) <br>
+- $\dfrac{B_{CaCO_3}^{C}}{B_{sd}^{C}}$ is the in situ ratio of $CaCO_3$ to small organic carbon detritus (`caco3_mmolm3/sdet_mmolm3`, [mol C (mol C)<sup>-1</sup>]) <br>
 
 Here we note that the processing of $CaCO_3$ by zooplankton grazing is treated differently to processing of organic carbon. For organic carbon, we route the biomass between zooplankton biomass (assimilation), inorganic nutrients (excretion) and particulate detritus (egestion). For $CaCO_3$ consumption by both micro-zooplankton and meso-zooplankton the $CaCO_3$ is not assimilated since it does not contain nitrogen or other key elements for biosynthesis, and so is only routed between excretion to DIC and alkalinity or goes undissolved and remains $CaCO_3$ that sinks through the water column. This is supported by the fact that micro- and meso-zooplankton may dissolve 92±7% and 38-73% of coccolithophore calcite during feeding, respectively ([Smith et al., 2024](https://doi.org/10.1126/sciadv.adr5453); [White et al., 2018](https://doi.org/10.1038/s41598-018-28073-x); [Harris, 1994](https://doi.org/10.1007/BF00347540)), and that the remainder is excreted and not assimilated ([Mayers et al., 2020](https://doi.org/10.3389/fmars.2020.569896)).
 
@@ -1881,6 +1904,15 @@ _where_ <br>
 
 
 ### 17. Tracer tendencies
+
+The code treats multiple concentration-dependent losses semi-implicitly. These are:
+- quadratic phytoplankton mortality ($\Gamma_{np}^{\rightarrow C}$ for `p_phy` and $\Gamma_{mp}^{\rightarrow C}$ for `p_dia`);
+- quadratic zooplankton mortality  ($\Gamma_{mz}^{\rightarrow C}$ for `p_zoo` and $\Gamma_{Mz}^{\rightarrow C}$ for `p_mes`);
+- small and large detritus hydrolysis ($\Gamma_{sd}^{\rightarrow C}$ for `p_sdet` and $\Gamma_{ld}^{\rightarrow C}$ for `p_ldet`);
+- DOC remineralisation ($\Gamma_{doc}^{\rightarrow C}$ for `p_doc`);
+- CaCO<sub>3</sub> dissolution (all dissolution terms for `p_caco3`).
+
+All production terms for the involved tracers are evaluated explicitly using forward euler timestepping, while these concentration-dependent loss terms are solved implicitly using the backward euler timestepping (i.e., where the loss term is evaluated on the future (n+1) tracer concentration). This makes the the time-stepping scheme "semi-implicit" for these tracers. Please see the Tracer Tendency step in the `generic_WOMBATmid.F90` code for details.
 
 **Nano-phytoplankton** (`p_phy(i,j,k)`, $B_{np}^{C}$, [mol C kg<sup>-1</sup>])
 
@@ -2272,9 +2304,9 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 ### 19. Additional operations on tracers
 
-**First**, dissolved iron concentrations are set to equal 1 nM everywhere where the depth of the water column is less than 200 metres deep. WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we universally set the dissolved iron concentration in these waters to 1 nM.
+**First**, dissolved iron concentrations are set to equal 1 nM in grid cells in contact with the sediment where the depth of the water column is less than 200 metres deep. WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we set the dissolved iron concentration in these bottom waters to 1 nM.
 
-**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)), we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
+**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)) in off-shelf waters, we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
 
 $$
 \begin{align}
@@ -2282,7 +2314,7 @@ $$
 \end{align}
 $$
 
-This resetting of minimum dFe concentration essentially copies what is done in the PISCES ocean model and functions as a constant source of dFe to the ocean when surface concentrations are drawn down to near zero values. Ideally, complexation by ligands would function to maintain iron in dissolved, biologically available form without the need for an addition source at low concentrations.
+This resetting of minimum dFe concentration functions as a constant source of dFe to the ocean when surface concentrations are drawn down to near zero values. Ideally, complexation by ligands would function to maintain iron in dissolved, biologically available form without the need for an addition source at low concentrations.
 
 ---
 
@@ -2358,7 +2390,7 @@ r_{Mz} =& \quad r_{Mz}^{-} \cdot 0.5 \cdot \left(B_{Mz}^{C}\right)^{\dfrac{1}{3}
 \end{align}
 $$
 
-We determine the mean radius of small (`rad_det`, [m]) and large particulate detritus (`rad_bdet`, [m]) by taking the biomass-weighted means of each plankton functional type:
+We determine the mean radius of small (`rad_sdet`, [m]) and large particulate detritus (`rad_ldet`, [m]) by taking the biomass-weighted means of each plankton functional type:
 
 $$
 \begin{align}
@@ -2441,7 +2473,7 @@ Next, we solve for the contribution of finite density to dynamic viscosity, $\ha
 
 $$
 \begin{align}
-\hat{\eta_{1}} =& \quad e^{\left[ \hat{\rho} \sum_{i=0}^{5}\left( \dfrac{1}{\hat{T} - 1} \right)^{i} \sum_{j=0}^{6} H_{ij}\left(\hat{\rho} - 1\right)^{j} \right]}
+\hat{\eta_{1}} =& \quad e^{\left[ \hat{\rho} \sum_{i=0}^{5}\left( \dfrac{1}{\hat{T}} - 1 \right)^{i} \sum_{j=0}^{6} H_{ij}\left(\hat{\rho} - 1\right)^{j} \right]}
 \end{align}
 $$
  
@@ -2476,7 +2508,7 @@ M_{BSi} =& \quad B_{ld}^{Si} \cdot 1 \times 10^{-6} \cdot 60
 $$
 
 _where_ <br>
-- $B_{sd}^{C}$ is the in situ concentration of small particulate organic carbon (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{sd}^{C}$ is the in situ concentration of small particulate organic carbon (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{ld}^{C}$ is the in situ concentration of large particulate organic carbon (`ldet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{CaCO_3}^{C}$ is the in situ concentration of calcium carbonate carbon (`caco3_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{ld}^{Si}$ is the in situ concentration of biogenic silica (`ldetsi_mmolm3`, [mmol Si m<sup>-3</sup>]) <br>
@@ -2517,8 +2549,8 @@ $$
 $$
 
 _where_ <br>
-- $p_{s}$ is the porosity of small particles (`detphi`, [dimensionless]) <br>
-- $p_{l}$ is the porosity of large particles (`bdetphi`, [dimensionless]) <br>
+- $p_{s}$ is the porosity of small particles (`sdetphi`, [dimensionless]) <br>
+- $p_{l}$ is the porosity of large particles (`ldetphi`, [dimensionless]) <br>
 - $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-3</sup>) <br>
 
 
@@ -2539,7 +2571,7 @@ $$
 $$
 
 _where_ <br>
-- $r_{s}$ and $r_{l}$ are the mean radii of small and large particles (`rad_det`; `rad_bdet`; [m]) <br>
+- $r_{s}$ and $r_{l}$ are the mean radii of small and large particles (`rad_sdet`; `rad_ldet`; [m]) <br>
 - $\eta_{sw}$ is the dynamic viscosity of seawater at in situ temperature, salinity and pressure (`dynvis_sw(i,j,k)`, [kg m<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\rho_{s}$ and $\rho_{l}$ are the harmonic mean densities of small and large particles (`rho_small`; `rho_large`, [kg m<sup>-3</sup>]) <br>
 - $\rho_{sw}$ is the density of seawater, which we set here to a constant 1025 (kg m<sup>-3</sup>) <br>
@@ -2552,17 +2584,19 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 
 ### 21. Sedimentary processes.
 
+Sediment sources to the ocean are recorded as negative `btf` values.
+
 WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), ammonium (NH<sub>4</sub>), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
 
 **Organics**
 
-Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces DOC and DON and removes O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of organic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
+Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces DOC and NH<sub>4</sub> and removes O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of biogenic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
 
 $$
 \begin{align}
 \gamma_{sed}^{\rightarrow DOC} =& \quad \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C} \\
-\gamma_{sed}^{\rightarrow DON} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{N:C} \\
+\gamma_{sed}^{\rightarrow NH_4} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{N:C} \\
 \gamma_{sed}^{\leftarrow O_2} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{O_2:C} \\
 \gamma_{sed}^{\rightarrow dFe} =& \quad \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}
 \end{align}
@@ -2589,12 +2623,13 @@ $$
 $$
 
 _where_ <br>
-- $B_{sed}^{Si}$ is the concentration of organic silicon in the sediment pool (`p_detsi_sediment(i,j,1)`, [mol Si m<sup>-2</sup>]) 
+- $B_{sed}^{Si}$ is the concentration of biogenic silica in the sediment pool (`p_detsi_sediment(i,j,1)`, [mol Si m<sup>-2</sup>]) 
 - $d_{sed^{Si}}^{T}$ is the temperature-dependent rate of dissolution (`disssi_temp`, [s<sup>-1</sup>]) <br>
 - $S_{sed^{Si}}^{Sat}$ is a scaling factor that decelerates dissolution as the in situ concentration approachs the equilibrium concentration (`disssi_usat`, [dimenionless]) <br>
 - $S_{sed^{Si}}^{bio}$ is a scaling factor that accelerates dissolution in the presence of heterotrophic bacterial biomass (`disssi_bact`, [dimenionless]) <br>
+- $B_{sed}^{Si}$ is the concentration of biogenic silica in the sediment pool (`p_detsi_sediment(i,j,1)`, [mol Si m<sup>-2</sup>]) <br>
 
-Please refer to the description above for the equations that describe these terms.
+Please refer to the description above in "Dissolution of biogenic silica" for the equations that describe these terms.
 
 
 **Dissolution of $CaCO_3$**
@@ -2603,7 +2638,7 @@ Dissolution of $CaCO_3$ produces DIC and alkalinity. The sedimenary $CaCO_3$ poo
 
 $$
 \begin{align}
-D_{CaCO_{3},sed} =& \quad d_{CaCO_{3},sed} \left(β_{hete}\right)^{T} \left(1 - \Omega_{cal,sed}\right)^{4.5}
+D_{CaCO_{3},sed} =& \quad d_{CaCO_{3},sed} \left(β_{hete}\right)^{T} \left(1 - \Omega_{cal,sed}\right)^{4.5} B_{sed}^{CaCO_{3}}
 \end{align}
 $$
 
@@ -2612,6 +2647,8 @@ _where_ <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
 - $\Omega_{cal,sed}$ is the calcite saturation state within sedimentary pore waters (`sedomega_cal(i,j)`, [dimensionless]) <br>
+- $B_{sed}^{CaCO_{3}}$ is the concentration of calcium carbonate in the sediment pool (`p_caco3_sediment(i,j,1)`, [mol C m<sup>-2</sup>]) <br>
+
 
 The $\Omega_{cal,sed}$ is calculated using the `mocsy` package for solving carbonate chemistry of seawater ([Orr & Epitalon, 2015](https://doi.org/10.5194/gmd-8-485-2015)). These routines require Alk and DIC as inputs, along with nutrient concentrations and temperature and salinity of bottom waters. For DIC, we chose to sum the water column concentration of DIC and the organic carbon content of the sediment to approximate the interstitial (i.e., porewater) DIC concentration. We assume that the organic carbon content of the sediment (`p_det_sediment`), which is held in units of in [mol m<sup>-2</sup>] is relevant over 10 centimeters, and therefore can be automatically converted to [mol m<sup>-3</sup>] via division by 0.1. With this assumption these arrays can be added together and approximates the reducing conditions of organic-rich sediments, which have lower $\Omega_{cal,sed}$. This ensures a greater rate of $CaCO_3$ dissolution within the sediment as organic matter accumulates.
 
@@ -2649,7 +2686,7 @@ Overall bottom fluxes of tracers are:
 $$
 \begin{align}
 \dfrac{\Delta DOC}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow DOC} \\
-\dfrac{\Delta DON}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow DON} \\
+\dfrac{\Delta NH_4}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow NH_4} \\
 \dfrac{\Delta NO_3}{\Delta t} =& \quad \gamma_{det,sed}^{\leftarrow NO_3} \\
 \dfrac{\Delta O_2}{\Delta t} =& \quad \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right) \\
 \dfrac{\Delta Si}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow Si} \\
@@ -2682,6 +2719,10 @@ $$
 
 where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> day<sup>-1</sup>].
 
-As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron, organic silicon and $CaCO_3$ that is buried increases.
+As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron, biogenic silica and $CaCO_3$ that is buried increases. 
+
+### Permanent burial of authigenic iron.
+
+All authigenic iron particles (`p_safe(i,j,k)` and `p_lafe(i,j,k)`) that reach the sediment are permanently buried and constitute a permanent loss of this iron from the ocean.
 
 ---
