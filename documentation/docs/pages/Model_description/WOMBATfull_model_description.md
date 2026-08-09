@@ -10,10 +10,10 @@
  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT)
 ```
 
-_Contact Pearse J. Buchanan and/or Dougal Squire for any questions_
+_Contact Pearse J. Buchanan and/or Dougal Squire for any questions_ <br>
 
-_Pearse.Buchanan@csiro.au_
-_Dougie.Squire@anu.edu.au_
+_Pearse.Buchanan@csiro.au_ <br>
+_Dougie.Squire@anu.edu.au_ <br>
 
 ---
 
@@ -35,12 +35,13 @@ _Dougie.Squire@anu.edu.au_
 - Micro- and Meso-zooplankton grazing assumes a Holling Type III functional form ([Holling, 1959](https://doi.org/10.4039/Ent91385-7)) and active switching between prey types ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)). <br>
 - Micro- and Meso-zooplankton routes Fe preferentially to egestion (i.e., faecal pellets) following [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597), enriching detritus in Fe. <br>
 - Micro- and Meso-zooplankton dissolve CaCO<sub>3</sub> ([Smith et al., 2024](https://doi.org/10.1126/sciadv.adr5453); [White et al., 2018](https://doi.org/10.1038/s41598-018-28073-x); [Harris, 1994](https://doi.org/10.1007/BF00347540)) but conserve biogenic silica due to acidic conditions in their gut ([Dagg et al., 2003](https://doi.org/10.1016/S0967-0645(02)00590-8); [Taucher et al., 2022](https://www.nature.com/articles/s41586-022-04687-0)).
-- The nitrogen cycle can be made to be open, with schemes for nitrogen fixation, anammox, and sedimentary denitrification that can be switched on or off at run time. <br>
-- Nitrification of NH<sub>4</sub> to NO<sub>3</sub> is performed by an implicit population of ammonia oxidizing archaea.
-- Hydrolysation of particulate organic matter releases dissolved iron, ammonium and dissolved organic carbon, reflecting the preferential remineralisation of iron and nitrogen to inorganic forms before carbon.
+- The nitrogen cycle can be made to be open, with schemes for nitrogen fixation, anammox, water column denitrification and sedimentary denitrification that can be switched on or off at run time. <br>
+- Ammonia oxidizing archaea are an explicit biomass type that performs nitrification of NH<sub>4</sub> to NO<sub>3</sub> and produces N<sub>2</sub>O as a byproduct ([Kelly et al., 2024](https://doi.org/10.5194/bg-21-3215-2024)).
+- Two types of free-living heterotrophic bacteria drive remineralisation of dissolved organic matter. Their metabolism and growth yields are controlled by electron balance ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Rittman & McCarty, 2001](https://books.google.com.au/books/about/Environmental_Biotechnology_Principles_a.html?id=1PMeAQAAIAAJ&redir_esc=y)).
+- Heterotrophic bacteria are facultative, meaning that they can switch to anaerobic metabolism and use NO<sub>3</sub> as electron acceptors for growth in low O<sub>2</sub> conditions ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Sun et al., 2024](https://doi.org/10.1073/pnas.2417421121)).
 - CaCO<sub>3</sub> cycling is a function of the ambient seawater carbonate chemistry: production is affected by the substrate-inhibitor ratio ([Lehmann & Bach, 2025](https://www.nature.com/articles/s41561-025-01644-0)); dissolution occurs in saturated waters ($\Omega$ > 1) due to reducing micro-environments and undersaturated waters ($\Omega$ < 1) ([Kwon et al., 2024](https://www.science.org/doi/full/10.1126/sciadv.adl0779)). <br>
 - Sinking of small and large particulates is a function of mean radius, seawater dynamic viscosity and their excess density ([Rubey, 1933](https://doi.org/10.2475/ajs.s5-25.148.325)). Radius varies via allometric scalings (e.g., [Wickman et al., 2024]((https://www.science.org/doi/10.1126/science.adk6901))), dynamic viscosity via thermohaline properties, and excess density by CaCO<sub>3</sub> and biogenic silica contents of the particles. <br>
-- External sources of nitrate, DIC, alkalinity silicic acid and DOC via rivers. <br>
+- External sources of nitrate, DIC, alkalinity, silicic acid, long-chain DOC and DON exist via rivers. <br>
 - Permanent burial of organics in sediments via [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907). <br>
 - External source of dissolved iron from aeolian deposition that includes mineral, fire and anthropogenic sources ([Hamilton et al., 2020](https://doi.org/10.1029/2019GB006448)). <br>
 - Major calibration and optimization of the model parameters... incoming. <br>
@@ -74,12 +75,17 @@ The following are the active tracers in WOMBAT-full
 | 21   | B<sub>sd</sub><sup>Fe</sup>   | `p_sdetfe` | Small sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
 | 22   | B<sub>ld</sub><sup>Fe</sup>   | `p_ldetfe` | Large sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
 | 23   | B<sub>ld</sub><sup>Si</sup>   | `p_ldetsi` | Large sinking detritus silicon content              | mol Si kg<sup>-1</sup>    | Yes         |
-| 24   | B<sub>DOM</sub><sup>C</sup>   | `p_doc`    | Dissolved organic carbon                            | mol C kg<sup>-1</sup>     | Yes         |
-| 25   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
-| 26   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
-| 27   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
-| 28   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
-| 29   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
+| 24   | B<sub>lDOM</sub><sup>C</sup>  | `p_ldoc`   | Long-chain dissolved organic carbon                 | mol C kg<sup>-1</sup>     | Yes         |
+| 25   | B<sub>lDOM</sub><sup>N</sup>  | `p_ldon`   | Long-chain dissolved organic nitrogen               | mol N kg<sup>-1</sup>     | Yes         |
+| 26   | B<sub>sDOM</sub><sup>C</sup>  | `p_sdoc`   | Short-chain dissolved organic carbon                | mol C kg<sup>-1</sup>     | Yes         |
+| 27   | B<sub>sDOM</sub><sup>N</sup>  | `p_sdon`   | Short-chain dissolved organic nitrogen              | mol N kg<sup>-1</sup>     | Yes         |
+| 28   | B<sub>sb</sub><sup>C</sup>    | `p_lbac`   | Long-chain consuming (sharing) bacteria             | mol C kg<sup>-1</sup>     | Yes         |
+| 29   | B<sub>sb</sub><sup>C</sup>    | `p_sbac`   | Short-chain consuming (scavenging) bacteria         | mol C kg<sup>-1</sup>     | Yes         |
+| 30   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
+| 31   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
+| 32   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
+| 33   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
+| 34   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
 
 ---
 
@@ -96,6 +102,7 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_nitrogen_fixation`       | Do implicit nitrogen fixation                                                              | .true.    |
 | `do_anammox`                 | Do implicit anaerobic ammonium oxidation                                                   | .true.    |
 | `do_benthic_denitrification` | Do implicit reduction of NO<sub>3</sub> in the sediment                                    | .true.    |
+| `do_wc_denitrification`      | Do explicit anaerobic facultative bacterial denitrification in water column                | .true.    |
 | `do_tracer_dicp`             | Carry preformed dissolved inorganic carbon (dicp) as a tracer                              | .false.   |
 | `do_tracer_dicr`             | Carry remineralised dissolved inorganic carbon (dicr) as a tracer                          | .false.   |
 | `do_viscous_sinking`         | Rubey's formula uses a non-constant dynamic viscosity of seawater                          | .true.    |
@@ -152,7 +159,8 @@ The following are all **2D** diagnostic output variables from WOMBAT-full.
 | `fe_stf`          | Surface flux of dissolved iron into ocean                                                            | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `sdet_stf`        | Surface flux of small sinking detritus into ocean                                                    | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `ldet_stf`        | Surface flux of large sinking detritus into ocean                                                    | mol C m<sup>-2</sup> s<sup>-1</sup>  |
-| `doc_stf`         | Surface flux of dissolved organic carbon into ocean                                                  | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldoc_stf`        | Surface flux of long-chain dissolved organic carbon into ocean                                       | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldon_stf`        | Surface flux of long-chain dissolved organic nitrogen into ocean                                     | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `dic_stf`         | Surface flux of dissolved inorganic carbon into ocean                                                | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `dicp_stf`        | Surface flux of preformed dissolved inorganic carbon into ocean                                      | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `alk_stf`         | Surface flux of alkalinity into ocean                                                                | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
@@ -164,7 +172,8 @@ The following are all **2D** diagnostic output variables from WOMBAT-full.
 | `o2_btf`          | Bottom flux of dissolved oxygen into ocean                                                           | mol O2 m<sup>-2</sup> s<sup>-1</sup> |
 | `no3_btf`         | Bottom flux of nitrate into ocean                                                                    | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `sil_btf`         | Bottom flux of silicic acid into ocean                                                               | mol Si m<sup>-2</sup> s<sup>-1</sup> |
-| `doc_btf`         | Bottom flux of dissolved organic carbon into ocean                                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldoc_btf`        | Bottom flux of long-chain dissolved organic carbon into ocean                                        | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldon_btf`        | Bottom flux of short-chain dissolved organic nitrogen into ocean                                     | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `fe_btf`          | Bottom flux of dissolved iron into ocean                                                             | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `dic_btf`         | Bottom flux of dissolved inorganic carbon into ocean                                                 | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `dicr_btf`        | Bottom flux of remineralised dissolved inorganic carbon into ocean                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
@@ -245,26 +254,44 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `fesources`        | Total source of dFe in water column                                                | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `fesinks`          | Total sink of dFe in water column                                                  | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `zooeps`           | Micro-zooplankton community-wide prey capture rate coefficient                     | m<sup>6</sup> mmolC<sup>-2</sup> s<sup>-1</sup> |
+| `zooprefsbac`      | Grazing dietary fraction of micro-zooplankton on scavenging bacteria               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zoopreflbac`      | Grazing dietary fraction of micro-zooplankton on sharing bacteria                  | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooprefaoa`       | Grazing dietary fraction of micro-zooplankton on ammonia oxidizing archaea         | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooprefphy`       | Grazing dietary fraction of micro-zooplankton on nano-phytoplankton                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooprefdia`       | Grazing dietary fraction of micro-zooplankton on micro-phytoplankton               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooprefsdet`      | Grazing dietary fraction of micro-zooplankton on small detritus                    | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zoograzsbac`      | Grazing rate of micro-zooplankton on scavenging bacteria                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zoograzlbac`      | Grazing rate of micro-zooplankton on sharing bacteria                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zoograzaoa`       | Grazing rate of micro-zooplankton on ammonia oxidizing archaea                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzphy`       | Grazing rate of micro-zooplankton on nano-phytoplankton                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzdia`       | Grazing rate of micro-zooplankton on micro-phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzsdet`      | Grazing rate of micro-zooplankton on small detritus                                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoomorl`          | Linear mortality of micro-zooplankton                                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoomorq`          | Quadratic (density-dependent) mortality of micro-zooplankton                       | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooexcrsbac`      | Excretion rate of micro-zooplankton eating scavenging bacteria                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooexcrlbac`      | Excretion rate of micro-zooplankton eating sharing bacteria                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooexcraoa`       | Excretion rate of micro-zooplankton eating ammonia oxidizing archaea               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooexcrphy`       | Excretion rate of micro-zooplankton eating nano-phytoplankton                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooexcrdia`       | Excretion rate of micro-zooplankton eating micro-phytoplankton                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooexcrsdet`      | Excretion rate of micro-zooplankton eating small detritus                          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooegessbac`      | Egestion rate of micro-zooplankton on scavenging bacteria                          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooegeslbac`      | Egestion rate of micro-zooplankton on sharing bacteria                             | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooegesaoa`       | Egestion rate of micro-zooplankton on ammonia oxidizing archaea                    | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooegesphy`       | Egestion rate of micro-zooplankton on nano-phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooegesdia`       | Egestion rate of micro-zooplankton on micro-phytoplankton                          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooegessdet`      | Egestion rate of micro-zooplankton on small detritus                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `meseps`           | Meso-zooplankton community-wide prey capture rate coefficient                      | m<sup>6</sup> mmolC<sup>-2</sup> s<sup>-1</sup> |
+| `mesprefsbac`      | Grazing dietary fraction of meso-zooplankton on scavenging bacteria                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mespreflbac`      | Grazing dietary fraction of meso-zooplankton on sharing bacteria                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesprefaoa`       | Grazing dietary fraction of meso-zooplankton on ammonia oxidizing archaea          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesprefphy`       | Grazing dietary fraction of meso-zooplankton on nano-phytoplankton                 | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesprefdia`       | Grazing dietary fraction of meso-zooplankton on micro-phytoplankton                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesprefsdet`      | Grazing dietary fraction of meso-zooplankton on small detritus                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesprefldet`      | Grazing dietary fraction of meso-zooplankton on large detritus                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesprefzoo`       | Grazing dietary fraction of meso-zooplankton on micro-zooplankton                  | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesgrazsbac`      | Grazing rate of meso-zooplankton on scavenging bacteria                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesgrazlbac`      | Grazing rate of meso-zooplankton on sharing bacteria                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesgrazaoa`       | Grazing rate of meso-zooplankton on ammonia oxidizing archaea                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazphy`       | Grazing rate of meso-zooplankton on nano-phytoplankton                             | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazdia`       | Grazing rate of meso-zooplankton on micro-phytoplankton                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazsdet`      | Grazing rate of meso-zooplankton on small detritus                                 | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
@@ -272,21 +299,55 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `mesgrazzoo`       | Grazing rate of meso-zooplankton on micro-zooplankton                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesmorl`          | Linear mortality of meso-zooplankton                                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesmorq`          | Quadratic (density-dependent) mortality of meso-zooplankton                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesexcrsbac`      | Excretion rate of meso-zooplankton eating scavenging bacteria                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesexcrlbac`      | Excretion rate of meso-zooplankton eating sharing bacteria                         | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesexcraoa`       | Excretion rate of meso-zooplankton eating ammonia oxidizing archaea                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrphy`       | Excretion rate of meso-zooplankton eating nano-phytoplankton                       | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrdia`       | Excretion rate of meso-zooplankton eating micro-phytoplankton                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrsdet`      | Excretion rate of meso-zooplankton eating small detritus                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrldet`      | Excretion rate of meso-zooplankton eating large detritus                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrzoo`       | Excretion rate of meso-zooplankton eating micro-zooplankton                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesegessbac`      | Egestion rate of meso-zooplankton on scavenging bacteria                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesegeslbac`      | Egestion rate of meso-zooplankton on sharing bacteria                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesegesaoa`       | Egestion rate of meso-zooplankton on ammonia oxidizing archaea                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegesphy`       | Egestion rate of meso-zooplankton on nano-phytoplankton                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegesdia`       | Egestion rate of meso-zooplankton on micro-phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegessdet`      | Egestion rate of meso-zooplankton on small detritus                                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegesldet`      | Egestion rate of meso-zooplankton on large detritus                                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegeszoo`       | Egestion rate of meso-zooplankton on micro-zooplankton                             | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `reminrpoc`        | Rate of hydrolysation of particulate organic matter                                | s<sup>-1</sup>                                  |
-| `reminrdoc`        | Rate of remineralisation of dissolved organic matter                               | s<sup>-1</sup>                                  |
 | `sdetremi`         | Hydrolysation of small sinking detritus                                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `ldetremi`         | Hydrolysation of large sinking detritus                                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `docremi`          | Remineralisation of dissolved organic carbon                                       | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `ldocremi`         | Remineralisation of large dissolved organic carbon by sharing bacteria             | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `sdocprod`         | Production of small dissolved organic carbon by sharing bacteria                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `sdonprod`         | Production of small dissolved organic nitrogen by sharing bacteria                 | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
+| `sdocremi`         | Remineralisation of small dissolved organic carbon by scavenging bacteria          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `lbacydoc`          | Biomass yield of sharing bacteria                                                 | mol C-biomass (mol DOC)<sup>-1</sup> |
+| `lbacgrow`          | Growth of sharing bacteria                                                        | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacresp`          | Oxygen consumption by sharing bacteria                                            | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacpnh4`          | Production of ammonium by sharing bacteria                                        | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacpco2`          | Production of carbon dioxide by sharing bacteria                                  | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacufer`          | Uptake of dissolved iron by sharing bacteria                                      | mol Fe kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbac_mu`           | Realised growth rate of sharing bacteria                                          | s<sup>-1</sup> |
+| `lbac_anaer`        | Fraction of sharing bacterial growth supported by anaerobic metabolism            | dimensionless [0-1] |
+| `lbac_felim`        | Indicator of iron limitation of sharing bacterial growth                          | dimensionless [0-1] |
+| `lbac_nlim`         | Indicator of nitrogen limitation of sharing bacterial growth                      | dimensionless [0-1] |
+| `lbacmorl`          | Linear mortality of sharing bacteria                                              | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacmorq`          | Quadratic mortality of sharing bacteria                                           | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacdeni`          | Denitrification by sharing bacteria (nitrate consumption)                         | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacydoc`          | Biomass yield of scavenging bacteria                                              | mol C-biomass (mol DOC)<sup>-1</sup> |
+| `sbacgrow`          | Growth of scavenging bacteria                                                     | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacresp`          | Oxygen consumption by scavenging bacteria                                         | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacpnh4`          | Production of ammonium by scavenging bacteria                                     | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacpco2`          | Production of carbon dioxide by scavenging bacteria                               | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacufer`          | Uptake of dissolved iron by scavenging bacteria                                   | mol Fe kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbac_mu`           | Realised growth rate of scavenging bacteria                                       | s<sup>-1</sup> |
+| `sbac_anaer`        | Fraction of scavenging bacterial growth supported by anaerobic metabolism         | dimensionless [0-1] |
+| `sbac_felim`        | Indicator of iron limitation of scavenging bacterial growth                       | dimensionless [0-1] |
+| `sbac_nlim`         | Indicator of nitrogen limitation of scavenging bacterial growth                   | dimensionless [0-1] |
+| `sbacmorl`          | Linear mortality of scavenging bacteria                                           | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacmorq`          | Quadratic mortality of scavenging bacteria                                        | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacdeni`          | Denitrification by scavenging bacteria (nitrate consumption)                      | mol N kg<sup>-1</sup> s<sup>-1</sup> |
 | `ammox`            | Ammonia oxidation rate (NH<sub>4</sub> consumption)                                | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
 | `aoa_loxy`         | Limitation of ammonia oxidation by oxygen                                          | dimensionless                                   |
 | `aoa_lnh4`         | Limitation of ammonia oxidation by ammonium                                        | dimensionless                                   |
@@ -333,13 +394,14 @@ The subroutine `generic_WOMBATfull_update_from_source` is the heart of the World
 12. Mortality terms.
 13. Zooplankton grazing, egestion, excretion and assimilation.
 14. Implicit nitrogen fixation.
-15. Calcium carbonate production and dissolution.
-16. Chemoautotrophy.
-17. Tracer tendencies.
-18. Check for conservation of mass.
-19. Additional operations on tracers.
-20. Sinking rate of particulates.
-21. Sedimentary processes.
+15. Facultative heterotrophic bacteria.
+16. Calcium carbonate production and dissolution.
+17. Chemoautotrophy.
+18. Tracer tendencies.
+19. Check for conservation of mass.
+20. Additional operations on tracers.
+21. Sinking rate of particulates.
+22. Sedimentary processes.
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in `grey` follow the Fortran code, while variable names in $math font$ are pointers to the equations; `i,j,k` refer to horizontal and vertical indices; [square brackets] denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
