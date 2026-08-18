@@ -352,6 +352,7 @@ module generic_WOMBATfull
         aoa_C2Fe, &
         aoalmor, &
         aoaqmor, &
+        pbac_alpha, &
         lbac_Vmax_doc, &
         lbac_Vmax_dfe, &
         lbac_Vmax_nh4, &
@@ -3258,6 +3259,10 @@ module generic_WOMBATfull
     ! Ammonia Oxidizing Archaea quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('aoaqmor', wombat%aoaqmor, 0.001/86400.0)
+
+    ! Particle-associated heterotrophic bacteria degree of partial oxidation [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('pbac_alpha', wombat%pbac_alpha, 1.00)
 
     ! Large, sharing heterotrophic bacteria maximum rate of uptake of DOC [mmol C m-3 s-1]
     !-----------------------------------------------------------------------
@@ -6193,37 +6198,6 @@ module generic_WOMBATfull
                                 wombat%phygrow(i,j,k) * wombat%phy_lno3(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                               + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
 
-      ! Ammonium equation ! [molN/kg]
-      !----------------------------------------------------------------------
-      wombat%p_nh4(i,j,k,tau) = wombat%p_nh4(i,j,k,tau) + dtsb * ( &
-                                ( zooexcrlbacn &
-                                + zooexcrobacn &
-                                + zooexcrsbacn &
-                                + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
-                              + ( mesexcrlbacn &
-                                + mesexcrobacn &
-                                + mesexcrsbacn &
-                                + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
-                              + wombat%lbacpnh4(i,j,k) &
-                              + wombat%obacpnh4(i,j,k) &
-                              + wombat%sbacpnh4(i,j,k) &
-                              - wombat%ammox(i,j,k) &
-                              - wombat%anammox(i,j,k) ) + dtsb * 16./122. * ( &
-                                wombat%zoomorl(i,j,k) &
-                              + wombat%mesmorl(i,j,k) &
-                              + ( wombat%zooexcrphy(i,j,k) &
-                                + wombat%zooexcrdia(i,j,k) &
-                                + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
-                              + ( wombat%mesexcrphy(i,j,k) &
-                                + wombat%mesexcrdia(i,j,k) &
-                                + wombat%mesexcrsdet(i,j,k) &
-                                + wombat%mesexcrldet(i,j,k) &
-                                + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
-                              - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
-                              - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
-      if (do_nitrogen_fixation) &
-        wombat%p_nh4(i,j,k,tau) = wombat%p_nh4(i,j,k,tau) + dtsb * wombat%nitrfix(i,j,k)
-
       ! Silicic acid equation ! [molSi/kg]
       !   Microzooplankton grazing on diatoms produces clean, small, largely suspended
       !   pieces of biogenic silica prone to rapid dissolution [Krause et al., 2010 L&O]
@@ -6501,6 +6475,39 @@ module generic_WOMBATfull
                                    + wombat%mesgrazdia(i,j,k) ) * dia_Si2C &
                                    - wombat%bsidiss(i,j,k) )
 
+      ! Ammonium equation ! [molN/kg]
+      !----------------------------------------------------------------------
+      wombat%p_nh4(i,j,k,tau) = wombat%p_nh4(i,j,k,tau) + dtsb * ( &
+                                ( zooexcrlbacn &
+                                + zooexcrobacn &
+                                + zooexcrsbacn &
+                                + zooexcraoan ) * (1.0-wombat%zooexcrdom) &
+                              + ( mesexcrlbacn &
+                                + mesexcrobacn &
+                                + mesexcrsbacn &
+                                + mesexcraoan ) * (1.0-wombat%mesexcrdom) &
+                              + wombat%lbacpnh4(i,j,k) &
+                              + wombat%obacpnh4(i,j,k) &
+                              + wombat%sbacpnh4(i,j,k) &
+                              - wombat%ammox(i,j,k) &
+                              - wombat%anammox(i,j,k) ) + dtsb * 16./122. * ( &
+                                wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
+                              + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
+                              + wombat%zoomorl(i,j,k) &
+                              + wombat%mesmorl(i,j,k) &
+                              + ( wombat%zooexcrphy(i,j,k) &
+                                + wombat%zooexcrdia(i,j,k) &
+                                + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
+                              + ( wombat%mesexcrphy(i,j,k) &
+                                + wombat%mesexcrdia(i,j,k) &
+                                + wombat%mesexcrsdet(i,j,k) &
+                                + wombat%mesexcrldet(i,j,k) &
+                                + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                              - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                              - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
+      if (do_nitrogen_fixation) &
+        wombat%p_nh4(i,j,k,tau) = wombat%p_nh4(i,j,k,tau) + dtsb * wombat%nitrfix(i,j,k)
+
       ! Large, sharing heterotrophic bacteria ! [molC/kg]
       !-----------------------------------------------------------------------
       ! Here we treat lbacmorq semi-implicitly to ensure numerical stability
@@ -6564,8 +6571,8 @@ module generic_WOMBATfull
       ! Long-chain reduced dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
       wombat%p_ldoc(i,j,k,tau) = wombat%p_ldoc(i,j,k,tau) + dtsb * ( &
-                                 wombat%sdetremi(i,j,k) &
-                               + wombat%ldetremi(i,j,k) &
+                                 wombat%sdetremi(i,j,k) * wombat%pbac_alpha &
+                               + wombat%ldetremi(i,j,k) * wombat%pbac_alpha &
                                + wombat%phymorl(i,j,k) &
                                + wombat%diamorl(i,j,k) &
                                + wombat%lbacmorl(i,j,k) &
@@ -6615,8 +6622,8 @@ module generic_WOMBATfull
                                  + mesexcraoan ) * wombat%mesexcrdom &
                                - wombat%ldocremi(i,j,k) * ldom_N2C ) &
                                + dtsb * 16./122.0 * ( &
-                                 wombat%sdetremi(i,j,k) &
-                               + wombat%ldetremi(i,j,k) &
+                                 wombat%sdetremi(i,j,k) * wombat%pbac_alpha &
+                               + wombat%ldetremi(i,j,k) * wombat%pbac_alpha &
                                + wombat%phymorl(i,j,k) &
                                + wombat%diamorl(i,j,k) &
                                + ( wombat%zooexcrphy(i,j,k) &
@@ -6674,6 +6681,8 @@ module generic_WOMBATfull
                                  + wombat%mesexcrsdet(i,j,k) &
                                  + wombat%mesexcrldet(i,j,k) &
                                  + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                               + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
+                               + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                                + wombat%zoomorl(i,j,k) &
                                + wombat%mesmorl(i,j,k) &
                                - wombat%phygrow(i,j,k) &
@@ -6737,6 +6746,8 @@ module generic_WOMBATfull
                                 + wombat%mesexcrsdet(i,j,k) &
                                 + wombat%mesexcrldet(i,j,k) &
                                 + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                              + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
+                              + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                               + wombat%zoomorl(i,j,k) &
                               + wombat%mesmorl(i,j,k) &
                               + wombat%lbacpco2(i,j,k) &
@@ -6778,6 +6789,8 @@ module generic_WOMBATfull
                                    + wombat%mesexcrsdet(i,j,k) &
                                    + wombat%mesexcrldet(i,j,k) &
                                    + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
+                                 + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
+                                 + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                                  + wombat%zoomorl(i,j,k) &
                                  + wombat%mesmorl(i,j,k) &
                                  + wombat%lbacpco2(i,j,k) &
@@ -6808,6 +6821,8 @@ module generic_WOMBATfull
                               + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
                               - wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                               - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
+                              + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
+                              + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                               + wombat%zoomorl(i,j,k) &
                               + wombat%mesmorl(i,j,k) &
                               + ( wombat%zooexcrphy(i,j,k) &
