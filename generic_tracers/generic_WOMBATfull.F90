@@ -310,7 +310,7 @@ module generic_WOMBATfull
         mesqmor, &
         zoopreyswitch, &
         mespreyswitch, &
-        sdetlrem, &
+        detqrem, &
         bottom_thickness, &
         detlrem_sed, &
         sdetphi, &
@@ -3067,9 +3067,9 @@ module generic_WOMBATfull
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mespreyswitch', wombat%mespreyswitch, 1.8)
 
-    ! Small detritus hydrolyzation rate constant [(mmol C m-3)-1 s-1]
+    ! Particulate detritus hydrolyzation rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('sdetlrem', wombat%sdetlrem, 0.7/86400.0)
+    call g_tracer_add_param('detqrem', wombat%detqrem, 0.7/86400.0)
 
     ! Detritus hydrolyzation rate constant in sediments [s-1]
     !-----------------------------------------------------------------------
@@ -3311,7 +3311,7 @@ module generic_WOMBATfull
 
     ! Fraction of partially oxidized material routed to s-DOM [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('lbac_beta', wombat%lbac_beta, 0.50)
+    call g_tracer_add_param('lbac_beta', wombat%lbac_beta, 0.10)
 
     ! Large, sharing heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
@@ -3348,7 +3348,7 @@ module generic_WOMBATfull
     !-----------------------------------------------------------------------
     ! DON is preferentially targeted by heterotrophs for remineralisation over DOC
     ! (Letscher & Moore, 2015 GBC; Hach et al., 2020 Sci. Rep; Zakem et al., 2019 GBC)
-    call g_tracer_add_param('obac_kdoc', wombat%obac_kdoc, 100.0)
+    call g_tracer_add_param('obac_kdoc', wombat%obac_kdoc, 200.0)
 
     ! Large, selfish heterotrophic bacteria half saturation constant for dissolved iron uptake [µmolFe/m3]
     !-----------------------------------------------------------------------
@@ -3360,7 +3360,7 @@ module generic_WOMBATfull
 
     ! Large, selfish heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('obac_fele', wombat%obac_fele, 0.075)
+    call g_tracer_add_param('obac_fele', wombat%obac_fele, 0.05)
 
     ! Small, scavenging heterotrophic bacteria maximum rate of uptake of DOC [mmol C m-3 s-1]
     !-----------------------------------------------------------------------
@@ -3401,7 +3401,7 @@ module generic_WOMBATfull
 
     ! Small, scavenging heterotrophic bacteria half saturation constant for dissolved NH4 uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('sbac_knh4', wombat%sbac_knh4, 0.15)
+    call g_tracer_add_param('sbac_knh4', wombat%sbac_knh4, 0.10)
 
     ! Small, scavenging heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
@@ -3409,7 +3409,7 @@ module generic_WOMBATfull
 
     ! Fraction of long-chain DON converted to short-chain DON and not NH4 [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('donpersist', wombat%donpersist, 0.5)
+    call g_tracer_add_param('donpersist', wombat%donpersist, 0.4)
 
     ! Heterotrophic bacteria biomass carbon to nitrogen ratio [mol C (mol N)-1]
     !-----------------------------------------------------------------------
@@ -3427,7 +3427,7 @@ module generic_WOMBATfull
 
     ! Heterotrophic bacteria quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bacqmor', wombat%bacqmor, 0.05/86400.0)
+    call g_tracer_add_param('bacqmor', wombat%bacqmor, 0.10/86400.0)
 
     ! Anammox bacteria half saturation constant for ammonium uptake [mmolN/m3]
     !-----------------------------------------------------------------------
@@ -5157,7 +5157,7 @@ module generic_WOMBATfull
       fbc = wombat%bbioh ** (Temp(i,j,k))
 
       ! Variable rates of remineralisation
-      wombat%reminr(i,j,k) = wombat%sdetlrem * fbc
+      wombat%reminr(i,j,k) = wombat%detqrem * fbc
 
 
       !-----------------------------------------------------------------------!
@@ -5875,8 +5875,8 @@ module generic_WOMBATfull
       !  [ Zakem et al., 2020 ISME; Buchanan et al., 2025 Science]
       !  Find electron potential of the bacterial biomass and DOM
       e_bac = max(epsi, 4.0 + 1.4 - 2.0*0.4 - 3.0/wombat%bac_C2N) ! [Zimmerman et al., 2014]
-      e_pom = max(epsi, 4.0 + 1.65 - 2.0*0.4 - 3.0*16./122.)  ! [Anderson et al., 1995]
-      e_ldom = max(epsi, 4.0 + 1.65 - 2.0*0.4 - 3.0*ldom_N2C)  ! [Anderson et al., 1995]
+      e_pom = max(epsi, 4.0 + 1.65 - 2.0*0.3 - 3.0*16./122.)  ! [Anderson et al., 1995]
+      e_ldom = max(epsi, 4.0 + 1.65 - 2.0*0.3 - 3.0*ldom_N2C)  ! [Anderson et al., 1995]
       ! Amino acid and carbohydrate rich DOM has H:C of ~2.0, O:C of ~0.6 and a NOSC ~ -0.65
       e_sdom = max(epsi, 4.0 + 2.0 - 2.0*0.6 - 3.0*sdom_N2C)
       ! Cai et al., 2026 - Newly produced reworked DOM has H:C of ~1.0, O:C of 0.6 and a NOSC ~ +0.30
@@ -6493,8 +6493,6 @@ module generic_WOMBATfull
                               - wombat%anammox(i,j,k) ) + dtsb * 16./122. * ( &
                                 wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                               + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
-                              + wombat%zoomorl(i,j,k) &
-                              + wombat%mesmorl(i,j,k) &
                               + ( wombat%zooexcrphy(i,j,k) &
                                 + wombat%zooexcrdia(i,j,k) &
                                 + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
@@ -6516,7 +6514,7 @@ module generic_WOMBATfull
              - wombat%lbacmorl(i,j,k) &
              - wombat%zoograzlbac(i,j,k) &
              - wombat%mesgrazlbac(i,j,k)
-      ! Treat diamorq semi-implicitly
+      ! Treat lbacmorq semi-implicitly
       zval1 = max(0.0, (wombat%p_lbac(i,j,k,tau) + dtsb * P_expl))
       zval2 = min(0.0, (wombat%p_lbac(i,j,k,tau) + dtsb * P_expl))
       k_loss = wombat%bacqmor / mmol_m3_to_mol_kg * zval1
@@ -6532,7 +6530,7 @@ module generic_WOMBATfull
              - wombat%obacmorl(i,j,k) &
              - wombat%zoograzobac(i,j,k) &
              - wombat%mesgrazobac(i,j,k)
-      ! Treat diamorq semi-implicitly
+      ! Treat obacmorq semi-implicitly
       zval1 = max(0.0, (wombat%p_obac(i,j,k,tau) + dtsb * P_expl))
       zval2 = min(0.0, (wombat%p_obac(i,j,k,tau) + dtsb * P_expl))
       k_loss = wombat%bacqmor / mmol_m3_to_mol_kg * zval1
@@ -6546,7 +6544,7 @@ module generic_WOMBATfull
       ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
       P_expl = wombat%sbacgrow(i,j,k) - wombat%sbacmorl(i,j,k) - &
                wombat%zoograzsbac(i,j,k) - wombat%mesgrazsbac(i,j,k)
-      ! Treat diamorq semi-implicitly
+      ! Treat sbacmorq semi-implicitly
       zval1 = max(0.0, (wombat%p_sbac(i,j,k,tau) + dtsb * P_expl))
       zval2 = min(0.0, (wombat%p_sbac(i,j,k,tau) + dtsb * P_expl))
       k_loss = wombat%bacqmor / mmol_m3_to_mol_kg * zval1
@@ -6583,6 +6581,8 @@ module generic_WOMBATfull
                                + wombat%sbacmorq(i,j,k) &
                                + wombat%aoamorl(i,j,k) &
                                + wombat%aoamorq(i,j,k) &
+                               + wombat%zoomorl(i,j,k) &
+                               + wombat%mesmorl(i,j,k) &
                                + ( wombat%zooexcrlbac(i,j,k) &
                                  + wombat%zooexcrobac(i,j,k) &
                                  + wombat%zooexcrsbac(i,j,k) &
@@ -6626,6 +6626,8 @@ module generic_WOMBATfull
                                + wombat%ldetremi(i,j,k) * wombat%pbac_alpha &
                                + wombat%phymorl(i,j,k) &
                                + wombat%diamorl(i,j,k) &
+                               + wombat%zoomorl(i,j,k) &
+                               + wombat%mesmorl(i,j,k) &
                                + ( wombat%zooexcrphy(i,j,k) &
                                  + wombat%zooexcrdia(i,j,k) &
                                  + wombat%zooexcrsdet(i,j,k) ) *wombat%zooexcrdom &
@@ -6683,8 +6685,6 @@ module generic_WOMBATfull
                                  + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
                                + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                                + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
-                               + wombat%zoomorl(i,j,k) &
-                               + wombat%mesmorl(i,j,k) &
                                - wombat%phygrow(i,j,k) &
                                - wombat%diagrow(i,j,k) ) &
                                - dtsb * ( &
@@ -6748,8 +6748,6 @@ module generic_WOMBATfull
                                 + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
                               + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                               + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
-                              + wombat%zoomorl(i,j,k) &
-                              + wombat%mesmorl(i,j,k) &
                               + wombat%lbacpco2(i,j,k) &
                               + wombat%obacpco2(i,j,k) &
                               + wombat%sbacpco2(i,j,k) &
@@ -6791,8 +6789,6 @@ module generic_WOMBATfull
                                    + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
                                  + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                                  + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
-                                 + wombat%zoomorl(i,j,k) &
-                                 + wombat%mesmorl(i,j,k) &
                                  + wombat%lbacpco2(i,j,k) &
                                  + wombat%obacpco2(i,j,k) &
                                  + wombat%sbacpco2(i,j,k) &
@@ -6823,8 +6819,6 @@ module generic_WOMBATfull
                               - wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) &
                               + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
                               + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
-                              + wombat%zoomorl(i,j,k) &
-                              + wombat%mesmorl(i,j,k) &
                               + ( wombat%zooexcrphy(i,j,k) &
                                 + wombat%zooexcrdia(i,j,k) &
                                 + wombat%zooexcrsdet(i,j,k) ) * (1.0-wombat%zooexcrdom) &
