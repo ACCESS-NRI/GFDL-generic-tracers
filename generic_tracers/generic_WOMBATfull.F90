@@ -319,7 +319,7 @@ module generic_WOMBATfull
         diarad0, &
         zoorad0, &
         mesrad0, &
-        sdetrho, &
+        detrho, &
         caco3rho, &
         bsirho, &
         phybiot, &
@@ -2971,7 +2971,7 @@ module generic_WOMBATfull
     !  - e.g., appendicularians filter feeding on small bacteria
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepssbac', wombat%mesepssbac, 0.10/86400.0)
+    call g_tracer_add_param('mesepssbac', wombat%mesepssbac, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for ammonia oxidizing archaea [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on ammonia oxidizing archaea
@@ -2989,25 +2989,25 @@ module generic_WOMBATfull
     !  - e.g., copepods preying on diatoms and other microphytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.20/86400.0)
+    call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on fine detritus
     !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepssdet', wombat%mesepssdet, 0.05/86400.0)
+    call g_tracer_add_param('mesepssdet', wombat%mesepssdet, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for large detritus [(mmol C m-3)-2 s-1]
     !  - e.g., copepods consuming sinking aggregates of marine snow
     !  - aim for half-saturation coefficent B1/2 = 10.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsldet', wombat%mesepsldet, 0.10/86400.0)
+    call g_tracer_add_param('mesepsldet', wombat%mesepsldet, 0.11/86400.0)
 
     ! Mesozooplankton prey capture rate constant for microzooplankton [(mmol C m-3)-2 s-1]
     !  - e.g., chaetognaths preying on copepods; copepods consuming ciliates
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.10/86400.0)
+    call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.11/86400.0)
 
     ! Mesozooplankton preference for large, sharing bacteria [dimensionless]
     !-----------------------------------------------------------------------
@@ -3104,9 +3104,9 @@ module generic_WOMBATfull
     !-----------------------------------------------------------------------
     call g_tracer_add_param('mesrad0', wombat%mesrad0, 1000.0)
 
-    ! Density of organic small detritus [kg/m3]
+    ! Density of organic detritus [kg/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('sdetrho', wombat%sdetrho, 1375.0)
+    call g_tracer_add_param('detrho', wombat%detrho, 1375.0)
 
     ! Density of calcium carbonate [kg/m3]
     !-----------------------------------------------------------------------
@@ -3226,7 +3226,7 @@ module generic_WOMBATfull
 
     ! Ammonia Oxidizing Archaea half saturation constant for NH4 uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoa_knh4', wombat%aoa_knh4, 0.1)
+    call g_tracer_add_param('aoa_knh4', wombat%aoa_knh4, 0.08)
 
     ! Ammonia Oxidizing Archaea diffusive uptake limit for oxygen [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
@@ -5880,9 +5880,9 @@ module generic_WOMBATfull
       ! Amino acid and carbohydrate rich DOM has H:C of ~2.0, O:C of ~0.6 and a NOSC ~ -0.65
       e_sdom = max(epsi, 4.0 + 2.0 - 2.0*0.6 - 3.0*sdom_N2C)
       ! Cai et al., 2026 - Newly produced reworked DOM has H:C of ~1.0, O:C of 0.6 and a NOSC ~ +0.30
-      e_odom = max(epsi, 4.0 + 1.0 - 2.0*0.5 - 3.0*odom_N2C)  ! [Lechtenfeld et al., 2014] - CRAM has H:C of ~1.0, O:C of ~0.6
+      e_odom = max(epsi, 4.0 + 1.0 - 2.0*0.6 - 3.0*odom_N2C)  ! [Lechtenfeld et al., 2014] - CRAM has H:C of ~1.0, O:C of ~0.6
       e_sdom_l = max(epsi, 4.0 + 2.0 - 2.0*0.6 - 3.0*ldom_N2C * wombat%donpersist)
-      e_odom_l = max(epsi, 4.0 + 1.0 - 2.0*0.5 - 3.0*ldom_N2C * wombat%donpersist)
+      e_odom_l = max(epsi, 4.0 + 1.0 - 2.0*0.6 - 3.0*ldom_N2C * wombat%donpersist)
       ! residual electrons available to sharing bacteria after loss to s-DOM and o-DOM
       e_lres = max(epsi, e_ldom &
                          - (wombat%lbac_alpha * wombat%lbac_beta * e_sdom_l) &
@@ -5914,7 +5914,7 @@ module generic_WOMBATfull
       ! anaerobic conditions
       lbacydoc_ana = min(1.0 - wombat%lbac_alpha, wombat%lbac_fele * 0.9 * e_lres/e_bac)
       if (lbacydoc_ana > 0.0) lbac_cdoc_ana = 1.0 / lbacydoc_ana ! DOC consumed per mol of C-biomass
-      lbac_cno3_ana = max(0.0, e_lres - lbacydoc_ana*e_bac)/4.0 * lbac_cdoc_ana ! N (NO3 --> N2O) molecules consumed per mol C-biomass
+      lbac_cno3_ana = max(0.0, e_lres - lbacydoc_ana*e_bac)/5.0 * lbac_cdoc_ana ! N (NO3 --> N2) molecules consumed per mol C-biomass
       lbac_psdoc_ana = wombat%lbac_alpha * wombat%lbac_beta * lbac_cdoc_ana ! s-DOM produced per mol of C-biomass
       lbac_podoc_ana = wombat%lbac_alpha * (1.0 - wombat%lbac_beta) * lbac_cdoc_ana ! partially oxidized o-DOM produced per mol of C-biomas
       lbac_pco2_ana = (1.0 - wombat%lbac_alpha) * lbac_cdoc_ana - 1.0 ! CO2 produced per mol of C-biomass
@@ -5930,7 +5930,7 @@ module generic_WOMBATfull
       ! anaerobic conditions
       obacydoc_ana = wombat%obac_fele * 0.9 * e_odom/e_bac
       if (obacydoc_ana > 0.0) obac_cdoc_ana = 1.0 / obacydoc_ana ! DOC consumed per mol C-biomass
-      obac_cno3_ana = max(0.0, e_odom - obacydoc_ana*e_bac)/4.0 * obac_cdoc_ana ! N (NO3 --> N2O) molecules consumed per mol of C-biomass
+      obac_cno3_ana = max(0.0, e_odom - obacydoc_ana*e_bac)/5.0 * obac_cdoc_ana ! N (NO3 --> N2) molecules consumed per mol of C-biomass
       obac_pco2_ana = obac_cdoc_ana - 1.0 ! CO2 produced per mol of C-biomass
       obac_pnh4_ana = odom_N2C*obac_cdoc_ana - 1.0/wombat%bac_C2N ! NH4 produced per mol of C-biomass
       !!!~~~ Small, scavenging bacteria ~~~!!!
@@ -5942,7 +5942,7 @@ module generic_WOMBATfull
       ! anaerobic conditions
       sbacydoc_ana = wombat%sbac_fele * 0.9 * e_sdom/e_bac
       if (sbacydoc_ana > 0.0) sbac_cdoc_ana = 1.0 / sbacydoc_ana ! DOC consumed per mol C-biomass
-      sbac_cno3_ana = max(0.0, e_sdom - sbacydoc_ana*e_bac)/4.0 * sbac_cdoc_ana ! N (NO3 --> N2O) molecules consumed per mol of C-biomass
+      sbac_cno3_ana = max(0.0, e_sdom - sbacydoc_ana*e_bac)/5.0 * sbac_cdoc_ana ! N (NO3 --> N2) molecules consumed per mol of C-biomass
       sbac_pco2_ana = sbac_cdoc_ana - 1.0 ! CO2 produced per mol of C-biomass
       sbac_pnh4_ana = sdom_N2C*sbac_cdoc_ana - 1.0/wombat%bac_C2N ! NH4 produced per mol of C-biomass
 
@@ -7290,16 +7290,16 @@ module generic_WOMBATfull
           if (mass_small > epsi) then
             w1 = mass_sdet / mass_small
             w2 = mass_caco3 / mass_small
-            rho_small = 1.0 / (max( w1/wombat%sdetrho + w2/wombat%caco3rho, epsi)) ! [kg/m3]
+            rho_small = 1.0 / (max( w1/wombat%detrho + w2/wombat%caco3rho, epsi)) ! [kg/m3]
           else
-            rho_small = wombat%sdetrho
+            rho_small = wombat%detrho
           endif
           if (mass_large > epsi) then
             w1 = mass_ldet / mass_large
             w2 = mass_bsi / mass_large
-            rho_large = 1.0 / (max( w1/wombat%sdetrho + w2/wombat%bsirho, epsi)) ! [kg/m3]
+            rho_large = 1.0 / (max( w1/wombat%detrho + w2/wombat%bsirho, epsi)) ! [kg/m3]
           else
-            rho_large = wombat%sdetrho
+            rho_large = wombat%detrho
           endif
 
           ! 4. Compute excess density given the mass of particles and their porosity

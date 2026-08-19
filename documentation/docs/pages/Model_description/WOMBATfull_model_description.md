@@ -36,7 +36,7 @@ _Dougie.Squire@anu.edu.au_ <br>
 - Micro- and Meso-zooplankton routes Fe preferentially to egestion (i.e., faecal pellets) following [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597), enriching detritus in Fe. <br>
 - Micro- and Meso-zooplankton dissolve CaCO<sub>3</sub> ([Smith et al., 2024](https://doi.org/10.1126/sciadv.adr5453); [White et al., 2018](https://doi.org/10.1038/s41598-018-28073-x); [Harris, 1994](https://doi.org/10.1007/BF00347540)) but conserve biogenic silica due to acidic conditions in their gut ([Dagg et al., 2003](https://doi.org/10.1016/S0967-0645(02)00590-8); [Taucher et al., 2022](https://www.nature.com/articles/s41586-022-04687-0)).
 - The nitrogen cycle can be made to be open, with schemes for nitrogen fixation, anammox, water column denitrification and sedimentary denitrification that can be switched on or off at run time. <br>
-- Ammonia oxidizing archaea are an explicit biomass type that performs nitrification of NH<sub>4</sub> to NO<sub>3</sub> and produces N<sub>2</sub>O as a byproduct ([Kelly et al., 2024](https://doi.org/10.5194/bg-21-3215-2024)).
+- Ammonia oxidizing archaea are an explicit biomass type that performs nitrification of NH<sub>4</sub> to NO<sub>3</sub> and compete with phytoplankton and bacteria for this resource.
 - Three types of free-living heterotrophic bacteria (sharers, scavengers and selfish ([Reintjes et al., 2019](https://doi.org/10.1038/s41396-018-0326-3)) drive remineralisation of three types of dissolved organic matter (long-chain, short-chain and oxidized). Their metabolism and growth yields are controlled by electron balance ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Rittman & McCarty, 2001](https://books.google.com.au/books/about/Environmental_Biotechnology_Principles_a.html?id=1PMeAQAAIAAJ&redir_esc=y)).
 - Heterotrophic bacteria are facultative, meaning that they can switch to anaerobic metabolism and use NO<sub>3</sub> as electron acceptors for growth in low O<sub>2</sub> conditions ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Sun et al., 2024](https://doi.org/10.1073/pnas.2417421121)).
 - CaCO<sub>3</sub> cycling is a function of the ambient seawater carbonate chemistry: production is affected by the substrate-inhibitor ratio ([Lehmann & Bach, 2025](https://www.nature.com/articles/s41561-025-01644-0)); dissolution occurs in saturated waters ($\Omega$ > 1) due to reducing micro-environments and undersaturated waters ($\Omega$ < 1) ([Kwon et al., 2024](https://www.science.org/doi/full/10.1126/sciadv.adl0779)). <br>
@@ -77,16 +77,17 @@ The following are the active tracers in WOMBAT-full
 | 23   | B<sub>ld</sub><sup>Si</sup>   | `p_ldetsi` | Large sinking detritus silicon content              | mol Si kg<sup>-1</sup>    | Yes         |
 | 24   | B<sub>lDOM</sub><sup>C</sup>  | `p_ldoc`   | Long-chain dissolved organic carbon                 | mol C kg<sup>-1</sup>     | Yes         |
 | 25   | B<sub>lDOM</sub><sup>N</sup>  | `p_ldon`   | Long-chain dissolved organic nitrogen               | mol N kg<sup>-1</sup>     | Yes         |
-| 26   | B<sub>oDOM</sub><sup>C</sup>  | `p_odoc`   | Oxidized dissolved organic carbon                 | mol C kg<sup>-1</sup>     | Yes         |
-| 27   | B<sub>oDOM</sub><sup>N</sup>  | `p_odon`   | Oxidized dissolved organic nitrogen               | mol N kg<sup>-1</sup>     | Yes         |
+| 26   | B<sub>oDOM</sub><sup>C</sup>  | `p_odoc`   | Oxidized dissolved organic carbon                   | mol C kg<sup>-1</sup>     | Yes         |
+| 27   | B<sub>oDOM</sub><sup>N</sup>  | `p_odon`   | Oxidized dissolved organic nitrogen                 | mol N kg<sup>-1</sup>     | Yes         |
 | 28   | B<sub>sDOM</sub><sup>C</sup>  | `p_sdoc`   | Short-chain dissolved organic carbon                | mol C kg<sup>-1</sup>     | Yes         |
 | 29   | B<sub>sDOM</sub><sup>N</sup>  | `p_sdon`   | Short-chain dissolved organic nitrogen              | mol N kg<sup>-1</sup>     | Yes         |
-| 30   | B<sub>lb</sub><sup>C</sup>    | `p_lbac`   | Long-chain DOM consuming (sharing) bacteria             | mol C kg<sup>-1</sup>     | Yes         |
-| 31   | B<sub>ob</sub><sup>C</sup>    | `p_obac`   | Oxidized DOM consuming (sharing) bacteria             | mol C kg<sup>-1</sup>     | Yes         |
-| 32   | B<sub>sb</sub><sup>C</sup>    | `p_sbac`   | Short-chain DOM consuming (scavenging) bacteria         | mol C kg<sup>-1</sup>     | Yes         |
-| 33   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
-| 34   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
-| 35   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
+| 30   | B<sub>lb</sub><sup>C</sup>    | `p_lbac`   | Long-chain DOM consuming (sharing) bacteria         | mol C kg<sup>-1</sup>     | Yes         |
+| 31   | B<sub>ob</sub><sup>C</sup>    | `p_obac`   | Oxidized DOM consuming (sharing) bacteria           | mol C kg<sup>-1</sup>     | Yes         |
+| 32   | B<sub>sb</sub><sup>C</sup>    | `p_sbac`   | Short-chain DOM consuming (scavenging) bacteria     | mol C kg<sup>-1</sup>     | Yes         |
+| 33   | B<sub>aoa</sub><sup>C</sup>   | `p_aoa`    | Ammonia oxidizing archaea                           | mol C kg<sup>-1</sup>     | Yes         |
+| 34   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
+| 35   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
+| 36   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
 | 36   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
 | 37   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
 
@@ -371,6 +372,12 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `aoa_loxy`         | Limitation of ammonia oxidation by oxygen                                          | dimensionless                                   |
 | `aoa_lnh4`         | Limitation of ammonia oxidation by ammonium                                        | dimensionless                                   |
 | `aoa_mu`           | Realized growth rate of ammonia oxidizing archaea                                  | s<sup>-1</sup>                                  |
+| `aoa_mumax`        | Maximum potential growth rate of ammonia oxidizing archaea                         | s<sup>-1</sup>                                  |
+| `aoa_eno3`         | Production of nitrate by ammonia oxidizing archaea                                 | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoagrow`          | Growth of ammonia oxidizing archaea                                                | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoaresp`          | Oxygen consumption by ammonia oxidizing archaea                                    | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoamorl`          | Linear mortality of ammonia oxidizing archaea                                      | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoamorq`          | Quadratic mortality of ammonia oxidizing archaea                                   | mol C kg<sup>-1</sup> s<sup>-1</sup> |
 | `anammox`          | Anammox rate (NH<sub>4</sub> consumption)                                          | mol kg<sup>-1</sup> s<sup>-1</sup>              |
 | `aox_lnh4`         | Limitation of anammox bacteria by ammonium                                         | dimensionless                                   |
 | `aox_mu`           | Realized growth rate of anammox bacteria                                           | s<sup>-1</sup>                                  |
@@ -504,10 +511,10 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `mesepssbac`       | Meso-zooplankton prey capture efficiency (scavenging bacteria)              | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepsaoa`        | Meso-zooplankton prey capture efficiency (AOA)                              | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepsphy`        | Meso-zooplankton prey capture efficiency (nano-phytoplankton)               | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsdia`        | Meso-zooplankton prey capture efficiency (micro-phytoplankton)              | 0.20/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepssdet`       | Meso-zooplankton prey capture efficiency (small detritus)                   | 0.05/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsldet`       | Meso-zooplankton prey capture efficiency (large detritus)                   | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepszoo`        | Meso-zooplankton prey capture efficiency (micro-zooplankton)                | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsdia`        | Meso-zooplankton prey capture efficiency (micro-phytoplankton)              | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepssdet`       | Meso-zooplankton prey capture efficiency (small detritus)                   | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsldet`       | Meso-zooplankton prey capture efficiency (large detritus)                   | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepszoo`        | Meso-zooplankton prey capture efficiency (micro-zooplankton)                | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mpreflbac`        | Meso-zooplankton preference (sharing bacteria)                              | 0.0           | dimensionless                                                        |
 | `mprefobac`        | Meso-zooplankton preference (selfish bacteria)                              | 0.0           | dimensionless                                                        |
 | `mprefsbac`        | Meso-zooplankton preference (scavenging bacteria)                           | 0.0           | dimensionless                                                        |
@@ -583,8 +590,8 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `obac_kfer`     | Half-saturation coefficient for dissolved iron uptake by selfish bacteria          | 0.35          | µmol Fe m<sup>-3</sup>                                      |
 | `obac_knh4`     | Half-saturation coefficient for NH<sub>4</sub> uptake by selfish bacteria          | 0.30          | mmol N m<sup>-3</sup>                                       |
 | `obac_fele`     | Fraction of electrons allocated to biosynthesis by selfish bacteria                | 0.05          | dimensionless                                               |
-| `sbac_Vmax_doc` | Maximum DOC uptake rate of scavenging bacteria                                     | 3.3/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                        |
-| `sbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of scavenging bacteria                          | 3.6/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_doc` | Maximum DOC uptake rate of scavenging bacteria                                     | 2.23/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of scavenging bacteria                          | 2.4/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
 | `sbac_Vmax_dFe` | Maximum dissolved iron uptake rate of scavenging bacteria                          | 0.00010/86400 | mmol Fe m<sup>-3</sup> s<sup>-1</sup>                       |
 | `sbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of scavenging bacteria                          | 0.10/86400    | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
 | `sbac_poxy`     | O<sub>2</sub> diffusive uptake limit of scavenging bacteria                        | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
@@ -1945,7 +1952,7 @@ S_{sDOM} + \dfrac{(1 - f)4.65}{4} O_{2} \rightarrow& \dfrac{f\cdot 4.65}{4} B_{s
 \end{align}
 $$
 
-In the case of full oxidation under aerobic conditions we therefore find that the growth yields of each bacterial type ($y_{lb}^{C}$, $y_{ob}^{C}$ and $y_{sb}^{C}$) are equal to $\min \left(1 - \alpha, \dfrac{f D}{d_{B}} \right)$, which is equivalent to $f \cdot \dfrac{4.65}{4}$ for sharing and selfish bacteria and $f \cdot \dfrac{3.65}{4}$ for selfish bacteria with our assumptions of substrate and bacterial stoichiometry.
+In the case of full oxidation under aerobic conditions we therefore find that the growth yields of each bacterial type ($y_{lb}^{C}$, $y_{ob}^{C}$ and $y_{sb}^{C}$) are equal to $\min \left(1 - \alpha, \dfrac{f D}{d_{B}} \right)$, which is equivalent to $f \cdot \dfrac{4.65}{4}$ for sharing and scavenging bacteria and $f \cdot \dfrac{3.65}{4}$ for selfish bacteria with our assumptions of substrate and bacterial stoichiometry.
 
 We note, however, that because we track variations in the N:C content of each DOM pool, the exact values of $d_{S}$ for each substrate also vary dynamically since $n_{S}$ ratios change in space and time. The best example of this is for the scavenging bacterial type. In scenarios of strong overflow production of s-DOC by phytoplankton, which has a unique but constant stoichiometry of CH<sub>2.0</sub>O.6 to represent exudation of carbohydrates, carboxylic acids and lipids ([Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)) with no nitrogne content, the N:C ratios of s-DOM become strongly depleted and consequently the energy of the substrate increases ($d_{S}$ > 4.65), which increases growth yields. However, high growth rates in this scenario can only be achieved if scavenging bacteria can access NH<sub>4</sub>.
 
@@ -2269,7 +2276,7 @@ $$
 
 _where_ <br>
 - $\mu_{aoa}$ is the realized growth rate of ammonia oxidizing archaea (`aoa_mu(i,j,k)`, [s<sup>-1</sup>]) <br>
-- $B_{aoa}^{C}$ is the in situ concentration of carbon biomass of ammonia oxidizing archaea (`f_aoa(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+- $B_{aoa}^{C}$ is the in situ concentration of carbon biomass of ammonia oxidizing archaea (`p_aoa(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
 The realized growth rate, $\mu_{aoa}$, is the minimum growth achievable on oxygen and ammonium:
 
@@ -2327,11 +2334,11 @@ $$
 _where_ <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $f_{ana}$ is the fraction of growth that is supported by anaerobic metabolism (`(1 - aoa_loxy(i,j,k))`, [dimenionless]) <br>
+- $f_{ana}$ is the fraction of growth that is supported by anaerobic metabolism (`(lbac_anaer(i,j,k))`, [dimenionless]) <br>
 - $L_{aox}^{NH_4}$ is the growth limiter of anammox associated with NH<sub>4</sub> availability (`aox_lnh4(i,j,k)`, [dimensionless]) <br>
 - NH<sub>4</sub> is the in situ concentration of ammonium (`nh4_p`, [mol N kg<sup>-1</sup>])
 
-Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of NH<sub>4</sub>. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here which is based on the oxygen limitation of ammonia oxidation. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
+Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of NH<sub>4</sub>. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here which is based on whether anaerobic metabolisms are occuring for the sharing bacterial type. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
 
 $$
 \begin{align}
