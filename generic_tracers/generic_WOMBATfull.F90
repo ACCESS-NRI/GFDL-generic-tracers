@@ -441,6 +441,8 @@ module generic_WOMBATfull
         b_odon, &
         b_ldoc, &
         b_ldon, &
+        b_nh4, &
+        b_o2, &
         b_no3, &
         b_sil, &
         b_fe, &
@@ -3242,7 +3244,8 @@ module generic_WOMBATfull
     !-----------------------------------------------------------------------
     ! NOTE: in the WOMBAT-full documentation, aoa_yoxy is written as the inverse
     !       of what it is here in the code, in units of mol Biomass per mol O2
-    call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5)
+    ! Because we don't represent nitrite oxidizing bacteria, we include their O2 yield too
+    call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5 + 12.9)
 
     ! Ammonia Oxidizing Archaea biomass carbon to nitrogen ratio [mol C (mol N)-1]
     !-----------------------------------------------------------------------
@@ -5296,6 +5299,10 @@ module generic_WOMBATfull
                                     fe_umolm3 / (fe_umolm3 + wombat%phy_kfe(i,j,k)) * &
                                     wombat%phy_feupreg(i,j,k) * &
                                     wombat%phy_fedoreg(i,j,k) ) * mmol_m3_to_mol_kg
+      else
+        wombat%phy_feupreg(i,j,k) = 1.0
+        wombat%phy_fedoreg(i,j,k) = 1.0
+        wombat%phy_dfeupt(i,j,k) = 0.0
       endif
 
       !!!~~~ Microphytoplankton ~~~!!!
@@ -5310,6 +5317,10 @@ module generic_WOMBATfull
                                        * fe_umolm3 / (fe_umolm3 + wombat%dia_kfe(i,j,k)) &
                                        * wombat%dia_feupreg(i,j,k) &
                                        * wombat%dia_fedoreg(i,j,k))) * mmol_m3_to_mol_kg
+      else
+        wombat%dia_feupreg(i,j,k) = 1.0
+        wombat%dia_fedoreg(i,j,k) = 1.0
+        wombat%dia_dfeupt(i,j,k) = 0.0
       endif
 
 
@@ -5440,7 +5451,7 @@ module generic_WOMBATfull
                + feagg4*(sdoc_mmolm3 + odoc_mmolm3 + ldoc_mmolm3) + feagg5*sdet_mmolm3 ) * wombat%kcoag_dfe
       wombat%fecoag2safe(i,j,k) = wombat%fecol(i,j,k) * zval
       ! Include an aggregation of colloidal authigenic Fe when concentration of colloidal Fe is high
-      wombat%fecoag2safe(i,j,k) = wombat%fecoag2safe(i,j,k) + wombat%kagg_col &
+      wombat%fecoag2safe(i,j,k) = wombat%fecoag2safe(i,j,k) + wombat%fecol(i,j,k) * wombat%kagg_col &
                                  * wombat%fecol(i,j,k)**4 / (wombat%fecol(i,j,k)**4 + wombat%kagg_kcol**4)
       ! Colloidal shunt associated with big particles (Tagliabue et al., 2023)
       feagg1 = 1.37
@@ -6665,7 +6676,7 @@ module generic_WOMBATfull
 
       ! Oxygen equation ! [molO2/kg]
       !-----------------------------------------------------------------------
-      if (wombat%p_o2(i,j,k,tau) > epsi) &
+      if (wombat%p_o2(i,j,k,tau) > epsi) then
         wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) - 132./122. * dtsb * ( &
                                  ( wombat%zooexcrlbac(i,j,k) &
                                  + wombat%zooexcrobac(i,j,k) &
@@ -6684,14 +6695,19 @@ module generic_WOMBATfull
                                  + wombat%mesexcrldet(i,j,k) &
                                  + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
                                + wombat%sdetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
-                               + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) &
-                               - wombat%phygrow(i,j,k) &
-                               - wombat%diagrow(i,j,k) ) &
+                               + wombat%ldetremi(i,j,k) * (1.0 - wombat%pbac_alpha) ) &
                                - dtsb * ( &
                                  wombat%lbacresp(i,j,k) &
                                + wombat%obacresp(i,j,k) &
                                + wombat%sbacresp(i,j,k) &
                                + wombat%aoaresp(i,j,k) )
+      endif
+      wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) + dtsb * ( &
+                               ( wombat%phygrow(i,j,k) * wombat%phy_lno3(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                               + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) ) * 164./122. &
+                             + ( wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                               + wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) ) * 132./122. &
+                             + ( wombat%phydoc(i,j,k) + wombat%diadoc(i,j,k) ) * 1.25 )
 
 
       ! Equation for CaCO3 ! [molCaCO3/kg]
@@ -7469,14 +7485,17 @@ module generic_WOMBATfull
 
         ! Remineralisation of sediments to supply nutrient fields.
         ! btf values are positive from the water column into the sediment.
-        wombat%b_ldoc(i,j) = -wombat%det_sed_remin(i,j) ! [mol/m2/s]
-        wombat%b_ldon(i,j) = -16./122. * wombat%det_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_ldoc(i,j) = -wombat%det_sed_remin(i,j) - 122.0/94.0 * wombat%fdenit(i,j) ! [mol/m2/s]
+        wombat%b_ldon(i,j) = -16./122. * wombat%det_sed_remin(i,j) - 122.0/94.0 * wombat%fdenit(i,j) ! [mol/m2/s]
+        wombat%b_nh4(i,j) = 16.0/122. * 122.0/94.0 * wombat%fdenit(i,j) ! [molN/m2/s]
+        wombat%b_o2(i,j) = 132.0/122. * 122.0/94.0 * wombat%fdenit(i,j) ! [molN/m2/s]
         wombat%b_no3(i,j) = wombat%det_sed_denit(i,j) ! [molN/m2/s]
-        wombat%b_dic(i,j) = -wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_dic(i,j) = -wombat%caco3_sed_remin(i,j) + 122.0/94.0 * wombat%fdenit(i,j) ! [mol/m2/s]
         if (do_tracer_dicr) wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
         wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
         wombat%b_sil(i,j) = -1.0 * wombat%detsi_sed_remin(i,j) ! [mol/m2/s]
-        wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
+        wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) - wombat%b_no3(i,j) &
+                          + 16.0/122 * 122.0/94.0 * wombat%fdenit(i,j) ! [mol/m2/s]
       endif
     enddo; enddo
 
@@ -7495,6 +7514,8 @@ module generic_WOMBATfull
 
     call g_tracer_set_values(tracer_list, 'ldoc', 'btf', wombat%b_ldoc, isd, jsd)
     call g_tracer_set_values(tracer_list, 'ldon', 'btf', wombat%b_ldon, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'nh4', 'btf', wombat%b_nh4, isd, jsd)
+    call g_tracer_set_values(tracer_list, 'o2', 'btf', wombat%b_o2, isd, jsd)
     call g_tracer_set_values(tracer_list, 'no3', 'btf', wombat%b_no3, isd, jsd)
     call g_tracer_set_values(tracer_list, 'dic', 'btf', wombat%b_dic, isd, jsd)
     if (do_tracer_dicr) call g_tracer_set_values(tracer_list, 'dicr', 'btf', wombat%b_dicr, isd, jsd)
@@ -8755,6 +8776,8 @@ module generic_WOMBATfull
 
     allocate(wombat%b_ldoc(isd:ied, jsd:jed)); wombat%b_ldoc(:,:)=0.0
     allocate(wombat%b_ldon(isd:ied, jsd:jed)); wombat%b_ldon(:,:)=0.0
+    allocate(wombat%b_nh4(isd:ied, jsd:jed)); wombat%b_nh4(:,:)=0.0
+    allocate(wombat%b_o2(isd:ied, jsd:jed)); wombat%b_o2(:,:)=0.0
     allocate(wombat%b_no3(isd:ied, jsd:jed)); wombat%b_no3(:,:)=0.0
     allocate(wombat%b_dic(isd:ied, jsd:jed)); wombat%b_dic(:,:)=0.0
     if (do_tracer_dicr) then
@@ -9041,6 +9064,8 @@ module generic_WOMBATfull
     deallocate( &
         wombat%b_ldoc, &
         wombat%b_ldon, &
+        wombat%b_nh4, &
+        wombat%b_o2, &
         wombat%b_no3, &
         wombat%b_dic, &
         wombat%b_fe, &

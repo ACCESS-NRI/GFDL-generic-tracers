@@ -1963,7 +1963,7 @@ We build from the above equations to include partial oxidation by considering tw
 
 $$
 \begin{align}
-CH_{h_S}O_{o_S}N_{n_S} + x H_{2}O \rightarrow& \alpha \beta CH_{h_{P1}}O_{o_{P1}}N_{n_{P1}} + \alpha \left(1 - \beta \right) CH_{h_{P2}}O_{o_{P2}}N_{n_{P2}} + y CO_{2} + z NH_{4}^{+} + z HCO_{3}^{-} + (d_{S} - \alpha d_{P})H^{+} + (d_{S} - \alpha d_{P})e^{-} \\
+CH_{h_S}O_{o_S}N_{n_S} + x H_{2}O \rightarrow& \alpha \beta CH_{h_{P1}}O_{o_{P1}}N_{n_{P1}} + \alpha \left(1 - \beta \right) CH_{h_{P2}}O_{o_{P2}}N_{n_{P2}} + y CO_{2} + z NH_{4}^{+} + z HCO_{3}^{-} + (d_{S} - \alpha \beta d_{P1} - \alpha \left(1-\beta \right) d_{P2})H^{+} + (d_{S} - \alpha d_{P})e^{-} \\
 \left(1-f\right)\left(d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2}\right) \bigg[ \dfrac{1}{4}O_{2} + H^{+} + e^{-} \rightarrow& \dfrac{1}{2} H_{2}O \bigg] \\
 \dfrac{f\cdot \left( d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2} \right)}{d_{B}} \bigg[ n_{B} NH_{4}^{+} + \left( 1-n_{B} \right)CO_{2} + n_{B}HCO_{3}^{-} + d_{B} H^{+} + d_{B} e^{-} \rightarrow& CH_{h_{B}}O_{o_{B}}N_{n_{B}} + \left( 2 - o_{B} + n_{B} \right) H_{2}O \bigg]
 \end{align}
