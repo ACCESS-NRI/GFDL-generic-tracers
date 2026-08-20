@@ -1240,8 +1240,7 @@ The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is 
 
 $$
 \begin{align}
-Lig_{s}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) \\
-             & \qquad                        - \left(0.7 \dfrac{PAR}{PAR + 10}\right)} \\
+Lig_{s}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) - \left(0.7 \dfrac{PAR}{PAR + 10}\right)} \\
              & \qquad                   + 10^{\left(-0.0002 \left(B_{lDOM}^{C} + B_{oDOM}^{C} + B_{sDOM}^{C}\right)^{2} + 0.034 \cdot \left(B_{lDOM}^{C} + B_{oDOM}^{C} + B_{sDOM}^{C}\right) - 1.67 \cdot pH + 24.36\right)} \bigg)
 \end{align}
 $$
@@ -1965,8 +1964,8 @@ We build from the above equations to include partial oxidation by considering tw
 $$
 \begin{align}
 CH_{h_S}O_{o_S}N_{n_S} + x H_{2}O \rightarrow& \alpha \beta CH_{h_{P1}}O_{o_{P1}}N_{n_{P1}} + \alpha \left(1 - \beta \right) CH_{h_{P2}}O_{o_{P2}}N_{n_{P2}} + y CO_{2} + z NH_{4}^{+} + z HCO_{3}^{-} + (d_{S} - \alpha d_{P})H^{+} + (d_{S} - \alpha d_{P})e^{-} \\
-\left(1-f\right)\left(d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2}\right) \left[ \dfrac{1}{4}O_{2} + H^{+} + e^{-} \rightarrow& \dfrac{1}{2} H_{2}O \right] \\
-\dfrac{f\cdot \left( d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2} \right)}{d_{B}} \left[ n_{B} NH_{4}^{+} + \left( 1-n_{B} \right)CO_{2} + n_{B}HCO_{3}^{-} + d_{B} H^{+} + d_{B} e^{-} \rightarrow& CH_{h_{B}}O_{o_{B}}N_{n_{B}} + \left( 2 - o_{B} + n_{B} \right) H_{2}O \right] \\
+\left(1-f\right)\left(d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2}\right) \bigg[ \dfrac{1}{4}O_{2} + H^{+} + e^{-} \rightarrow& \dfrac{1}{2} H_{2}O \bigg] \\
+\dfrac{f\cdot \left( d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2} \right)}{d_{B}} \bigg[ n_{B} NH_{4}^{+} + \left( 1-n_{B} \right)CO_{2} + n_{B}HCO_{3}^{-} + d_{B} H^{+} + d_{B} e^{-} \rightarrow& CH_{h_{B}}O_{o_{B}}N_{n_{B}} + \left( 2 - o_{B} + n_{B} \right) H_{2}O \bigg]
 \end{align}
 $$
 
@@ -2684,8 +2683,8 @@ $$
 \begin{aligned}
 \dfrac{\Delta NO_3}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow NO_3} \\
                                &  - \mu_{lb}^{\leftarrow NO_3} - \mu_{ob}^{\leftarrow NO_3} - \mu_{sb}^{\leftarrow NO_3} \\
-                               &  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
-                               &         + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+                               &  - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
+                               &         + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \bigg) \cdot \dfrac{16}{122}
 \end{aligned}
 $$
 
