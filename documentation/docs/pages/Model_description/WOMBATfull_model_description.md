@@ -82,14 +82,14 @@ The following are the active tracers in WOMBAT-full
 | 28   | B<sub>sDOM</sub><sup>C</sup>  | `p_sdoc`   | Short-chain dissolved organic carbon                | mol C kg<sup>-1</sup>     | Yes         |
 | 29   | B<sub>sDOM</sub><sup>N</sup>  | `p_sdon`   | Short-chain dissolved organic nitrogen              | mol N kg<sup>-1</sup>     | Yes         |
 | 30   | B<sub>lb</sub><sup>C</sup>    | `p_lbac`   | Long-chain DOM consuming (sharing) bacteria         | mol C kg<sup>-1</sup>     | Yes         |
-| 31   | B<sub>ob</sub><sup>C</sup>    | `p_obac`   | Oxidized DOM consuming (sharing) bacteria           | mol C kg<sup>-1</sup>     | Yes         |
+| 31   | B<sub>ob</sub><sup>C</sup>    | `p_obac`   | Oxidized DOM consuming (selfish) bacteria           | mol C kg<sup>-1</sup>     | Yes         |
 | 32   | B<sub>sb</sub><sup>C</sup>    | `p_sbac`   | Short-chain DOM consuming (scavenging) bacteria     | mol C kg<sup>-1</sup>     | Yes         |
 | 33   | B<sub>aoa</sub><sup>C</sup>   | `p_aoa`    | Ammonia oxidizing archaea                           | mol C kg<sup>-1</sup>     | Yes         |
 | 34   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
 | 35   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
 | 36   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
-| 36   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
-| 37   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
+| 37   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
+| 38   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
 
 ---
 
@@ -177,7 +177,7 @@ The following are all **2D** diagnostic output variables from WOMBAT-full.
 | `no3_btf`         | Bottom flux of nitrate into ocean                                                                    | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `sil_btf`         | Bottom flux of silicic acid into ocean                                                               | mol Si m<sup>-2</sup> s<sup>-1</sup> |
 | `ldoc_btf`        | Bottom flux of long-chain dissolved organic carbon into ocean                                        | mol C m<sup>-2</sup> s<sup>-1</sup>  |
-| `ldon_btf`        | Bottom flux of short-chain dissolved organic nitrogen into ocean                                     | mol N m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldon_btf`        | Bottom flux of long-chain dissolved organic nitrogen into ocean                                      | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `fe_btf`          | Bottom flux of dissolved iron into ocean                                                             | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `dic_btf`         | Bottom flux of dissolved inorganic carbon into ocean                                                 | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `dicr_btf`        | Bottom flux of remineralised dissolved inorganic carbon into ocean                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
@@ -197,7 +197,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `radbio`           | Photosynthetically active radiation available for phytoplankton growth             | W m<sup>-2</sup>                                |
 | `radmid`           | Photosynthetically active radiation at centre point of grid cell                   | W m<sup>-2</sup>                                |
 | `radmld`           | Photosynthetically active radiation averaged in mixed layer                        | W m<sup>-2</sup>                                |
-| `npp3d`            | Net primary productivity                                                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `npp3d`            | Net primary productivity (excluding overflow)                                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `rpp3d`            | Regenerated primary productivity                                                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zsp3d`            | Zooplankton secondary productivity                                                 | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `phy_mumax`        | Maximum growth rate of nano-phytoplankton                                          | s<sup>-1</sup>                                  |
@@ -258,12 +258,12 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `fesources`        | Total source of dFe in water column                                                | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `fesinks`          | Total sink of dFe in water column                                                  | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `zooeps`           | Micro-zooplankton community-wide prey capture rate coefficient                     | m<sup>6</sup> mmolC<sup>-2</sup> s<sup>-1</sup> |
-| `zooprefsbac`      | Grazing dietary fraction of micro-zooplankton on scavenging bacteria               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `zoopreflbac`      | Grazing dietary fraction of micro-zooplankton on sharing bacteria                  | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `zooprefaoa`       | Grazing dietary fraction of micro-zooplankton on ammonia oxidizing archaea         | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `zooprefphy`       | Grazing dietary fraction of micro-zooplankton on nano-phytoplankton                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `zooprefdia`       | Grazing dietary fraction of micro-zooplankton on micro-phytoplankton               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `zooprefsdet`      | Grazing dietary fraction of micro-zooplankton on small detritus                    | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooprefsbac`      | Grazing dietary fraction of micro-zooplankton on scavenging bacteria               | dimensionless            |
+| `zoopreflbac`      | Grazing dietary fraction of micro-zooplankton on sharing bacteria                  | dimensionless            |
+| `zooprefaoa`       | Grazing dietary fraction of micro-zooplankton on ammonia oxidizing archaea         | dimensionless            |
+| `zooprefphy`       | Grazing dietary fraction of micro-zooplankton on nano-phytoplankton                | dimensionless            |
+| `zooprefdia`       | Grazing dietary fraction of micro-zooplankton on micro-phytoplankton               | dimensionless            |
+| `zooprefsdet`      | Grazing dietary fraction of micro-zooplankton on small detritus                    | dimensionless            |
 | `zoograzsbac`      | Grazing rate of micro-zooplankton on scavenging bacteria                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzlbac`      | Grazing rate of micro-zooplankton on sharing bacteria                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzaoa`       | Grazing rate of micro-zooplankton on ammonia oxidizing archaea                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
@@ -285,14 +285,14 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `zooegesdia`       | Egestion rate of micro-zooplankton on micro-phytoplankton                          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooegessdet`      | Egestion rate of micro-zooplankton on small detritus                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `meseps`           | Meso-zooplankton community-wide prey capture rate coefficient                      | m<sup>6</sup> mmolC<sup>-2</sup> s<sup>-1</sup> |
-| `mesprefsbac`      | Grazing dietary fraction of meso-zooplankton on scavenging bacteria                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mespreflbac`      | Grazing dietary fraction of meso-zooplankton on sharing bacteria                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefaoa`       | Grazing dietary fraction of meso-zooplankton on ammonia oxidizing archaea          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefphy`       | Grazing dietary fraction of meso-zooplankton on nano-phytoplankton                 | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefdia`       | Grazing dietary fraction of meso-zooplankton on micro-phytoplankton                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefsdet`      | Grazing dietary fraction of meso-zooplankton on small detritus                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefldet`      | Grazing dietary fraction of meso-zooplankton on large detritus                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefzoo`       | Grazing dietary fraction of meso-zooplankton on micro-zooplankton                  | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesprefsbac`      | Grazing dietary fraction of meso-zooplankton on scavenging bacteria                | dimensionless            |
+| `mespreflbac`      | Grazing dietary fraction of meso-zooplankton on sharing bacteria                   | dimensionless            |
+| `mesprefaoa`       | Grazing dietary fraction of meso-zooplankton on ammonia oxidizing archaea          | dimensionless            |
+| `mesprefphy`       | Grazing dietary fraction of meso-zooplankton on nano-phytoplankton                 | dimensionless            |
+| `mesprefdia`       | Grazing dietary fraction of meso-zooplankton on micro-phytoplankton                | dimensionless            |
+| `mesprefsdet`      | Grazing dietary fraction of meso-zooplankton on small detritus                     | dimensionless            |
+| `mesprefldet`      | Grazing dietary fraction of meso-zooplankton on large detritus                     | dimensionless            |
+| `mesprefzoo`       | Grazing dietary fraction of meso-zooplankton on micro-zooplankton                  | dimensionless            |
 | `mesgrazsbac`      | Grazing rate of meso-zooplankton on scavenging bacteria                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazlbac`      | Grazing rate of meso-zooplankton on sharing bacteria                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazaoa`       | Grazing rate of meso-zooplankton on ammonia oxidizing archaea                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
@@ -323,7 +323,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `sdetremi`         | Hydrolysation of small sinking detritus                                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `ldetremi`         | Hydrolysation of large sinking detritus                                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `ldocremi`         | Remineralisation of long-chain dissolved organic carbon by sharing bacteria        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `odocremi`         | Remineralisation of oxidzied dissolved organic carbon by scavenging bacteria       | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `odocremi`         | Remineralisation of oxidzied dissolved organic carbon by selfish bacteria          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `sdocremi`         | Remineralisation of short-chain dissolved organic carbon by scavenging bacteria    | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `odocprod`         | Production of oxidized dissolved organic carbon by sharing bacteria                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `odonprod`         | Production of oxidized dissolved organic nitrogen by sharing bacteria                 | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
@@ -373,12 +373,12 @@ The following are all **3D** diagnostic output variables from WOMBAT-full.
 | `aoa_lnh4`         | Limitation of ammonia oxidation by ammonium                                        | dimensionless                                   |
 | `aoa_mu`           | Realized growth rate of ammonia oxidizing archaea                                  | s<sup>-1</sup>                                  |
 | `aoa_mumax`        | Maximum potential growth rate of ammonia oxidizing archaea                         | s<sup>-1</sup>                                  |
-| `aoa_eno3`         | Production of nitrate by ammonia oxidizing archaea                                 | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoa_eno3`         | Production of nitrate by ammonia oxidizing archaea                                 | mol N (mol C-biomass)<sup>-1</sup> |
 | `aoagrow`          | Growth of ammonia oxidizing archaea                                                | mol C kg<sup>-1</sup> s<sup>-1</sup> |
 | `aoaresp`          | Oxygen consumption by ammonia oxidizing archaea                                    | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
 | `aoamorl`          | Linear mortality of ammonia oxidizing archaea                                      | mol C kg<sup>-1</sup> s<sup>-1</sup> |
 | `aoamorq`          | Quadratic mortality of ammonia oxidizing archaea                                   | mol C kg<sup>-1</sup> s<sup>-1</sup> |
-| `anammox`          | Anammox rate (NH<sub>4</sub> consumption)                                          | mol kg<sup>-1</sup> s<sup>-1</sup>              |
+| `anammox`          | Anammox rate (NH<sub>4</sub> consumption)                                          | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
 | `aox_lnh4`         | Limitation of anammox bacteria by ammonium                                         | dimensionless                                   |
 | `aox_mu`           | Realized growth rate of anammox bacteria                                           | s<sup>-1</sup>                                  |
 | `pic2poc`          | Inorganic (CaCO3) to organic carbon ratio                                          | dimensionless                                   |
@@ -543,7 +543,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `f_inorg`          | Base inorganic fraction (PIC:POC ratio)                                     | 0.04          | mol CaCO3 (mol C)<sup>-1</sup>                                       |
 | `disscal`          | Calcite dissolution rate                                                    | 0.10/86400.0  | s<sup>-1</sup>                                                       |
 | `dissara`          | Aragonite dissolution rate                                                  | 0.10/86400.0  | s<sup>-1</sup>                                                       |
-| `dissdet`          | Fraction CaCO3 dissolved per detritus hydrolyzed                            | 0.20          | mol CaCO3 (mol C)<sup>-1</sup>                                       |
+| `dissdet`          | Fraction CaCO3 dissolved per detritus hydrolyzed                            | 0.20          | (mmol C m<sup>-3</sup>)<sup>-1</sup>                                       |
 | `fgutdiss`         | Zooplankton gut CaCO3 dissolution efficiency                                | 0.80          | dimensionless                                                        |
 | `ligW`             | Weak ligand concentration                                                   | 1.7           | µmol m<sup>-3</sup>                                                  |
 | `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
@@ -562,16 +562,16 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `aoa_knh4`         | AOA NH<sub>4</sub> half-saturation coefficient                              | 0.08           | mmol N m<sup>-3</sup>                                                |
 | `aoa_poxy`         | AOA O<sub>2</sub> diffusive uptake limit                                    | 275/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
 | `aoa_ynh4`         | AOA NH<sub>4</sub> demand per C biomass                                     | 11.0          | mol N (mol C)<sup>-1</sup>                                           |
-| `aoa_yoxy`         | AOA O<sub>2</sub> demand per C biomass                                      | 15.5          | mol O<sub>2</sub> (mol C)<sup>-1</sup>                               |
+| `aoa_yoxy`         | AOA O<sub>2</sub> demand per C biomass                                      | 28.4          | mol O<sub>2</sub> (mol C)<sup>-1</sup>                               |
 | `aoa_C2N`       | AOA biomass carbon-to-nitrogen ratio                                           | 5.0           | mol C (mol N)<sup>-1</sup>                                  |
 | `aoa_C2Fe`      | AOA biomass carbon-to-iron ratio                                               | 1.0/20e-6     | mol C (mol Fe)<sup>-1</sup>                                 |
 | `aoalmor`       | AOA linear mortality rate constant                                             | 0.005/86400   | s<sup>-1</sup>                                              |
 | `aoaqmor`       | AOA quadratic mortality rate constant                                          | 0.001/86400   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>         |
 | `pbac_alpha`    | Degree of partial oxidation by implicit particle-associated bacteria           | 1.0           | dimensionless                                               |
-| `lbac_Vmax_doc` | Maximum DOC uptake rate of sharing bacteria                                    | 6.7/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                        |
-| `lbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of sharing bacteria                         | 7.2/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
-| `lbac_Vmax_dFe` | Maximum dissolved iron uptake rate of sharing bacteria                             | 0.00010/86400 | mmol Fe m<sup>-3</sup> s<sup>-1</sup>                       |
-| `lbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of sharing bacteria                             | 0.5/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
+| `lbac_Vmax_doc` | Maximum DOC uptake rate of sharing bacteria                                    | 6.7/86400     | mol C (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `lbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of sharing bacteria                         | 7.2/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `lbac_Vmax_dFe` | Maximum dissolved iron uptake rate of sharing bacteria                             | 0.00010/86400 | mol Fe (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                       |
+| `lbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of sharing bacteria                             | 0.5/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
 | `lbac_poxy`     | O<sub>2</sub> diffusive uptake limit of sharing bacteria                           | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
 | `lbac_kno3`     | Half-saturation coefficient for NO<sub>3</sub> uptake by sharing bacteria          | 15.0          | mmol N m<sup>-3</sup>                                       |
 | `lbac_kdoc`     | Half-saturation coefficient for DOC uptake by sharing bacteria                     | 100.0         | mmol C m<sup>-3</sup>                                       |
@@ -580,20 +580,20 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `lbac_alpha`    | Degree of partial oxidation by sharing bacteria                                    | 0.50          | dimensionless                                               |
 | `lbac_beta`     | Fraction of partially oxidized material directed to short-chain DOM                | 0.10          | dimensionless                                               |
 | `lbac_fele`     | Fraction of electrons allocated to biosynthesis by sharing bacteria                | 0.15          | dimensionless                                               |
-| `obac_Vmax_doc` | Maximum DOC uptake rate of selfish bacteria                                    | 6.7/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                        |
-| `obac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of selfish bacteria                         | 7.2/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
-| `obac_Vmax_dFe` | Maximum dissolved iron uptake rate of selfish bacteria                             | 0.00010/86400 | mmol Fe m<sup>-3</sup> s<sup>-1</sup>                       |
-| `obac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of selfish bacteria                             | 0.5/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
+| `obac_Vmax_doc` | Maximum DOC uptake rate of selfish bacteria                                    | 6.7/86400     | mol C (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `obac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of selfish bacteria                         | 7.2/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `obac_Vmax_dFe` | Maximum dissolved iron uptake rate of selfish bacteria                             | 0.00010/86400 | mol Fe (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                       |
+| `obac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of selfish bacteria                             | 0.5/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
 | `obac_poxy`     | O<sub>2</sub> diffusive uptake limit of selfish bacteria                           | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
 | `obac_kno3`     | Half-saturation coefficient for NO<sub>3</sub> uptake by selfish bacteria          | 15.0          | mmol N m<sup>-3</sup>                                       |
 | `obac_kdoc`     | Half-saturation coefficient for DOC uptake by selfish bacteria                     | 200.0         | mmol C m<sup>-3</sup>                                       |
 | `obac_kfer`     | Half-saturation coefficient for dissolved iron uptake by selfish bacteria          | 0.35          | µmol Fe m<sup>-3</sup>                                      |
 | `obac_knh4`     | Half-saturation coefficient for NH<sub>4</sub> uptake by selfish bacteria          | 0.30          | mmol N m<sup>-3</sup>                                       |
 | `obac_fele`     | Fraction of electrons allocated to biosynthesis by selfish bacteria                | 0.05          | dimensionless                                               |
-| `sbac_Vmax_doc` | Maximum DOC uptake rate of scavenging bacteria                                     | 2.23/86400     | mmol C m<sup>-3</sup> s<sup>-1</sup>                        |
-| `sbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of scavenging bacteria                          | 2.4/86400     | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
-| `sbac_Vmax_dFe` | Maximum dissolved iron uptake rate of scavenging bacteria                          | 0.00010/86400 | mmol Fe m<sup>-3</sup> s<sup>-1</sup>                       |
-| `sbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of scavenging bacteria                          | 0.10/86400    | mmol N m<sup>-3</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_doc` | Maximum DOC uptake rate of scavenging bacteria                                     | 2.23/86400     | mol C (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of scavenging bacteria                          | 2.4/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_dFe` | Maximum dissolved iron uptake rate of scavenging bacteria                          | 0.00010/86400 | mol Fe (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                       |
+| `sbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of scavenging bacteria                          | 0.167/86400   | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
 | `sbac_poxy`     | O<sub>2</sub> diffusive uptake limit of scavenging bacteria                        | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
 | `sbac_kno3`     | Half-saturation coefficient for NO<sub>3</sub> uptake by scavenging bacteria       | 15.0          | mmol N m<sup>-3</sup>                                       |
 | `sbac_kdoc`     | Half-saturation coefficient for DOC uptake by scavenging bacteria                  | 10.0          | mmol C m<sup>-3</sup>                                       |
