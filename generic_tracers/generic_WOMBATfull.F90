@@ -3261,13 +3261,15 @@ module generic_WOMBATfull
 
     ! Ammonia Oxidizing Archaea quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoaqmor', wombat%aoaqmor, 0.001/86400.0)
+    call g_tracer_add_param('aoaqmor', wombat%aoaqmor, 0.05/86400.0)
 
     ! Particle-associated heterotrophic bacteria degree of partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('pbac_alpha', wombat%pbac_alpha, 1.00)
 
     ! Large, sharing heterotrophic bacteria maximum rate of uptake of DOC [mol C (mol C-biomass)-1 s-1]
+    ! ... mumax = Vmax * yield
+    ! ... so mumax = 1.0 = 6.7 * 0.15
     !-----------------------------------------------------------------------
     call g_tracer_add_param('lbac_Vmax_doc', wombat%lbac_Vmax_doc, 6.7/86400.0)
 
@@ -3280,11 +3282,15 @@ module generic_WOMBATfull
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
     ! in unfiltered seawater when they added Fe+C
+    ! ... for a mumax of 1.0 per day, a C:Fe ratio of 25,000...
+    ! ... we need a Vmax of 40e-6, but bacteria do much better than this.
     call g_tracer_add_param('lbac_Vmax_dFe', wombat%lbac_Vmax_dFe, 0.00010/86400.0)
 
     ! Large, sharing heterotrophic bacteria maximum rate of uptake of NH4 [mol N (mol C-biomass)-1 s-1]
+    ! ... for a mumax of 1.0 per day, a C:N ratio of 5:1 and no organic N in DOM,
+    ! ... we need a Vmax of 0.2 mol NH4 per mol C-biomass per day to achieve mumax = 1.0
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('lbac_Vmax_nh4', wombat%lbac_Vmax_nh4, 0.5/86400.0)
+    call g_tracer_add_param('lbac_Vmax_nh4', wombat%lbac_Vmax_nh4, 0.2/86400.0)
 
     ! Large, sharing heterotrophic bacteria diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
@@ -3306,7 +3312,7 @@ module generic_WOMBATfull
 
     ! Large, sharing heterotrophic bacteria half saturation constant for dissolved NH4 uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('lbac_knh4', wombat%lbac_knh4, 0.30)
+    call g_tracer_add_param('lbac_knh4', wombat%lbac_knh4, 0.1)
 
     ! Large, sharing heterotrophic bacteria degree of partial oxidation [dimensionless]
     !-----------------------------------------------------------------------
@@ -3337,7 +3343,7 @@ module generic_WOMBATfull
 
     ! Large, selfish heterotrophic bacteria maximum rate of uptake of NH4 [mol N (mol C-biomass)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('obac_Vmax_nh4', wombat%obac_Vmax_nh4, 0.5/86400.0)
+    call g_tracer_add_param('obac_Vmax_nh4', wombat%obac_Vmax_nh4, 0.2/86400.0)
 
     ! Large, selfish heterotrophic bacteria diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
@@ -3359,7 +3365,7 @@ module generic_WOMBATfull
 
     ! Large, selfish heterotrophic bacteria half saturation constant for dissolved NH4 uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('obac_knh4', wombat%obac_knh4, 0.30)
+    call g_tracer_add_param('obac_knh4', wombat%obac_knh4, 0.10)
 
     ! Large, selfish heterotrophic bacteria fraction of electrons to biosynthesis [dimensionless]
     !-----------------------------------------------------------------------
@@ -3378,11 +3384,11 @@ module generic_WOMBATfull
     ! From Fourquez et al., 2020 Frontiers in Marine Science: Heterotrophic bacteria
     ! took up dFe at a rate of 100 pmol L-1 day-1 --> 0.00010 mmol m-3 day-1
     ! in unfiltered seawater when they added Fe+C
-    call g_tracer_add_param('sbac_Vmax_dFe', wombat%sbac_Vmax_dFe, 0.00010/86400.0)
+    call g_tracer_add_param('sbac_Vmax_dFe', wombat%sbac_Vmax_dFe, 0.00010/3.0/86400.0)
 
     ! Small, scavenging heterotrophic bacteria maximum rate of uptake of NH4 [mol N (mol C-biomass)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('sbac_Vmax_nh4', wombat%sbac_Vmax_nh4, 0.5/3.0/86400.0)
+    call g_tracer_add_param('sbac_Vmax_nh4', wombat%sbac_Vmax_nh4, 0.2/3.0/86400.0)
 
     ! Small, scavenging heterotrophic bacteria diffusive uptake limit of O2 [(mmol C biomass m-3)-1 s-1)]
     !-----------------------------------------------------------------------
