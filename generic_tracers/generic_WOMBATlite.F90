@@ -218,6 +218,7 @@ module generic_WOMBATlite
         zoolmor, &
         zooqmor, &
         detlrem, &
+        feburyscaler, &
         bottom_thickness, &
         detlrem_sed, &
         wdetbio, &
@@ -1459,6 +1460,10 @@ module generic_WOMBATlite
     ! Thickness over which tracer values are integrated to define the bottom layer
     call g_tracer_add_param('bottom_thickness', wombat%bottom_thickness, 1.0)
 
+    ! Multiplier on the amount of Fe that is buried per unit organic carbon buried [m]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('feburyscaler', wombat%feburyscaler, 10.0)
+
     ! Detritus remineralisation rate constant in sediments [1/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('detlrem_sed', wombat%detlrem_sed, 0.01/86400.0)
@@ -1949,7 +1954,8 @@ module generic_WOMBATlite
     call g_tracer_set_values(tracer_list, 'det', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment)
-    wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + wombat%detfe_btm(:,:) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
+    wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + wombat%detfe_btm(:,:) * &
+                                     max(0.0, min(1.0, (wombat%feburyscaler * wombat%fbury(:,:)))) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'detfe', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment)
