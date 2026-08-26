@@ -1955,7 +1955,7 @@ module generic_WOMBATlite
 
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment)
     wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + wombat%detfe_btm(:,:) * &
-                                     max(0.0, min(1.0, (wombat%feburyscaler * wombat%fbury(:,:)))) ! [mol/m2]
+                                     max(0.0, min(1.0, (1.0 - wombat%feburyscaler * wombat%fbury(:,:)))) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'detfe', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment)
