@@ -107,6 +107,11 @@
 !  <DATA NAME="do_check_c_conserve" TYPE="logical">
 !   If true, check that the ecosystem model conserves carbon
 !  </DATA>
+!
+!  <DATA NAME="do_check_fe_conserve" TYPE="logical">
+!   If true, check that the ecosystem model conserves iron
+!  </DATA>
+!
 ! </NAMELIST>
 !
 !-----------------------------------------------------------------------
@@ -167,11 +172,12 @@ module generic_WOMBATlite
   logical :: do_tracer_dicr             = .false. ! enable remineralised dissolved inorganic carbon tracer dicr?
   logical :: do_check_n_conserve        = .false. ! check that the N fluxes balance in the ecosystem
   logical :: do_check_c_conserve        = .false. ! check that the C fluxes balance in the ecosystem
+  logical :: do_check_fe_conserve       = .false. ! check that the Fe fluxes balance in the ecosystem
 
   namelist /generic_wombatlite_nml/ co2_calc, do_caco3_dynamics, do_colloidal_shunt, &
                                     do_two_ligands, do_burial, do_nitrogen_fixation, do_benthic_denitrification, &
                                     do_tracer_dicp, do_tracer_dicr, &
-                                    do_check_n_conserve, do_check_c_conserve
+                                    do_check_n_conserve, do_check_c_conserve, do_check_fe_conserve
 
   !=======================================================================
   ! This type contains all the parameters and arrays used in this module
@@ -235,7 +241,6 @@ module generic_WOMBATlite
         ligW, &
         ligS, &
         dfefloor, &
-        knano_dfe, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -294,6 +299,7 @@ module generic_WOMBATlite
         detfe_sed_remin, &
         caco3_sed_remin, &
         fbury, &
+        ffebury, &
         fdenit, &
         zeuphot, &
         seddep, &
@@ -331,7 +337,6 @@ module generic_WOMBATlite
         felig, &
         ligK, &
         fecol, &
-        feprecip, &
         fescaven, &
         fescadet, &
         fecoag2det, &
@@ -427,7 +432,6 @@ module generic_WOMBATlite
         id_felig = -1, &
         id_ligK = -1, &
         id_fecol = -1, &
-        id_feprecip = -1, &
         id_fescaven = -1, &
         id_fescadet = -1, &
         id_fecoag2det = -1, &
@@ -474,6 +478,7 @@ module generic_WOMBATlite
         id_det_sed_denit = -1, &
         id_det_sed_depst = -1, &
         id_fbury = -1, &
+        id_ffebury = -1, &
         id_fdenit = -1, &
         id_detfe_sed_remin = -1, &
         id_detfe_sed_depst = -1, &
@@ -617,6 +622,11 @@ module generic_WOMBATlite
     if (do_check_c_conserve) then
       write (stdoutunit,*) trim(note_header), &
           'Checking that the ecosystem model conserves carbon'
+    endif
+
+    if (do_check_fe_conserve) then
+      write (stdoutunit,*) trim(note_header), &
+          'Checking that the ecosystem model conserves iron'
     endif
 
     ! Specify all prognostic and diagnostic tracers of this modules.
@@ -837,6 +847,12 @@ module generic_WOMBATlite
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
+        'ffebury', 'Fraction of deposited iron permanently buried beneath sediment', &
+        'h', '1', 's', '[0-1]', 'f')
+    wombat%id_ffebury = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
         'fdenit', 'Fraction of detritus remineralised via denitrification', &
         'h', '1', 's', '[0-1]', 'f')
     wombat%id_fdenit = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
@@ -959,11 +975,6 @@ module generic_WOMBATlite
     vardesc_temp = vardesc( &
         'fecol', 'Colloidal dissolved iron', 'h', 'L', 's', 'mol/kg', 'f')
     wombat%id_fecol = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
-        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
-
-    vardesc_temp = vardesc( &
-        'feprecip', 'Precipitation of free Fe onto nanoparticles', 'h', 'L', 's', 'mol/kg/s', 'f')
-    wombat%id_feprecip = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -1378,7 +1389,7 @@ module generic_WOMBATlite
 
     ! Zooplankton assimilation of ingested prey carbon (the rest is excreted) [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.10)
+    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.45)
 
     ! Zooplankton ingestion efficiency of prey carbon (the rest is egested) [1]
     !-----------------------------------------------------------------------
@@ -1511,10 +1522,6 @@ module generic_WOMBATlite
     ! Worsford et al., 2014 Mar. Chem. says anywhere between 10 - 50 pM
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.05)
-
-    ! Precipitation of Fe` as nanoparticles (in excess of solubility) [/s]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('knano_dfe', wombat%knano_dfe, 0.1/86400.0)
 
     ! Scavenging of Fe` onto biogenic particles [(mmol/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -1924,27 +1931,37 @@ module generic_WOMBATlite
     integer, intent(in)                      :: tau
     type(time_type), intent(in)              :: model_time
 
-    integer                         :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
-    real, dimension(:,:,:), pointer :: grid_tmask
-    real                            :: orgflux
-    logical                         :: used
+    integer                            :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
+    real, dimension(:,:,:,:), pointer  :: p_o2
+    real, dimension(:,:,:), pointer    :: grid_tmask
+    integer, dimension(:,:), pointer   :: grid_kmt
+    real                               :: orgflux, boto2, mmol_m3_to_mol_kg
+    real, parameter                    :: epsi = 1.0e-30
+    logical                            :: used
 
     call g_tracer_get_common(isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, &
-        grid_tmask=grid_tmask)
+        grid_tmask=grid_tmask, grid_kmt=grid_kmt)
+
+    ! Unit conversion factor
+    mmol_m3_to_mol_kg = 1.e-3 / wombat%Rho_0
 
     ! Move bottom reservoirs to sediment tracers
     !-----------------------------------------------------------------------
+    call g_tracer_get_pointer(tracer_list, 'o2', 'field', wombat%p_o2)
     call g_tracer_get_values(tracer_list, 'det', 'btm_reservoir', wombat%det_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'detfe', 'btm_reservoir', wombat%detfe_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'caco3', 'btm_reservoir', wombat%caco3_btm, isd, jsd)
 
-    ! Calculate burial of deposited detritus (Dunne et al., 2007)
+    ! Calculate burial of deposited detritus (Dunne et al., 2007) and deposited iron (Dale et al., 2015)
     wombat%fbury(:,:) = 0.0
+    wombat%ffebury(:,:) = 0.90 ! 90% of iron is buried when do_burial == .false. to avoid unrealistic accumulation
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
+          boto2 = wombat%p_o2(i,j,grid_kmt(i,j),ntau) / mmol_m3_to_mol_kg
           orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
           wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
+          wombat%ffebury(i,j) = max(0.0, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
         enddo
       enddo
     endif
@@ -1954,8 +1971,7 @@ module generic_WOMBATlite
     call g_tracer_set_values(tracer_list, 'det', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment)
-    wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + wombat%detfe_btm(:,:) * &
-                                     max(0.0, min(1.0, (1.0 - wombat%feburyscaler * wombat%fbury(:,:)))) ! [mol/m2]
+    wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + wombat%detfe_btm(:,:) * (1.0 - wombat%ffebury(:,:)) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'detfe', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment)
@@ -1978,6 +1994,10 @@ module generic_WOMBATlite
 
     if (wombat%id_fbury > 0) &
       used = g_send_data(wombat%id_fbury, wombat%fbury, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+
+    if (wombat%id_ffebury > 0) &
+      used = g_send_data(wombat%id_ffebury, wombat%ffebury, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
   end subroutine generic_WOMBATlite_update_from_bottom
@@ -2099,7 +2119,7 @@ module generic_WOMBATlite
     real                                    :: zoo_slmor, o2lim
     real                                    :: hco3, ddic, do2_sink
     real                                    :: dzt_bot, dzt_bot_os
-    real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools
+    real, dimension(:,:,:,:), allocatable   :: n_pools, c_pools, fe_pools
     logical                                 :: used
 
     character(len=fm_string_len), parameter :: sub_name = 'generic_WOMBATlite_update_from_source'
@@ -2297,7 +2317,6 @@ module generic_WOMBATlite
     wombat%ligK(:,:,:) = 0.0
     wombat%felig(:,:,:) = 0.0
     wombat%fecol(:,:,:) = 0.0
-    wombat%feprecip(:,:,:) = 0.0
     wombat%fescaven(:,:,:) = 0.0
     wombat%fescadet(:,:,:) = 0.0
     wombat%fesources(:,:,:) = 0.0
@@ -2333,6 +2352,7 @@ module generic_WOMBATlite
     wombat%pocdiss(:,:,:) = 0.0
     wombat%zeuphot(:,:) = 0.0
     wombat%fbury(:,:) = 0.0
+    wombat%ffebury(:,:) = 0.0
     wombat%fdenit(:,:) = 0.0
     wombat%seddep(:,:) = 0.0
     wombat%sedmask(:,:) = 0.0
@@ -2360,6 +2380,7 @@ module generic_WOMBATlite
     allocate(par_bgr_top(nk,3)); par_bgr_top(:,:)=0.0
     allocate(n_pools(isc:iec,jsc:jec,nk,2)); n_pools(:,:,:,:)=0.0
     allocate(c_pools(isc:iec,jsc:jec,nk,2)); c_pools(:,:,:,:)=0.0
+    allocate(fe_pools(isc:iec,jsc:jec,nk,2)); fe_pools(:,:,:,:)=0.0
 
     ! Set the maximum index for euphotic depth
     ! dts: in WOMBAT v3, kmeuph and k100 are integers but here they are arrays since zw
@@ -2548,11 +2569,13 @@ module generic_WOMBATlite
     ! Arrays for assessing conservation of mass within ecosystem component
     n_pools(:,:,:,:) = 0.0
     c_pools(:,:,:,:) = 0.0
+    fe_pools(:,:,:,:) = 0.0
 
     do tn = 1,ts_npzd  !{
 
       n_pools(:,:,:,1) = n_pools(:,:,:,2)
       c_pools(:,:,:,1) = c_pools(:,:,:,2)
+      fe_pools(:,:,:,1) = fe_pools(:,:,:,2)
 
       do k = 1,nk; do j = jsc,jec; do i = isc,iec;
 
@@ -2799,9 +2822,6 @@ module generic_WOMBATlite
       endif
       wombat%felig(i,j,k) = max(0.0, fe_sfe - wombat%feIII(i,j,k))
 
-      ! Precipitation of Fe' (creation of nanoparticles)
-      wombat%feprecip(i,j,k) = max(0.0, ( wombat%feIII(i,j,k) - fe3sol ) ) * wombat%knano_dfe
-
       ! Scavenging of Fe` onto biogenic particles
       partic = (det_mmolm3*2 + caco3_mmolm3*8.3)
       wombat%fescaven(i,j,k) = wombat%feIII(i,j,k) * (1e-7/86400.0 + wombat%kscav_dfe * partic)
@@ -2822,7 +2842,6 @@ module generic_WOMBATlite
       wombat%fecoag2det(i,j,k) = wombat%fecol(i,j,k) * zval
 
       ! Convert the terms back to mol/kg
-      wombat%feprecip(i,j,k) = wombat%feprecip(i,j,k) * umol_m3_to_mol_kg
       wombat%fescaven(i,j,k) = wombat%fescaven(i,j,k) * umol_m3_to_mol_kg
       wombat%fescadet(i,j,k) = wombat%fescadet(i,j,k) * umol_m3_to_mol_kg
       wombat%fecoag2det(i,j,k) = wombat%fecoag2det(i,j,k) * umol_m3_to_mol_kg
@@ -3185,7 +3204,6 @@ module generic_WOMBATlite
                              zooexcrdetfe + &
                              wombat%phymorl(i,j,k) * phy_Fe2C - &
                              wombat%phy_dfeupt(i,j,k) - &
-                             wombat%feprecip(i,j,k) - &
                              wombat%fescaven(i,j,k) - &
                              wombat%fecoag2det(i,j,k) )
 
@@ -3198,7 +3216,6 @@ module generic_WOMBATlite
                                   wombat%phymorl(i,j,k) * phy_Fe2C)
       wombat%fesinks(i,j,k) = wombat%fesinks(i,j,k) + dtsb * ( &
                                 wombat%phy_dfeupt(i,j,k) + &
-                                wombat%feprecip(i,j,k) + &
                                 wombat%fescaven(i,j,k) + &
                                 wombat%fecoag2det(i,j,k))
 
@@ -3215,6 +3232,8 @@ module generic_WOMBATlite
                           wombat%p_zoo(i,j,k,tau)) * 16/122.0
       c_pools(i,j,k,2) = wombat%p_dic(i,j,k,tau) + wombat%p_phy(i,j,k,tau) + wombat%p_det(i,j,k,tau) + &
                          wombat%p_zoo(i,j,k,tau) + wombat%p_caco3(i,j,k,tau)
+      fe_pools(i,j,k,2) = wombat%p_fe(i,j,k,tau) + wombat%p_phyfe(i,j,k,tau) + wombat%p_detfe(i,j,k,tau) + &
+                          wombat%p_zoofe(i,j,k,tau)
 
       if (tn>1) then
         if (do_check_n_conserve) then
@@ -3263,6 +3282,27 @@ module generic_WOMBATlite
             print *, " "
             print *, "--------------------------------------------"
             call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
+          endif
+          if (do_check_fe_conserve) then
+            if (abs(fe_pools(i,j,k,2) - fe_pools(i,j,k,1))>1e-16) then
+            print *, "--------------------------------------------"
+            print *, trim(error_header) // " Ecosystem model is not conserving iron"
+            print *, "       Longitude index =", i
+            print *, "       Latitude index =", j
+            print *, "       Depth index and value =", k, wombat%zm(i,j,k)
+            print *, "       Nested timestep number =", tn
+            print *, " "
+            print *, "       Biological C budget (molC/kg) at two timesteps =", fe_pools(i,j,k,1), fe_pools(i,j,k,2)
+            print *, "       Difference in budget between timesteps =", fe_pools(i,j,k,2) - fe_pools(i,j,k,1)
+            print *, " "
+            print *, "       dFe (molFe/kg) =", wombat%p_fe(i,j,k,tau)
+            print *, "       PHYFe (molFe/kg) =", wombat%p_phyfe(i,j,k,tau)
+            print *, "       ZOOFe (molFe/kg) =", wombat%p_zoofe(i,j,k,tau)
+            print *, "       DETFe (molFe/kg) =", wombat%p_detfe(i,j,k,tau)
+            print *, " "
+            print *, "--------------------------------------------"
+            call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
+            endif
           endif
         endif
       endif
@@ -3618,10 +3658,6 @@ module generic_WOMBATlite
 
     if (wombat%id_fecol > 0) &
       used = g_send_data(wombat%id_fecol, wombat%fecol, model_time, &
-          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
-
-    if (wombat%id_feprecip > 0) &
-      used = g_send_data(wombat%id_feprecip, wombat%feprecip, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_fescaven > 0) &
@@ -4120,7 +4156,6 @@ module generic_WOMBATlite
     allocate(wombat%felig(isd:ied, jsd:jed, 1:nk)); wombat%felig(:,:,:)=0.0
     allocate(wombat%ligK(isd:ied, jsd:jed, 1:nk)); wombat%ligK(:,:,:)=0.0
     allocate(wombat%fecol(isd:ied, jsd:jed, 1:nk)); wombat%fecol(:,:,:)=0.0
-    allocate(wombat%feprecip(isd:ied, jsd:jed, 1:nk)); wombat%feprecip(:,:,:)=0.0
     allocate(wombat%fescaven(isd:ied, jsd:jed, 1:nk)); wombat%fescaven(:,:,:)=0.0
     allocate(wombat%fescadet(isd:ied, jsd:jed, 1:nk)); wombat%fescadet(:,:,:)=0.0
     allocate(wombat%fecoag2det(isd:ied, jsd:jed, 1:nk)); wombat%fecoag2det(:,:,:)=0.0
@@ -4158,6 +4193,7 @@ module generic_WOMBATlite
     allocate(wombat%det_sed_denit(isd:ied, jsd:jed)); wombat%det_sed_denit(:,:)=0.0
     allocate(wombat%det_btm(isd:ied, jsd:jed)); wombat%det_btm(:,:)=0.0
     allocate(wombat%fbury(isd:ied, jsd:jed)); wombat%fbury(:,:)=0.0
+    allocate(wombat%ffebury(isd:ied, jsd:jed)); wombat%ffebury(:,:)=0.0
     allocate(wombat%fdenit(isd:ied, jsd:jed)); wombat%fdenit(:,:)=0.0
     allocate(wombat%detfe_sed_remin(isd:ied, jsd:jed)); wombat%detfe_sed_remin(:,:)=0.0
     allocate(wombat%detfe_btm(isd:ied, jsd:jed)); wombat%detfe_btm(:,:)=0.0
@@ -4238,7 +4274,6 @@ module generic_WOMBATlite
         wombat%felig, &
         wombat%ligK, &
         wombat%fecol, &
-        wombat%feprecip, &
         wombat%fescaven, &
         wombat%fescadet, &
         wombat%fecoag2det, &
@@ -4273,6 +4308,7 @@ module generic_WOMBATlite
         wombat%det_sed_denit, &
         wombat%det_btm, &
         wombat%fbury, &
+        wombat%ffebury, &
         wombat%fdenit, &
         wombat%detfe_sed_remin, &
         wombat%detfe_btm, &
