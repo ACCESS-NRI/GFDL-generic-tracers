@@ -1608,8 +1608,10 @@ The burial of iron that sinks to the sediment is treated differently to organic 
 
 $$
 \begin{align}
-F_{bury}^{Fe} =& \quad 1 - \tanh \left( \dfrac{f_{org}}{O_2} \right)
+F_{bury}^{Fe} =& \quad \max \left(0.5, 1 - \tanh \left( \dfrac{f_{org}}{O_2} \right) \right)
 \end{align}
 $$
+
+where $O_2$ is the oxygen content of the overlying water column (`boto2`, [mmol m<sup>-3</sup>]). Furthermore, we set a minimum burial fraction of 50% of the total iron hitting sediments even in anoxic conditions to account for the formation of iron sulphides ([Wijsman, Middelburg & Help, 2001](https://doi.org/10.1016/S0025-3227(00)00122-5)).
 
 ---
