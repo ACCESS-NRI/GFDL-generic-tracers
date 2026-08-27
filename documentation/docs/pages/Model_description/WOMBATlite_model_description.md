@@ -95,7 +95,8 @@ The following are all **2D** diagnostic output variables from WOMBAT-lite.
 | `det_sed_remin`   | Rate of remineralisation of detritus in accumulated sediment                                         | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `det_sed_depst`   | Rate of deposition of detritus to sediment at base of water column                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `det_sed_denit`   | Rate of denitrification (NO<sub>3</sub> consumption) in accumulated sediment                         | mol N m<sup>-2</sup> s<sup>-1</sup>  |
-| `fbury`           | Fraction of deposited detritus permanently buried beneath sediment                                   | dimensionless                        |
+| `fbury`           | Fraction of deposited detritus permanently buried within sediment                                    | dimensionless                        |
+| `ffebury`         | Fraction of deposited iron permanently buried within sediment                                        | dimensionless                        |
 | `fdenit`          | Fraction of detritus remineralised via denitrification                                               | dimensionless                        |
 | `detfe_sed_remin` | Rate of remineralisation of detrital iron in accumulated sediment                                    | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `detfe_sed_depst` | Rate of deposition of detrital iron to sediment at base of water column                              | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
@@ -164,7 +165,6 @@ The following are all **3D** diagnostic output variables from WOMBAT-lite.
 | `ligK`        | Ligand stability constant                                              | L mol<sup>-1</sup>                               |
 | `felig`       | Ligand-bound dissolved iron                                            | mol kg<sup>-1</sup>                              |
 | `fecol`       | Colloidal dissolved iron                                               | mol kg<sup>-1</sup>                              |
-| `feprecip`    | Precipitation of free Fe onto nanoparticles                            | mol kg<sup>-1</sup> s<sup>-1</sup>               |
 | `fescaven`    | Scavenging of free Fe onto detritus (organic + inorganic)              | mol kg<sup>-1</sup> s<sup>-1</sup>               |
 | `fescadet`    | Scavenging of free Fe onto organic detritus                            | mol kg<sup>-1</sup> s<sup>-1</sup>               |
 | `fecoag2det`  | Coagulation of colloidal dFe onto detritus                             | mol kg<sup>-1</sup> s<sup>-1</sup>               |
@@ -283,7 +283,6 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `ligW`             | Weak ligand background concentration [µmol/m³]                              | 1.7                |
 | `ligS`             | Strong ligand background concentration [µmol/m³]                            | 0.4                |
 | `dfefloor`         | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
-| `knano_dfe`        | Fe nanoparticle precipitation rate [s⁻¹]                                    | 0.1/86400.0        |
 | `kscav_dfe`        | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
 | `kcoag_dfe`        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-6/86400         |
 | `kagg_col`         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
@@ -649,9 +648,8 @@ _where_ <br>
 
 Treatment of dissolved iron (`fe_umolm3`, $dFe$, [nmol Fe kg<sup>-1</sup>]) follows a combination of [Aumont et al. (2015)](https://gmd.copernicus.org/articles/8/2465/2015/) and [Tagliabue et al. (2023)](https://www.nature.com/articles/s41586-023-06210-5). Our calculations involve: <br>
 1. Solving for the distinct pools of dissolved iron: free iron, ligand-bound iron and colloidal iron. <br>
-2. Computing precipitation of free iron into nanoparticles that are permanently lost. <br>
-3. Computing scavenging of free iron onto sinking organic particles. <br>
-4. Computing coagulation of colloidal iron onto sinking organic particles. <br>
+2. Computing scavenging of free iron onto sinking organic particles. <br>
+3. Computing coagulation of colloidal iron onto sinking organic particles. <br>
 
 _NOTE: WOMBAT-lite differs from WOMBAT-mid in that sinking authigenic pools of iron are not resolved._
 
@@ -778,24 +776,8 @@ dFe_{lig} =& \quad dFe_{sFe} - dFe_{free}
 \end{align}
 $$
 
-Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe all in units of [nmol Fe kg<sup>-1</sup>], we solve for precipiation of nanoparticles, scavenging and coagulation of dissolved Fe, all of which remove dFe from the water column. These are the major sinks outside of phytoplankton uptake.
+Now that we have separated the dissolved Fe pool into its subcomponents of free, ligand-bound and colloidal Fe all in units of [nmol Fe kg<sup>-1</sup>], we solve for scavenging and coagulation of dissolved Fe, each of which remove dFe from the water column. These are the major sinks outside of phytoplankton uptake.
 
-
-**Precipitation:**
-
-Precipitation of dissolved iron specifically affects free iron when the concentration is greater than that deemed soluble. This iron is permanently lost from the water column. This only occurs when `do_colloidal_shunt == .false.`.
-
-$$
-\begin{align}
-Pr_{dFe}^{\rightarrow} =& \quad \max\left(0.0, dFe_{free} - dFe_{sol}\right) \gamma_{Fe}^{nano}
-\end{align}
-$$
-
-_where_ <br>
-- $dFe_{free}$ is the concentration of free dissolved iron (`feIII(i,j,k)`, [nmol Fe kg<sup>-1</sup>]) <br>
-- $dFe_{sol}$ is the final estimated solubility of dissolve iron in seawater (`fe3sol`, [nmol Fe kg<sup>-1</sup>]) <br>
-- $\gamma_{Fe}^{nano}$ is the rate constant of nanoparticle precipitation (`knano_dfe`, [s<sup>-1</sup>]) <br>
-- $Pr_{dFe}^{\rightarrow}$ is the rate of loss of dFe via nanoparticle precipitation (`feprecip(i,j,k)`, [nmol Fe kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 
 **Scavenging:**
 
@@ -1610,20 +1592,24 @@ It is at this point that the model performs permanent burial of sinking organic 
 
 ### Permanent burial of particulates.
 
-If `do_burial = .true.`, we compute the fraction of incident sinking organic matter and $CaCO_3$ that is permanently buried in the sediments. This permanently buried fraction is effectively removed from the model and therefore is not accumulated within the sedimentary pools.
+If `do_burial = .true.`, we compute the fraction of incident sinking organic matter, iron and $CaCO_3$ that is permanently buried in the sediments. This permanently buried fraction is effectively removed from the model and therefore is not accumulated within the sedimentary pools.
 
-The fraction buried is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
+The fraction of organic matter buried (`fbury(i,j)`, $F_{bury}^{C}$, [dimensionless]) is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
 
 $$
 \begin{align}
-F_{bury} =& \quad 0.013 \cdot 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury}^{C} =& \quad 0.013 \cdot 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
 \end{align}
 $$
 
-where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>].
+where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CACO_3$ that is buried increases.
 
-As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CACO_3$ that is buried increases.
+The burial of iron that sinks to the sediment is treated differently to organic matter. According to [Dale et al. (2015)](https://doi.org/10.1002/2014GB005017), the flux of iron from the sediments into the overlying water column is a function of oxygen and the amount of organic carbon being remineralised in the sediment, with oxic sediments having much lower fluxes than reducing, anoxic sediments. We derive instead an estimate of the fraction of iron that is permanently buried (`ffebury(i,j)`, $F_{bury}^{Fe}$, [dimensionless]) from their relationship. Specifically, the fraction of iron that rains onto the sedimment and is permanently buried is equal to:
 
-If `do_conserve_tracers = .true.`, then we capture the total loss of both Alk and $NO_3$ via burial or organic detritus and $CaCO_3$ and redistribute the Alk and $NO_3$ amount back at the ocean surface. This amount of each tracer is redistributed uniformly to avoid strong gradients.
+$$
+\begin{align}
+F_{bury}^{Fe} =& \quad 1 - \tanh \left( \dfrac{f_{org}}{O_2} \right)
+\end{align}
+$$
 
 ---
