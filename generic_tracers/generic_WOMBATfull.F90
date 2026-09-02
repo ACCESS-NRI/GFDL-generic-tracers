@@ -333,6 +333,7 @@ module generic_WOMBATfull
         ligW, &
         ligS, &
         dfefloor, &
+        detfesedfloor, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -3191,6 +3192,11 @@ module generic_WOMBATfull
     ! Worsford et al., 2014 Mar. Chem. says anywhere between 10 - 50 pM
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.025)
+
+    ! Set floor on the detrital iron sediment reservoir [umol/m2] in shallow (<=200m) columns.
+    ! This replaces the previous approach (taken from WOMBAT legace) of setting the bottom cell
+    ! dFe concentration to 1 nM, which led to sharp gradients and associated issues.
+    call g_tracer_add_param('detfesedfloor', wombat%detfesedfloor, 30.0)
 
     ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -7222,13 +7228,12 @@ module generic_WOMBATfull
     !-----------------------------------------------------------------------!
     !-----------------------------------------------------------------------!
 
+    ! Note: shallow (<=200m) columns no longer get a bottom-cell dFe overwrite here. Instead
+    ! detfesedfloor is applied to the sediment reservoir (see Step 22).
     do j = jsc,jec; do i = isc,iec;
       if (grid_kmt(i,j) > 0) then
         k = grid_kmt(i,j)
-        if (wombat%zw(i,j,k) <= 200) then
-          ! mac: bottom dFe fix to 1 nM when the water is <= 200 m deep.
-          wombat%p_fe(i,j,k,tau) = umol_m3_to_mol_kg * 0.999 ! [mol/kg]
-        else
+        if (wombat%zw(i,j,k) > 200) then
           do k = 1,nk
             ! pjb: tune minimum dissolved iron concentration to detection limit...
             !       this is essential for ensuring dFe is replenished in upper ocean and actually
@@ -7431,6 +7436,17 @@ module generic_WOMBATfull
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment) ! [mol/m2]
     call g_tracer_get_pointer(tracer_list, 'detsi_sediment', 'field', wombat%p_detsi_sediment) ! [mol/m2]
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment) ! [mol/m2]
+
+    ! Ensure adequate detrital Fe supply in shallow waters. This replaces the previous approach
+    ! (taken from WOMBAT legace) of setting the bottom cell dFe concentration to 1 nM.
+    do j = jsc,jec; do i = isc,iec;
+      if (grid_kmt(i,j) > 0) then
+        k = grid_kmt(i,j)
+        if (wombat%zw(i,j,k) <= 200) then
+          wombat%p_detfe_sediment(i,j,1) = max(wombat%detfesedfloor * 1.0e-6, wombat%p_detfe_sediment(i,j,1))
+        endif
+      endif
+    enddo; enddo
 
     ! Get bottom conditions, including those that influence bottom fluxes. Bottom conditions are
     ! calculated over a layer defined by wombat%bottom_thickness (default 0.1 m). This is done because
