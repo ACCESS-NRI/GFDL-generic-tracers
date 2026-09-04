@@ -3413,7 +3413,6 @@ module generic_WOMBATlite
         ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
         ! CaCO3 within the sediment as organic matter accumulates.
         wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%bottom_thickness / wombat%Rho_0
-        wombat%sedalk(i,j) = wombat%sedalk(i,j) + wombat%p_caco3_sediment(i,j,1) / wombat%bottom_thickness / wombat%Rho_0
       endif
     enddo; enddo
 

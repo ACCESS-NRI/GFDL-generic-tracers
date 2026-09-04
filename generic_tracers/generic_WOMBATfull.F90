@@ -3566,6 +3566,7 @@ module generic_WOMBATfull
         units = 'mol/kg', &
         prog = .true., &
         flux_runoff = .true., &
+        flux_param = [ 1.0 ], & ! dts: trunoff supplied in mol/kg
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -3578,6 +3579,7 @@ module generic_WOMBATfull
         units = 'mol/kg', &
         prog = .true., &
         flux_runoff = .true., &
+        flux_param = [ 1.0 ], & ! dts: trunoff supplied in mol/kg
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -3589,6 +3591,7 @@ module generic_WOMBATfull
         units = 'mol/kg', &
         prog = .true., &
         flux_runoff = .true., &
+        flux_param = [ 1.0 ], & ! dts: trunoff supplied in mol/kg
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -3759,7 +3762,8 @@ module generic_WOMBATfull
         longname = 'Short-chain molecules (LMW) of dissolved organic carbon', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_runoff = .true.)
+        flux_runoff = .true., &
+        flux_param = [ 1.0 ])
 
     ! Short-chain, reduced molecules (LMW) of dissolved organic nitrogen
     !-----------------------------------------------------------------------
@@ -3768,7 +3772,8 @@ module generic_WOMBATfull
         longname = 'Short-chain molecules (LMW) of dissolved organic nitrogen', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_runoff = .true.)
+        flux_runoff = .true., &
+        flux_param = [ 1.0 ])
 
     ! Oxidized molecules of dissolved organic carbon
     !-----------------------------------------------------------------------
@@ -3777,7 +3782,8 @@ module generic_WOMBATfull
         longname = 'Oxidized molecules (HMW) of dissolved organic carbon', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_runoff = .true.)
+        flux_runoff = .true., &
+        flux_param = [ 1.0 ])
 
     ! Oxidized molecules of dissolved organic nitrogen
     !-----------------------------------------------------------------------
@@ -3786,7 +3792,8 @@ module generic_WOMBATfull
         longname = 'Oxidized molecules (HMW) of dissolved organic nitrogen', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_runoff = .true.)
+        flux_runoff = .true., &
+        flux_param = [ 1.0 ]) ! dts: trunoff supplied in mol/kg
 
     ! Long-chain, reduced molecules (HMW) of dissolved organic carbon
     !-----------------------------------------------------------------------
@@ -3794,9 +3801,10 @@ module generic_WOMBATfull
         name = 'ldoc', &
         longname = 'Long-chain, reduced molecules (HMW) of dissolved organic carbon', &
         units = 'mol/kg', &
-        flux_bottom = .true., &
         prog = .true., &
-        flux_runoff = .true.)
+        flux_runoff = .true., &
+        flux_param = [ 1.0 ], & ! dts: trunoff supplied in mol/kg
+        flux_bottom = .true.)
 
     ! Long-chain, reduced molecules (HMW) of dissolved organic nitrogen
     !-----------------------------------------------------------------------
@@ -3804,9 +3812,10 @@ module generic_WOMBATfull
         name = 'ldon', &
         longname = 'Long-chain, reduced molecules (HMW) of dissolved organic nitrogen', &
         units = 'mol/kg', &
-        flux_bottom = .true., &
         prog = .true., &
-        flux_runoff = .true.)
+        flux_runoff = .true., &
+        flux_param = [ 1.0 ], & ! dts: trunoff supplied in mol/kg
+        flux_bottom = .true.)
 
     ! Large, sharing heterotrophic bacteria
     !-----------------------------------------------------------------------
@@ -3857,14 +3866,15 @@ module generic_WOMBATfull
         longname = 'Dissolved Inorganic Carbon', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_runoff = .true., &
         flux_gas = .true., &
-        flux_bottom = .true., &
         flux_gas_name = 'co2_flux', &
         flux_gas_type = 'air_sea_gas_flux_generic', &
         flux_gas_molwt = WTMCO2, &
         flux_gas_param = [ as_coeff_wombatfull, 9.7561e-06 ], & ! dts: param(2) converts Pa -> atm
         flux_gas_restart_file = 'ocean_wombatfull_airsea_flux.res.nc', &
+        flux_runoff = .true., &
+        flux_param  = [ 1.0 ], & ! dts: trunoff supplied in mol/kg
+        flux_bottom = .true., &
         flux_virtual = .true.)
 
     ! DICp (preformed Dissolved inorganic carbon)
@@ -3899,6 +3909,7 @@ module generic_WOMBATfull
         units = 'mol/kg', &
         prog = .true., &
         flux_runoff = .true., &
+        flux_param  = [ 1.0 ], & ! dts: trunoff supplied in mol/kg
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -3909,7 +3920,6 @@ module generic_WOMBATfull
         longname = 'Dissolved Iron', &
         units = 'mol/kg', &
         prog = .true., &
-        flux_runoff = .true., &
         flux_drydep = .true., &
         flux_param  = [ 1.0 ], & ! dts: conversion to mol/m2/s done in data_table
         flux_bottom = .true.)
@@ -7421,7 +7431,6 @@ module generic_WOMBATfull
         ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
         ! CaCO3 within the sediment as organic matter accumulates.
         wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%bottom_thickness / wombat%Rho_0
-        wombat%sedalk(i,j) = wombat%sedalk(i,j) + wombat%p_caco3_sediment(i,j,1) / wombat%bottom_thickness / wombat%Rho_0
       endif
     enddo; enddo
 
