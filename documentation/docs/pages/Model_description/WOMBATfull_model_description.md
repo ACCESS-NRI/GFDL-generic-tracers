@@ -1,4 +1,4 @@
-# Description of the WOMBATmid ocean biogeochemical model
+# Description of the WOMBATfull ocean biogeochemical model
 
 ```
         (\___/)  .-.   .-. .--. .-..-..---.  .--. .-----.
@@ -11,12 +11,13 @@
 ```
 
 _Contact Pearse J. Buchanan and/or Dougal Squire for any questions_ <br>
+
 _Pearse.Buchanan@csiro.au_ <br>
 _Dougie.Squire@anu.edu.au_ <br>
 
 ---
 
-![schematic](/assets/schematic-mid.png)
+![schematic](/assets/schematic-full.png)
 
 ## Executive summary
 
@@ -34,19 +35,20 @@ _Dougie.Squire@anu.edu.au_ <br>
 - Micro- and Meso-zooplankton grazing assumes a Holling Type III functional form ([Holling, 1959](https://doi.org/10.4039/Ent91385-7)) and active switching between prey types ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)). <br>
 - Micro- and Meso-zooplankton routes Fe preferentially to egestion (i.e., faecal pellets) following [Le Mézo & Galbraith (2021)](https://doi.org/10.1002/lno.11597), enriching detritus in Fe. <br>
 - Micro- and Meso-zooplankton dissolve CaCO<sub>3</sub> ([Smith et al., 2024](https://doi.org/10.1126/sciadv.adr5453); [White et al., 2018](https://doi.org/10.1038/s41598-018-28073-x); [Harris, 1994](https://doi.org/10.1007/BF00347540)) but conserve biogenic silica due to acidic conditions in their gut ([Dagg et al., 2003](https://doi.org/10.1016/S0967-0645(02)00590-8); [Taucher et al., 2022](https://www.nature.com/articles/s41586-022-04687-0)).
-- The nitrogen cycle can be made to be open, with schemes for nitrogen fixation, anammox, and sedimentary denitrification that can be switched on or off at run time. <br>
-- Nitrification of NH<sub>4</sub> to NO<sub>3</sub> is performed by an implicit population of ammonia oxidizing archaea.
-- Hydrolysation of particulate organic matter releases dissolved iron, ammonium and dissolved organic carbon, reflecting the preferential remineralisation of iron and nitrogen to inorganic forms before carbon.
+- The nitrogen cycle can be made to be open, with schemes for nitrogen fixation, anammox, water column denitrification and sedimentary denitrification that can be switched on or off at run time. <br>
+- Ammonia oxidizing archaea are an explicit biomass type that performs nitrification of NH<sub>4</sub> to NO<sub>3</sub> and compete with phytoplankton and bacteria for this resource.
+- Three types of free-living heterotrophic bacteria (sharers, scavengers and selfish ([Reintjes et al., 2019](https://doi.org/10.1038/s41396-018-0326-3)) drive remineralisation of three types of dissolved organic matter (long-chain, short-chain and oxidized). Their metabolism and growth yields are controlled by electron balance ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Rittman & McCarty, 2001](https://books.google.com.au/books/about/Environmental_Biotechnology_Principles_a.html?id=1PMeAQAAIAAJ&redir_esc=y)).
+- Heterotrophic bacteria are facultative, meaning that they can switch to anaerobic metabolism and use NO<sub>3</sub> as electron acceptors for growth in low O<sub>2</sub> conditions ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8); [Sun et al., 2024](https://doi.org/10.1073/pnas.2417421121)).
 - CaCO<sub>3</sub> cycling is a function of the ambient seawater carbonate chemistry: production is affected by the substrate-inhibitor ratio ([Lehmann & Bach, 2025](https://www.nature.com/articles/s41561-025-01644-0)); dissolution occurs in saturated waters ($\Omega$ > 1) due to reducing micro-environments and undersaturated waters ($\Omega$ < 1) ([Kwon et al., 2024](https://www.science.org/doi/full/10.1126/sciadv.adl0779)). <br>
 - Sinking of small and large particulates is a function of mean radius, seawater dynamic viscosity and their excess density ([Rubey, 1933](https://doi.org/10.2475/ajs.s5-25.148.325)). Radius varies via allometric scalings (e.g., [Wickman et al., 2024]((https://www.science.org/doi/10.1126/science.adk6901))), dynamic viscosity via thermohaline properties, and excess density by CaCO<sub>3</sub> and biogenic silica contents of the particles. <br>
-- External sources of nitrate, DIC, alkalinity silicic acid and DOC via rivers. <br>
+- External sources of nitrate, DIC, alkalinity, silicic acid, long-chain DOC and DON exist via rivers. <br>
 - Permanent burial of organics in sediments via [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907). <br>
 - External source of dissolved iron from aeolian deposition that includes mineral, fire and anthropogenic sources ([Hamilton et al., 2020](https://doi.org/10.1029/2019GB006448)). <br>
 - Major calibration and optimization of the model parameters... incoming. <br>
 
 ## Tracers
 
-The following are the active tracers in WOMBAT-mid
+The following are the active tracers in WOMBAT-full
 
 | #    | Tracer                        | Code name  | Description                                         | Units                     | Default on? |
 |------|-------------------------------|------------|-----------------------------------------------------|---------------------------|-------------|
@@ -73,12 +75,21 @@ The following are the active tracers in WOMBAT-mid
 | 21   | B<sub>sd</sub><sup>Fe</sup>   | `p_sdetfe` | Small sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
 | 22   | B<sub>ld</sub><sup>Fe</sup>   | `p_ldetfe` | Large sinking detritus iron content                 | mol Fe kg<sup>-1</sup>    | Yes         |
 | 23   | B<sub>ld</sub><sup>Si</sup>   | `p_ldetsi` | Large sinking detritus silicon content              | mol Si kg<sup>-1</sup>    | Yes         |
-| 24   | B<sub>DOM</sub><sup>C</sup>   | `p_doc`    | Dissolved organic carbon                            | mol C kg<sup>-1</sup>     | Yes         |
-| 25   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
-| 26   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
-| 27   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
-| 28   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
-| 29   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
+| 24   | B<sub>lDOM</sub><sup>C</sup>  | `p_ldoc`   | Long-chain dissolved organic carbon                 | mol C kg<sup>-1</sup>     | Yes         |
+| 25   | B<sub>lDOM</sub><sup>N</sup>  | `p_ldon`   | Long-chain dissolved organic nitrogen               | mol N kg<sup>-1</sup>     | Yes         |
+| 26   | B<sub>oDOM</sub><sup>C</sup>  | `p_odoc`   | Oxidized dissolved organic carbon                   | mol C kg<sup>-1</sup>     | Yes         |
+| 27   | B<sub>oDOM</sub><sup>N</sup>  | `p_odon`   | Oxidized dissolved organic nitrogen                 | mol N kg<sup>-1</sup>     | Yes         |
+| 28   | B<sub>sDOM</sub><sup>C</sup>  | `p_sdoc`   | Short-chain dissolved organic carbon                | mol C kg<sup>-1</sup>     | Yes         |
+| 29   | B<sub>sDOM</sub><sup>N</sup>  | `p_sdon`   | Short-chain dissolved organic nitrogen              | mol N kg<sup>-1</sup>     | Yes         |
+| 30   | B<sub>lb</sub><sup>C</sup>    | `p_lbac`   | Long-chain DOM consuming (sharing) bacteria         | mol C kg<sup>-1</sup>     | Yes         |
+| 31   | B<sub>ob</sub><sup>C</sup>    | `p_obac`   | Oxidized DOM consuming (selfish) bacteria           | mol C kg<sup>-1</sup>     | Yes         |
+| 32   | B<sub>sb</sub><sup>C</sup>    | `p_sbac`   | Short-chain DOM consuming (scavenging) bacteria     | mol C kg<sup>-1</sup>     | Yes         |
+| 33   | B<sub>aoa</sub><sup>C</sup>   | `p_aoa`    | Ammonia oxidizing archaea                           | mol C kg<sup>-1</sup>     | Yes         |
+| 34   | DIC                           | `p_dic`    | Dissolved inorganic carbon                          | mol C kg<sup>-1</sup>     | Yes         |
+| 35   | Alk                           | `p_alk`    | Dissolved alkalinity                                | mol Eq kg<sup>-1</sup>    | Yes         |
+| 36   | CaCO<sub>3</sub>              | `p_caco3`  | Calcium carbonate                                   | mol C kg<sup>-1</sup>     | Yes         |
+| 37   | DICp                          | no local   | Preformed dissolved inorganic carbon                | mol C kg<sup>-1</sup>     | No          |
+| 38   | DICr                          | `p_dicr`   | Remineralised dissolved inorganic carbon            | mol C kg<sup>-1</sup>     | No          |
 
 ---
 
@@ -95,6 +106,7 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_nitrogen_fixation`       | Do implicit nitrogen fixation                                                              | .true.    |
 | `do_anammox`                 | Do implicit anaerobic ammonium oxidation                                                   | .true.    |
 | `do_benthic_denitrification` | Do implicit reduction of NO<sub>3</sub> in the sediment                                    | .true.    |
+| `do_wc_denitrification`      | Do explicit anaerobic facultative bacterial denitrification in water column                | .true.    |
 | `do_tracer_dicp`             | Carry preformed dissolved inorganic carbon (dicp) as a tracer                              | .false.   |
 | `do_tracer_dicr`             | Carry remineralised dissolved inorganic carbon (dicr) as a tracer                          | .false.   |
 | `do_viscous_sinking`         | Rubey's formula uses a non-constant dynamic viscosity of seawater                          | .true.    |
@@ -109,7 +121,7 @@ We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic var
 
 ## Diagnostic outputs
 
-The following are all **2D** diagnostic output variables from WOMBAT-mid.
+The following are all **2D** diagnostic output variables from WOMBAT-full.
 
 | Diagnostic        | Description                                                                                          | Units                                |
 | ----------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------ |
@@ -151,7 +163,8 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `fe_stf`          | Surface flux of dissolved iron into ocean                                                            | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `sdet_stf`        | Surface flux of small sinking detritus into ocean                                                    | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `ldet_stf`        | Surface flux of large sinking detritus into ocean                                                    | mol C m<sup>-2</sup> s<sup>-1</sup>  |
-| `doc_stf`         | Surface flux of dissolved organic carbon into ocean                                                  | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldoc_stf`        | Surface flux of long-chain dissolved organic carbon into ocean                                       | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldon_stf`        | Surface flux of long-chain dissolved organic nitrogen into ocean                                     | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `dic_stf`         | Surface flux of dissolved inorganic carbon into ocean                                                | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `dicp_stf`        | Surface flux of preformed dissolved inorganic carbon into ocean                                      | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `alk_stf`         | Surface flux of alkalinity into ocean                                                                | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
@@ -163,14 +176,15 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `o2_btf`          | Bottom flux of dissolved oxygen into ocean                                                           | mol O2 m<sup>-2</sup> s<sup>-1</sup> |
 | `no3_btf`         | Bottom flux of nitrate into ocean                                                                    | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `sil_btf`         | Bottom flux of silicic acid into ocean                                                               | mol Si m<sup>-2</sup> s<sup>-1</sup> |
-| `doc_btf`         | Bottom flux of dissolved organic carbon into ocean                                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldoc_btf`        | Bottom flux of long-chain dissolved organic carbon into ocean                                        | mol C m<sup>-2</sup> s<sup>-1</sup>  |
+| `ldon_btf`        | Bottom flux of long-chain dissolved organic nitrogen into ocean                                      | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `fe_btf`          | Bottom flux of dissolved iron into ocean                                                             | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `dic_btf`         | Bottom flux of dissolved inorganic carbon into ocean                                                 | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `dicr_btf`        | Bottom flux of remineralised dissolved inorganic carbon into ocean                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `alk_btf`         | Bottom flux of alkalinity into ocean                                                                 | mol Eq m<sup>-2</sup> s<sup>-1</sup> |
 
 
-The following are all **3D** diagnostic output variables from WOMBAT-mid.
+The following are all **3D** diagnostic output variables from WOMBAT-full.
 
 | Diagnostic         | Description                                                                        | Units                                           |
 | ------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -183,7 +197,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 | `radbio`           | Photosynthetically active radiation available for phytoplankton growth             | W m<sup>-2</sup>                                |
 | `radmid`           | Photosynthetically active radiation at centre point of grid cell                   | W m<sup>-2</sup>                                |
 | `radmld`           | Photosynthetically active radiation averaged in mixed layer                        | W m<sup>-2</sup>                                |
-| `npp3d`            | Net primary productivity                                                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `npp3d`            | Net primary productivity (excluding overflow)                                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `rpp3d`            | Regenerated primary productivity                                                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zsp3d`            | Zooplankton secondary productivity                                                 | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `phy_mumax`        | Maximum growth rate of nano-phytoplankton                                          | s<sup>-1</sup>                                  |
@@ -244,26 +258,44 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 | `fesources`        | Total source of dFe in water column                                                | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `fesinks`          | Total sink of dFe in water column                                                  | mol Fe kg<sup>-1</sup> s<sup>-1</sup>           |
 | `zooeps`           | Micro-zooplankton community-wide prey capture rate coefficient                     | m<sup>6</sup> mmolC<sup>-2</sup> s<sup>-1</sup> |
-| `zooprefphy`       | Grazing dietary fraction of micro-zooplankton on nano-phytoplankton                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `zooprefdia`       | Grazing dietary fraction of micro-zooplankton on micro-phytoplankton               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `zooprefsdet`      | Grazing dietary fraction of micro-zooplankton on small detritus                    | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooprefsbac`      | Grazing dietary fraction of micro-zooplankton on scavenging bacteria               | dimensionless            |
+| `zoopreflbac`      | Grazing dietary fraction of micro-zooplankton on sharing bacteria                  | dimensionless            |
+| `zooprefaoa`       | Grazing dietary fraction of micro-zooplankton on ammonia oxidizing archaea         | dimensionless            |
+| `zooprefphy`       | Grazing dietary fraction of micro-zooplankton on nano-phytoplankton                | dimensionless            |
+| `zooprefdia`       | Grazing dietary fraction of micro-zooplankton on micro-phytoplankton               | dimensionless            |
+| `zooprefsdet`      | Grazing dietary fraction of micro-zooplankton on small detritus                    | dimensionless            |
+| `zoograzsbac`      | Grazing rate of micro-zooplankton on scavenging bacteria                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zoograzlbac`      | Grazing rate of micro-zooplankton on sharing bacteria                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zoograzaoa`       | Grazing rate of micro-zooplankton on ammonia oxidizing archaea                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzphy`       | Grazing rate of micro-zooplankton on nano-phytoplankton                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzdia`       | Grazing rate of micro-zooplankton on micro-phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoograzsdet`      | Grazing rate of micro-zooplankton on small detritus                                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoomorl`          | Linear mortality of micro-zooplankton                                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zoomorq`          | Quadratic (density-dependent) mortality of micro-zooplankton                       | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooexcrsbac`      | Excretion rate of micro-zooplankton eating scavenging bacteria                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooexcrlbac`      | Excretion rate of micro-zooplankton eating sharing bacteria                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooexcraoa`       | Excretion rate of micro-zooplankton eating ammonia oxidizing archaea               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooexcrphy`       | Excretion rate of micro-zooplankton eating nano-phytoplankton                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooexcrdia`       | Excretion rate of micro-zooplankton eating micro-phytoplankton                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooexcrsdet`      | Excretion rate of micro-zooplankton eating small detritus                          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooegessbac`      | Egestion rate of micro-zooplankton on scavenging bacteria                          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooegeslbac`      | Egestion rate of micro-zooplankton on sharing bacteria                             | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `zooegesaoa`       | Egestion rate of micro-zooplankton on ammonia oxidizing archaea                    | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooegesphy`       | Egestion rate of micro-zooplankton on nano-phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooegesdia`       | Egestion rate of micro-zooplankton on micro-phytoplankton                          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `zooegessdet`      | Egestion rate of micro-zooplankton on small detritus                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `meseps`           | Meso-zooplankton community-wide prey capture rate coefficient                      | m<sup>6</sup> mmolC<sup>-2</sup> s<sup>-1</sup> |
-| `mesprefphy`       | Grazing dietary fraction of meso-zooplankton on nano-phytoplankton                 | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefdia`       | Grazing dietary fraction of meso-zooplankton on micro-phytoplankton                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefsdet`      | Grazing dietary fraction of meso-zooplankton on small detritus                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefldet`      | Grazing dietary fraction of meso-zooplankton on large detritus                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `mesprefzoo`       | Grazing dietary fraction of meso-zooplankton on micro-zooplankton                  | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesprefsbac`      | Grazing dietary fraction of meso-zooplankton on scavenging bacteria                | dimensionless            |
+| `mespreflbac`      | Grazing dietary fraction of meso-zooplankton on sharing bacteria                   | dimensionless            |
+| `mesprefaoa`       | Grazing dietary fraction of meso-zooplankton on ammonia oxidizing archaea          | dimensionless            |
+| `mesprefphy`       | Grazing dietary fraction of meso-zooplankton on nano-phytoplankton                 | dimensionless            |
+| `mesprefdia`       | Grazing dietary fraction of meso-zooplankton on micro-phytoplankton                | dimensionless            |
+| `mesprefsdet`      | Grazing dietary fraction of meso-zooplankton on small detritus                     | dimensionless            |
+| `mesprefldet`      | Grazing dietary fraction of meso-zooplankton on large detritus                     | dimensionless            |
+| `mesprefzoo`       | Grazing dietary fraction of meso-zooplankton on micro-zooplankton                  | dimensionless            |
+| `mesgrazsbac`      | Grazing rate of meso-zooplankton on scavenging bacteria                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesgrazlbac`      | Grazing rate of meso-zooplankton on sharing bacteria                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesgrazaoa`       | Grazing rate of meso-zooplankton on ammonia oxidizing archaea                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazphy`       | Grazing rate of meso-zooplankton on nano-phytoplankton                             | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazdia`       | Grazing rate of meso-zooplankton on micro-phytoplankton                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesgrazsdet`      | Grazing rate of meso-zooplankton on small detritus                                 | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
@@ -271,26 +303,82 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 | `mesgrazzoo`       | Grazing rate of meso-zooplankton on micro-zooplankton                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesmorl`          | Linear mortality of meso-zooplankton                                               | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesmorq`          | Quadratic (density-dependent) mortality of meso-zooplankton                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesexcrsbac`      | Excretion rate of meso-zooplankton eating scavenging bacteria                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesexcrlbac`      | Excretion rate of meso-zooplankton eating sharing bacteria                         | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesexcraoa`       | Excretion rate of meso-zooplankton eating ammonia oxidizing archaea                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrphy`       | Excretion rate of meso-zooplankton eating nano-phytoplankton                       | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrdia`       | Excretion rate of meso-zooplankton eating micro-phytoplankton                      | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrsdet`      | Excretion rate of meso-zooplankton eating small detritus                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrldet`      | Excretion rate of meso-zooplankton eating large detritus                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesexcrzoo`       | Excretion rate of meso-zooplankton eating micro-zooplankton                        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesegessbac`      | Egestion rate of meso-zooplankton on scavenging bacteria                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesegeslbac`      | Egestion rate of meso-zooplankton on sharing bacteria                              | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `mesegesaoa`       | Egestion rate of meso-zooplankton on ammonia oxidizing archaea                     | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegesphy`       | Egestion rate of meso-zooplankton on nano-phytoplankton                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegesdia`       | Egestion rate of meso-zooplankton on micro-phytoplankton                           | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegessdet`      | Egestion rate of meso-zooplankton on small detritus                                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegesldet`      | Egestion rate of meso-zooplankton on large detritus                                | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `mesegeszoo`       | Egestion rate of meso-zooplankton on micro-zooplankton                             | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `reminrpoc`        | Rate of hydrolysation of particulate organic matter                                | s<sup>-1</sup>                                  |
-| `reminrdoc`        | Rate of remineralisation of dissolved organic matter                               | s<sup>-1</sup>                                  |
 | `sdetremi`         | Hydrolysation of small sinking detritus                                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
 | `ldetremi`         | Hydrolysation of large sinking detritus                                            | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
-| `docremi`          | Remineralisation of dissolved organic carbon                                       | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `ldocremi`         | Remineralisation of long-chain dissolved organic carbon by sharing bacteria        | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `odocremi`         | Remineralisation of oxidzied dissolved organic carbon by selfish bacteria          | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `sdocremi`         | Remineralisation of short-chain dissolved organic carbon by scavenging bacteria    | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `odocprod`         | Production of oxidized dissolved organic carbon by sharing bacteria                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `odonprod`         | Production of oxidized dissolved organic nitrogen by sharing bacteria                 | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
+| `sdocprod`         | Production of short-chain dissolved organic carbon by sharing bacteria                   | mol C kg<sup>-1</sup> s<sup>-1</sup>            |
+| `sdonprod`         | Production of short-chain dissolved organic nitrogen by sharing bacteria                 | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
+| `lbacydoc`         | Biomass yield of sharing bacteria                                                  | mol C-biomass (mol DOC)<sup>-1</sup> |
+| `lbacgrow`         | Growth of sharing bacteria                                                         | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacresp`         | Oxygen consumption by sharing bacteria                                             | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacpnh4`         | Production of ammonium by sharing bacteria                                         | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacpco2`         | Production of carbon dioxide by sharing bacteria                                   | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacufer`         | Uptake of dissolved iron by sharing bacteria                                       | mol Fe kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbac_mu`          | Realised growth rate of sharing bacteria                                           | s<sup>-1</sup> |
+| `lbac_anaer`       | Fraction of sharing bacterial growth supported by anaerobic metabolism             | dimensionless [0-1] |
+| `lbac_felim`       | Indicator of iron limitation of sharing bacterial growth                           | dimensionless [0-1] |
+| `lbac_nlim`        | Indicator of nitrogen limitation of sharing bacterial growth                       | dimensionless [0-1] |
+| `lbacmorl`         | Linear mortality of sharing bacteria                                               | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacmorq`         | Quadratic mortality of sharing bacteria                                            | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `lbacdeni`         | Denitrification by sharing bacteria (nitrate consumption)                          | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `obacydoc`         | Biomass yield of selfish bacteria                                                  | mol C-biomass (mol DOC)<sup>-1</sup> |
+| `obacgrow`         | Growth of selfish bacteria                                                         | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `obacresp`         | Oxygen consumption by selfish bacteria                                             | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
+| `obacpnh4`         | Production of ammonium by selfish bacteria                                         | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `obacpco2`         | Production of carbon dioxide by selfish bacteria                                   | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `obacufer`         | Uptake of dissolved iron by selfish bacteria                                       | mol Fe kg<sup>-1</sup> s<sup>-1</sup> |
+| `obac_mu`          | Realised growth rate of selfish bacteria                                           | s<sup>-1</sup> |
+| `obac_anaer`       | Fraction of selfish bacterial growth supported by anaerobic metabolism             | dimensionless [0-1] |
+| `obac_felim`       | Indicator of iron limitation of selfish bacterial growth                           | dimensionless [0-1] |
+| `obac_nlim`        | Indicator of nitrogen limitation of selfish bacterial growth                       | dimensionless [0-1] |
+| `obacmorl`         | Linear mortality of selfish bacteria                                               | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `obacmorq`         | Quadratic mortality of selfish bacteria                                            | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `obacdeni`         | Denitrification by selfish bacteria (nitrate consumption)                          | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacydoc`         | Biomass yield of scavenging bacteria                                               | mol C-biomass (mol DOC)<sup>-1</sup> |
+| `sbacgrow`         | Growth of scavenging bacteria                                                      | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacresp`         | Oxygen consumption by scavenging bacteria                                          | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacpnh4`         | Production of ammonium by scavenging bacteria                                      | mol N kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacpco2`         | Production of carbon dioxide by scavenging bacteria                                | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacufer`         | Uptake of dissolved iron by scavenging bacteria                                    | mol Fe kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbac_mu`          | Realised growth rate of scavenging bacteria                                        | s<sup>-1</sup> |
+| `sbac_anaer`       | Fraction of scavenging bacterial growth supported by anaerobic metabolism          | dimensionless [0-1] |
+| `sbac_felim`       | Indicator of iron limitation of scavenging bacterial growth                        | dimensionless [0-1] |
+| `sbac_nlim`        | Indicator of nitrogen limitation of scavenging bacterial growth                    | dimensionless [0-1] |
+| `sbacmorl`         | Linear mortality of scavenging bacteria                                            | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacmorq`         | Quadratic mortality of scavenging bacteria                                         | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `sbacdeni`         | Denitrification by scavenging bacteria (nitrate consumption)                       | mol N kg<sup>-1</sup> s<sup>-1</sup> |
 | `ammox`            | Ammonia oxidation rate (NH<sub>4</sub> consumption)                                | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
 | `aoa_loxy`         | Limitation of ammonia oxidation by oxygen                                          | dimensionless                                   |
 | `aoa_lnh4`         | Limitation of ammonia oxidation by ammonium                                        | dimensionless                                   |
 | `aoa_mu`           | Realized growth rate of ammonia oxidizing archaea                                  | s<sup>-1</sup>                                  |
-| `anammox`          | Anammox rate (NH<sub>4</sub> consumption)                                          | mol kg<sup>-1</sup> s<sup>-1</sup>              |
+| `aoa_mumax`        | Maximum potential growth rate of ammonia oxidizing archaea                         | s<sup>-1</sup>                                  |
+| `aoa_eno3`         | Production of nitrate by ammonia oxidizing archaea                                 | mol N (mol C-biomass)<sup>-1</sup> |
+| `aoagrow`          | Growth of ammonia oxidizing archaea                                                | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoaresp`          | Oxygen consumption by ammonia oxidizing archaea                                    | mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoamorl`          | Linear mortality of ammonia oxidizing archaea                                      | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `aoamorq`          | Quadratic mortality of ammonia oxidizing archaea                                   | mol C kg<sup>-1</sup> s<sup>-1</sup> |
+| `anammox`          | Anammox rate (NH<sub>4</sub> consumption)                                          | mol N kg<sup>-1</sup> s<sup>-1</sup>            |
 | `aox_lnh4`         | Limitation of anammox bacteria by ammonium                                         | dimensionless                                   |
 | `aox_mu`           | Realized growth rate of anammox bacteria                                           | s<sup>-1</sup>                                  |
 | `pic2poc`          | Inorganic (CaCO3) to organic carbon ratio                                          | dimensionless                                   |
@@ -316,7 +404,7 @@ The following are all **3D** diagnostic output variables from WOMBAT-mid.
 
 ## Subroutine - "update_from_source"
 
-The subroutine `generic_WOMBATmid_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics (WOMBAT). Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, particulate detritus, dissolved and particulate iron, dissolved organics carbon, alkalinity, oxygen and carbon pools) at each time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
+The subroutine `generic_WOMBATfull_update_from_source` is the heart of the World Ocean Model of Biogeochemistry And Trophic‑dynamics (WOMBAT). Its purpose is to apply biological source–sink terms to ocean tracers (nutrients, phytoplankton, zooplankton, particulate detritus, dissolved and particulate iron, dissolved organics carbon, alkalinity, oxygen and carbon pools) at each time‑step. The subroutine is documented internally by a list of numbered steps (see code comments). These steps are:
 
 1. Light attenuation through the water column.
 2. Nutrient limitation of phytoplankton.
@@ -332,13 +420,14 @@ The subroutine `generic_WOMBATmid_update_from_source` is the heart of the World 
 12. Mortality terms.
 13. Zooplankton grazing, egestion, excretion and assimilation.
 14. Implicit nitrogen fixation.
-15. Calcium carbonate production and dissolution.
-16. Chemoautotrophy.
-17. Tracer tendencies.
-18. Check for conservation of mass.
-19. Additional operations on tracers.
-20. Sinking rate of particulates.
-21. Sedimentary processes.
+15. Facultative heterotrophic bacteria.
+16. Calcium carbonate production and dissolution.
+17. Chemoautotrophy.
+18. Tracer tendencies.
+19. Check for conservation of mass.
+20. Additional operations on tracers.
+21. Sinking rate of particulates.
+22. Sedimentary processes.
 
 Below is a step‑by‑step explanation of each section together with the key equations. Variable names in `grey` follow the Fortran code, while variable names in $math font$ are pointers to the equations; `i,j,k` refer to horizontal and vertical indices; [square brackets] denote units. If a variable is without i,j,k dimensions, this variable is held as a scalar and not an array.
 
@@ -394,9 +483,17 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `zooFeassim`       | Micro-zooplankton Fe assimilation efficiency                                | 0.60          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `zooexcrdom`       | Micro-zooplankton excretion fraction routed to DOM                          | 0.70          | dimensionless                                                        |
 | `zoogmax`          | Micro-zooplankton max grazing rate                                          | 3.3/86400.0   | s<sup>-1</sup>                                                       |
+| `zooepslbac`       | Micro-zooplankton prey capture efficiency (sharing bacteria)                | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepsobac`       | Micro-zooplankton prey capture efficiency (selfish bacteria)                | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepssbac`       | Micro-zooplankton prey capture efficiency (scavenging bacteria)             | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zooepsaoa`        | Micro-zooplankton prey capture efficiency (AOA)                             | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `zooepsphy`        | Micro-zooplankton prey capture efficiency (nano-phytoplankton)              | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `zooepsdia`        | Micro-zooplankton prey capture efficiency (micro-phytoplankton)             | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `zooepssdet`       | Micro-zooplankton prey capture efficiency (small detritus)                  | 0.40/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `zpreflbac`        | Micro-zooplankton preference (sharing bacteria)                             | 1.0           | dimensionless                                                        |
+| `zprefobac`        | Micro-zooplankton preference (selfish bacteria)                             | 1.0           | dimensionless                                                        |
+| `zprefsbac`        | Micro-zooplankton preference (scavenging bacteria)                          | 1.0           | dimensionless                                                        |
+| `zprefaoa`         | Micro-zooplankton preference (AOA)                                          | 1.0           | dimensionless                                                        |
 | `zprefphy`         | Micro-zooplankton preference (nano-phytoplankton)                           | 1.0           | dimensionless                                                        |
 | `zprefdia`         | Micro-zooplankton preference (micro-phytoplankton)                          | 0.25          | dimensionless                                                        |
 | `zprefsdet`        | Micro-zooplankton preference (small detritus)                               | 1.0           | dimensionless                                                        |
@@ -409,11 +506,19 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `mesFeassim`       | Meso-zooplankton Fe assimilation                                            | 0.75          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `mesexcrdom`       | Meso-zooplankton excretion fraction routed to DOM                           | 0.35          | dimensionless                                                        |
 | `mesgmax`          | Meso-zooplankton maximum grazing rate                                       | 0.30/86400.0  | s<sup>-1</sup>                                                       |
+| `mesepslbac`       | Meso-zooplankton prey capture efficiency (sharing bacteria)                 | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsobac`       | Meso-zooplankton prey capture efficiency (selfish bacteria)                 | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepssbac`       | Meso-zooplankton prey capture efficiency (scavenging bacteria)              | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsaoa`        | Meso-zooplankton prey capture efficiency (AOA)                              | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepsphy`        | Meso-zooplankton prey capture efficiency (nano-phytoplankton)               | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsdia`        | Meso-zooplankton prey capture efficiency (micro-phytoplankton)              | 0.20/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepssdet`       | Meso-zooplankton prey capture efficiency (small detritus)                   | 0.05/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepsldet`       | Meso-zooplankton prey capture efficiency (large detritus)                   | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
-| `mesepszoo`        | Meso-zooplankton prey capture efficiency (micro-zooplankton)                | 0.10/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsdia`        | Meso-zooplankton prey capture efficiency (micro-phytoplankton)              | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepssdet`       | Meso-zooplankton prey capture efficiency (small detritus)                   | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepsldet`       | Meso-zooplankton prey capture efficiency (large detritus)                   | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mesepszoo`        | Meso-zooplankton prey capture efficiency (micro-zooplankton)                | 0.11/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
+| `mpreflbac`        | Meso-zooplankton preference (sharing bacteria)                              | 0.0           | dimensionless                                                        |
+| `mprefobac`        | Meso-zooplankton preference (selfish bacteria)                              | 0.0           | dimensionless                                                        |
+| `mprefsbac`        | Meso-zooplankton preference (scavenging bacteria)                           | 0.0           | dimensionless                                                        |
+| `mprefaoa`         | Meso-zooplankton preference (AOA)                                           | 0.0           | dimensionless                                                        |
 | `mprefphy`         | Meso-zooplankton preference (nano-phytoplankton)                            | 0.5           | dimensionless                                                        |
 | `mprefdia`         | Meso-zooplankton preference (micro-phytoplankton)                           | 1.0           | dimensionless                                                        |
 | `mprefsdet`        | Meso-zooplankton preference (small detritus)                                | 1.0           | dimensionless                                                        |
@@ -423,7 +528,6 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `mesqmor`          | Meso-zooplankton quadratic mortality rate                                   | 0.75/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `mespreyswitch`    | Meso-zooplankton prey switching exponent                                    | 1.8           | dimensionless                                                        |
 | `detqrem`          | Detritus hydrolysation rate                                                 | 0.7/86400.0   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `docqrem`          | Dissolved organic matter remineralisation rate                              | 0.2/86400.0   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `detlrem_sed`      | Sediment detritus hydrolysation rate                                        | 0.005/86400.0 | s<sup>-1</sup>                                                       |
 | `sdetphi`          | Porosity (small detritus)                                                   | 0.25          | dimensionless                                                        |
 | `ldetphi`          | Porosity (large detritus)                                                   | 0.75          | dimensionless                                                        |
@@ -439,7 +543,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `f_inorg`          | Base inorganic fraction (PIC:POC ratio)                                     | 0.04          | mol CaCO3 (mol C)<sup>-1</sup>                                       |
 | `disscal`          | Calcite dissolution rate                                                    | 0.10/86400.0  | s<sup>-1</sup>                                                       |
 | `dissara`          | Aragonite dissolution rate                                                  | 0.10/86400.0  | s<sup>-1</sup>                                                       |
-| `dissdet`          | Fraction CaCO3 dissolved per detritus hydrolyzed                            | 0.20          | mol CaCO3 (mol C)<sup>-1</sup>                                       |
+| `dissdet`          | Fraction CaCO3 dissolved per detritus hydrolyzed                            | 0.20          | (mmol C m<sup>-3</sup>)<sup>-1</sup>                                       |
 | `fgutdiss`         | Zooplankton gut CaCO3 dissolution efficiency                                | 0.80          | dimensionless                                                        |
 | `ligW`             | Weak ligand concentration                                                   | 1.7           | µmol m<sup>-3</sup>                                                  |
 | `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
@@ -455,13 +559,54 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `bsi_alpha`        | Natural-log intercept of temperature-dependent biogenic silica dissolution  | -10           | ln(per hour)                                                         |
 | `bsi_fbac`         | Bacterial enhancement factor for silica dissolution                         | 10            | dimensionless                                                        |
 | `bsi_kbac`         | Half-saturation coefficient for bacterial enhancement of silica dissolution | 0.5           | mmol C m<sup>-3</sup>                                                |
-| `bsilrem_sed`      | Base sediment biogenic silica dissolution rate                              | 2.8e-8        | s<sup>-1</sup>                                                       |
-| `aoa_knh4`         | AOA NH<sub>4</sub> half-saturation coefficient                              | 0.1           | mmol N m<sup>-3</sup>                                                |
+| `aoa_knh4`         | AOA NH<sub>4</sub> half-saturation coefficient                              | 0.08           | mmol N m<sup>-3</sup>                                                |
 | `aoa_poxy`         | AOA O<sub>2</sub> diffusive uptake limit                                    | 275/86400     | (mmol C biomass m<sup>3</sup>)<sup>-1</sup> s<sup>-1</sup>           |
 | `aoa_ynh4`         | AOA NH<sub>4</sub> demand per C biomass                                     | 11.0          | mol N (mol C)<sup>-1</sup>                                           |
-| `aoa_yoxy`         | AOA O<sub>2</sub> demand per C biomass                                      | 15.5          | mol O<sub>2</sub> (mol C)<sup>-1</sup>                               |
-| `aoxkn`            | Anammox NH<sub>4</sub> half-saturation coefficient                          | 0.5           | mmol N m<sup>-3</sup>                                                |
-| `aoxmumax`         | Anammox maximum growth rate                                                 | 0.0025/86400  | s<sup>-1</sup>                                                       |
+| `aoa_yoxy`         | AOA O<sub>2</sub> demand per C biomass                                      | 28.4          | mol O<sub>2</sub> (mol C)<sup>-1</sup>                               |
+| `aoa_C2N`       | AOA biomass carbon-to-nitrogen ratio                                           | 5.0           | mol C (mol N)<sup>-1</sup>                                  |
+| `aoa_C2Fe`      | AOA biomass carbon-to-iron ratio                                               | 1.0/20e-6     | mol C (mol Fe)<sup>-1</sup>                                 |
+| `aoalmor`       | AOA linear mortality rate constant                                             | 0.005/86400   | s<sup>-1</sup>                                              |
+| `aoaqmor`       | AOA quadratic mortality rate constant                                          | 0.001/86400   | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>         |
+| `pbac_alpha`    | Degree of partial oxidation by implicit particle-associated bacteria           | 1.0           | dimensionless                                               |
+| `lbac_Vmax_doc` | Maximum DOC uptake rate of sharing bacteria                                    | 6.7/86400     | mol C (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `lbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of sharing bacteria                         | 7.2/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `lbac_Vmax_dFe` | Maximum dissolved iron uptake rate of sharing bacteria                             | 0.00010/86400 | mol Fe (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                       |
+| `lbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of sharing bacteria                             | 0.5/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `lbac_poxy`     | O<sub>2</sub> diffusive uptake limit of sharing bacteria                           | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
+| `lbac_kno3`     | Half-saturation coefficient for NO<sub>3</sub> uptake by sharing bacteria          | 15.0          | mmol N m<sup>-3</sup>                                       |
+| `lbac_kdoc`     | Half-saturation coefficient for DOC uptake by sharing bacteria                     | 100.0         | mmol C m<sup>-3</sup>                                       |
+| `lbac_kfer`     | Half-saturation coefficient for dissolved iron uptake by sharing bacteria          | 0.35          | µmol Fe m<sup>-3</sup>                                      |
+| `lbac_knh4`     | Half-saturation coefficient for NH<sub>4</sub> uptake by sharing bacteria          | 0.30          | mmol N m<sup>-3</sup>                                       |
+| `lbac_alpha`    | Degree of partial oxidation by sharing bacteria                                    | 0.50          | dimensionless                                               |
+| `lbac_beta`     | Fraction of partially oxidized material directed to short-chain DOM                | 0.10          | dimensionless                                               |
+| `lbac_fele`     | Fraction of electrons allocated to biosynthesis by sharing bacteria                | 0.15          | dimensionless                                               |
+| `obac_Vmax_doc` | Maximum DOC uptake rate of selfish bacteria                                    | 6.7/86400     | mol C (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `obac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of selfish bacteria                         | 7.2/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `obac_Vmax_dFe` | Maximum dissolved iron uptake rate of selfish bacteria                             | 0.00010/86400 | mol Fe (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                       |
+| `obac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of selfish bacteria                             | 0.5/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `obac_poxy`     | O<sub>2</sub> diffusive uptake limit of selfish bacteria                           | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
+| `obac_kno3`     | Half-saturation coefficient for NO<sub>3</sub> uptake by selfish bacteria          | 15.0          | mmol N m<sup>-3</sup>                                       |
+| `obac_kdoc`     | Half-saturation coefficient for DOC uptake by selfish bacteria                     | 200.0         | mmol C m<sup>-3</sup>                                       |
+| `obac_kfer`     | Half-saturation coefficient for dissolved iron uptake by selfish bacteria          | 0.35          | µmol Fe m<sup>-3</sup>                                      |
+| `obac_knh4`     | Half-saturation coefficient for NH<sub>4</sub> uptake by selfish bacteria          | 0.30          | mmol N m<sup>-3</sup>                                       |
+| `obac_fele`     | Fraction of electrons allocated to biosynthesis by selfish bacteria                | 0.05          | dimensionless                                               |
+| `sbac_Vmax_doc` | Maximum DOC uptake rate of scavenging bacteria                                     | 2.23/86400     | mol C (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of scavenging bacteria                          | 2.4/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_dFe` | Maximum dissolved iron uptake rate of scavenging bacteria                          | 0.00010/86400 | mol Fe (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                       |
+| `sbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of scavenging bacteria                          | 0.067/86400   | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `sbac_poxy`     | O<sub>2</sub> diffusive uptake limit of scavenging bacteria                        | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
+| `sbac_kno3`     | Half-saturation coefficient for NO<sub>3</sub> uptake by scavenging bacteria       | 15.0          | mmol N m<sup>-3</sup>                                       |
+| `sbac_kdoc`     | Half-saturation coefficient for DOC uptake by scavenging bacteria                  | 10.0          | mmol C m<sup>-3</sup>                                       |
+| `sbac_kfer`     | Half-saturation coefficient for dissolved iron uptake by scavenging bacteria       | 0.35          | µmol Fe m<sup>-3</sup>                                      |
+| `sbac_knh4`     | Half-saturation coefficient for NH<sub>4</sub> uptake by scavenging bacteria       | 0.10          | mmol N m<sup>-3</sup>                                       |
+| `sbac_fele`     | Fraction of electrons allocated to biosynthesis by scavenging bacteria             | 0.15          | dimensionless                                               |
+| `donpersist`    | Fraction of long-chain DON converted to short-chain DON rather than NH<sub>4</sub> | 0.4           | dimensionless                                               |
+| `bac_C2N`       | Heterotrophic bacterial biomass carbon-to-nitrogen ratio                           | 5.0           | mol C (mol N)<sup>-1</sup>                                  |
+| `bac_C2Fe`      | Heterotrophic bacterial biomass carbon-to-iron ratio                               | 1.0/40e-6     | mol C (mol Fe)<sup>-1</sup>                                 |
+| `baclmor`       | Heterotrophic bacterial linear mortality rate constant                             | 0.005/86400   | s<sup>-1</sup>                                              |
+| `bacqmor`       | Heterotrophic bacterial quadratic mortality rate constant                          | 0.10/86400    | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>         |
+| `aox_knh4`         | Anammox NH<sub>4</sub> half-saturation coefficient                          | 0.5           | mmol N m<sup>-3</sup>                                                |
+| `aox_mumax`        | Anammox maximum growth rate                                                 | 0.0025/86400  | s<sup>-1</sup>                                                       |
 | `bottom_thickness` | Bottom layer thickness                                                      | 0.1           | m                                                                    |
 
 
@@ -478,7 +623,7 @@ For chlorophyll, attenuation coefficients for each of blue, green and red light 
 
 For organic detritus, attenuation coefficients for blue, green and red light (`dbgr(b)`, [(mg N m<sup>-3</sup>)<sup>-1</sup> m<sup>-1</sup>]) are taken from [Dutkiewicz et al. (2015)](https://bg.copernicus.org/articles/12/4447/2015/bg-12-4447-2015.html) (their Fig. 1b), while for calcium carbonate (`cbgr(b)`, [(kg CaCO<sub>3</sub> m<sup>-3</sup>)<sup>-1</sup>m<sup>-1</sup>]) we take the coefficients defined in [Soja-Wozniak et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019JC014998). For both detritus and calcium carbonate, these studies provide concentration-normalized attenuation coefficients, which must be multiplied against concentrations to retrieve the correct units of [m<sup>-1</sup>].
 
-Because WOMBAT-mid has two forms of phytoplankton (nanophytoplankton and microphytoplankton) with their own chlorophyll quotas and two forms of particulate detritus (small and large), we sum both chlorophyll pools and particulate detritus pools to return the total chlorophyll and the total particulate detritus. 
+Because WOMBAT-full has two forms of phytoplankton (nanophytoplankton and microphytoplankton) with their own chlorophyll quotas and two forms of particulate detritus (small and large), we sum both chlorophyll pools and particulate detritus pools to return the total chlorophyll and the total particulate detritus. 
 
 As an example, the PAR in the blue band (`b=1`) at the top of level k is computed as
 
@@ -715,7 +860,7 @@ In the above, $\mu_{np}^{0ºC}$, $\mu_{mp}^{0ºC}$, $β_{np}$ and $β_{mp}$ are 
 
 **Heterotrophy**
 
-Heterotrophic processes include mortality of ecosystem functional types, grazing rates of zooplankton, hydrolysation and remineralisation of particulate and dissolved organic material (POC and DOC)in the water column and sediments. These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0ºC}$, [<sup>s-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$). Each heterotrophic process has a different $\mu_{het}^{0ºC}$ value and we expand on this later under the mortality and grazing sections. However, the basic formulation for scaling heterotrophic metabolisms with temperature takes the form:
+Heterotrophic processes include mortality of ecosystem functional types, grazing rates of zooplankton, hydrolysation of particulate organic matter, and the growth rates of heterotrophic free-living bacterial functional types, which consume dissolved organic matter (DOM). These processes are scaled similarly to autotrophy, where some reference rate at 0ºC ($\mu_{het}^{0ºC}$, [<sup>s-1</sup>]) is multiplied by a power-law with temperature ($β_{hete}$). Each heterotrophic process has a different $\mu_{het}^{0ºC}$ value and we expand on this later under the mortality and grazing sections. However, the basic formulation for scaling heterotrophic metabolisms with temperature takes the form:
 
 $$
 \begin{align}
@@ -730,9 +875,9 @@ _where_ <br>
 
 In the code, the combined term $\left(β_{hete}\right)^{T}$ is saved as `fbc`. See sections below for further details on heterotrophic metabolisms.
 
-**POM --> DOM**
+**POM --> lDOM**
 
-WOMBAT-mid considers the hydrolysation of sinking particulate organic matter (POM) into suspended dissolved organic matter (DOM). The hydrolysation rate of small sinking organic detritus (`sdetremi(i,j,k)`, $\Gamma_{sd}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`ldetremi(i,j,k)`, $\Gamma_{ld}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
+WOMBAT-full considers the hydrolysation of sinking particulate organic matter (POM) into suspended long-chain dissolved organic matter (lDOM). The hydrolysation rate of small sinking organic detritus (`sdetremi(i,j,k)`, $\Gamma_{sd}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) and large sinking organic detritus (`ldetremi(i,j,k)`, $\Gamma_{ld}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is computed as:
 
 $$
 \begin{align}
@@ -746,23 +891,10 @@ _where_ <br>
 - $\left(β_{hete}\right)^{T}$ is the temperature-dependent scaler of heterotrophic metabolism (`fbc`, [dimenionless]) <br>
 - $B_{sd}^{C}$ and $B_{ld}^{C}$ are the in situ concentrations of small and large sinking organic detritus (`sdet_mmolm3`; `ldet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
-It is well appreciated that nitrogen is preferentially remineralised back to inorganic form before carbon, evident in the increasingly N-deplete dissolved organic matter that is long-lived and therefore recalcitrant in the ocean ([Hopkinson & Vallino, 2005](https://www.nature.com/articles/nature03191)). For simplicity, we therefore assert that the DOM has no nitrogen content and thus represents carbohydrate or lipid-like compounds. Hydrolysation of our particulate detritus, with a fixed C:N ratio of 122:16 ([Takahashi et al., 1985](https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/jc090ic04p06907); [Anderson et al., 1994](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/93GB03318)), necessitates the total conversion of the nitrogen within it to ammonium.
 
+**lDOM --> sDOM or oDOM --> inorganic nutrients**
 
-**DOM --> inorganic nutrients**
-
-WOMBAT-mid considers the remineralisation of the dissolved inorganic matter (`docremi(i,j,k)`, $\Gamma_{doc}^{\rightarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) as:
-
-$$
-\begin{align}
-\Gamma_{doc}^{\rightarrow C} =& \quad \Gamma_{doc}^{0ºC} \left(β_{hete}\right)^{T} \left(B_{doc}^{C}\right)^{2}
-\end{align}
-$$
-
-_where_ <br>
-- $\Gamma_{doc}^{0ºC}$ is the base remineralisation rate of dissolved organic matter at 0ºC (`docqrem`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\left(β_{hete}\right)^{T}$ is the temperature-dependent scaler of heterotrophic metabolism (`fbc`, [dimenionless]) <br>
-- $B_{doc}^{C}$ is the in situ concentrations of dissolved organic carbon (`doc_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+WOMBAT-full considers the sequential and partial oxidation of long-chain DOM (l-DOM) to either oxidized DOM (o-DOM) or short-chain DOM (s-DOM) before the full oxidation of this intermediate material to CO<sub>2</sub>. This oxidation chain is performed by free-living heterotrophic bacterial types: a sharing, scavenging and selfish bacteria ([Reintjes et al., 2019](https://doi.org/10.1038/s41396-018-0326-3)). Details are found below in Step 15.
 
 ---
 
@@ -851,18 +983,18 @@ _where_ <br>
 
 ### 6. Dissolved organic carbon release by phytoplankton.
 
-We implement the overflow hypothesis ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)), which posits that phytoplankton can exude their assimilated carbon as dissolved organic carbon (DOC) in high light, low nutrient conditions. We thus account for a phytoplankton-mediated creation of DOC from dissolved inorganic carbon (DIC) via:
+We implement the overflow hypothesis ([Fogg, 1983](https://doi.org/10.1515/botm.1983.26.1.3); [Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)), which posits that phytoplankton can exude their assimilated carbon as simple compounds of dissolved organic carbon (short-chain DOC) in high light, low nutrient conditions. We thus account for a phytoplankton-mediated creation of sDOC (`p_sdoc(i,j,k)`, [mol C kg<sup>-1</sup>]) from dissolved inorganic carbon (DIC) via:
 
 $$
 \begin{align}
-\mu_{np}^{\rightarrow DOC} =& \quad \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{\leftarrow C}\right) \right) \\
-\mu_{mp}^{\rightarrow DOC} =& \quad \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{\leftarrow C}\right) \right)
+\mu_{np}^{\rightarrow sDOC} =& \quad \min\left( f_{overflow} \mu_{np}^{totalC}, \max\left(0.02 \cdot \mu_{np}^{totalC}, \mu_{np}^{totalC} - \mu_{np}^{\leftarrow C}\right) \right) \\
+\mu_{mp}^{\rightarrow sDOC} =& \quad \min\left( f_{overflow} \mu_{mp}^{totalC}, \max\left(0.02 \cdot \mu_{mp}^{totalC}, \mu_{mp}^{totalC} - \mu_{mp}^{\leftarrow C}\right) \right)
 \end{align}
 $$
 
 _where_ <br>
-- $\mu_{np}^{\rightarrow DOC}$ is the overflow production of DOC by nano-phytoplankton (`phydoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $\mu_{mp}^{\rightarrow DOC}$ is the overflow production of DOC by micro-phytoplankton (`diadoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{np}^{\rightarrow sDOC}$ is the overflow production of short-chain DOC by nano-phytoplankton (`phydoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\mu_{mp}^{\rightarrow sDOC}$ is the overflow production of short-chain DOC by micro-phytoplankton (`diadoc(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\mu_{np}^{totalC}$ is the total carbon fixation rate of nano-phytoplankton (`zval`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\mu_{mp}^{totalC}$ is the total carbon fixation rate rate of micro-phytoplankton (`zval`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\mu_{np}^{\leftarrow C}$ is the realized biomass growth rate of nano-phytoplankton (`phygrow(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
@@ -878,6 +1010,8 @@ $$
 $$
 
 This formulation is derived from the idea that DOC exudation occurs as a result of the difference between carbon fixation capacity, which is bounded by light, and biosynthesis, which is bounded by light and nutrient resources. Since [Thornton (2014)](https://doi.org/10.1080/09670262.2013.875596) identified that as much as 50% of total phytoplankton carbon fixation can be routed to DOC exudation, we cap DOC exudation at $f_{overflow}$ of total carbon fixation, which is set as to a default of 0.50. We also set a hard bound that 2% of total carbon fixation must at minimum go to DOC production based on the findings of [Bjørnsen (1988)](https://doi.org/10.4319/lo.1988.33.1.0151) who identified that even the healthiest cells lose a small fraction of their assimilated carbon as DOC via passive diffusion across the cell membrane.
+
+As a consequence of overflow production by phytoplankton the C:N ratio of the short-chain DOM pool becomes greatly enriched, which drives scavenging bacteria to assimilate NH<sub>4</sub> from the environment and compete with phytoplankton and ammonia oxidizing archaea for this resource ([Wheeler & Kirchman, 1986](https://doi.org/10.4319/lo.1986.31.5.0998); [Kirchman et al., 1990](https://doi.org/10.4319/lo.1990.35.6.1258); [Smith et al., 2014](https://doi.org/10.1371/journal.pone.0108173); [Klawonn et al., 2019](https://doi.org/10.1038/s41396-019-0386-z)). 
 
 ---
 
@@ -938,7 +1072,7 @@ This formulation elevates chlorophyll-to-carbon ratios in low light and supresse
 
 ### 8. Phytoplankton uptake of iron
 
-Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. First, a maximum quota is found based on the maximum Fe:C ratio of the phytoplankton type:
+Like chlorophyll, the iron content of phytoplankton is explicitly tracked as a tracer in WOMBAT-full. First, a maximum quota is found based on the maximum Fe:C ratio of the phytoplankton type:
 
 $$
 \begin{align}
@@ -1003,7 +1137,7 @@ _where_ <br>
 
 ### 9. Phytoplankton uptake of silicic acid.
 
-Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-mid. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{\leftarrow Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
+Like chlorophyll and iron, the silicon content of micro-phytoplankton is explicitly tracked as a tracer in WOMBAT-full. Uptake of silicic acid by micro-phytoplankton (`dia_silupt(i,j,k)`, $\mu_{mp}^{\leftarrow Si}$, [mol Si kg<sup>-1</sup> s<sup>-1</sup>]) is scaled by two terms relating to (i) michaelis-menten type affinity for H<sub>4</sub>SiO<sub>4</sub> and (ii) down regulation of H<sub>4</sub>SiO<sub>4</sub> uptake associated with enriched cellular quotas. 
 
 $$
 \begin{align}
@@ -1102,13 +1236,12 @@ When `do_two_ligands == .false.`, we use a single ligand class and solve for the
 
 In either case, we first determine the conditional stability constant(s) of the ligand(s). In the case of `do_two_ligands == .true.`, we solve for the stability constant of a strong ligand (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) and then consider the stability constant of a weak ligand to be a constant offset equal to -1.5 log<sub>10</sub> units based on [Gledhill & Buck (2012)](https://doi.org/10.3389/fmicb.2012.00069). In the case of `do_two_ligands == .false.`, we solve for the stability constant of the strong (`ligK(i,j,k)`) and weak ligands (`ligW_K`), but take the concentration-weighted average binding strength to get the bulk ligand binding stregnth.
 
-The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-mid, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
+The stability constant (`ligK(i,j,k)`, $Lig_{s}^{K}$, [kg mol<sup>-1</sup>]) is known to vary with the environmental conditions. In WOMBAT-full, we consider the effect of temperature, light, pH and the concentration of labile DOC on the binding strength. The temperature dependency comes from [Volker & Tagliabue (2015)](https://doi.org/10.1016/j.marchem.2014.11.008) and warmer waters increase binding strength. The light-dependency accounts for the photoreduction of photoreactive ligands, which was identified to reduce the conditional stability constant of aquachelin by 0.7 log<sub>10</sub> units ([Barbeau et al., 2001](https://doi.org/10.1038/35096545); [Vraspir & Butler, 2009](https://doi.org/10.1146/annurev.marine.010908.163712)). The pH and DOC concentration dependency comes from [Ye et al. (2020)](https://doi.org/10.1029/2019GB006425) and increases binding strength at lower pH and higher concentrations of DOC.
 
 $$
 \begin{align}
-Lig_{s}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) \\
-             & \qquad                        - \left(0.7 \dfrac{PAR}{PAR + 10}\right)} \\
-             & \qquad                   + 10^{\left(-0.0002 \left(B_{DOM}^{C} + 40\right)^{2} + 0.034 \cdot \left(B_{DOM}^{C} + 40\right) - 1.67 \cdot pH + 24.36\right)} \bigg)
+Lig_{s}^{K} =& \quad 10^{-9} \cdot \bigg( 10^{ \left(17.27 - 1565.7 \left(T_K\right)^{-1} \right) - \left(0.7 \dfrac{PAR}{PAR + 10}\right)} \\
+             & \qquad                   + 10^{\left(-0.0002 \left(B_{lDOM}^{C} + B_{oDOM}^{C} + B_{sDOM}^{C}\right)^{2} + 0.034 \cdot \left(B_{lDOM}^{C} + B_{oDOM}^{C} + B_{sDOM}^{C}\right) - 1.67 \cdot pH + 24.36\right)} \bigg)
 \end{align}
 $$
 
@@ -1116,7 +1249,9 @@ _where_ <br>
 - $T_K$ is in situ water temperature (`ztemk`, [ºK]) <br>
 - $PAR$ is the total photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>]) <br>
 - pH is the in situ pH <br>
-- $B_{DOM}^{C}$ is the in situ concentration of dissolved organic carbon (`doc_mmolm3`, [mmol m<sup>-3</sup>]) <br>
+- $B_{lDOM}^{C}$ is the in situ concentration of long-chain dissolved organic carbon (`ldoc_mmolm3`, [mmol m<sup>-3</sup>]) <br>
+- $B_{oDOM}^{C}$ is the in situ concentration of oxidized dissolved organic carbon (`odoc_mmolm3`, [mmol m<sup>-3</sup>]) <br>
+- $B_{sDOM}^{C}$ is the in situ concentration of short-chain dissolved organic carbon (`sdoc_mmolm3`, [mmol m<sup>-3</sup>]) <br>
 
 After finding $Lig_{s}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
@@ -1239,8 +1374,8 @@ The coagulation scaling coefficients are themselves dependent on the concentrati
 
 $$
 \begin{align}
-S_{coag}^{sA} =& \quad H_{mix} \left(10.8 \cdot F_{coag} \left(B_{DOM}^{C} + 40\right) + 9.05 \cdot B_{sd}^{C}\right) \\
-& \quad + 2.49 \cdot B_{sd}^{C} + 115.02 \cdot F_{coag} \left(B_{DOC}^{C} + 40\right) + 725.7 \cdot B_{sd}^{C} \\
+S_{coag}^{sA} =& \quad H_{mix} \left(10.8 \cdot F_{coag} \left(B_{lDOM}^{C} + B_{oDOM}^{C} + B_{sDOM}^{C}\right) + 9.05 \cdot B_{sd}^{C}\right) \\
+& \quad + 2.49 \cdot B_{sd}^{C} + 115.02 \cdot F_{coag} \left(B_{lDOM}^{C} + B_{oDOM}^{C} + B_{sDOM}^{C}\right) + 725.7 \cdot B_{sd}^{C} \\
 F_{coag} =& \quad \dfrac{B_{np}^{C} + B_{mp}^{C}}{B_{np}^{C} + B_{mp}^{C} + 0.03}
 \end{align}
 $$
@@ -1249,7 +1384,9 @@ _where_ <br>
 - $H_{mix}$ is a Heaviside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless]) <br>
 - $F_{coag}$ is a phytoplankton concentration dependent coagulation factor (`biof`, [dimensionless])  <br>
 - $B_{np}^{C}$ and $B_{mp}^{C}$ are the concentrations of nano- and micro-phytoplankton biomass (`phy_mmolm3`; `dia_mmolm3`, [mmol C m<sup>-3</sup>])  <br>
-- $B_{DOM}^{C}$ is the concentration of dissolved organic matter in carbon (`doc_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{lDOM}^{C}$ is the concentration of long-chain dissolved organic matter in carbon (`ldoc_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{oDOM}^{C}$ is the concentration of oxidized dissolved organic matter in carbon (`odoc_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{sDOM}^{C}$ is the concentration of short-chain dissolved organic matter in carbon (`sdoc_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{sd}^{C}$ is the concentration of small organic detrital particles (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 The colloidal aggregation term:
@@ -1423,17 +1560,16 @@ The scaling term associated with activity of heterotrophic bacteria is informed 
 
 $$
 \begin{align}
-S_{B_{ld}^{Si}}^{bio} =& \quad 1 + F_{B_{ld}^{Si}}^{bac} \cdot \dfrac{B_{sd}^{C} + B_{ld}^{C}}{B_{sd}^{C} + B_{ld}^{C} + K_{B_{ld}^{Si}}^{bac}}
+S_{B_{ld}^{Si}}^{bio} =& \quad 1 + F_{B_{ld}^{Si}}^{bac} \cdot \dfrac{B_{lb}^{C} + B_{ob}^{C} + B_{sb}^{C}}{B_{lb}^{C} + B_{ob}^{C} + B_{sb}^{C} + K_{B_{ld}^{Si}}^{bac}}
 \end{align}
 $$
 
 _where_ <br>
 - $F_{B_{ld}^{Si}}^{bac}$ is the factor increase in dissolution caused by peak bacterial biomass (`bsi_fbac`, [dimenionless]) <br>
 - $K_{B_{ld}^{Si}}^{bac}$ is the half-saturation coefficient for stimulation of silica dissolution in the presence of bacterial biomass (`bsi_kbac`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{sd}^{C}$ is the in situ concentration of small sinking detritus (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
-- $B_{ld}^{C}$ is the in situ concentration of large sinking detritus (`sdet_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
-
-and assume that the abundance of bacteria covaries strongly with the concentration of particulate organic matter in the water column.
+- $B_{lb}^{C}$ is the in situ concentration of sharing bacteria (`lbac_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{ob}^{C}$ is the in situ concentration of selfish bacteria (`obac_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $B_{sb}^{C}$ is the in situ concentration of scavenging bacteria (`sbac_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 
 ---
 
@@ -1446,6 +1582,10 @@ Mortality of ecological functional types are affected by both linear ($\gamma$) 
 
 $$
 \begin{align}
+\gamma_{lb}^{\rightarrow C} =& \quad \gamma_{bac}^{0ºC} (β_{hete})^{T} B_{lb}^{C} \\
+\gamma_{ob}^{\rightarrow C} =& \quad \gamma_{bac}^{0ºC} (β_{hete})^{T} B_{ob}^{C} \\
+\gamma_{sb}^{\rightarrow C} =& \quad \gamma_{bac}^{0ºC} (β_{hete})^{T} B_{sb}^{C} \\
+\gamma_{aoa}^{\rightarrow C} =& \quad \gamma_{aoa}^{0ºC} (β_{hete})^{T} B_{aoa}^{C} \\
 \gamma_{np}^{\rightarrow C} =& \quad \gamma_{np}^{0ºC} (β_{hete})^{T} B_{np}^{C} \\
 \gamma_{mp}^{\rightarrow C} =& \quad \gamma_{mp}^{0ºC} (β_{hete})^{T} B_{mp}^{C} \\
 \gamma_{mz}^{\rightarrow C} =& \quad \gamma_{mz}^{0ºC} (β_{hete})^{T} B_{mz}^{C} \\
@@ -1454,12 +1594,18 @@ $$
 $$
 
 _where_ <br>
+- $\gamma_{bac}^{0ºC}$ is the rate of linear mortality of bacteria at 0ºC (`baclmor`, [s<sup>-1</sup>]) <br>
+- $\gamma_{aoa}^{0ºC}$ is the rate of linear mortality of AOA at 0ºC (`aoalmor`, [s<sup>-1</sup>]) <br>
 - $\gamma_{np}^{0ºC}$ is the rate of linear mortality of nano-phytoplankton at 0ºC (`phylmor`, [s<sup>-1</sup>]) <br>
 - $\gamma_{mp}^{0ºC}$ is the rate of linear mortality of micro-phytoplankton at 0ºC (`dialmor`, [s<sup>-1</sup>]) <br>
 - $\gamma_{mz}^{0ºC}$ is the rate of linear mortality of micro-zooplankton at 0ºC (`zoolmor`, [s<sup>-1</sup>]) <br>
 - $\gamma_{Mz}^{0ºC}$ is the rate of linear mortality of meso-zooplankton at 0ºC (`meslmor`, [s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
+- $B_{lb}^{C}$ is the concentration of sharing bacteria carbon biomass (`p_lbac(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
+- $B_{ob}^{C}$ is the concentration of selfish bacteria carbon biomass (`p_obac(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
+- $B_{sb}^{C}$ is the concentration of scavenging bacteria carbon biomass (`p_sbac(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
+- $B_{aoa}^{C}$ is the concentration of AOA carbon biomass (`p_aoa(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{np}^{C}$ is the concentration of nano-phytoplankton carbon biomass (`p_phy(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{mp}^{C}$ is the concentration of micro-phytoplankton carbon biomass (`p_dia(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`p_zoo(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
@@ -1470,6 +1616,10 @@ _where_ <br>
 
 $$
 \begin{align}
+\Gamma_{lb}^{\rightarrow C} =& \quad \Gamma_{bac}^{0ºC} (β_{hete})^{T} \left(B_{lb}^{C}\right)^{2} \\
+\Gamma_{ob}^{\rightarrow C} =& \quad \Gamma_{bac}^{0ºC} (β_{hete})^{T} \left(B_{ob}^{C}\right)^{2} \\
+\Gamma_{sb}^{\rightarrow C} =& \quad \Gamma_{bac}^{0ºC} (β_{hete})^{T} \left(B_{sb}^{C}\right)^{2} \\
+\Gamma_{aoa}^{\rightarrow C} =& \quad \Gamma_{aoa}^{0ºC} (β_{hete})^{T} \left(B_{aoa}^{C}\right)^{2} \\
 \Gamma_{np}^{\rightarrow C} =& \quad \Gamma_{np}^{0ºC} (β_{hete})^{T} \left(B_{np}^{C}\right)^{2} \\
 \Gamma_{mp}^{\rightarrow C} =& \quad \Gamma_{mp}^{0ºC} (β_{hete})^{T} \left(B_{mp}^{C}\right)^{2} \\
 \Gamma_{mz}^{\rightarrow C} =& \quad \Gamma_{mz}^{0ºC} (β_{hete})^{T} \left(B_{mz}^{C}\right)^{2} \\
@@ -1478,12 +1628,18 @@ $$
 $$
 
 _where_ <br>
+- $\Gamma_{bac}^{0ºC}$ is the rate of quadratic mortality of bacteria at 0ºC (`bacqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\Gamma_{aoa}^{0ºC}$ is the rate of quadratic mortality of AOA at 0ºC (`aoaqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\Gamma_{np}^{0ºC}$ is the rate of quadratic mortality of nano-phytoplankton at 0ºC (`phyqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\Gamma_{mp}^{0ºC}$ is the rate of quadratic mortality of micro-phytoplankton at 0ºC (`diaqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\Gamma_{mz}^{0ºC}$ is the rate of quadratic mortality of micro-zooplankton at 0ºC (`zooqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $\Gamma_{Mz}^{0ºC}$ is the rate of quadratic mortality of meso-zooplankton at 0ºC (`mesqmor`, [(mol C kg<sup>-1</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
+- $B_{lb}^{C}$ is the concentration of sharing bacteria carbon biomass (`p_lbac(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
+- $B_{ob}^{C}$ is the concentration of selfish bacteria carbon biomass (`p_obac(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
+- $B_{sb}^{C}$ is the concentration of scavenging bacteria carbon biomass (`p_sbac(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
+- $B_{aoa}^{C}$ is the concentration of AOA carbon biomass (`p_aoa(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{np}^{C}$ is the concentration of nano-phytoplankton carbon biomass (`p_phy(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{mp}^{C}$ is the concentration of micro-phytoplankton carbon biomass (`p_dia(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
 - $B_{mz}^{C}$ is the concentration of micro-zooplankton carbon biomass (`p_zoo(i,j,k)`, [mol kg<sup>-1</sup>]) <br>
@@ -1572,8 +1728,8 @@ Total grazing of prey can also be expressed as the sum of individual prey type c
 
 $$
 \begin{align}
-g_{mz}^{\leftarrow C} =& \quad g_{mz}^{\leftarrow B_{np}^{C}} + g_{mz}^{\leftarrow B_{mp}^{C}} + g_{mz}^{\leftarrow B_{sd}^{C}} \\
-g_{Mz}^{\leftarrow C} =& \quad g_{Mz}^{\leftarrow B_{np}^{C}} + g_{Mz}^{\leftarrow B_{mp}^{C}} + g_{Mz}^{\leftarrow B_{sd}^{C}} + g_{Mz}^{\leftarrow B_{ld}^{C}} + g_{Mz}^{\leftarrow B_{mz}^{C}}
+g_{mz}^{\leftarrow C} =& \quad g_{mz}^{\leftarrow B_{lb}^{C}} + g_{mz}^{\leftarrow B_{ob}^{C}} + g_{mz}^{\leftarrow B_{sb}^{C}} + g_{mz}^{\leftarrow B_{aoa}^{C}} + g_{mz}^{\leftarrow B_{np}^{C}} + g_{mz}^{\leftarrow B_{mp}^{C}} + g_{mz}^{\leftarrow B_{sd}^{C}} \\
+g_{Mz}^{\leftarrow C} =& \quad g_{Mz}^{\leftarrow B_{lb}^{C}} + g_{Mz}^{\leftarrow B_{ob}^{C}} + g_{Mz}^{\leftarrow B_{sb}^{C}} + g_{Mz}^{\leftarrow B_{aoa}^{C}} + g_{Mz}^{\leftarrow B_{np}^{C}} + g_{Mz}^{\leftarrow B_{mp}^{C}} + g_{Mz}^{\leftarrow B_{sd}^{C}} + g_{Mz}^{\leftarrow B_{ld}^{C}} + g_{Mz}^{\leftarrow B_{mz}^{C}}
 \end{align}
 $$
 
@@ -1586,9 +1742,17 @@ g_{z}^{\leftarrow B_{i}^{C}} =& \quad g_{z} B_{z}^{C} \cdot \dfrac{\varepsilon_{
 $$
 
 Thus: <br>
+- $g_{mz}^{\leftarrow B_{lb}^{C}}$ is the grazing rate of sharing bacteria by micro-zooplankton (`zoograzlbac(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{ob}^{C}}$ is the grazing rate of selfish bacteria by micro-zooplankton (`zoograzobac(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{sb}^{C}}$ is the grazing rate of scavenging bacteria by micro-zooplankton (`zoograzsbac(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{mz}^{\leftarrow B_{aoa}^{C}}$ is the grazing rate of AOA by micro-zooplankton (`zoograzaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by micro-zooplankton (`zoograzphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{mz}^{\leftarrow B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by micro-zooplankton (`zoograzdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by micro-zooplankton (`zoograzsdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{lb}^{C}}$ is the grazing rate of sharing bacteria by meso-zooplankton (`mesgrazlbac(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{ob}^{C}}$ is the grazing rate of selfish bacteria by meso-zooplankton (`mesgrazobac(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{sb}^{C}}$ is the grazing rate of scavenging bacteria by meso-zooplankton (`mesgrazsbac(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $g_{Mz}^{\leftarrow B_{aoa}^{C}}$ is the grazing rate of AOA by meso-zooplankton (`mesgrazaoa(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{Mz}^{\leftarrow B_{np}^{C}}$ is the grazing rate of nano-phytoplankton by meso-zooplankton (`mesgrazphy(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{Mz}^{\leftarrow B_{mp}^{C}}$ is the grazing rate of micro-phytoplankton by meso-zooplankton (`mesgrazdia(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
 - $g_{Mz}^{\leftarrow B_{sd}^{C}}$ is the grazing rate of small particulate detritus by meso-zooplankton (`mesgrazsdet(i,j,k)`, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) <br>
@@ -1655,7 +1819,9 @@ $$
 
 **Fate of excretion**
 
-Excreted carbon is split between inorganic and organic form, specifically dissolved inorganic carbon (`p_dic(i,j,k)`, [mol C kg<sup>-1</sup>]) and dissolved organic carbon (`p_doc(i,j,k)`, [mol C kg<sup>-1</sup>]) by fixed input factors set at run time for both micro-zooplankton (`zooexcrdom`, [mol C (mol C)<sup>-1<sup>]) and meso-zooplankton (`mesexcrdom`, [mol C (mol C)<sup>-1<sup>]). For nitrogen, we do not consider dissolved organic matter to have a nitrogen component, such that all excreted nitrogen must be routed to NH<sub>4</sub>. Thus
+Excreted carbon is split between inorganic and organic form, specifically dissolved inorganic carbon (`p_dic(i,j,k)`, [mol C kg<sup>-1</sup>]) and the long-chain dissolved organic carbon (`p_ldoc(i,j,k)`, [mol C kg<sup>-1</sup>]) by fixed input factors set at run time for both micro-zooplankton (`zooexcrdom`, [mol C (mol C)<sup>-1<sup>]) and meso-zooplankton (`mesexcrdom`, [mol C (mol C)<sup>-1<sup>]). 
+
+For zooplankton preying on phytoplankton, other zooplankton and paticulate detritus, their total excretion of nitrogen will be equal to:
 
 $$
 \begin{align}
@@ -1663,7 +1829,13 @@ X_{z}^{\leftarrow B_{i}^{N}} =& \quad X_{z}^{\leftarrow B_{i}^{C}} \dfrac{16}{12
 \end{align}
 $$
 
-and all of term $X_{z}^{\leftarrow B_{i}^{N}}$ is directed to NH<sub>4</sub> in the tracer tendency step.
+However, since both micro-zooplankton and meso-zooplankton consume heterotrophic bacterial and ammonia oxidizing arcaheal (AOA) types, which have different C:N ratios to other ecosystem biomass components, we must also compute the specific excretion of NH<sub>4</sub> and $B_{lDOM}^{N}$ by zooplankton when feeding on these types. Since these types are richer in N than the other prey types, zooplankton excrete more NH<sub>4</sub> and $B_{lDOM}^{N}$ when bacteria and archaea represent a greater proportion of their diet ([Sterner & Elser, 2002](https://press.princeton.edu/books/ebook/9781400885695/ecological-stoichiometry-pdf)). Total excretion of nitrogen from bacterial/archaeal type $i$ by zooplankton type $z$ is as follows:
+
+$$
+\begin{align}
+X_{z}^{\leftarrow B_{i}^{N}} =& \quad g_{z}^{\leftarrow B_{i}^{C}} \dfrac{1}{R_{i}^{C:N}} - \dfrac{A_{z}^{\leftarrow B_{i}^{C}} + E_{z}^{\leftarrow B_{i}^{C}}}{R_{z}^{C:N}}
+\end{align}
+$$
 
 ---
 
@@ -1717,13 +1889,280 @@ _where_ <br>
 ---
 
 
-### 15. Calcium carbonate production and dissolution.
+### 15. Bacterial heterotrophy.
+
+Dissolved organic matter (DOM) is consumed by three bacterial heterotrophs: sharing (`p_lbac(i,j,k)`, $B_{lb}^{C}$, mol C kg<sup>-1</sup>), selfish (`p_obac(i,j,k)`, $B_{ob}^{C}$, mol C kg<sup>-1</sup>) and scavenging types (`p_sbac(i,j,k)`, $B_{sb}^{C}$, mol C kg<sup>-1</sup>). The sharing bacteria consume long-chain DOM (`p_ldoc(i,j,k)`, $B_{lDOM}^{C}$, mol C kg<sup>-1</sup>) and may partially oxidize this DOM to produce downstream pools of oxidized DOM (`p_odoc(i,j,k)`, $B_{oDOM}^{C}$, mol C kg<sup>-1</sup>) and/or short-chain DOM (`p_sdoc(i,j,k)`, $B_{sDOM}^{C}$, mol C kg<sup>-1</sup>). These sharing bacteria are considered to be copiotrophic generalists with fast maximum growth rates and low substrate affinity ([Zakem et al., 2025](https://doi.org/10.1126/science.ado5323); [Reynolds et al., 2026](https://doi.org/10.1126/sciadv.adz0537)). Selfish bacteria consume and fully oxidize the oxidizied DOM pool to CO<sub>2</sub>, but due to the oxidized nature of the substrate they consume and the need for specialised enzymes to consume it these bacteria have the lowest substrate affinity and low growth yields. This allows the oxidized DOM pool to accumulate, consistent with the "island of stability" of slightly oxidized, CRAM-like DOM material that persists in the ocean ([Lechtenfeld et al., 2014](https://doi.org/10.1016/j.gca.2013.11.009); [Cai et al., 2026](https://doi.org/10.1073/pnas.2601044123)). Scavenging bacteria consume the short-chain DOM pool, which we consider to be a pool of highly labile compounds like simple carbohydrates, carboxylic acids and amino acids fed largely by phytoplankton overflow production (see Step 6). Scavenging bacteria, like SAR11, thus have high resource affinities but slow maximum growth rates ([Norris et al., 2011](https://doi.org/10.1371/journal.pcbi.1009023); [Zakem et al., 2025](https://doi.org/10.1126/science.ado5323); [Reynolds et al., 2026](https://doi.org/10.1126/sciadv.adz0537)). 
+
+All heterotrophic bacterial types reduce dissolved oxygen (O<sub>2</sub>) when it is replete, but they also perform complete denitrification (NO<sub>3</sub> to N<sub>2</sub>) when oxygen is limiting by being facultatively anaerobic ([Zakem et al., 2020](https://doi.org/10.1038/s41396-019-0523-8)).
+
+**Growth requirements and products during full oxidation of organic matter**
+
+We compute the resource requirements and products of heterotrophic bacteria performing full oxidation following [Zakem et al. (2020)](https://doi.org/10.1038/s41396-019-0523-8) and [Rittman & McCarty (2001)](https://books.google.com.au/books/about/Environmental_Biotechnology_Principles_a.html?id=1PMeAQAAIAAJ&redir_esc=y). For a heterotrophic bacteria performing aerobic metabolism, that is consuming an organic matter substrate (S) and oxygen (O<sub>2</sub>) to produce biomass (B), CO<sub>2</sub> and inorganic nutrient, we split their metabolism into three half reactions and normalize by carbon:
+
+$$
+\begin{align}
+CH_{h_S}O_{o_S}N_{n_S} + (2 - o_{S} + n_{S})H_{2}O \rightarrow& n_{S} NH_{4}^{+} + (1-n_{S})CO_{2} + n_{S}HCO_{3}^{-} + d_{S}H^{+} + d_{S}e^{-} \\
+(1-f)d_{S} [ \dfrac{1}{4}O_{2} + H^{+} + e^{-} \rightarrow& \dfrac{1}{2} H_{2}O ] \\
+\dfrac{f\cdot d_{S}}{d_{B}} [ n_{B} NH_{4}^{+} + (1-n_{B})CO_{2} + n_{B}HCO_{3}^{-} + d_{B} H^{+} + d_{B} e^{-} \rightarrow& CH_{h_{B}}O_{o_{B}}N_{n_{B}} + (2 - o_{B} + n_{B})H_{2}O 
+\end{align}
+$$
+
+_where_ <br>
+- $CH_{h_S}O_{o_S}N_{n_S}$ is the carbon, hydrogen, oxygen and nitrogen stoichiometry of the organic substrate (S), normalized by carbon  <br>
+- $CH_{h_B}O_{o_B}N_{n_B}$ is the carbon, hydrogen, oxygen and nitrogen stoichiometry of the bacterial biomass (B), normalized by carbon  <br>
+- $f$ is the fraction of electrons that are routed to biomass synthesis, rather than oxygen reduction via the respiratory electron chain (`lbac_fele`; `obac_fele`; `sbac_fele`, [e (e)<sup>-1</sup>]) <br>
+- $d_{S}$ is the number of electrons per carbon atom within the substrate (S) (`e_pom`; `e_dom`, [e]) <br>
+- $d_{B}$ is the number of electrons per carbon atom within the bacterial biomass (B) (`e_bac`, [e]) <br>
+
+The first half reaction is the electron donor oxidation, where organic matter substrate is fully oxidized to its inorganic constituents and electrons are released. The second and third constitute the electron acceptor reduction, which generates ATP, and biomass synthesis, which uses ATP. $f$ in this case represents the fraction of electrons that are routed from oxidation of organic matter substrate to biomass synthesis and can be thought of as the underlying growth efficiency of the cell. All reactions are scaled to one mole carbon in the substrate.
+
+If we sum these three equations and treat S as $CH_{h_S}O_{o_S}N_{n_S}$ and B as $CH_{h_{B}}O_{o_{B}}N_{n_{B}}$:
+
+$$
+\begin{align}
+S + \dfrac{(1 - f)d_{S}}{4} O_{2} \rightarrow& \dfrac{f\cdot d_{S}}{d_{B}} B + (1 - \dfrac{f \cdot d_{S}}{d_{B}})CO_{2} + (n_{S} - \dfrac{n_{B} \cdot f \cdot d_{S}}{d_{B}}) NH_{4}^{+} 
+\end{align}
+$$
+
+We calculate $d_{S}$ and $d_{B}$ as equal to:
+
+$$
+\begin{align}
+d_{S} =& 4 + h_{S} - 2 o_{S} - 3 n_{S} \\
+d_{B} =& 4 + h_{B} - 2 o_{B} - 3 n_{B} 
+\end{align}
+$$
+
+_where_ <br>
+- $h_{S}$, $o_{S}$, and $n_{S}$ are the ratios of hydrogen, oxygen and nitrogen to carbon within the substrate <br>
+- $h_{B}$, $o_{B}$, and $n_{B}$ are the ratios of hydrogen, oxygen and nitrogen to carbon within the bacterial biomass <br>
+
+A high $d$ value indicates an organic molecule that is highly reduced with a high energy content (i.e., many electrons per carbon atom), whereas a low $d$ value means the molecule is more oxidized with less electrons and less potential energy ([Rittman & McCarty, 2001](https://books.google.com.au/books/about/Environmental_Biotechnology_Principles_a.html?id=1PMeAQAAIAAJ&redir_esc=y); [Stephens et al., 2025](https://doi.org/10.1038/s42003-025-07574-2)). For the biomass of heterotrophic marine bacteria we assume a stoichiometry of $CH_{1.4}O_{0.4}N_{0.2}$ ([White et al., 2019](https://doi.org/10.1002/lol2.10103); [Zimmerman et al., 2014](https://doi.org/10.1111/1462-2920.12329)), which returns $d_{B}$ = 4. 
+
+We consider long-chain DOM to inherit a typical stoichiometry of fresh marine organic matter of CH<sub>1.65</sub>O<sub>0.3</sub>N<sub>0.131</sub> ([Anderson, 1995](https://doi.org/10.1016/0967-0637(95)00072-E)), which gives a $d_{S}$ = 4.65. A similar $d_{S}$ is achieved for the short-chain DOM with a different stoichiometry of CH<sub>2.0</sub>O<sub>0.6</sub>N<sub>0.05</sub>. The oxidized DOM, however, contains less energy than these other DOM pools and has a stoichiometry of CH<sub>1.0</sub>O<sub>0.6</sub>N<sub>0.05</sub> with a $d_{S}$ = 3.65. 
+
+Consequently, these energetics return resource requirements of the different heterotrophic bacterial types performing complete and aerobic oxidation of organic matter of:
+
+$$
+\begin{align}
+S_{lDOM} + \dfrac{(1 - f)4.65}{4} O_{2} \rightarrow& \dfrac{f\cdot 4.65}{4} B_{lb}^{C} + (1 - \dfrac{f \cdot 4.65}{4})CO_{2} + (0.131 - \dfrac{0.2 \cdot 4.65 f }{4}) NH_{4}^{+} \\
+S_{oDOM} + \dfrac{(1 - f)3.65}{4} O_{2} \rightarrow& \dfrac{f\cdot 3.65}{4} B_{ob}^{C} + (1 - \dfrac{f \cdot 3.65}{4})CO_{2} + (0.05 - \dfrac{0.2 \cdot 3.65 f }{4}) NH_{4}^{+} \\
+S_{sDOM} + \dfrac{(1 - f)4.65}{4} O_{2} \rightarrow& \dfrac{f\cdot 4.65}{4} B_{sb}^{C} + (1 - \dfrac{f \cdot 4.65}{4})CO_{2} + (0.05 - \dfrac{0.2 \cdot 4.65 f }{4}) NH_{4}^{+}
+\end{align}
+$$
+
+In the case of full oxidation under aerobic conditions we therefore find that the growth yields of each bacterial type ($y_{lb}^{C}$, $y_{ob}^{C}$ and $y_{sb}^{C}$) are equal to $\min \left(1 - \alpha, \dfrac{f D}{d_{B}} \right)$, which is equivalent to $f \cdot \dfrac{4.65}{4}$ for sharing and scavenging bacteria and $f \cdot \dfrac{3.65}{4}$ for selfish bacteria with our assumptions of substrate and bacterial stoichiometry.
+
+We note, however, that because we track variations in the N:C content of each DOM pool, the exact values of $d_{S}$ for each substrate also vary dynamically since $n_{S}$ ratios change in space and time. The best example of this is for the scavenging bacterial type. In scenarios of strong overflow production of s-DOC by phytoplankton, which has a unique but constant stoichiometry of CH<sub>2.0</sub>O.6 to represent exudation of carbohydrates, carboxylic acids and lipids ([Hansell & Carlson, 2014](https://books.google.com.au/books?id=7iKOAwAAQBAJ&lpg=PP1&ots=kzkdHuHMF_&dq=Carlson%20Hansell%202014%20doi&lr&pg=PP1#v=onepage&q&f=false)) with no nitrogne content, the N:C ratios of s-DOM become strongly depleted and consequently the energy of the substrate increases ($d_{S}$ > 4.65), which increases growth yields. However, high growth rates in this scenario can only be achieved if scavenging bacteria can access NH<sub>4</sub>.
+
+**Growth requirements and products during partial oxidation of organic matter**
+
+Heterotrophic bacteria do not always completely oxidize the organic substrates they feed on to CO<sub>2</sub>. It is well appreciated that cross-feeding across different bacterial types occurs in nature, where one bacteria will excrete partially oxidized material and this will be used by another ([Amarnath et al., 2023](https://doi.org/10.1038/s41467-023-38913-8); [Braakman et al., 2025](https://www.science.org/doi/full/10.1126/sciadv.adp1949); [Pontrelli et al., 2022](https://www.science.org/doi/10.1126/sciadv.abk3076); [Reintjes et al., 2019](https://doi.org/10.1038/s41396-018-0326-3)).
+
+We build from the above equations to include partial oxidation by considering two additional dissolved organic matter products (P1 and P2) on the right-hand-side of the half reactions:
+
+$$
+\begin{align}
+CH_{h_S}O_{o_S}N_{n_S} + x H_{2}O \rightarrow& \alpha \beta CH_{h_{P1}}O_{o_{P1}}N_{n_{P1}} + \alpha \left(1 - \beta \right) CH_{h_{P2}}O_{o_{P2}}N_{n_{P2}} + y CO_{2} + z NH_{4}^{+} + z HCO_{3}^{-} + (d_{S} - \alpha \beta d_{P1} - \alpha \left(1-\beta \right) d_{P2})H^{+} + (d_{S} - \alpha d_{P})e^{-} \\
+\left(1-f\right)\left(d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2}\right) \bigg[ \dfrac{1}{4}O_{2} + H^{+} + e^{-} \rightarrow& \dfrac{1}{2} H_{2}O \bigg] \\
+\dfrac{f\cdot \left( d_{S} - \alpha \beta d_{P1} - \alpha \left(1 - \beta \right) d_{P2} \right)}{d_{B}} \bigg[ n_{B} NH_{4}^{+} + \left( 1-n_{B} \right)CO_{2} + n_{B}HCO_{3}^{-} + d_{B} H^{+} + d_{B} e^{-} \rightarrow& CH_{h_{B}}O_{o_{B}}N_{n_{B}} + \left( 2 - o_{B} + n_{B} \right) H_{2}O \bigg]
+\end{align}
+$$
+
+_where_ <br>
+- $\alpha$ is the fraction of organic substrate that undergoes partial oxidation by the sharing bacteria (`lbac_alpha`, [dimensionless])
+- $\beta$ is the fraction of partially oxidized substrate that goes to P1, being short-chain DOM (`lbac_beta`, [dimensionless])
+- $CH_{h_S}O_{o_S}N_{n_S}$ is the carbon, hydrogen, oxygen and nitrogen stoichiometry of the organic substrate (S), normalized by carbon  <br>
+- $CH_{h_B}O_{o_B}N_{n_B}$ is the carbon, hydrogen, oxygen and nitrogen stoichiometry of the bacterial biomass (B), normalized by carbon  <br>
+- $CH_{h_P1}O_{o_P1}N_{n_P1}$ is the carbon, hydrogen, oxygen and nitrogen stoichiometry of an organic product (P1, s-DOM), normalized by carbon  <br>
+- $CH_{h_P2}O_{o_P2}N_{n_P2}$ is the carbon, hydrogen, oxygen and nitrogen stoichiometry of an organic product (P2, o-DOM), normalized by carbon  <br>
+- $f$ is the fraction of electrons that are routed to biomass synthesis, rather than oxygen reduction via the respiratory electron chain (`lbac_fele`; `obac_fele`; `sbac_fele`, [e (e)<sup>-1</sup>]) <br>
+- $d_{B}$ is the number of electrons per carbon atom within the bacterial biomass (B) (`e_bac`, [e]) <br>
+- $d_{S}$ is the number of electrons per carbon atom within the organic substrate l-DOM (S) (`e_ldom`, [e]) <br>
+- $d_{P1}$ is the number of electrons per carbon atom within the s-DOM product (P1) (`e_sdom_l`, [e]) <br>
+- $d_{P2}$ is the number of electrons per carbon atom within the o-DOM product (P2) (`e_odom_l`, [e]) <br>
+
+The first half reaction is the electron donor oxidation, where organic matter is partially oxidized to its inorganic constituents, two organic matter products and some electrons are released. The second and third constitute the electron acceptor reduction, which generates ATP, and biomass synthesis, which uses ATP. Again, $f$ represents the fraction of electrons that are routed from oxidation of organic matter to biomass synthesis and is an overall cellular efficiency for growth.
+
+$$
+\begin{align}
+x =& 2 - o_{S} + n_{S} + \alpha \beta \left(o_{P1} - 2 - n_{P1} \right) + \alpha \left( 1-\beta \right) \left(o_{P2} - 2 - n_{P2} \right)\\
+y =& 1 - \alpha - n_{S} + \alpha \beta n_{P1} + \alpha \left( 1-\beta \right) n_{P2} \\
+z =& n_{S} - \alpha \beta n_{P1} - \alpha \left( 1-\beta \right) n_{P2}
+\end{align}
+$$
+
+If we sum the half reactions with partial oxidation (ignoring H<sub>2</sub>O), treating organic matter substrate S as $CH_{h_S}O_{o_S}N_{n_S}$, B as $CH_{h_{B}}O_{o_{B}}N_{n_{B}}$, P1 as $CH_{h_{P1}}O_{o_{P1}}N_{n_{P1}}$ and P2 as $CH_{h_{P2}}O_{o_{P2}}N_{n_{P2}}$ we retrieve:
+
+$$
+\begin{align}
+S + \dfrac{(1 - f)D}{4} O_{2} \rightarrow& \dfrac{f D}{d_{B}} B + \alpha \beta P1 + \alpha \left( 1-\beta \right) P2 + \left(1 - \alpha - \dfrac{f D}{d_{B}} \right)CO_{2} + \left( n_{S} - \alpha \beta n_{P1} - \alpha \left( 1-\beta \right) n_{P2} - n_{B} \cdot \dfrac{f D}{d_{B}} \right) NH_{4}^{+} 
+\end{align}
+$$
+
+_where_ <br>
+- $D$ is the number of electrons released per carbon atom during oxidation (`e_lres`, [e]) <br>
+
+and is equal to
+
+$$
+\begin{align}
+D =& (d_{S} - \alpha \beta d_{P1} - \alpha \left( 1-\beta \right) d_{P2})
+\end{align}
+$$
+
+The biomass yield of the sharing bacteria, $y_{lb}$, performing partial oxidation is dependent on $D$ and is equal to
+
+$$
+\begin{align}
+y_{lb} =& \min \left(1 - \alpha, \dfrac{f D}{d_{B}} \right) \\
+\end{align}
+$$
+
+$d_{S}$, $d_{P1}$ and $d_{P2}$ all vary dynamically because we allow the nitrogen content of dissolved organic matter to vary, meaning that $n_{S}$, $n_{P1}$ and $n_{P2}$ ratios change in space and time. A higher $D$ increases the potential biomass yield of the sharing bacteria. Increasing $\alpha$ lowers $D$ and lowers $y_{lb}$. An increasing $\beta$ directs more of the partially oxidized substrate to P1, which is s-DOM, and this lowers $y_{lb}$ because $d_{P1} > d_{P2}$. The substrate (S) is l-DOM, P1 is s-DOM and P2 is o-DOM.
+
+**Uptake of inorganic nutrients**
+
+All heterotrophic bacteria assimilate dissolved iron ($dFe$) to support biosynthesis and will assimilate ammonium (NH<sub>4</sub>) if limited by nitrogen (very low N:C ratios of the organic substrate). Ammonium production is computed from stoichiometric balance, and it will become negative if biomass N demand exceeds the N supplied by the substrate. By taking up NH<sub>4</sub> and $dFe$, bacteria may compete directly with phytoplankton, consistent with prior observations ([Kirchman, 1994](https://www.jstor.org/stable/4251383); [Tortell et al., 1996](https://doi.org/10.1038/383330a0); [Kirchman & Wheeler, 1998](https://doi.org/10.1016/S0967-0637(97)00075-7); [Fourquez et al., 2015](https://doi.org/10.5194/bg-12-1893-2015); [Deng et al., 2021](https://doi.org/10.1002/lno.11883); [Strzepek et al., 2025](https://doi.org/10.1093/ismejo/wraf015)).
+
+**Heterotrophic denitrification**
+
+We consider these bacterial types to be facultatively anaerobic to reflect the apparently ubiquitous presence of denitrifying genes in bacteria ([Zumft, 1997](https://doi.org/10.1128/mmbr.61.4.533-616.1997); [Tsementzi et al., 2016](https://doi.org/10.1038/nature19068); [Zhang et al., 2023](https://doi.org/10.1038/s43705-023-00284-y); [Pold et al., 2025](https://doi.org/10.1038/s41467-025-65319-5)). This means that they can shift their metabolism to using nitrate (NO<sub>3</sub>) as an alternative electron acceptor when O<sub>2</sub> is limiting. Although denitrification is modular [Sun et al. (2024)](https://doi.org/10.1073/pnas.2417421121), we consider all three heterotrophc to perform complete denitrification from NO<sub>3</sub> to N<sub>2</sub>.
+
+**Overall growth of bacterial types**
+
+The realized biomass growth rate (integration of carbon into biomass) of bacterial functional type $b$ (`lbacgrow(i,j,k)`; `obacgrow(i,j,k)`; `sbacgrow(i,j,k)`, $\mu_{b}^{\leftarrow C}$, [mol C kg<sup>-1</sup> s<sup>-1</sup>]) is defined by:
+
+$$
+\begin{align}
+\mu_{b}^{\leftarrow C} =& \quad \max\left(\mu_{b}^{aer}, \mu_{b}^{ana} \right) B_{b}^{C}
+\end{align}
+$$
+
+_where_ <br>
+- $\mu_{b}^{aer}$ is the realized growth rate due to aerobic metabolism (`bac_muaer`, [s<sup>-1</sup>]) <br>
+- $\mu_{b}^{ana}$ is the realized growth rate due to anaerobic metabolism (`bac_muana`, [s<sup>-1</sup>]) <br>
+- $B_{b}^{C}$ is the in situ concentration of bacterial functional type $b$ (`p_lbac(i,j,k)`; `p_obac(i,j,k)`; `p_sbac(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
+
+Thus, when `do_wc_denitrification == .true.` bacteria use whichever of aerobic and anaerobic metabolism offers the greatest growth rate. 
+
+Both aerobic ($\mu_{b}^{aer}$) and anaerobic ($\mu_{b}^{ana}$) growth rates are calculated as the minimum of four resource-specific rates: growth supported by organic carbon substrate ($OC$), growth supported by dissolved iron ($dFe$), growth supported by NH<sub>4</sub> when organic nitrogen is not sufficient ($N$),and growth supported by the electron acceptor ($EA$). For our free-living bacterial types, the organic carbon substrate is a dissolved organic carbon pool - one of $B_{lDOM}^{C}$, $B_{oDOM}^{C}$ or $B_{sDOM}^{C}$. 
+
+For aerobic growth:
+
+$$
+\begin{align}
+\mu_{b}^{aer} =& \quad \min \left(\mu_{b}^{aer(OC)}, \mu_{b}^{aer(dFe)}, \mu_{b}^{aer(N)}, \mu_{b}^{aer(EA)} \right) (β_{hete})^{T}
+\end{align}
+$$
+
+For anaerobic growth:
+
+$$
+\begin{align}
+\mu_{b}^{ana} =& \quad \min \left(\mu_{b}^{ana(OC)}, \mu_{b}^{ana(dFe)}, \mu_{b}^{ana(N)}, \mu_{b}^{ana(EA)} \right) (β_{hete})^{T}
+\end{align}
+$$
+
+_where_ <br>
+- $(β_{hete})^{T}$ is the temperature-dependent scaling on heterotrophic metabolism (`fbc`, [dimensionless]) <br>
+- $\mu_{b}^{aer(OC)}$ and $\mu_{b}^{ana(OC)}$ are the potential specific growth rates supported by organic carbon substrate uptake ([s<sup>-1</sup>]) <br>
+- $\mu_{b}^{aer(N)}$ and $\mu_{b}^{ana(N)}$ are the potential specific growth rates supported by NH<sub>4</sub> uptake ([s<sup>-1</sup>]) <br>
+- $\mu_{b}^{aer(dFe)}$ and $\mu_{b}^{ana(dFe)}$ are the potential specific growth rates supported by dissolved iron uptake ([s<sup>-1</sup>]) <br>
+- $\mu_{b}^{aer(EA)}$ and $\mu_{b}^{ana(EA)}$ are the potential specific growth rates supported by electron-acceptor uptake ([s<sup>-1</sup>]) <br>
+
+When `do_wc_denitrification == .true.`, $\mu_{b}^{ana}$ ≥ 0.0. However, when `do_wc_denitrification == .false.`, $\mu_{b}^{ana}$ = 0.0. 
+
+For aerobic growth, the resource-specific growth rates are:
+
+$$
+\begin{align}
+\mu_{b}^{aer(OC)} =& \quad V_{b}^{OC} y_{b}^{aer(OC)} \\
+\mu_{b}^{aer(dFe)} =& \quad V_{b}^{dFe} R_{b}^{C:Fe} \\
+\mu_{b}^{aer(N)} =& \quad \dfrac{V_{b}^{N}}{ -p_{b}^{aer(N)} } \\
+\mu_{b}^{aer(EA)} =& \quad \dfrac{V_{b}^{O_{2}}}{c_{b}^{O_{2}}}
+\end{align}
+$$
+
+_where_ <br>
+- $V_{b}^{OC}$ is the potential uptake rate of organic carbon substrate by bacterial type $b$ (`bac_Voc`, [mol C substrate (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b}^{dFe}$ is the potential uptake rate of dissolved iron by bacterial type $b$ (`bac_VdFe`, [mol Fe (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b}^{N}$ is the potential uptake rate of NH<sub>4</sub> by bacterial type $b$ (`bac_Vnh4`, [mol N (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b}^{O_2}$ is the potential uptake rate of dissolved oxygen by bacterial type $b$ (`bac_Voxy`, [mol O<sub>2</sub> (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $y_{b}^{aer(OC)}$ is the aerobic biomass yield on organic carbon substrate (`lbacydoc(i,j,k)`; `obacydoc(i,j,k)`; `sbacydoc(i,j,k)`, [mol C biomass (mol C substrate)<sup>-1</sup>]) <br>
+- $R_{b}^{C:Fe}$ is the bacterial carbon-to-iron ratio (`bac_C2Fe`, [mol C (mol Fe)<sup>-1</sup>]) <br>
+- $p_{b}^{NH_{4}}$ is the NH<sub>4</sub> producted per unit bacterial biomass produced (`lbac_pnh4`; `obac_pnh4`; `sbac_pnh4`, [mol NH<sub>4</sub> (mol C biomass)<sup>-1</sup>]) <br>
+- $c_{b}^{O_{2}}$ is the oxygen requirement per unit bacterial biomass produced (`lbac_coxy`; `obac_coxy`; `sbac_coxy`, [mol O<sub>2</sub> (mol C biomass)<sup>-1</sup>]) <br>
+
+For anaerobic growth, the organic carbon and iron terms are calculated in the same way, but the electron acceptor is nitrate rather than oxygen:
+$$
+\begin{align}
+\mu_{b}^{ana(OC)} =& \quad V_{b}^{OC} y_{b}^{ana(OC)} \\
+\mu_{b}^{ana(dFe)} =& \quad V_{b}^{dFe} R_{b}^{C:Fe} \\
+\mu_{b}^{ana(N)} =& \quad \dfrac{V_{b}^{N}}{ -p_{b}^{ana(N)} } \\
+\mu_{b}^{ana(EA)} =& \quad \dfrac{V_{b}^{NO_{3}}}{c_{b}^{NO_{3} \rightarrow N_{2}}} \\
+\end{align}
+$$
+
+_where_ <br>
+- $V_{b}^{NO_3}$ is the potential nitrate uptake rate by the bacteria (`bac_Vno3`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $y_{b}^{ana(OC)}$ is the anaerobic biomass yield on organic carbon substrate (`lbacydoc_ana`; `obacydoc_ana`; `sbacydoc_ana`, [mol C biomass (mol C substrate)<sup>-1</sup>]) <br>
+- $c_{b}^{NO_{3} \rightarrow N_{2}}$ is the nitrate requirement for complete denitrification (`lbac_cno3_ana`; `obac_cno3_ana`; `sbac_cno3_ana`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup>]) <br>
+
+Whether aerobic or anaerobic metabolism results in higher bacterial growth therefore depends on both substrate uptake rates and the stoichiometric cost of converting those substrates into biomass. The model does not mix aerobic and anaerobic metabolism fractionally. Instead, it uses a binary anaerobic pathway selector:
+
+$$
+\begin{align}
+I_{b}^{ana} =
+\begin{cases}
+1, & \mu_{b}^{ana} > \mu_{b}^{aer} \\
+0, & \mu_{b}^{ana} \leq \mu_{b}^{aer}
+\end{cases}
+\end{align}
+$$
+
+This selector is then used to apply either the aerobic or anaerobic source-sink stoichiometry.
+
+**Uptake rates** 
+
+Potential uptake rates of organic carbon substrate, dissolved iron and electron acceptors are calculated as:
+
+$$
+\begin{align}
+V_{b}^{OC} =& \quad V_{b}^{max,OC} \cdot \dfrac{B_{om}^{C}}{B_{om}^{C} + K_{b}^{om}} \\
+V_{b}^{dFe} =& \quad V_{b}^{max,dFe} \cdot \dfrac{dFe}{dFe + K_{b}^{dFe}} \\
+V_{b}^{NH_4} =& \quad V_{b}^{max,NH_4} \cdot \dfrac{NH_4}{NH_4 + K_{b}^{NH_4}} \\
+V_{b}^{O_{2}} =& \quad \rho_{b}^{O_2} \cdot O_{2} \\
+V_{b}^{NO_{3}} =& \quad V_{b}^{max,NO_{3}} \cdot \dfrac{NO_{3}}{NO_{3} + K_{b}^{NO_{3}}} \\
+\end{align}
+$$
+
+_where_ <br>
+- $V_{b}^{max,OC}$ is the maximum uptake rates of organic carbon by a heterotrophic bacterial type (`lbac_Vmax_doc`; `obac_Vmax_doc`, `sbac_Vmax_doc`, [mol C substrate (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b}^{max,dFe}$ is the maximum uptake rate of $dFe$ by bacterial functional type $b$ (`lbac_Vmax_dfe`; `obac_Vmax_dfe`; `sbac_Vmax_dfe`, [mol Fe (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b}^{max,NH_4}$ is the maximum uptake rate of $NH_4$ by bacterial functional type $b$ (`lbac_Vmax_nh4`; `obac_Vmax_nh4`; `sbac_Vmax_nh4`, [mol N (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $V_{b}^{max,NO_{3}}$ is the maximum uptake rate of NO<sub>3</sub> by nitrate-reducing bacteria (`lbac_Vmax_no3`; `obac_Vmax_no3`; `sbac_Vmax_no3`, [mol NO<sub>3</sub> (mol C biomass)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $\rho_{b}^{O_{2}}$ is the diffusive uptake coefficient for O<sub>2</sub> by bacterial functional type $b$ (`lbac_poxy`; `obac_poxy`; `sbac_poxy`, [(mmol O<sub>2</sub> m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
+- $K_{b}^{om}$ is the half-saturation coefficient for DOC uptake by bacterial functional type (`lbacp_kdoc`, `obacp_kdoc`, `sbacp_kdoc`, [mmol C m<sup>-3</sup>]) <br>
+- $K_{b}^{dFe}$ is the half-saturation coefficient for $dFe$ uptake by bacterial functional type $b$ (`lbac_kfer`; `obac_kfer`; `sbac_kfer`, [µmol Fe m<sup>-3</sup>]) <br>
+- $K_{b}^{NO_{3}}$ is the half-saturation coefficient for NH<sub>4</sub> uptake by the bacterial types (`lbac_knh4`; `obac_knh4`; `sbac_knh4`, [mmol N m<sup>-3</sup>]) <br>
+- $K_{b}^{NO_{3}}$ is the half-saturation coefficient for NO<sub>3</sub> uptake by the bacterial types (`lbac_kno3`; `obac_kno3`; `sbac_kno3`, [mmol N m<sup>-3</sup>]) <br>
+- $B_{om}^{C}$ are the DOC concentrations available to each bacterial type (`ldoc_mmolm3`; `odoc_mmolm3`; `sdoc_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
+- $dFe$ is the in situ concentration of dissolved iron (`fe_umolm3`, [µmol Fe m<sup>-3</sup>]) <br>
+- $NH_4$ is the in situ concentration of ammonium (`nh4_mmolm3`, [mmol N m<sup>-3</sup>]) <br>
+- $NO_3$ is the in situ concentration of nitrate (`no3_mmolm3`, [mmol N m<sup>-3</sup>]) <br>
+- $O_2$ is the in situ concentration of oxygen (`oxy_mmolm3`, [mmol O<sub>2</sub> m<sup>-3</sup>]) <br>
+
+---
+
+
+### 16. Calcium carbonate production and dissolution.
 
 **Dynamic $CaCO_3$ production and dissolution**
 
 When $CaCO_3$ dynamics are enabled (`do_caco3_dynamics = .true.`), the model computes both particulate inorganic carbon production (via the PIC:POC ratio) and $CaCO_3$ dissolution rates as functions of carbonate chemistry, temperature, and organic matter availability.
 
-**Production** of $CaCO_3$ in WOMBAT-mid comes from five sources: (1) density-dependent mortality of nano-phytoplankton (i.e., coccolithophorids), (2) density-dependent mortality of micro-zooplankton (i.e., foraminifera), (3) micro-zooplankton egestion of grazed nano-phytoplankton, (4) meso-zooplankton egestion of grazed nano-phytoplankton, and (5) meso-zooplankton egestion of grazed micro-zooplankton. Each term is multiplied by the particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) to return a rate of $CaCO_3$ production in mol C kg<sup>-1</sup> s<sup>-1</sup>.
+**Production** of $CaCO_3$ in WOMBAT-full comes from five sources: (1) density-dependent mortality of nano-phytoplankton (i.e., coccolithophorids), (2) density-dependent mortality of micro-zooplankton (i.e., foraminifera), (3) micro-zooplankton egestion of grazed nano-phytoplankton, (4) meso-zooplankton egestion of grazed nano-phytoplankton, and (5) meso-zooplankton egestion of grazed micro-zooplankton. Each term is multiplied by the particulate inorganic to organic carbon production ratio (`pic2poc`, $PIC:POC$, [mol/mol]) to return a rate of $CaCO_3$ production in mol C kg<sup>-1</sup> s<sup>-1</sup>.
 
 $$
 \begin{align}
@@ -1791,7 +2230,7 @@ _where_ <br>
 - $d_{CaCO_3}^{\Omega_{cal}}$ is the reference dissolution rate constant for calcite (`disscal`, [s<sup>-1</sup>])  <br>
 - $d_{CaCO_3}^{\Omega_{ara}}$ is the reference dissolution rate constant for aragonite (`dissara`, [s<sup>-1</sup>])  <br>
 - $d_{CaCO_3}^{\Gamma_{sd}}$ is the reference dissolution rate constant per unit of small detrital organic carbon remineralised (`dissdet`, [(mmol C m<sup>-3</sup>)<sup>-1</sup>])  <br>
-- $\Gamma_{sd}^{\rightarrow C}$ is the in situ remineralisation rate of small detrital organic carbon (`detremi(i,j,k)`, [mmol C m<sup>-3</sup> s<sup>-1</sup>]) <br>
+- $\Gamma_{sd}^{\rightarrow C}$ is the in situ remineralisation rate of small detrital organic carbon (`sdetremi(i,j,k)`, [mmol C m<sup>-3</sup> s<sup>-1</sup>]) <br>
 - $B_{CaCO_3}^{C}$ is the in situ concentration of $CaCO_3$ in carbon units (`p_caco3(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
 For $D_{CaCO_3}^{\Omega_{cal}}$ and $D_{CaCO_3}^{\Omega_{ara}}$, dissolution is activated only under undersaturated conditions ($\Omega_{cal} < 1$; $\Omega_{ara} < 1$) and increases nonlinearly with increasing undersaturation. In contrast, $D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}$ represents shallow water dissolution due to reducing microenvironments. In this scenario, $\Omega_{cal}$ and $\Omega_{ara}$ tend to be > 1 ([Sulpis et al., 2021](https://doi.org/10.1038/s41561-021-00743-y)) but dissolution nonetheless occurs in microenvironments enriched in $CO_{2}^{*}$ due to heterotrophic activity ([Borer et al., 2026](https://doi.org/10.1073/pnas.2510025123)).
@@ -1820,24 +2259,25 @@ When $CaCO_3$ dynamics are disabled (`do_caco3_dynamics = .false.`), the model u
 ---
 
 
-### 16. Chemoautotrophy.
+### 17. Chemoautotrophy.
 
-We consider two forms of chemoautotrophy carried out by two distinct forms of microbes: ammonia oxidizing archaea and anaerobic ammonia oxidizing (anammox) bacteria. Both are considered implicitly within WOMBAT-mid and therefore do not have varying biomasses (i.e., we only compute rates of inorganic nitrogen conversions). Anammox may be turned on when `do_anammox == .true.`.
+We consider two forms of chemoautotrophy carried out by two distinct forms of microbes: ammonia oxidizing archaea (AOA) and anaerobic ammonia oxidizing (anammox) bacteria. AOA are considered explicitly - they have a biomass pool, while anammox bacteria are considered implicitly within WOMBAT-full and therefore do not have varying biomasses (i.e., we only compute a rate of NH<sub>4</sub> use). Anammox may be turned on when `do_anammox == .true.`.
 
-**Ammonia oxidation**
+**Ammonia oxidizing archaea**
 
-Growth of ammonia oxidizing archaea, $\mu_{aoa}$, controls the maximum potential rate of ammonia oxidation from NH<sub>4</sub> to NO<sub>3</sub>. This growth rate is temperature-dependent and is informed by the cultures of [Qin et al. (2015)](https://doi.org/10.1073/pnas.1501568112):
+Growth of ammonia oxidizing archaea (`aoagrow(i,j,k)`, $\mu_{aoa}^{C}$, [mol C kg<sup>-1</sup>]) is defined similarly to other microbes:
 
 $$
 \begin{align}
-\mu_{aoa}^{max} =& \quad \dfrac{\max\left(0.2, 0.029 \cdot T - 0.147 \right)}{86400}
+\mu_{aoa}^{C} =& \quad \mu_{aoa} B_{aoa}^{C}
 \end{align}
 $$
 
 _where_ <br>
-- $T$ is the in situ temperature of seawater (`Temp(i,j,k)`, [ºC]) <br>
+- $\mu_{aoa}$ is the realized growth rate of ammonia oxidizing archaea (`aoa_mu(i,j,k)`, [s<sup>-1</sup>]) <br>
+- $B_{aoa}^{C}$ is the in situ concentration of carbon biomass of ammonia oxidizing archaea (`p_aoa(i,j,k)`, [mol C kg<sup>-1</sup>]) <br>
 
-This maximum potential rate is then scaled down by limitation factors associated with oxygen and ammonium availability:
+The realized growth rate, $\mu_{aoa}$, is the minimum growth achievable on oxygen and ammonium:
 
 $$
 \begin{align}
@@ -1848,31 +2288,41 @@ $$
 $$
 
 _where_ <br>
-- $\mu_{aoa}^{max}$ is the temperature-dependent maximum growh rate of ammonia oxidizing archaea (`aoa_mumax`, [s<sup>-1</sup>]) <br>
+- $\mu_{aoa}^{max}$ is a temperature-dependent maximum growh rate of ammonia oxidizing archaea (`aoa_mumax(i,j,k)`, [s<sup>-1</sup>]) <br>
 - $K_{aoa}^{NH_4}$ is the half-saturation coefficient for uptake of NH<sub>4</sub> by ammonia oxidizing archaea (`aoa_knh4`, [mmol N m<sup>-3</sup>]) <br>
 - $\rho_{aoa}^{O_2}$ is the diffusive uptake limit of O<sub>2</sub> by ammonia oxidizing archaea (`aoa_poxy`, [(mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>]) <br>
-- $y_{aoa}^{O_2}$ is the aerobic growth demand of ammonia oxidizing archaea for O<sub>2</sub> (`aoa_yoxy`, [mol O<sub>2</sub> (mol C biomass)<sup>-1</sup>]) <br>
-- NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`nh4_mmolm3`, [mmol N m<sup>-3</sup>]) <br>
-- O<sub>2</sub> is the in situ concentration of O<sub>2</sub>$ (`oxy_mmolm3`, [mmol O<sub>2</sub> m<sup>-3</sup>]) <br>
+- $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on O<sub>2</sub> (`aoa_yoxy`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>]) <br>
+- NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`bionh4`, [mmol N m<sup>-3</sup>]) <br>
+- O<sub>2</sub> is the in situ concentration of O<sub>2</sub>$ (`biooxy`, [mmol O<sub>2</sub> m<sup>-3</sup>]) <br>
 
-In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-mid we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-mid we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> ([mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
+The temperature-dependent maximum growth rate of ammonia oxidizing archaea is informed by the cultures of [Qin et al. (2015)](https://doi.org/10.1073/pnas.1501568112):
 
 $$
 \begin{align}
-\mu_{aoa}^{\leftarrow NH_4} =& \quad \mu_{aoa} \cdot NH_4 \cdot y_{aoa}^{NH_4} \\
-\mu_{aoa}^{\leftarrow O_2} =& \quad \mu_{aoa} \cdot NH_4 \cdot y_{aoa}^{O_2}
+\mu_{aoa}^{max} =& \quad \dfrac{\max\left(0.2, 0.029 \cdot T - 0.147 \right)}{86400}
 \end{align}
 $$
 
 _where_ <br>
-- $y_{aoa}^{NH_4}$ is the aerobic growth demand of ammonia oxidizing archaea for NH<sub>4</sub> (`aoa_ynh4`, [mol NH<sub>4</sub> (mol C biomass)<sup>-1</sup>]) <br>
-- $y_{aoa}^{O_2}$ is the aerobic growth demand of ammonia oxidizing archaea for O<sub>2</sub> (`aoa_yoxy`, [mol O<sub>2</sub> (mol C biomass)<sup>-1</sup>]) <br>
-- NH<sub>4</sub> is the in situ concentration of NH<sub>4</sub> (`nh4_p`, [mol N kg<sup>-1</sup>]) <br>
+- $T$ is the in situ temperature of seawater (`Temp(i,j,k)`, [ºC]) <br>
+
+In reality, ammonia oxidizing archaea perform the first step of the nitrification process by oxidizing ammonia through to nitrite. However, in WOMBAT-full we do not consider nitrite oxidizing bacteria that then complete the second step of the nitrification process to produce nitrate. Hence, in this version of WOMBAT-full we consider ammonia oxidizing archaea to perform full nitrification and oxidize NH<sub>4</sub> direclty to NO<sub>3</sub>. Consumption of NH<sub>4</sub> (`ammox(i,j,k)`, [mol N kg<sup>-1</sup> s<sup>-1</sup>]) and O<sub>2</sub> (`aoaresp(i,j,k)`, [mol O<sub>2</sub> kg<sup>-1</sup> s<sup>-1</sup>]) are calculated as:
+
+$$
+\begin{align}
+\mu_{aoa}^{\leftarrow NH_4} =& \quad \dfrac{\mu_{aoa}^{C}}{y_{aoa}^{NH_4}} \\
+\mu_{aoa}^{\leftarrow O_2} =& \quad \dfrac{\mu_{aoa}^{C}}{y_{aoa}^{O_2}}
+\end{align}
+$$
+
+_where_ <br>
+- $y_{aoa}^{NH_4}$ is the aerobic growth yield of ammonia oxidizing archaea on NH<sub>4</sub> (`aoa_ynh4`, [mol C biomass (mol NH<sub>4</sub>)<sup>-1</sup>]) <br>
+- $y_{aoa}^{O_2}$ is the aerobic growth yield of ammonia oxidizing archaea on O<sub>2</sub> (`aoa_yoxy`, [mol C biomass (mol O<sub>2</sub>)<sup>-1</sup>]) <br>
 
 
 **Anaerobic ammonia oxidizing (anammox) bacteria**
 
-Anammox bacteria are considered to be an implicit population within WOMBAT-mid when `do_anammox == .true.` and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. This nitrogen is then permanently lost from the ocean. We perform this metabolism as:
+Anammox bacteria are considered to be an implicit population within WOMBAT-full when `do_anammox == .true.` and we do not track variations in their biomass. Rather then computing growth of anammox bacteria we therefore compute rates of anammox, which convert NH<sub>4</sub> to $N_2$. This nitrogen is then permanently lost from the ocean. We perform this metabolism as:
 
 $$
 \begin{align}
@@ -1883,11 +2333,11 @@ $$
 _where_ <br>
 - $β_{hete}$ is the base temperature-sensitivity coefficient for heterotrophy (`bbioh`, [dimenionless]) <br>
 - $T$ is the in situ temperature (`Temp(i,j,k)`, [ºC]) <br>
-- $f_{ana}$ is the fraction of growth that is supported by anaerobic metabolism (`(1 - aoa_loxy(i,j,k))`, [dimenionless]) <br>
+- $f_{ana}$ is the fraction of growth that is supported by anaerobic metabolism (`(lbac_anaer(i,j,k))`, [dimenionless]) <br>
 - $L_{aox}^{NH_4}$ is the growth limiter of anammox associated with NH<sub>4</sub> availability (`aox_lnh4(i,j,k)`, [dimensionless]) <br>
 - NH<sub>4</sub> is the in situ concentration of ammonium (`nh4_p`, [mol N kg<sup>-1</sup>])
 
-Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of NH<sub>4</sub>. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here which is based on the oxygen limitation of ammonia oxidation. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
+Note that anammox is considered to be present only when anaerobic metabolisms are ocurring. While anammox bacteria can perform anammox in oxygenated and deoxygenated environments, this metabolism is only appreciably measured in deoxygenated environments due to reduced competition with ammonia oxidizing archaea for a limited supply of NH<sub>4</sub>. Because we do not resolve this competition explicitly, we apply $f_{ana}$ here which is based on whether anaerobic metabolisms are occuring for the sharing bacterial type. The growth limiter due to ammonium availability is a simple michealis-menten limitation function:
 
 $$
 \begin{align}
@@ -1902,16 +2352,18 @@ _where_ <br>
 ---
 
 
-### 17. Tracer tendencies
+### 18. Tracer tendencies
 
 The code treats multiple concentration-dependent losses semi-implicitly. These are:
 - quadratic phytoplankton mortality ($\Gamma_{np}^{\rightarrow C}$ for `p_phy` and $\Gamma_{mp}^{\rightarrow C}$ for `p_dia`);
+- quadratic zooplankton mortality ($\Gamma_{mz}^{\rightarrow C}$ for `p_zoo` and $\Gamma_{Mz}^{\rightarrow C}$ for `p_mes`);
+- quadratic bacterial mortality ($\Gamma_{lb}^{\rightarrow C}$ for `p_lbac`,  $\Gamma_{ob}^{\rightarrow C}$ for `p_obac` and $\Gamma_{sb}^{\rightarrow C}$ for `p_sbac`);
+- quadratic AOA mortality ($\Gamma_{aoa}^{\rightarrow C}$ for `p_aoa`);
 - quadratic zooplankton mortality  ($\Gamma_{mz}^{\rightarrow C}$ for `p_zoo` and $\Gamma_{Mz}^{\rightarrow C}$ for `p_mes`);
 - small and large detritus hydrolysis ($\Gamma_{sd}^{\rightarrow C}$ for `p_sdet` and $\Gamma_{ld}^{\rightarrow C}$ for `p_ldet`);
-- DOC remineralisation ($\Gamma_{doc}^{\rightarrow C}$ for `p_doc`);
 - CaCO<sub>3</sub> dissolution (all dissolution terms for `p_caco3`).
 
-All production terms for the involved tracers are evaluated explicitly using forward euler timestepping, while these concentration-dependent loss terms are solved implicitly using the backward euler timestepping (i.e., where the loss term is evaluated on the future (n+1) tracer concentration). This makes the the time-stepping scheme "semi-implicit" for these tracers. Please see the Tracer Tendency step in the `generic_WOMBATmid.F90` code for details.
+All production terms for the involved tracers are evaluated explicitly using forward euler timestepping, while these concentration-dependent loss terms are solved implicitly using the backward euler timestepping (i.e., where the loss term is evaluated on the future (n+1) tracer concentration). This makes the the time-stepping scheme "semi-implicit" for these tracers. Please see the Tracer Tendency step in the `generic_WOMBATfull.F90` code for details.
 
 **Nano-phytoplankton** (`p_phy(i,j,k)`, $B_{np}^{C}$, [mol C kg<sup>-1</sup>])
 
@@ -2098,31 +2550,141 @@ $$
 \end{align}
 $$
 
-**Dissolved organic carbon** (`p_doc(i,j,k)`, $B_{DOM}^{C}$, [mol C kg<sup>-1</sup>])
+**Sharing heterotrophic bacteria** (`p_lbac(i,j,k)`, $B_{lb}^{C}$, [mol C kg<sup>-1</sup>])
 
 $$
 \begin{align}
-\dfrac{\Delta B_{DOM}^{C}}{\Delta t} =& \quad \mu_{np}^{\rightarrow DOC} 
-                                            + \mu_{mp}^{\rightarrow DOC} \\
-                                      &     + \Gamma_{sd}^{\rightarrow C}
-                                            + \Gamma_{ld}^{\rightarrow C} \\
+\dfrac{\Delta B_{lb}^{C}}{\Delta t} =& \quad \mu_{lb}^{\leftarrow C} 
+                                            - g_{mz}^{\leftarrow B_{lb}^{C}}
+                                            - g_{Mz}^{\leftarrow B_{lb}^{C}}
+                                            - \gamma_{lb}^{\rightarrow C} 
+                                            - \Gamma_{lb}^{\rightarrow C}
+\end{align}
+$$
+
+**Selfish heterotrophic bacteria** (`p_obac(i,j,k)`, $B_{ob}^{C}$, [mol C kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{ob}^{C}}{\Delta t} =& \quad \mu_{ob}^{\leftarrow C} 
+                                            - g_{mz}^{\leftarrow B_{ob}^{C}}
+                                            - g_{Mz}^{\leftarrow B_{ob}^{C}}
+                                            - \gamma_{ob}^{\rightarrow C} 
+                                            - \Gamma_{ob}^{\rightarrow C}
+\end{align}
+$$
+
+**Scavenging heterotrophic bacteria** (`p_sbac(i,j,k)`, $B_{sb}^{C}$, [mol C kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{sb}^{C}}{\Delta t} =& \quad \mu_{sb}^{\leftarrow C} 
+                                            - g_{mz}^{\leftarrow B_{sb}^{C}}
+                                            - g_{Mz}^{\leftarrow B_{sb}^{C}}
+                                            - \gamma_{sb}^{\rightarrow C} 
+                                            - \Gamma_{sb}^{\rightarrow C}
+\end{align}
+$$
+
+**Ammonia oxidizing archaea** (`p_aoa(i,j,k)`, $B_{aoa}^{C}$, [mol C kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{aoa}^{C}}{\Delta t} =& \quad \mu_{aoa}^{\leftarrow C} 
+                                            - g_{mz}^{\leftarrow B_{aoa}^{C}}
+                                            - g_{Mz}^{\leftarrow B_{aoa}^{C}}
+                                            - \gamma_{aoa}^{\rightarrow C} 
+                                            - \Gamma_{aoa}^{\rightarrow C}
+\end{align}
+$$
+
+**Long-chain dissolved organic carbon** (`p_ldoc(i,j,k)`, $B_{lDOM}^{C}$, [mol C kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{lDOM}^{C}}{\Delta t} =& \quad \bigg( \Gamma_{sd}^{\rightarrow C}
+                                                   + \Gamma_{ld}^{\rightarrow C} \bigg) \alpha_{pbac} \\
                                       &     + \gamma_{np}^{\rightarrow C}
                                             + \gamma_{mp}^{\rightarrow C} \\
                                       &     + \gamma_{mz}^{\rightarrow C}
                                             + \gamma_{Mz}^{\rightarrow C} \\
+                                      &     + \gamma_{lb}^{\rightarrow C} + \Gamma_{lb}^{\rightarrow C}
+                                            + \gamma_{ob}^{\rightarrow C} + \Gamma_{ob}^{\rightarrow C} \\
+                                      &     + \gamma_{sb}^{\rightarrow C} + \Gamma_{sb}^{\rightarrow C}
+                                            + \gamma_{aoa}^{\rightarrow C} + \Gamma_{aoa}^{\rightarrow C} \\
                                       &     + X_{mz}^{\leftarrow C} f_{mz}^{X \rightarrow DOM} 
                                             + X_{Mz}^{\leftarrow C} f_{Mz}^{X \rightarrow DOM} \\
-                                      &     - \Gamma_{doc}^{\rightarrow C} 
+                                      &     - \mu_{lb}^{\leftarrow DOC} 
 \end{align}
 $$
+
+**Long-chain dissolved organic nitrogen** (`p_ldon(i,j,k)`, $B_{lDOM}^{N}$, [mol N kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{lDOM}^{N}}{\Delta t} =& \quad \bigg( \Gamma_{sd}^{\rightarrow C}
+                                                    + \Gamma_{ld}^{\rightarrow C} \bigg) \alpha_{pbac} \dfrac{16}{122} \\
+                                      &      + \bigg( \gamma_{np}^{\rightarrow C}
+                                                    + \gamma_{mp}^{\rightarrow C} \\
+                                      &             + \gamma_{mz}^{\rightarrow C}
+                                                    + \gamma_{Mz}^{\rightarrow C} \bigg) \dfrac{16}{122}\\
+                                      &      + \bigg( \gamma_{lb}^{\rightarrow C} + \Gamma_{lb}^{\rightarrow C}
+                                                    + \gamma_{ob}^{\rightarrow C} + \Gamma_{ob}^{\rightarrow C}
+                                                    + \gamma_{sb}^{\rightarrow C} + \Gamma_{sb}^{\rightarrow C} \bigg) \cdot \dfrac{1}{5} \\
+                                      &      + \bigg( \gamma_{aoa}^{\rightarrow C} + \Gamma_{aoa}^{\rightarrow C} \bigg) \cdot \dfrac{1}{5} \\
+                                                    + X_{mz}^{\leftarrow N} f_{mz}^{X \rightarrow DOM} 
+                                                    + X_{Mz}^{\leftarrow N} f_{Mz}^{X \rightarrow DOM} \\
+                                      &             - \mu_{lb}^{\leftarrow DOC} \cdot \dfrac{B_{lDOM}^{N}}{B_{lDOM}^{C}}
+\end{align}
+$$
+
+**Oxidized dissolved organic carbon** (`p_odoc(i,j,k)`, $B_{oDOM}^{C}$, [mol C kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{oDOM}^{C}}{\Delta t} =& \quad \mu_{lb}^{\leftarrow DOC} \alpha \left(1 - \beta \right) \\
+                                      &     - \mu_{ob}^{\leftarrow DOC} 
+\end{align}
+$$
+
+**Oxidized dissolved organic nitrogen** (`p_odon(i,j,k)`, $B_{oDOM}^{N}$, [mol N kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{oDOM}^{N}}{\Delta t} =& \quad \mu_{lb}^{\leftarrow DON} \alpha \left(1 - \beta \right) f_{DONpersist} \\
+                                      &     - \mu_{ob}^{\leftarrow DON} 
+\end{align}
+$$
+
+**Short-chain dissolved organic carbon** (`p_sdoc(i,j,k)`, $B_{sDOM}^{C}$, [mol C kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{sDOM}^{C}}{\Delta t} =& \quad \mu_{np}^{\rightarrow DOC} 
+                                            + \mu_{mp}^{\rightarrow DOC} \\
+                                      &     + \mu_{lb}^{\leftarrow DOC} \alpha \beta \\
+                                      &     - \mu_{sb}^{\leftarrow DOC} 
+\end{align}
+$$
+
+**Short-chain dissolved organic nitrogen** (`p_sdon(i,j,k)`, $B_{sDOM}^{N}$, [mol N kg<sup>-1</sup>])
+
+$$
+\begin{align}
+\dfrac{\Delta B_{sDOM}^{N}}{\Delta t} =& \quad \mu_{lb}^{\rightarrow DON} \alpha \beta f_{DONpersist} \\
+                                      &     - \mu_{sb}^{\rightarrow DON} 
+\end{align}
+$$
+
 
 **Nitrate** (`p_no3(i,j,k)`, NO<sub>3</sub>, [mol N kg<sup>-1</sup>])
 
 $$
 \begin{aligned}
-\dfrac{\Delta NO_3}{\Delta t} =& \quad \mu_{aoa}^{\leftarrow NH_4} \\
-                               &  - \left( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
-                               &         + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \right) \cdot \dfrac{16}{122}
+\dfrac{\Delta NO_3}{\Delta t} =& \quad \mu_{aoa}^{\rightarrow NO_3} \\
+                               &  - \mu_{lb}^{\leftarrow NO_3} - \mu_{ob}^{\leftarrow NO_3} - \mu_{sb}^{\leftarrow NO_3} \\
+                               &  - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NO_3}}{L_{np}^{N}} \\
+                               &         + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} \bigg) \cdot \dfrac{16}{122}
 \end{aligned}
 $$
 
@@ -2130,23 +2692,30 @@ $$
 
 $$
 \begin{align}
-\dfrac{\Delta NH_4}{\Delta t} =& \quad X_{mz}^{\leftarrow B_{np}^{N}} 
-                                     + X_{mz}^{\leftarrow B_{mp}^{N}} 
-                                     + X_{mz}^{\leftarrow B_{sd}^{N}} \\
-                               & \quad + X_{Mz}^{\leftarrow B_{np}^{N}} 
-                                     + X_{Mz}^{\leftarrow B_{mp}^{N}} 
-                                     + X_{Mz}^{\leftarrow B_{sd}^{N}} 
-                                     + X_{Mz}^{\leftarrow B_{ld}^{N}} 
-                                     + X_{Mz}^{\leftarrow B_{mz}^{N}} \\
-                               & + \bigg( \gamma_{np}^{\rightarrow C}  
-                                        + \gamma_{mp}^{\rightarrow C}
-                                        + \gamma_{mz}^{\rightarrow C}  
-                                        + \gamma_{Mz}^{\rightarrow C}
-                                        + \Gamma_{sd}^{\rightarrow C}
-                                        + \Gamma_{ld}^{\rightarrow C} \bigg) \cdot \dfrac{16}{122} \\
+\dfrac{\Delta NH_4}{\Delta t} =& \quad \bigg( X_{mz}^{\leftarrow B_{np}^{N}} 
+                                        + X_{mz}^{\leftarrow B_{mp}^{N}} 
+                                        + X_{mz}^{\leftarrow B_{sd}^{N}} \\
+                               & \qquad + X_{mz}^{\leftarrow B_{lb}^{N}} 
+                                        + X_{mz}^{\leftarrow B_{ob}^{N}} 
+                                        + X_{mz}^{\leftarrow B_{sb}^{N}} 
+                                        + X_{mz}^{\leftarrow B_{aoa}^{N}} \bigg) \left(1 - f_{mz}^{X \rightarrow DOM} \right) \\
+                               & + \bigg( X_{Mz}^{\leftarrow B_{np}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{mp}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{sd}^{N}} \\
+                               & \qquad + X_{Mz}^{\leftarrow B_{ld}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{mz}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{lb}^{N}} \\
+                               & \qquad + X_{Mz}^{\leftarrow B_{ob}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{sb}^{N}} 
+                                        + X_{Mz}^{\leftarrow B_{aoa}^{N}} \bigg) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
                                & + \mu_{diazo}^{\rightarrow NH_4} 
                                  - \mu_{aox}^{NH_4 \rightarrow N_2} 
                                  - \mu_{aoa}^{\leftarrow NH_4} \\
+                               & + \mu_{lb}^{\rightarrow NH_{4}} 
+                                 + \mu_{ob}^{\rightarrow NH_{4}}
+                                 + \mu_{sb}^{\rightarrow NH_{4}} \\
+                               & + \bigg( \Gamma_{sd}^{\rightarrow C}
+                                        + \Gamma_{ld}^{\rightarrow C} \bigg) \cdot \alpha_{pbac} \dfrac{16}{122} \\
                                & - \bigg( \mu_{np}^{\leftarrow C} \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
                                         + \mu_{mp}^{\leftarrow C} \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \bigg) \cdot \dfrac{16}{122}
 \end{align}
@@ -2171,8 +2740,12 @@ $$
                                            + \mu_{mp}^{\leftarrow C} \\
                               & \quad      - X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
                                            - X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
-                              & \quad      - \Gamma_{doc}^{\rightarrow C} \bigg) \dfrac{132}{122} \\
-                              & \quad      - \mu_{aoa}^{\leftarrow O_2}
+                              & \quad      - \bigg( \Gamma_{sd}^{\rightarrow C} 
+                                                  + \Gamma_{sd}^{\rightarrow C} \bigg) \left(1 - \alpha_{pbac} \right) \bigg) \dfrac{132}{122} \\
+                              & \quad      - \mu_{lb}^{\leftarrow O_2}
+                                           - \mu_{ob}^{\leftarrow O_2}
+                                           - \mu_{sb}^{\leftarrow O_2}
+                                           - \mu_{aoa}^{\leftarrow O_2}
 \end{align}
 $$
  
@@ -2198,8 +2771,12 @@ $$
 $$
 \begin{align}
 \dfrac{\Delta DIC}{\Delta t} =& \quad X_{mz}^{\leftarrow C} \left(1 - f_{mz}^{X \rightarrow DOM} \right)
-                                    + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right) 
-                                    + \Gamma_{doc}^{\rightarrow C} \\
+                                    + X_{Mz}^{\leftarrow C} \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
+                              &     + \bigg( \Gamma_{sd}^{\rightarrow C} 
+                                           + \Gamma_{sd}^{\rightarrow C} \bigg) \left(1 - \alpha_{pbac} \right) \\
+                              &     + \mu_{lb}^{\rightarrow CO_2}
+                                    + \mu_{ob}^{\rightarrow CO_2}
+                                    + \mu_{sb}^{\rightarrow CO_2}
                               &     + D_{CaCO_3}^{\Omega_{cal}}
                                     + D_{CaCO_3}^{\Omega_{ara}}
                                     + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
@@ -2207,6 +2784,7 @@ $$
                                     + D_{CaCO_3}^{g_{Mz}^{\leftarrow B_{sd}^{C}}} \\
                               &     - \mu_{np}^{\leftarrow C}
                                     - \mu_{mp}^{\leftarrow C}
+                                    - \mu_{aoa}^{\leftarrow C}
                                     - \mu_{np}^{\rightarrow DOC}
                                     - \mu_{mp}^{\rightarrow DOC} \\
                               &     - P_{CaCO_3}^{\Gamma_{np}^{\rightarrow C}}
@@ -2225,16 +2803,33 @@ $$
                                            + \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NO_3}}{L_{mp}^{N}} 
                                            - \mu_{np}^{\leftarrow C} \cdot \dfrac{L_{np}^{NH_4}}{L_{np}^{N}} 
                                            - \mu_{mp}^{\leftarrow C} \cdot \dfrac{L_{mp}^{NH_4}}{L_{mp}^{N}} \\
-                              &            + \gamma_{np}^{\rightarrow C} 
-                                           + \gamma_{mp}^{\rightarrow C}
-                                           + \gamma_{mz}^{\rightarrow C} 
-                                           + \gamma_{Mz}^{\rightarrow C} \\
-                              &            + \Gamma_{sd}^{\rightarrow C} 
-                                           + \Gamma_{ld}^{\rightarrow C} \\
-                              &            + X_{mz}^{\leftarrow C}
-                                           + X_{Mz}^{\leftarrow C} \bigg) \cdot \dfrac{16}{122} \\
-                              &            - 2 \cdot \mu_{aoa}^{\leftarrow NH_{4}}
+                              &            + \bigg( \Gamma_{sd}^{\rightarrow C} 
+                                                  + \Gamma_{sd}^{\rightarrow C} \bigg) \left(1 - \alpha_{pbac} \right) \bigg) \dfrac{16}{122} \\
+                              &     + \bigg( X_{mz}^{\leftarrow B_{np}^{N}}
+                                           + X_{mz}^{\leftarrow B_{mp}^{N}}
+                                           + X_{mz}^{\leftarrow B_{sd}^{N}} \\
+                              &            + X_{mz}^{\leftarrow B_{lb}^{N}}
+                                           + X_{mz}^{\leftarrow B_{ob}^{N}}
+                                           + X_{mz}^{\leftarrow B_{sb}^{N}}
+                                           + X_{mz}^{\leftarrow B_{aoa}^{N}} \bigg) \left(1 - f_{mz}^{X \rightarrow DOM} \right) \\
+                              &     + \bigg( X_{Mz}^{\leftarrow B_{np}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{mp}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{sd}^{N}} \\
+                              &            + X_{Mz}^{\leftarrow B_{ld}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{mz}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{lb}^{N}} \\
+                              &            + X_{Mz}^{\leftarrow B_{ob}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{sb}^{N}}
+                                           + X_{Mz}^{\leftarrow B_{aoa}^{N}} \bigg) \cdot \left(1 - f_{Mz}^{X \rightarrow DOM} \right) \\
+                              &            - \mu_{aoa}^{\leftarrow NH_{4}}
+                                           - \mu_{aoa}^{\rightarrow NO_{3}}
                                            - \mu_{aox}^{NH_4 \rightarrow N_2} \\
+                              &            + \mu_{lb}^{\rightarrow NH_{4}} 
+                                           + \mu_{ob}^{\rightarrow NH_{4}}
+                                           + \mu_{sb}^{\rightarrow NH_{4}} \\
+                              &            + \mu_{lb}^{\leftarrow NO_3} 
+                                           + \mu_{ob}^{\leftarrow NO_3} 
+                                           + \mu_{sb}^{\leftarrow NO_3} \\
                               &            + 2 \cdot \bigg( D_{CaCO_3}^{\Omega_{cal}}
                                            + D_{CaCO_3}^{\Omega_{ara}}
                                            + D_{CaCO_3}^{\Gamma_{sd}^{\rightarrow C}}
@@ -2295,15 +2890,15 @@ $$
 ---
 
 
-### 18. Check for conservation of mass
+### 19. Check for conservation of mass
 
-When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.` or `do_check_si_conserve = .true.` or `do_check_fe_conserve = .true.`), the model will calculate the budget of nitrogen or carbon or silicon or iron before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of these elements within the ocean. In WOMBAT-mid, these elements should be perfectly conserved during ecosystem cycling. The exception to this is for nitrogen, where if any of `do_nitrogen_fixation = .true.`, `do_anammox = .true.`, or `do_benthic_denitrification = .true.` then the model does not and should not be expected to conserve nitrogen.
+When checks for the conservation of mass is enabled (`do_check_n_conserve = .true.` or `do_check_c_conserve = .true.` or `do_check_si_conserve = .true.` or `do_check_fe_conserve = .true.`), the model will calculate the budget of nitrogen or carbon or silicon or iron before and after the ecosystem equations have completed. This checks that the ecosystem equations detailed above have indeed conserved the mass of these elements within the ocean. In WOMBAT-full, these elements should be perfectly conserved during ecosystem cycling. The exception to this is for nitrogen, where if any of `do_nitrogen_fixation = .true.`, `do_anammox = .true.`, `do_wc_denitrification = .true.` or `do_benthic_denitrification = .true.` then the model does not and should not be expected to conserve nitrogen.
 
 ---
 
-### 19. Additional operations on tracers
+### 20. Additional operations on tracers
 
-**First**, dissolved iron concentrations are set to equal 1 nM in grid cells in contact with the sediment where the depth of the water column is less than 200 metres deep. WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we set the dissolved iron concentration in these bottom waters to 1 nM.
+**First**, dissolved iron concentrations are set to equal 1 nM in grid cells in contact with the sediment where the depth of the water column is less than 200 metres deep. WOMBAT-full is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we set the dissolved iron concentration in these bottom waters to 1 nM.
 
 **Second**, if dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)) in off-shelf waters, we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
 
@@ -2318,9 +2913,9 @@ This resetting of minimum dFe concentration functions as a constant source of dF
 ---
 
 
-### 20. Sinking rate of particulates.
+### 21. Sinking rate of particulates.
 
-WOMBAT-mid functions with a spatially variable sinking rate of organic detritus (`p_sdet(i,j,k)`; `p_ldet(i,j,k)`), calcium carbonate (`p_caco3(i,j,k)`) and biogenic silica (`p_ldetsi(i,j,k)`). Sinking of organic iron (`p_sdetfe(i,j,k)`; `p_ldetfe(i,j,k)`)occurs at the same rate as their respective organic particulate carbon types, while small and large authigenic iron particles (`p_safe(i,j,k)`; `p_lafe(i,j,k)`) sink at their own unique rates. The algorithm to compute sinking rates functions by computing:
+WOMBAT-full functions with a spatially variable sinking rate of organic detritus (`p_sdet(i,j,k)`; `p_ldet(i,j,k)`), calcium carbonate (`p_caco3(i,j,k)`) and biogenic silica (`p_ldetsi(i,j,k)`). Sinking of organic iron (`p_sdetfe(i,j,k)`; `p_ldetfe(i,j,k)`)occurs at the same rate as their respective organic particulate carbon types, while small and large authigenic iron particles (`p_safe(i,j,k)`; `p_lafe(i,j,k)`) sink at their own unique rates. The algorithm to compute sinking rates functions by computing:
 
 1. the average radii of particles in the community;
 2. the seawater dynamic viscosity (if `do_viscous_sinking =.true.`);
@@ -2495,7 +3090,7 @@ which we apply above to calculate the dynamic viscosity of seawater ($\eta_{sw}$
 
 **Mineral ballasting and excess density**
 
-WOMBAT-mid explicitly considers small organic carbon, large aggregates of organic carbon, $CaCO_3$ and biogenic silica. Each of these particulate types have unique densities. We compute the mass of each particulate type in [kg m</sup>-3</sup>]:
+WOMBAT-full explicitly considers small organic carbon, large aggregates of organic carbon, $CaCO_3$ and biogenic silica. Each of these particulate types have unique densities. We compute the mass of each particulate type in [kg m</sup>-3</sup>]:
 
 $$
 \begin{align}
@@ -2581,21 +3176,21 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 ---
 
 
-### 21. Sedimentary processes.
+### 22. Sedimentary processes.
 
 Sediment sources to the ocean are recorded as negative `btf` values.
 
-WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), ammonium (NH<sub>4</sub>), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
+WOMBAT-full tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), ammonium (NH<sub>4</sub>), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
 
 **Organics**
 
-Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces DOC and NH<sub>4</sub> and removes O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of biogenic silica produces silicic acid. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and 132:122.
+Remineralisation of organic carbon ($\gamma_{sed}^{\rightarrow C}$) produces long-chain DOC and DON. Because this transfers matter from particulate to dissolved without an oxidation of the substrate, it does not consume O<sub>2</sub>. Remineralisation of organic iron produces dFe and remineralisation of biogenic silica produces silicic acid. The ratio of nitrogen to carbon in the organic matter is static at 16:122.
 
 $$
 \begin{align}
-\gamma_{sed}^{\rightarrow DOC} =& \quad \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C} \\
-\gamma_{sed}^{\rightarrow NH_4} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{N:C} \\
+\gamma_{sed}^{\rightarrow lDOC} =& \quad \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{C} \\
+\gamma_{sed}^{\rightarrow lDON} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{N:C} \\
 \gamma_{sed}^{\leftarrow O_2} =& \quad \gamma_{sed}^{\rightarrow DOC} R^{O_2:C} \\
 \gamma_{sed}^{\rightarrow dFe} =& \quad \gamma_{sed}^{0^{\circ}C} (β_{hete})^{T} B_{sed}^{Fe}
 \end{align}
@@ -2684,10 +3279,9 @@ Overall bottom fluxes of tracers are:
 
 $$
 \begin{align}
-\dfrac{\Delta DOC}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow DOC} \\
-\dfrac{\Delta NH_4}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow NH_4} \\
+\dfrac{\Delta lDOC}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow lDOC} \\
+\dfrac{\Delta lDON}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow lDON} \\
 \dfrac{\Delta NO_3}{\Delta t} =& \quad \gamma_{det,sed}^{\leftarrow NO_3} \\
-\dfrac{\Delta O_2}{\Delta t} =& \quad \gamma_{det,sed}^{\leftarrow O_2} \left(1 - f_{sed}^{denit}\right) \\
 \dfrac{\Delta Si}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow Si} \\
 \dfrac{\Delta dFe}{\Delta t} =& \quad \gamma_{det,sed}^{\rightarrow dFe} \\
 \dfrac{\Delta DIC}{\Delta t} =& \quad D_{CaCO_{3},sed} \\
@@ -2699,7 +3293,7 @@ $$
 
 ## Subroutine - "update_from_bottom"
 
-The subroutine `generic_WOMBATmid_update_from_bottom` moves sinking organic material from the water column into the sediment pools.
+The subroutine `generic_WOMBATfull_update_from_bottom` moves sinking organic material from the water column into the sediment pools.
 It is at this point that the model performs permanent burial of sinking organic matter if desired.
 
 ---

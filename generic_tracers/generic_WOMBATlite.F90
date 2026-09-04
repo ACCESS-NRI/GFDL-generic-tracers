@@ -61,10 +61,10 @@
 !
 ! <NAMELIST NAME="generic_wombatlite_nml">
 !  <DATA NAME="co2_calc" TYPE="character">
-!   Defines the carbon equiliabration method.  Default is 'ocmip2' which
-!   uses the FMS_ocmip2_co2calc routine.  The other option is 'mocsy',
-!   which uses the set of routines authored by J. Orr. See reference at:
+!   Defines the carbon equiliabration method.  Default is 'mocsy' which
+!   uses the set of routines authored by J. Orr. See reference at:
 !   http://ocmip5.ipsl.jussieu.fr/mocsy/index.html
+!   The other option is 'ocmip2', which uses the FMS_ocmip2_co2calc routine.
 !  </DATA>
 !
 !  <DATA NAME="do_caco3_dynamics" TYPE="logical">
@@ -251,8 +251,8 @@ module generic_WOMBATlite
         Rho_0, &
         a_0, a_1, a_2, a_3, a_4, a_5, &
         b_0, b_1, b_2, b_3, c_0, &
-        a1_co2, a2_co2, a3_co2, a4_co2, &
-        a1_o2, a2_o2, a3_o2, a4_o2
+        a1_co2, a2_co2, a3_co2, a4_co2, a5_co2, &
+        a1_o2, a2_o2, a3_o2, a4_o2, a5_o2
 
     character(len=fm_string_len) :: ice_restart_file
     character(len=fm_string_len) :: ocean_restart_file
@@ -1251,20 +1251,20 @@ module generic_WOMBATlite
     ! Schmidt number coefficients [1]
     !-----------------------------------------------------------------------
     ! Compute the Schmidt number of CO2 in seawater using the
-    ! formulation presented by Wanninkhof (1992, J. Geophys. Res., 97,
-    ! 7373-7382).
-    call g_tracer_add_param('a1_co2', wombat%a1_co2,  2073.1)
-    call g_tracer_add_param('a2_co2', wombat%a2_co2, -125.62)
-    call g_tracer_add_param('a3_co2', wombat%a3_co2,  3.6276)
-    call g_tracer_add_param('a4_co2', wombat%a4_co2, -0.043219)
+    ! formulation proposed by Wanninkhof (2014, Limnology and Oceanography: Methods, 12, 351-362)
+    call g_tracer_add_param('a1_co2', wombat%a1_co2,  2116.8)
+    call g_tracer_add_param('a2_co2', wombat%a2_co2, -136.25)
+    call g_tracer_add_param('a3_co2', wombat%a3_co2,  4.7353)
+    call g_tracer_add_param('a4_co2', wombat%a4_co2, -0.092307)
+    call g_tracer_add_param('a5_co2', wombat%a5_co2,  0.0007555)
 
     ! Compute the Schmidt number of O2 in seawater using the
-    ! formulation proposed by Keeling et al. (1998, Global Biogeochem.
-    ! Cycles, 12, 141-163).
-    call g_tracer_add_param('a1_o2', wombat%a1_o2, 1638.0)
-    call g_tracer_add_param('a2_o2', wombat%a2_o2, -81.83)
-    call g_tracer_add_param('a3_o2', wombat%a3_o2, 1.483)
-    call g_tracer_add_param('a4_o2', wombat%a4_o2, -0.008004)
+    ! formulation proposed by Wanninkhof (2014, Limnology and Oceanography: Methods, 12, 351-362)
+    call g_tracer_add_param('a1_o2', wombat%a1_o2, 1920.4)
+    call g_tracer_add_param('a2_o2', wombat%a2_o2, -135.6)
+    call g_tracer_add_param('a3_o2', wombat%a3_o2, 5.2122)
+    call g_tracer_add_param('a4_o2', wombat%a4_o2, -0.10939)
+    call g_tracer_add_param('a5_o2', wombat%a5_o2, 0.00093777)
 
     ! Initial H+ concentration [mol/kg]
     !-----------------------------------------------------------------------
@@ -1377,7 +1377,7 @@ module generic_WOMBATlite
 
     ! Zooplankton assimilation of ingested prey carbon (the rest is excreted) [0-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.10)
+    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.40)
 
     ! Zooplankton ingestion efficiency of prey carbon (the rest is egested) [1]
     !-----------------------------------------------------------------------
@@ -1457,7 +1457,7 @@ module generic_WOMBATlite
     ! Bottom thickness [m]
     !-----------------------------------------------------------------------
     ! Thickness over which tracer values are integrated to define the bottom layer
-    call g_tracer_add_param('bottom_thickness', wombat%bottom_thickness, 1.0)
+    call g_tracer_add_param('bottom_thickness', wombat%bottom_thickness, 0.1)
 
     ! Detritus remineralisation rate constant in sediments [1/s]
     !-----------------------------------------------------------------------
@@ -2883,7 +2883,7 @@ module generic_WOMBATlite
       zval2 = (wombat%zooprefdet(i,j,k) * det_mmolm3)**2
       Xzoo = (  wombat%zooepsphy * zval1 + wombat%zooepsdet * zval2 )
 
-      ! Oxygen limitation term reducing zooplankton grazing pressure in low-oxygen waters (following Buchanan et al., 2025; Science)
+      ! Oxygen limitation term reducing zooplankton grazing pressure in low-oxygen waters
       o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3/10.0)))
 
       ! Grazing rate of zooplankton
@@ -2901,6 +2901,7 @@ module generic_WOMBATlite
         wombat%zoograzphy(i,j,k) = g_zoo * zoo_p * ( wombat%zooepsphy * zval1 * I_Xzoo )! [molC/kg/s]
         wombat%zoograzdet(i,j,k) = g_zoo * zoo_p * ( wombat%zooepsdet * zval2 * I_Xzoo ) ! [molC/kg/s]
       else
+        wombat%zooeps(i,j,k) = 0.0
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdet(i,j,k) = 0.0
       endif
@@ -3103,7 +3104,7 @@ module generic_WOMBATlite
 
       ! Oxygen equation ! [molO2/kg]
       !-----------------------------------------------------------------------
-      wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) - 172./122. * dtsb * ( &
+      wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) - 164./122. * dtsb * ( &
                              wombat%detremi(i,j,k) + &
                              wombat%zoomorl(i,j,k) + &
                              wombat%zooexcrphy(i,j,k) + &
@@ -3411,7 +3412,7 @@ module generic_WOMBATlite
         ! We add these arrays together to simulate the reducing conditions of organic-rich sediments,
         ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
         ! CaCO3 within the sediment as organic matter accumulates.
-        wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%Rho_0
+        wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%bottom_thickness / wombat%Rho_0
       endif
     enddo; enddo
 
@@ -3463,7 +3464,7 @@ module generic_WOMBATlite
       ! Remineralisation of sediments to supply nutrient fields.
       ! btf values are positive from the water column into the sediment.
       wombat%b_no3(i,j) = -16./122. * wombat%det_sed_remin(i,j) + wombat%det_sed_denit(i,j) ! [mol/m2/s]
-      wombat%b_o2(i,j) = 172./122. * wombat%det_sed_remin(i,j) * (1.0 - wombat%fdenit(i,j)) ! [mol/m2/s]
+      wombat%b_o2(i,j) = 164./122. * wombat%det_sed_remin(i,j) * (1.0 - wombat%fdenit(i,j)) ! [mol/m2/s]
       wombat%b_dic(i,j) = -1.0 * wombat%det_sed_remin(i,j) - wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
       wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
@@ -3883,7 +3884,7 @@ module generic_WOMBATlite
     real, dimension(ilb:,jlb:,:), optional, intent(in) :: dzt
 
     integer                                 :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
-    real                                    :: sal, ST, o2_saturation
+    real                                    :: sal, ST, o2_solubility
     real                                    :: tt, tk, ts, ts2, ts3, ts4, ts5
     real                                    :: mmol_m3_to_mol_kg
     real, dimension(:,:,:), pointer         :: grid_tmask
@@ -3923,10 +3924,10 @@ module generic_WOMBATlite
 
       call FMS_ocmip2_co2calc(CO2_dope_vec, grid_tmask(:,:,1), &
           SST(:,:), SSS(:,:), &
-          max(0.0, wombat%p_dic(:,:,1,1)), &
-          max(0.0, wombat%p_no3(:,:,1,1) / 16.), &
+          max(0.0, wombat%p_dic(:,:,1,tau)), &
+          max(0.0, wombat%p_no3(:,:,1,tau) / 16.), &
           wombat%sio2(:,:), &
-          max(0.0, wombat%p_alk(:,:,1,1)), &
+          max(0.0, wombat%p_alk(:,:,1,tau)), &
           wombat%htotallo(:,:), wombat%htotalhi(:,:), &
           wombat%htotal(:,:,1), &
           co2_calc=trim(co2_calc), &
@@ -3946,12 +3947,11 @@ module generic_WOMBATlite
 
     do j=jsc,jec ; do i=isc,iec
       !-----------------------------------------------------------------------
-      ! Compute the Schmidt number of CO2 in seawater using the formulation
-      ! presented by Wanninkhof (1992, J. Geophys. Res., 97, 7373-7382).
+      !  Compute the Schmidt number of O2 in seawater using Wanninkhof (2014)
       !-----------------------------------------------------------------------
       ST = SST(i,j)
-      wombat%co2_sc_no(i,j) = wombat%a1_co2 + ST*(wombat%a2_co2 + ST*(wombat%a3_co2 + &
-          ST*wombat%a4_co2)) * grid_tmask(i,j,1)
+      wombat%co2_sc_no(i,j) = wombat%a1_co2 + ST * (wombat%a2_co2 + ST * (wombat%a3_co2 + ST &
+          * (wombat%a4_co2 + ST * wombat%a5_co2))) * grid_tmask(i,j,1)
 
       wombat%co2_alpha(i,j) = wombat%co2_alpha(i,j) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
       wombat%co2_csurf(i,j) = wombat%co2_csurf(i,j) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
@@ -3997,22 +3997,19 @@ module generic_WOMBATlite
       ts4 = ts3 * ts
       ts5 = ts4 * ts
 
-      o2_saturation = (1000.0/22391.6) * grid_tmask(i,j,1) *  & !convert from ml/l to mol m-3
+      ! Note that we divide by 0.20946 to convert mol m-3 to mol m-3 atm-1
+      o2_solubility = (1000.0/22391.6) * grid_tmask(i,j,1) *  & !convert from ml/l to mol m-3
           exp( wombat%a_0 + wombat%a_1*ts + wombat%a_2*ts2 + wombat%a_3*ts3 + wombat%a_4*ts4 + &
               wombat%a_5*ts5 + (wombat%b_0 + wombat%b_1*ts + wombat%b_2*ts2 + wombat%b_3*ts3 + &
-              wombat%c_0*sal)*sal)
+              wombat%c_0*sal)*sal) / 0.20946
 
       !-----------------------------------------------------------------------
-      !  Compute the Schmidt number of O2 in seawater using the
-      !  formulation proposed by Keeling et al. (1998, Global Biogeochem.
-      !  Cycles, 12, 141-163).
+      !  Compute the Schmidt number of O2 in seawater using Wanninkhof (2014)
       !-----------------------------------------------------------------------
-      wombat%o2_sc_no(i,j)  = wombat%a1_o2 + ST * (wombat%a2_o2 + ST * (wombat%a3_o2 + ST * &
-          wombat%a4_o2 )) * grid_tmask(i,j,1)
+      wombat%o2_sc_no(i,j) = wombat%a1_o2 + ST * (wombat%a2_o2 + ST * (wombat%a3_o2 + ST &
+          * (wombat%a4_o2 + ST * wombat%a5_o2))) * grid_tmask(i,j,1)
 
-      ! renormalize the alpha value for atm o2
-      ! data table override for o2_flux_pcair_atm is now set to 0.21
-      wombat%o2_alpha(i,j) = (o2_saturation / 0.21)
+      wombat%o2_alpha(i,j) = o2_solubility ! already in mol/m3 atm-1 (see above)
       wombat%o2_csurf(i,j) = wombat%p_o2(i,j,1,tau) * wombat%Rho_0 !nnz: MOM has rho(i,j,1,tau)
     enddo; enddo
 
@@ -4188,6 +4185,7 @@ module generic_WOMBATlite
         wombat%htotal, &
         wombat%omega_ara, &
         wombat%omega_cal, &
+        wombat%sio2, &
         wombat%co3, &
         wombat%co2_star, &
         wombat%co2_csurf, &
@@ -4243,10 +4241,13 @@ module generic_WOMBATlite
         wombat%phygrow, &
         wombat%phymorl, &
         wombat%phymorq, &
+        wombat%zooprefphy, &
+        wombat%zooprefdet, &
         wombat%zoograzphy, &
         wombat%zoograzdet, &
         wombat%zoomorl, &
         wombat%zoomorq, &
+        wombat%zooeps, &
         wombat%zooexcrphy, &
         wombat%zooexcrdet, &
         wombat%zooassiphy, &
