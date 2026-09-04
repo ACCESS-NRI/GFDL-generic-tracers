@@ -593,7 +593,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `sbac_Vmax_doc` | Maximum DOC uptake rate of scavenging bacteria                                     | 2.23/86400     | mol C (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
 | `sbac_Vmax_no3` | Maximum NO<sub>3</sub> uptake rate of scavenging bacteria                          | 2.4/86400     | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
 | `sbac_Vmax_dFe` | Maximum dissolved iron uptake rate of scavenging bacteria                          | 0.00010/86400 | mol Fe (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                       |
-| `sbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of scavenging bacteria                          | 0.167/86400   | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
+| `sbac_Vmax_nh4` | Maximum NH<sub>4</sub> uptake rate of scavenging bacteria                          | 0.067/86400   | mol N (mol C-biomass)<sup>-1</sup> s<sup>-1</sup>                        |
 | `sbac_poxy`     | O<sub>2</sub> diffusive uptake limit of scavenging bacteria                        | 450.0/86400   | (mmol C biomass m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup> |
 | `sbac_kno3`     | Half-saturation coefficient for NO<sub>3</sub> uptake by scavenging bacteria       | 15.0          | mmol N m<sup>-3</sup>                                       |
 | `sbac_kdoc`     | Half-saturation coefficient for DOC uptake by scavenging bacteria                  | 10.0          | mmol C m<sup>-3</sup>                                       |

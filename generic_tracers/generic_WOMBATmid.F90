@@ -67,10 +67,10 @@
 !
 ! <NAMELIST NAME="generic_wombatmid_nml">
 !  <DATA NAME="co2_calc" TYPE="character">
-!   Defines the carbon equiliabration method.  Default is 'ocmip2' which
-!   uses the FMS_ocmip2_co2calc routine.  The other option is 'mocsy',
-!   which uses the set of routines authored by J. Orr. See reference at:
+!   Defines the carbon equiliabration method.  Default is 'mocsy' which
+!   uses the set of routines authored by J. Orr. See reference at:
 !   http://ocmip5.ipsl.jussieu.fr/mocsy/index.html
+!   The other option is 'ocmip2', which uses the FMS_ocmip2_co2calc routine.
 !  </DATA>
 !
 !  <DATA NAME="do_caco3_dynamics" TYPE="logical">
@@ -323,7 +323,6 @@ module generic_WOMBATmid
         aoa_poxy, &
         aoa_ynh4, &
         aoa_yoxy, &
-        bac_C2N, &
         aox_kn, &
         aox_mumax, &
         dt_npzd, &
@@ -1503,17 +1502,17 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooprefphy', 'Grazing dietary fraction of zooplankton on phytoplankton', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'zooprefphy', 'Grazing dietary fraction of zooplankton on phytoplankton', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_zooprefphy = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooprefdia', 'Grazing dietary fraction of zooplankton on microphytoplankton', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'zooprefdia', 'Grazing dietary fraction of zooplankton on microphytoplankton', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_zooprefdia = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'zooprefsdet', 'Grazing dietary fraction of zooplankton on small detritus', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'zooprefsdet', 'Grazing dietary fraction of zooplankton on small detritus', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_zooprefsdet = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -1578,27 +1577,27 @@ module generic_WOMBATmid
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefphy', 'Grazing dietary fraction of mesozooplankton on phytoplankton', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'mesprefphy', 'Grazing dietary fraction of mesozooplankton on phytoplankton', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_mesprefphy = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefdia', 'Grazing dietary fraction of mesozooplankton on microphytoplankton', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'mesprefdia', 'Grazing dietary fraction of mesozooplankton on microphytoplankton', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_mesprefdia = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefsdet', 'Grazing dietary fraction of mesozooplankton on small detritus', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'mesprefsdet', 'Grazing dietary fraction of mesozooplankton on small detritus', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_mesprefsdet = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefldet', 'Grazing dietary fraction of mesozooplankton on large detritus', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'mesprefldet', 'Grazing dietary fraction of mesozooplankton on large detritus', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_mesprefldet = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
-        'mesprefzoo', 'Grazing dietary fraction of mesozooplankton on zooplankton', 'h', 'L', 's', 'molC/kg/s', 'f')
+        'mesprefzoo', 'Grazing dietary fraction of mesozooplankton on zooplankton', 'h', 'L', 's', 'dimensionless', 'f')
     wombat%id_mesprefzoo = register_diag_field(package_name, vardesc_temp%name, axes(1:3), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
@@ -2481,8 +2480,11 @@ module generic_WOMBATmid
     call g_tracer_add_param('aoa_ynh4', wombat%aoa_ynh4, 11.0)
 
     ! Ammonia Oxidizing Archaea yield for oxygen [mmolO2/mmolC]
+    ! NOTE: in the WOMBAT-full documentation, aoa_yoxy is written as the inverse
+    !       of what it is here in the code, in units of mol Biomass per mol O2
+    ! Because we don't represent nitrite oxidizing bacteria, we include their O2 yield too
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5)
+    call g_tracer_add_param('aoa_yoxy', wombat%aoa_yoxy, 15.5 + 12.9)
 
     ! Anammox bacteria half saturation constant for ammonium uptake [mmolN/m3]
     !-----------------------------------------------------------------------
@@ -2586,6 +2588,7 @@ module generic_WOMBATmid
         longname = 'Nitrate', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -2597,6 +2600,7 @@ module generic_WOMBATmid
         longname = 'Ammonium', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -2607,6 +2611,7 @@ module generic_WOMBATmid
         longname = 'Silicic acid', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -2777,7 +2782,8 @@ module generic_WOMBATmid
         longname = 'Dissolved organic carbon', &
         units = 'mol/kg', &
         flux_bottom = .true., &
-        prog = .true.)
+        prog = .true., &
+        flux_runoff = .true.)
 
     ! CaCO3
     !-----------------------------------------------------------------------
@@ -2836,6 +2842,7 @@ module generic_WOMBATmid
         longname = 'Alkalinity', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
         flux_bottom = .true., &
         flux_virtual = .true.)
 
@@ -2846,6 +2853,7 @@ module generic_WOMBATmid
         longname = 'Dissolved Iron', &
         units = 'mol/kg', &
         prog = .true., &
+        flux_runoff = .true., &
         flux_drydep = .true., &
         flux_param  = [ 1.0 ], & ! dts: conversion to mol/m2/s done in data_table
         flux_bottom = .true.)
@@ -3238,6 +3246,7 @@ module generic_WOMBATmid
     real                                    :: theta_opt
     real                                    :: phy_minqfe, phy_maxqfe
     real                                    :: dia_minqfe, dia_maxqfe
+    real                                    :: o2lim
     real                                    :: hco3, ddic, dcaco3
     real                                    :: dzt_bot, dzt_bot_os
     real                                    :: aoa_Vnh4, aoa_Voxy, aoa_mumax
@@ -3995,8 +4004,9 @@ module generic_WOMBATmid
       fbc = wombat%bbioh ** (Temp(i,j,k))
 
       ! Variable rates of remineralisation for POC and DOC
+      o2lim = max(0.0, min(1.0, 1.0 - exp(-oxy_mmolm3)))
       wombat%reminrpoc(i,j,k) = wombat%detqrem * fbc
-      wombat%reminrdoc(i,j,k) = wombat%docqrem * fbc
+      wombat%reminrdoc(i,j,k) = wombat%docqrem * fbc * o2lim
 
 
       !-----------------------------------------------------------------------!
@@ -4062,14 +4072,14 @@ module generic_WOMBATmid
       if (phy_p > epsi) then
         zval = wombat%phy_mumax(i,j,k) * wombat%phy_lpar(i,j,k) * phy_p ! Gross carbon fixation
         wombat%phydoc(i,j,k) = min( wombat%overflow * zval, &
-                                    max( 0.02 * zval, max(0.0, zval - wombat%phygrow(i,j,k)) ) ) !
+                                    max( 0.02 * zval, zval - wombat%phygrow(i,j,k)) )
       else
         wombat%phydoc(i,j,k) = 0.0
       endif
       if (dia_p > epsi) then
         zval = wombat%dia_mumax(i,j,k) * wombat%dia_lpar(i,j,k) * dia_p ! Gross carbon fixation
         wombat%diadoc(i,j,k) = min( wombat%overflow * zval, &
-                                    max( 0.02 * zval, max(0.0, zval - wombat%diagrow(i,j,k)) ) ) !
+                                    max( 0.02 * zval, zval - wombat%diagrow(i,j,k)) )
       else
         wombat%diadoc(i,j,k) = 0.0
       endif
@@ -4386,23 +4396,24 @@ module generic_WOMBATmid
       !-----------------------------------------------------------------------!
       !-----------------------------------------------------------------------!
 
+      o2lim = max(0.0, min(1.0, 1.0 - exp(-oxy_mmolm3/10.0)))
+
       !!!~~~ Zooplankton ~~~!!!
       ! Grazing function ! [1/s]
       ! normalize the prey preference kernal to reflect dietary fractions (Gentleman et al., (2003) DSRII)
-      I_denom = 1.0 / ( wombat%zprefphy + wombat%zprefdia + wombat%zprefsdet )
-      wombat%zooprefphy(i,j,k) = wombat%zprefphy * I_denom
-      wombat%zooprefdia(i,j,k) = wombat%zprefdia * I_denom
-      wombat%zooprefsdet(i,j,k) = wombat%zprefsdet * I_denom
-
-      ! Gentleman et al. (2003) DSRII
-      !   - add a switching component designed to weight the diet towards abundant prey
-      !   - see their Eq. 19
-      ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
-      !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
-      zval = wombat%zooprefphy(i,j,k) + wombat%zooprefdia(i,j,k) + wombat%zooprefsdet(i,j,k)
+      zval = wombat%zprefphy + wombat%zprefdia + wombat%zprefsdet
       if (zval < epsi) then
         wombat%zooprefphy(i,j,k) = 1.0/3.0; wombat%zooprefdia(i,j,k) = 1.0/3.0; wombat%zooprefsdet(i,j,k) = 1.0/3.0
       else
+        I_denom = 1.0 / ( wombat%zprefphy + wombat%zprefdia + wombat%zprefsdet )
+        wombat%zooprefphy(i,j,k) = wombat%zprefphy * I_denom
+        wombat%zooprefdia(i,j,k) = wombat%zprefdia * I_denom
+        wombat%zooprefsdet(i,j,k) = wombat%zprefsdet * I_denom
+        ! Gentleman et al. (2003) DSRII
+        !   - add a switching component designed to weight the diet towards abundant prey
+        !   - see their Eq. 19
+        ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
+        !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
         wzphy = (wombat%zooprefphy(i,j,k) * phy_mmolm3)**wombat%zoopreyswitch
         wzdia = (wombat%zooprefdia(i,j,k) * dia_mmolm3)**wombat%zoopreyswitch
         wzsdet = (wombat%zooprefsdet(i,j,k) * sdet_mmolm3)**wombat%zoopreyswitch
@@ -4416,7 +4427,8 @@ module generic_WOMBATmid
       Xzoo = (  wombat%zooepsphy * (wombat%zooprefphy(i,j,k) * phy_mmolm3)**2 &
               + wombat%zooepsdia * (wombat%zooprefdia(i,j,k) * dia_mmolm3)**2 &
               + wombat%zooepssdet * (wombat%zooprefsdet(i,j,k) * sdet_mmolm3)**2)
-      g_zoo = wombat%zoogmax * fbc * Xzoo / (wombat%zoogmax * fbc + Xzoo)
+            ! Oxygen limitation term reducing zooplankton grazing pressure in low-oxygen waters
+      g_zoo = wombat%zoogmax * fbc * o2lim * Xzoo / (wombat%zoogmax * fbc + Xzoo)
 
       ! Grazing, egestion, excretion and assimilation
       if (Xzoo>epsi) then
@@ -4429,6 +4441,7 @@ module generic_WOMBATmid
         wombat%zoograzdia(i,j,k) = g_zoo * zoo_p * wombat%zooepsdia*(wombat%zooprefdia(i,j,k)*dia_mmolm3)**2 * I_Xzoo ! [molC/kg/s]
         wombat%zoograzsdet(i,j,k) = g_zoo * zoo_p * wombat%zooepssdet*(wombat%zooprefsdet(i,j,k)*sdet_mmolm3)**2 * I_Xzoo ! [molC/kg/s]
       else
+        wombat%zooeps(i,j,k) = 0.0
         wombat%zoograzphy(i,j,k) = 0.0
         wombat%zoograzdia(i,j,k) = 0.0
         wombat%zoograzsdet(i,j,k) = 0.0
@@ -4456,24 +4469,22 @@ module generic_WOMBATmid
       !!!~~~ Mesozooplankton ~~~!!!
       ! Grazing function ! [1/s]
       ! normalize the prey preference kernal to reflect dietary fractions (Gentleman et al., (2003) DSRII)
-      I_denom = 1.0 / ( wombat%mprefphy + wombat%mprefdia &
-                      + wombat%mprefsdet + wombat%mprefzoo )
-      wombat%mesprefphy(i,j,k) = wombat%mprefphy * I_denom
-      wombat%mesprefdia(i,j,k) = wombat%mprefdia * I_denom
-      wombat%mesprefsdet(i,j,k) = wombat%mprefsdet * I_denom
-      wombat%mesprefldet(i,j,k) = wombat%mprefldet * I_denom
-      wombat%mesprefzoo(i,j,k) = wombat%mprefzoo * I_denom
-      zval = wombat%mesprefphy(i,j,k) + wombat%mesprefdia(i,j,k) &
-           + wombat%mesprefsdet(i,j,k) + wombat%mesprefldet(i,j,k) + wombat%mesprefzoo(i,j,k)
-      ! Gentleman et al. (2003) DSRII
-      !   - add a switching component designed to weight the diet towards abundant prey
-      !   - see their Eq. 19
-      ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
-      !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
-      if (zval < 1e-20) then
+      zval = wombat%mprefphy + wombat%mprefdia + wombat%mprefsdet + wombat%mprefldet + wombat%mprefzoo
+      if (zval < epsi) then
         wombat%mesprefphy(i,j,k) = 1.0/5.0; wombat%mesprefdia(i,j,k) = 1.0/5.0; wombat%mesprefsdet(i,j,k) = 1.0/5.0
         wombat%mesprefldet(i,j,k) = 1.0/5.0; wombat%mesprefzoo(i,j,k) = 1.0/5.0
       else
+        I_denom = 1.0 / ( wombat%mprefphy + wombat%mprefdia + wombat%mprefsdet + wombat%mprefldet + wombat%mprefzoo )
+        wombat%mesprefphy(i,j,k) = wombat%mprefphy * I_denom
+        wombat%mesprefdia(i,j,k) = wombat%mprefdia * I_denom
+        wombat%mesprefsdet(i,j,k) = wombat%mprefsdet * I_denom
+        wombat%mesprefldet(i,j,k) = wombat%mprefldet * I_denom
+        wombat%mesprefzoo(i,j,k) = wombat%mprefzoo * I_denom
+        ! Gentleman et al. (2003) DSRII
+        !   - add a switching component designed to weight the diet towards abundant prey
+        !   - see their Eq. 19
+        ! Emulates empirical basis of selective feeding on more abundant prey (Kiorboe et al., 2017; L&O)
+        !   ... if denominator is zero, then set all preferences to 1/3 (this is a failsafe, but it should not happen)
         wzphy = (wombat%mesprefphy(i,j,k) * phy_mmolm3)**wombat%mespreyswitch
         wzdia = (wombat%mesprefdia(i,j,k) * dia_mmolm3)**wombat%mespreyswitch
         wzsdet= (wombat%mesprefsdet(i,j,k) * sdet_mmolm3)**wombat%mespreyswitch
@@ -4493,7 +4504,7 @@ module generic_WOMBATmid
               + wombat%mesepssdet * (wombat%mesprefsdet(i,j,k) * sdet_mmolm3)**2 &
               + wombat%mesepsldet * (wombat%mesprefldet(i,j,k) * ldet_mmolm3)**2 &
               + wombat%mesepszoo * (wombat%mesprefzoo(i,j,k) * zoo_mmolm3)**2 )
-      g_mes = wombat%mesgmax * fbc * Xmes / (wombat%mesgmax * fbc + Xmes)
+      g_mes = wombat%mesgmax * fbc * o2lim * Xmes / (wombat%mesgmax * fbc + Xmes)
 
       ! Grazing, egestion, excretion and assimilation
       if (Xmes>epsi) then
@@ -4510,6 +4521,7 @@ module generic_WOMBATmid
         wombat%mesgrazldet(i,j,k) = g_mes * mes_p * wombat%mesepsldet*(wombat%mesprefldet(i,j,k)*ldet_mmolm3)**2 * I_Xmes ! [molC/kg/s]
         wombat%mesgrazzoo(i,j,k) = g_mes * mes_p * wombat%mesepszoo*(wombat%mesprefzoo(i,j,k)*zoo_mmolm3)**2 * I_Xmes ! [molC/kg/s]
       else
+        wombat%meseps(i,j,k) = 0.0
         wombat%mesgrazphy(i,j,k) = 0.0
         wombat%mesgrazdia(i,j,k) = 0.0
         wombat%mesgrazsdet(i,j,k) = 0.0
@@ -4614,7 +4626,7 @@ module generic_WOMBATmid
       ! 1. find max growth rate of AOA dependent on temperature (Qin et al., 2015 PNAS)
       aoa_mumax = max(0.2, 0.029 * Temp(i,j,k) - 0.147) / 86400.0
       ! 2. Limitation terms of oxygen and ammonium substrate affecting uptake
-      wombat%aoa_loxy(i,j,k) = min(1.0, oxy_mmolm3 * wombat%aoa_poxy)
+      wombat%aoa_loxy(i,j,k) = oxy_mmolm3 / (oxy_mmolm3 + 0.1)
       wombat%aoa_lnh4(i,j,k) = nh4_mmolm3 / (nh4_mmolm3 + wombat%aoa_knh4)
       aoa_Voxy = oxy_mmolm3 * wombat%aoa_poxy
       aoa_Vnh4 = wombat%aoa_ynh4 * aoa_mumax * wombat%aoa_lnh4(i,j,k)  ! Note: yield * max growth rate = Vmax
@@ -4728,7 +4740,7 @@ module generic_WOMBATmid
                             wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
                           + wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) )
 
-      ! Net primary productivity (gross PP minus linear mortality) ! [molC/kg/s]
+      ! Net primary productivity (gross PP excluding overflow production) ! [molC/kg/s]
       wombat%npp3d(i,j,k) = wombat%npp3d(i,j,k) + dtsb * ( &
                             wombat%phygrow(i,j,k) + wombat%diagrow(i,j,k) )
 
@@ -4875,7 +4887,7 @@ module generic_WOMBATmid
 
       ! Dissolved organic carbon equation ! [molC/kg]
       !-----------------------------------------------------------------------
-      ! Here we treat ldetremi semi-implicitly to ensure numerical stability
+      ! Here we treat docremi semi-implicitly to ensure numerical stability
       ! See https://github.com/ACCESS-NRI/GFDL-generic-tracers/issues/96
       P_expl = wombat%sdetremi(i,j,k) &
              + wombat%ldetremi(i,j,k) &
@@ -4893,7 +4905,7 @@ module generic_WOMBATmid
              + wombat%mesexcrsdet(i,j,k) &
              + wombat%mesexcrldet(i,j,k) &
              + wombat%mesexcrzoo(i,j,k) ) * wombat%mesexcrdom
-      ! Treat ldetremi semi-implicitly
+      ! Treat docremi semi-implicitly
       zval1 = max(0.0, (wombat%p_doc(i,j,k,tau) + dtsb * P_expl))
       zval2 = min(0.0, (wombat%p_doc(i,j,k,tau) + dtsb * P_expl))
       k_loss = wombat%reminrdoc(i,j,k) / mmol_m3_to_mol_kg * zval1
@@ -4955,11 +4967,14 @@ module generic_WOMBATmid
                                  + wombat%mesexcrsdet(i,j,k) &
                                  + wombat%mesexcrldet(i,j,k) &
                                  + wombat%mesexcrzoo(i,j,k) ) * (1.0-wombat%mesexcrdom) &
-                               + wombat%docremi(i,j,k) &
-                               - wombat%phygrow(i,j,k) &
-                               - wombat%diagrow(i,j,k) ) &
+                               + wombat%docremi(i,j,k) ) &
                                - dtsb * ( wombat%ammox(i,j,k) * wombat%aoa_yoxy/wombat%aoa_ynh4 )
-
+      wombat%p_o2(i,j,k,tau) = wombat%p_o2(i,j,k,tau) + dtsb * ( &
+                               ( wombat%phygrow(i,j,k) * wombat%phy_lno3(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                               + wombat%diagrow(i,j,k) * wombat%dia_lno3(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) ) * 164./122. &
+                             + ( wombat%phygrow(i,j,k) * wombat%phy_lnh4(i,j,k) / ( wombat%phy_lnit(i,j,k) + epsi ) &
+                               + wombat%diagrow(i,j,k) * wombat%dia_lnh4(i,j,k) / ( wombat%dia_lnit(i,j,k) + epsi ) ) * 132./122. &
+                             + ( wombat%phydoc(i,j,k) + wombat%diadoc(i,j,k) ) * 132./122. )
 
       ! Equation for CaCO3 ! [molCaCO3/kg]
       !-----------------------------------------------------------------------
@@ -5541,6 +5556,7 @@ module generic_WOMBATmid
         ! and to calculate a lower omega for calcite, which ensures greater rates of dissolution of
         ! CaCO3 within the sediment as organic matter accumulates.
         wombat%seddic(i,j) = wombat%seddic(i,j) + wombat%p_det_sediment(i,j,1) / wombat%bottom_thickness / wombat%Rho_0
+        wombat%sedalk(i,j) = wombat%sedalk(i,j) + wombat%p_caco3_sediment(i,j,1) / wombat%bottom_thickness / wombat%Rho_0
       endif
     enddo; enddo
 
@@ -5599,15 +5615,15 @@ module generic_WOMBATmid
 
         ! Remineralisation of sediments to supply nutrient fields.
         ! btf values are positive from the water column into the sediment.
-        wombat%b_doc(i,j) = -wombat%det_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_doc(i,j) = -wombat%det_sed_remin(i,j) * (1.0 - wombat%fdenit(i,j)) ! [mol/m2/s]
         wombat%b_nh4(i,j) = -wombat%det_sed_remin(i,j) * 16/122.0 ! [mol/m2/s]
         wombat%b_no3(i,j) = wombat%det_sed_denit(i,j) ! [molN/m2/s]
-        wombat%b_o2(i,j) = -132./122. * (wombat%b_doc(i,j)) * (1.0 - wombat%fdenit(i,j)) ! [mol/m2/s]
-        wombat%b_dic(i,j) = -wombat%caco3_sed_remin(i,j) ! [mol/m2/s]
+        wombat%b_o2(i,j) = 0.0 ! [mol/m2/s]
+        wombat%b_dic(i,j) = -wombat%caco3_sed_remin(i,j) - wombat%det_sed_remin(i,j) * wombat%fdenit(i,j) ! [mol/m2/s]
         if (do_tracer_dicr) wombat%b_dicr(i,j) = wombat%b_dic(i,j) ! [mol/m2/s]
         wombat%b_fe(i,j) = -1.0 * wombat%detfe_sed_remin(i,j) ! [mol/m2/s]
         wombat%b_sil(i,j) = -1.0 * wombat%detsi_sed_remin(i,j) ! [mol/m2/s]
-        wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) - wombat%b_no3(i,j) ! [mol/m2/s]
+        wombat%b_alk(i,j) = -2.0 * wombat%caco3_sed_remin(i,j) - wombat%b_no3(i,j) + wombat%b_nh4(i,j) ! [mol/m2/s]
       endif
     enddo; enddo
 
@@ -6127,6 +6143,10 @@ module generic_WOMBATmid
 
     if (wombat%id_docremi > 0) &
       used = g_send_data(wombat%id_docremi, wombat%docremi, model_time, &
+          rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
+
+    if (wombat%id_sdetremi > 0) &
+      used = g_send_data(wombat%id_sdetremi, wombat%sdetremi, model_time, &
           rmask=grid_tmask, is_in=isc, js_in=jsc, ks_in=1, ie_in=iec, je_in=jec, ke_in=nk)
 
     if (wombat%id_ldetremi > 0) &
@@ -6835,6 +6855,7 @@ module generic_WOMBATmid
         wombat%diadoc, &
         wombat%diamorl, &
         wombat%diamorq, &
+        wombat%zooeps, &
         wombat%zooprefphy, &
         wombat%zooprefdia, &
         wombat%zooprefsdet, &
@@ -6849,6 +6870,7 @@ module generic_WOMBATmid
         wombat%zooegesphy, &
         wombat%zooegesdia, &
         wombat%zooegessdet, &
+        wombat%meseps, &
         wombat%mesprefphy, &
         wombat%mesprefdia, &
         wombat%mesprefsdet, &
