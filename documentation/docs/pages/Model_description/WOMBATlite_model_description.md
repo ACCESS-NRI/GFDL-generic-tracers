@@ -10,9 +10,10 @@
  World Ocean Model of Biogeochemistry And Trophic-dynamics (WOMBAT)
 ```
 
-_Contact Pearse J. Buchanan for any questions_
+_Contact Pearse J. Buchanan and/or Dougal Squire for any questions_ <br>
 
-_Pearse.Buchanan@csiro.au_
+_Pearse.Buchanan@csiro.au_ <br>
+_Dougie.Squire@anu.edu.au_ <br>
 
 ---
 
