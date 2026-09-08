@@ -3360,7 +3360,7 @@ module generic_WOMBATlite
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment) ! [mol/m2]
 
     ! Get bottom conditions, including those that influence bottom fluxes. Bottom conditions are
-    ! calculated over a layer defined by wombat%bottom_thickness (default 1 m). This is done because
+    ! calculated over a layer defined by wombat%bottom_thickness (default 0.1 m). This is done because
     ! the bottom layers in MOM6 are usually "vanished" layers. This approach is based on what is done
     ! in COBALT v3.
     do j = jsc,jec; do i = isc,iec;

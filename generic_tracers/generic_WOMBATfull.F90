@@ -5737,7 +5737,7 @@ module generic_WOMBATfull
       ! normalize the prey preference kernal to reflect dietary fractions (Gentleman et al., (2003) DSRII)
       zval = wombat%mpreflbac + wombat%mprefobac + wombat%mprefsbac + wombat%mprefaoa &
            + wombat%mprefphy + wombat%mprefdia + wombat%mprefsdet + wombat%mprefldet + wombat%mprefzoo
-      if (zval < 1e-20) then
+      if (zval < epsi) then
         wombat%mespreflbac(i,j,k) = 1.0/9.0; wombat%mesprefobac(i,j,k) = 1.0/9.0; wombat%mesprefsbac(i,j,k) = 1.0/9.0
         wombat%mesprefaoa(i,j,k) = 1.0/9.0; wombat%mesprefphy(i,j,k) = 1.0/9.0; wombat%mesprefdia(i,j,k) = 1.0/9.0
         wombat%mesprefsdet(i,j,k) = 1.0/9.0; wombat%mesprefldet(i,j,k) = 1.0/9.0; wombat%mesprefzoo(i,j,k) = 1.0/9.0
@@ -6214,6 +6214,7 @@ module generic_WOMBATfull
           wombat%aox_mu(i,j,k) = wombat%aox_mumax * wombat%bbioh**(Temp(i,j,k)) &
                                * wombat%lbac_anaer(i,j,k) * wombat%aox_lnh4(i,j,k)
         else
+          o2lim = oxy_mmolm3 / (oxy_mmolm3 + 0.1)
           wombat%aox_mu(i,j,k) = wombat%aox_mumax * wombat%bbioh**(Temp(i,j,k)) &
                                * (1.0-o2lim) * wombat%aox_lnh4(i,j,k)
         endif
