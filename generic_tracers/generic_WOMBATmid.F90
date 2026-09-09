@@ -391,6 +391,7 @@ module generic_WOMBATmid
         caco3_sed_remin, &
         det_sed_denit, &
         fbury, &
+        ffebury, &
         fdenit, &
         zeuphot, &
         sdet_radius, &
@@ -737,6 +738,7 @@ module generic_WOMBATmid
         id_det_sed_depst = -1, &
         id_det_sed_denit = -1, &
         id_fbury = -1, &
+        id_ffebury = -1, &
         id_fdenit = -1, &
         id_detfe_sed_remin = -1, &
         id_detfe_sed_depst = -1, &
@@ -1142,6 +1144,12 @@ module generic_WOMBATmid
         'fbury', 'Fraction of deposited detritus permanently buried beneath sediment', &
         'h', '1', 's', '[0-1]', 'f')
     wombat%id_fbury = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
+        init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
+
+    vardesc_temp = vardesc( &
+        'ffebury', 'Fraction of deposited detrital iron permanently buried beneath sediment', &
+        'h', '1', 's', '[0-1]', 'f')
+    wombat%id_ffebury = register_diag_field(package_name, vardesc_temp%name, axes(1:2), &
         init_time, vardesc_temp%longname, vardesc_temp%units, missing_value=missing_value1)
 
     vardesc_temp = vardesc( &
@@ -3030,16 +3038,23 @@ module generic_WOMBATmid
     integer, intent(in)                      :: tau
     type(time_type), intent(in)              :: model_time
 
-    integer                         :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
-    real, dimension(:,:,:), pointer :: grid_tmask
-    real                            :: orgflux
-    logical                         :: used
+    integer                            :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
+    real, dimension(:,:,:,:), pointer  :: p_o2
+    real, dimension(:,:,:), pointer    :: grid_tmask
+    integer, dimension(:,:), pointer   :: grid_kmt
+    real                               :: orgflux, boto2, mmol_m3_to_mol_kg
+    real, parameter                    :: epsi = 1.0e-30
+    logical                            :: used
 
     call g_tracer_get_common(isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, &
-        grid_tmask=grid_tmask)
+        grid_tmask=grid_tmask, grid_kmt=grid_kmt)
+
+    ! Unit conversion factor
+    mmol_m3_to_mol_kg = 1.e-3 / wombat%Rho_0
 
     ! Move bottom reservoirs to sediment tracers
     !-----------------------------------------------------------------------
+    call g_tracer_get_pointer(tracer_list, 'o2', 'field', wombat%p_o2)
     call g_tracer_get_values(tracer_list, 'sdet', 'btm_reservoir', wombat%sdet_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'sdetfe', 'btm_reservoir', wombat%sdetfe_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'ldet', 'btm_reservoir', wombat%ldet_btm, isd, jsd)
@@ -3051,11 +3066,14 @@ module generic_WOMBATmid
 
     ! Calculate burial of deposited detritus (Dunne et al., 2007)
     wombat%fbury(:,:) = 0.0
+    wombat%ffebury(:,:) = 0.90 ! 90% of iron is buried when do_burial == .false. to avoid unrealistic accumulation
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
+          boto2 = wombat%p_o2(i,j,grid_kmt(i,j),ntau) / mmol_m3_to_mol_kg
           orgflux = (wombat%sdet_btm(i,j) + wombat%ldet_btm(i,j)) / dt * 86400 * 1e3 ! mmol C m-2 day-1
           wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
+          wombat%ffebury(i,j) = max(0.5, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
         enddo
       enddo
     endif
@@ -3066,7 +3084,8 @@ module generic_WOMBATmid
     call g_tracer_set_values(tracer_list, 'ldet', 'btm_reservoir', 0.0)
 
     call g_tracer_get_pointer(tracer_list, 'detfe_sediment', 'field', wombat%p_detfe_sediment)
-    wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + (wombat%sdetfe_btm(:,:) + wombat%ldetfe_btm(:,:)) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
+    wombat%p_detfe_sediment(:,:,1) = wombat%p_detfe_sediment(:,:,1) + &
+                                     (wombat%sdetfe_btm(:,:) + wombat%ldetfe_btm(:,:)) * (1.0-wombat%ffebury(:,:)) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'sdetfe', 'btm_reservoir', 0.0)
     call g_tracer_set_values(tracer_list, 'ldetfe', 'btm_reservoir', 0.0)
 
@@ -3102,6 +3121,10 @@ module generic_WOMBATmid
 
     if (wombat%id_fbury > 0) &
       used = g_send_data(wombat%id_fbury, wombat%fbury, model_time, &
+          rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
+
+    if (wombat%id_ffebury > 0) &
+      used = g_send_data(wombat%id_ffebury, wombat%ffebury, model_time, &
           rmask=grid_tmask(:,:,1), is_in=isc, js_in=jsc, ie_in=iec, je_in=jec)
 
   end subroutine generic_WOMBATmid_update_from_bottom
@@ -3610,6 +3633,7 @@ module generic_WOMBATmid
     wombat%sdet_density(:,:,:) = 0.0
     wombat%ldet_density(:,:,:) = 0.0
     wombat%fbury(:,:) = 0.0
+    wombat%ffebury(:,:) = 0.0
     wombat%seddep(:,:) = 0.0
     wombat%sedmask(:,:) = 0.0
     wombat%sedtemp(:,:) = 0.0
@@ -6721,6 +6745,7 @@ module generic_WOMBATmid
     allocate(wombat%sdet_btm(isd:ied, jsd:jed)); wombat%sdet_btm(:,:)=0.0
     allocate(wombat%ldet_btm(isd:ied, jsd:jed)); wombat%ldet_btm(:,:)=0.0
     allocate(wombat%fbury(isd:ied, jsd:jed)); wombat%fbury(:,:)=0.0
+    allocate(wombat%ffebury(isd:ied, jsd:jed)); wombat%ffebury(:,:)=0.0
     allocate(wombat%fdenit(isd:ied, jsd:jed)); wombat%fdenit(:,:)=0.0
     allocate(wombat%detfe_sed_remin(isd:ied, jsd:jed)); wombat%detfe_sed_remin(:,:)=0.0
     allocate(wombat%detsi_sed_remin(isd:ied, jsd:jed)); wombat%detsi_sed_remin(:,:)=0.0
@@ -6925,6 +6950,7 @@ module generic_WOMBATmid
         wombat%sdet_btm, &
         wombat%ldet_btm, &
         wombat%fbury, &
+        wombat%ffebury, &
         wombat%fdenit, &
         wombat%detfe_sed_remin, &
         wombat%detsi_sed_remin, &
