@@ -123,6 +123,7 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `det_sed_depst`   | Rate of deposition of detritus to sediment at base of water column                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `det_sed_denit`   | Rate of benthic denitrification (removal of NO<sub>3</sub>) in accumulated sediment                  | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `fbury`           | Fraction of deposited detritus permanently buried beneath sediment                                   | dimensionless                        |
+| `ffebury`         | Fraction of deposited iron permanently buried within sediment                                        | dimensionless                        |
 | `fdenit`          | Fraction of sedimentary detritus remineralised via denitrification                                   | dimensionless                        |
 | `detfe_sed_remin` | Rate of remineralisation of detrital iron in accumulated sediment                                    | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `detfe_sed_depst` | Rate of deposition of detrital iron to sediment at base of water column                              | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
@@ -444,6 +445,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `ligW`             | Weak ligand concentration                                                   | 1.7           | µmol m<sup>-3</sup>                                                  |
 | `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
 | `dfefloor`         | Minimum open water concentration of dissolved iron (detection limit)        | 0.025         | µmol Fe m<sup>-3</sup>                                               |
+| `detfesedfloor`    | Minimum detrital iron sediment reservoir in shallow (≤200m) columns         | 30.0          | µmol Fe m<sup>-2</sup>                                               |
 | `kscav_dfe`        | Free dissolved iron scavenging rate                                         | 0.01/86400.0  | (mmol mass of particle m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>   |
 | `kcoag_dfe`        | Colloidal dissolved iron coagulation rate                                   | 1e-5/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `kagg_col`         | Colloidal dissolved iron aggregation rate                                   | 0.1/86400.0   | s<sup>-1</sup>                                                       |
@@ -2303,9 +2305,7 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 ### 19. Additional operations on tracers
 
-**First**, dissolved iron concentrations are set to equal 1 nM in grid cells in contact with the sediment where the depth of the water column is less than 200 metres deep. WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we set the dissolved iron concentration in these bottom waters to 1 nM.
-
-**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)) in off-shelf waters, we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
+If dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)) in off-shelf waters, we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
 
 $$
 \begin{align}
@@ -2587,6 +2587,8 @@ Sediment sources to the ocean are recorded as negative `btf` values.
 
 WOMBAT-mid tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), ammonium (NH<sub>4</sub>), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
 
+In columns shallower than 200 m, $B_{det,sed}^{Fe}$ is floored at a minimum value (`detfesedfloor`, $[B_{det,sed}^{Fe}]^{min}$, [µmol m<sup>-2</sup>]). WOMBAT-mid is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, this floor ensures such shelf regions receive an adequate supply of dissolved iron. $[B_{det,sed}^{Fe}]^{min}$ is set in the parameter list and is configurable at run time.
+
 
 **Organics**
 
@@ -2706,19 +2708,27 @@ It is at this point that the model performs permanent burial of sinking organic 
 
 ### Permanent burial of particulates.
 
-If `do_burial = .true.`, we compute the fraction of incident sinking particualte carbon, iron, silicon and $CaCO_3$ that is permanently buried in the sediments. This permanently buried fraction is effectively removed from the model and therefore is not accumulated within the sedimentary pools.
+If `do_burial = .true.`, we compute the fraction of incident sinking organic matter, iron and $CaCO_3$ that is permanently buried in the sediments. This permanently buried fraction is effectively removed from the model and therefore is not accumulated within the sedimentary pools.
 
-The fraction buried is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
+The fraction of organic matter buried (`fbury(i,j)`, $F_{bury}^{C}$, [dimensionless]) is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
 
 $$
 \begin{align}
-F_{bury} =& \quad 0.013 + 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury}^{C} =& \quad 0.013 \cdot 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
 \end{align}
 $$
 
-where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> day<sup>-1</sup>].
+where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CACO_3$ that is buried increases.
 
-As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron, biogenic silica and $CaCO_3$ that is buried increases. 
+The burial of iron that sinks to the sediment is treated differently to organic matter. According to [Dale et al. (2015)](https://doi.org/10.1002/2014GB005017), the flux of iron from the sediments into the overlying water column is a function of oxygen and the amount of organic carbon being remineralised in the sediment, with oxic sediments having much lower fluxes than reducing, anoxic sediments. We derive instead an estimate of the fraction of iron that is permanently buried (`ffebury(i,j)`, $F_{bury}^{Fe}$, [dimensionless]) from their relationship. Specifically, the fraction of iron that rains onto the sedimment and is permanently buried is equal to:
+
+$$
+\begin{align}
+F_{bury}^{Fe} =& \quad \max \left(0.5, 1 - \tanh \left( \dfrac{f_{org}}{O_2} \right) \right)
+\end{align}
+$$
+
+where $O_2$ is the oxygen content of the overlying water column (`boto2`, [mmol m<sup>-3</sup>]). Furthermore, we set a minimum burial fraction of 50% of the total iron hitting sediments even in anoxic conditions to account for the formation of iron sulphides ([Wijsman, Middelburg & Help, 2001](https://doi.org/10.1016/S0025-3227(00)00122-5)).
 
 ### Permanent burial of authigenic iron.
 
