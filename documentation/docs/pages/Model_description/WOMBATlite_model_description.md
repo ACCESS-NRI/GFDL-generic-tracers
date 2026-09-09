@@ -284,6 +284,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `ligW`             | Weak ligand background concentration [µmol/m³]                              | 1.7                |
 | `ligS`             | Strong ligand background concentration [µmol/m³]                            | 0.4                |
 | `dfefloor`         | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
+| `detfesedfloor`    | Minimum detrital Fe sediment reservoir in shallow (≤200m) columns [µmol/m²] | 30.0               |
 | `kscav_dfe`        | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
 | `kcoag_dfe`        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-6/86400         |
 | `kagg_col`         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
@@ -1382,9 +1383,7 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 ### 15. Additional operations on tracers.
 
-**First**, dissolved iron concentrations are set to equal 1 nM everywhere where the depth of the water column is less than 200 metres deep. WOMBAT-lite is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we universally set the dissolved iron concentration in these waters to 1 nM.
-
-**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits in waters deeper than 200 m, we reset these concentrations to this minimum  (`dfefloor`, $[dFe]^{min}$, [nmol Fe kg<sup>-1</sup>]). $[dFe]^{min}$ is set in the parameter list and is configurable at run time.
+If dissolved iron concentrations dip below that measureable by operational detection limits in waters deeper than 200 m, we reset these concentrations to this minimum  (`dfefloor`, $[dFe]^{min}$, [nmol Fe kg<sup>-1</sup>]). $[dFe]^{min}$ is set in the parameter list and is configurable at run time.
 
 ---
 
@@ -1494,6 +1493,8 @@ WOMBAT-lite sinks organic detrital iron at the same rate as organic detrital car
 ### 17. Sedimentary processes.
 
 WOMBAT-lite tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved inorganic carbon (DIC), nitrate ($NO_3$), dissolved iron (dFe), oxygen ($O_2$) and alkalinity (Alk). Remineralisation of organic carbon ($\gamma_{det,sed}^{C}$) produces DIC and $NO_3$, but removes $O_2$ and Alk. Ratios of nitrogen to carbon and oxygen to carbon are static at 16:122 and -172:122. Remineralisation of organic iron produces dFe.
+
+In columns shallower than 200 m, $B_{det,sed}^{Fe}$ is floored at a minimum value (`detfesedfloor`, $[B_{det,sed}^{Fe}]^{min}$, [µmol m<sup>-2</sup>]). WOMBAT-lite is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, this floor ensures such shelf regions receive an adequate supply of dissolved iron. $[B_{det,sed}^{Fe}]^{min}$ is set in the parameter list and is configurable at run time.
 
 **Organics**
 
