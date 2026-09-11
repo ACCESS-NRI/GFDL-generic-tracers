@@ -1470,10 +1470,6 @@ module generic_WOMBATlite
     ! Thickness over which tracer values are integrated to define the bottom layer
     call g_tracer_add_param('bottom_thickness', wombat%bottom_thickness, 0.1)
 
-    ! Multiplier on the amount of Fe that is buried per unit organic carbon buried [m]
-    !-----------------------------------------------------------------------
-    call g_tracer_add_param('feburyscaler', wombat%feburyscaler, 10.0)
-
     ! Detritus remineralisation rate constant in sediments [1/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('detlrem_sed', wombat%detlrem_sed, 0.01/86400.0)
@@ -1957,10 +1953,12 @@ module generic_WOMBATlite
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
-          boto2 = wombat%p_o2(i,j,grid_kmt(i,j),ntau) / mmol_m3_to_mol_kg
           orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
           wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
-          wombat%ffebury(i,j) = max(0.5, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
+          if (grid_kmt(i,j) > 0) then
+            boto2 = wombat%p_o2(i,j,grid_kmt(i,j),tau) / mmol_m3_to_mol_kg
+            wombat%ffebury(i,j) = max(0.5, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
+          endif
         enddo
       enddo
     endif
@@ -3292,7 +3290,7 @@ module generic_WOMBATlite
             print *, "       Depth index and value =", k, wombat%zm(i,j,k)
             print *, "       Nested timestep number =", tn
             print *, " "
-            print *, "       Biological C budget (molC/kg) at two timesteps =", fe_pools(i,j,k,1), fe_pools(i,j,k,2)
+            print *, "       Biological Fe budget (molFe/kg) at two timesteps =", fe_pools(i,j,k,1), fe_pools(i,j,k,2)
             print *, "       Difference in budget between timesteps =", fe_pools(i,j,k,2) - fe_pools(i,j,k,1)
             print *, " "
             print *, "       dFe (molFe/kg) =", wombat%p_fe(i,j,k,tau)

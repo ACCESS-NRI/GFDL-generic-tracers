@@ -2713,11 +2713,11 @@ The fraction of organic matter buried (`fbury(i,j)`, $F_{bury}^{C}$, [dimensionl
 
 $$
 \begin{align}
-F_{bury}^{C} =& \quad 0.013 \cdot 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury}^{C} =& \quad 0.013 + 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
 \end{align}
 $$
 
-where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CACO_3$ that is buried increases.
+where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CaCO_3$ that is buried increases.
 
 The burial of iron that sinks to the sediment is treated differently to organic matter. According to [Dale et al. (2015)](https://doi.org/10.1002/2014GB005017), the flux of iron from the sediments into the overlying water column is a function of oxygen and the amount of organic carbon being remineralised in the sediment, with oxic sediments having much lower fluxes than reducing, anoxic sediments. We derive instead an estimate of the fraction of iron that is permanently buried (`ffebury(i,j)`, $F_{bury}^{Fe}$, [dimensionless]) from their relationship. Specifically, the fraction of iron that rains onto the sedimment and is permanently buried is equal to:
 
