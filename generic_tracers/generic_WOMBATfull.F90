@@ -4130,9 +4130,9 @@ module generic_WOMBATfull
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
-          orgflux = (wombat%sdet_btm(i,j) + wombat%ldet_btm(i,j)) / dt * 86400 * 1e3 ! mmol C m-2 day-1
-          wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
           if (grid_kmt(i,j) > 0) then
+            orgflux = (wombat%sdet_btm(i,j) + wombat%ldet_btm(i,j)) / dt * 86400 * 1e3 ! mmol C m-2 day-1
+            wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
             boto2 = wombat%p_o2(i,j,grid_kmt(i,j),tau) / mmol_m3_to_mol_kg
             wombat%ffebury(i,j) = max(0.5, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
           endif
