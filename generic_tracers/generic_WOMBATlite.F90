@@ -224,7 +224,6 @@ module generic_WOMBATlite
         zoolmor, &
         zooqmor, &
         detlrem, &
-        feburyscaler, &
         bottom_thickness, &
         detlrem_sed, &
         wdetbio, &
