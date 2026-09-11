@@ -123,6 +123,7 @@ The following are all **2D** diagnostic output variables from WOMBAT-mid.
 | `det_sed_depst`   | Rate of deposition of detritus to sediment at base of water column                                   | mol C m<sup>-2</sup> s<sup>-1</sup>  |
 | `det_sed_denit`   | Rate of benthic denitrification (removal of NO<sub>3</sub>) in accumulated sediment                  | mol N m<sup>-2</sup> s<sup>-1</sup>  |
 | `fbury`           | Fraction of deposited detritus permanently buried beneath sediment                                   | dimensionless                        |
+| `ffebury`         | Fraction of deposited iron permanently buried within sediment                                        | dimensionless                        |
 | `fdenit`          | Fraction of sedimentary detritus remineralised via denitrification                                   | dimensionless                        |
 | `detfe_sed_remin` | Rate of remineralisation of detrital iron in accumulated sediment                                    | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
 | `detfe_sed_depst` | Rate of deposition of detrital iron to sediment at base of water column                              | mol Fe m<sup>-2</sup> s<sup>-1</sup> |
@@ -2706,19 +2707,27 @@ It is at this point that the model performs permanent burial of sinking organic 
 
 ### Permanent burial of particulates.
 
-If `do_burial = .true.`, we compute the fraction of incident sinking particualte carbon, iron, silicon and $CaCO_3$ that is permanently buried in the sediments. This permanently buried fraction is effectively removed from the model and therefore is not accumulated within the sedimentary pools.
+If `do_burial = .true.`, we compute the fraction of incident sinking organic matter, iron and $CaCO_3$ that is permanently buried in the sediments. This permanently buried fraction is effectively removed from the model and therefore is not accumulated within the sedimentary pools.
 
-The fraction buried is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
+The fraction of organic matter buried (`fbury(i,j)`, $F_{bury}^{C}$, [dimensionless]) is calculated according to Equation 3 of [Dunne et al. (2007)](https://doi.org/10.1029/2006GB002907):
 
 $$
 \begin{align}
-F_{bury} =& \quad 0.013 + 0.53 \dfrac{(f_{org})^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury}^{C} =& \quad 0.013 + 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
 \end{align}
 $$
 
-where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> day<sup>-1</sup>].
+where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CaCO_3$ that is buried increases.
 
-As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron, biogenic silica and $CaCO_3$ that is buried increases. 
+The burial of iron that sinks to the sediment is treated differently to organic matter. According to [Dale et al. (2015)](https://doi.org/10.1002/2014GB005017), the flux of iron from the sediments into the overlying water column is a function of oxygen and the amount of organic carbon being remineralised in the sediment, with oxic sediments having much lower fluxes than reducing, anoxic sediments. We derive instead an estimate of the fraction of iron that is permanently buried (`ffebury(i,j)`, $F_{bury}^{Fe}$, [dimensionless]) from their relationship. Specifically, the fraction of iron that rains onto the sedimment and is permanently buried is equal to:
+
+$$
+\begin{align}
+F_{bury}^{Fe} =& \quad \max \left(0.5, 1 - \tanh \left( \dfrac{f_{org}}{O_2} \right) \right)
+\end{align}
+$$
+
+where $O_2$ is the oxygen content of the overlying water column (`boto2`, [mmol m<sup>-3</sup>]). Furthermore, we set a minimum burial fraction of 50% of the total iron hitting sediments even in anoxic conditions to account for the formation of iron sulphides ([Wijsman, Middelburg & Help, 2001](https://doi.org/10.1016/S0025-3227(00)00122-5)).
 
 ### Permanent burial of authigenic iron.
 
