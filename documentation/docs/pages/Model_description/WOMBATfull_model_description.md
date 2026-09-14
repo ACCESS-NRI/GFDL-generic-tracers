@@ -549,6 +549,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `ligW`             | Weak ligand concentration                                                   | 1.7           | µmol m<sup>-3</sup>                                                  |
 | `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
 | `dfefloor`         | Minimum open water concentration of dissolved iron (detection limit)        | 0.025         | µmol Fe m<sup>-3</sup>                                               |
+| `detfesedfloor`    | Minimum detrital iron sediment reservoir in shallow (≤200m) columns         | 30.0          | µmol Fe m<sup>-2</sup>                                               |
 | `kscav_dfe`        | Free dissolved iron scavenging rate                                         | 0.01/86400.0  | (mmol mass of particle m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>   |
 | `kcoag_dfe`        | Colloidal dissolved iron coagulation rate                                   | 1e-5/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `kagg_col`         | Colloidal dissolved iron aggregation rate                                   | 0.1/86400.0   | s<sup>-1</sup>                                                       |
@@ -2899,9 +2900,7 @@ When checks for the conservation of mass is enabled (`do_check_n_conserve = .tru
 
 ### 20. Additional operations on tracers
 
-**First**, dissolved iron concentrations are set to equal 1 nM in grid cells in contact with the sediment where the depth of the water column is less than 200 metres deep. WOMBAT-full is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, we set the dissolved iron concentration in these bottom waters to 1 nM.
-
-**Second**, if dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)) in off-shelf waters, we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
+If dissolved iron concentrations dip below that measureable by operational detection limits considered to be roughlly 10-50 pM ([Worsford et al., 2014](https://doi.org/10.1016/j.marchem.2014.08.009)) in off-shelf waters, we reset these concentrations to this minimum (`dfefloor`, $[dFe]^{min}$, [µmol m<sup>-3</sup>]):
 
 $$
 \begin{align}
@@ -3182,6 +3181,8 @@ Our approach therefore considers mineral ballasting on particle excess density, 
 Sediment sources to the ocean are recorded as negative `btf` values.
 
 WOMBAT-full tracks the accumulation of organic detrital carbon (`p_det_sediment(i,j)`, $B_{det,sed}^{C}$, [mol C m<sup>-2</sup>]), organic detrital iron (`p_detfe_sediment(i,j)`, $B_{det,sed}^{Fe}$, [mol Fe m<sup>-2</sup>]), organic detrital silica (`p_detsi_sediment(i,j)`, $B_{det,sed}^{Si}$, [mol Si m<sup>-2</sup>]) and $CaCO_3$ (`p_caco3_sediment(i,j)`, $B_{CaCO_3,sed}^{C}$, [mol C m<sup>-2</sup>]) within sedimentary pools. The organic pools contribute to bottom fluxes of dissolved organic carbon (DOC), ammonium (NH<sub>4</sub>), dissolved inorganic carbon (DIC), dissolved iron (dFe), silicic acid (H<sub>4</sub>SiO<sub>4</sub>), oxygen (O<sub>2</sub>) and alkalinity (Alk). 
+
+In columns shallower than 200 m, $B_{det,sed}^{Fe}$ is floored at a minimum value (`detfesedfloor`, $[B_{det,sed}^{Fe}]^{min}$, [µmol m<sup>-2</sup>]). WOMBAT-full is not considered to be a model of the coastal ocean, but rather a model of the global pelagic ocean. Given that coastal waters are not limited in dissolved iron due to substantial interactions with sediments and exchange with the land, this floor ensures such shelf regions receive an adequate supply of dissolved iron. $[B_{det,sed}^{Fe}]^{min}$ is set in the parameter list and is configurable at run time.
 
 
 **Organics**
