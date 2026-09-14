@@ -81,6 +81,7 @@ The following are logical statements within the `input.nml` namelist file that c
 | `do_tracer_dicr`               | Carry remineralised dissolved inorganic carbon (dicr) as a tracer               | .false.          |
 | `do_check_n_conserve`          | Checks that the ecosystem calculations are conserving the mass of nitrogen      | .false.          |
 | `do_check_c_conserve`          | Checks that the ecosystem calculations are conserving the mass of carbon        | .false.          |
+| `do_check_fe_conserve`         | Checks that the ecosystem calculations are conserving the mass of iron.         | .false.          |
 
 We note that when `do_two_ligands` is set to `.true.`, the `ligK` diagnostic variable reflects the binding strength of the strong ligand. However, when `do_two_ligands` is set to `.false.`, this diagnostic (`ligK`) reflects the binding strength of the bulk ligand pool.
 

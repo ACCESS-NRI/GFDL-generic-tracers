@@ -1927,7 +1927,6 @@ module generic_WOMBATlite
     type(time_type), intent(in)              :: model_time
 
     integer                            :: isc, iec, jsc, jec, isd, ied, jsd, jed, nk, ntau, i, j
-    real, dimension(:,:,:,:), pointer  :: p_o2
     real, dimension(:,:,:), pointer    :: grid_tmask
     integer, dimension(:,:), pointer   :: grid_kmt
     real                               :: orgflux, boto2, mmol_m3_to_mol_kg
@@ -1942,7 +1941,6 @@ module generic_WOMBATlite
 
     ! Move bottom reservoirs to sediment tracers
     !-----------------------------------------------------------------------
-    call g_tracer_get_pointer(tracer_list, 'o2', 'field', wombat%p_o2)
     call g_tracer_get_values(tracer_list, 'det', 'btm_reservoir', wombat%det_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'detfe', 'btm_reservoir', wombat%detfe_btm, isd, jsd)
     call g_tracer_get_values(tracer_list, 'caco3', 'btm_reservoir', wombat%caco3_btm, isd, jsd)
@@ -1956,7 +1954,7 @@ module generic_WOMBATlite
           if (grid_kmt(i,j) > 0) then
             orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
             wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
-            boto2 = wombat%p_o2(i,j,grid_kmt(i,j),tau) / mmol_m3_to_mol_kg
+            boto2 = wombat%sedo2(i,j) / mmol_m3_to_mol_kg
             wombat%ffebury(i,j) = max(0.5, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
           endif
         enddo
@@ -3256,7 +3254,7 @@ module generic_WOMBATlite
           endif
         endif
         if (do_check_c_conserve) then
-            if (abs(c_pools(i,j,k,2) - c_pools(i,j,k,1))>1e-16) then
+          if (abs(c_pools(i,j,k,2) - c_pools(i,j,k,1))>1e-16) then
             print *, "--------------------------------------------"
             print *, trim(error_header) // " Ecosystem model is not conserving carbon"
             print *, "       Longitude index =", i
@@ -3281,8 +3279,9 @@ module generic_WOMBATlite
             print *, "--------------------------------------------"
             call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
           endif
-          if (do_check_fe_conserve) then
-            if (abs(fe_pools(i,j,k,2) - fe_pools(i,j,k,1))>1e-16) then
+        endif
+        if (do_check_fe_conserve) then
+          if (abs(fe_pools(i,j,k,2) - fe_pools(i,j,k,1))>1e-16) then
             print *, "--------------------------------------------"
             print *, trim(error_header) // " Ecosystem model is not conserving iron"
             print *, "       Longitude index =", i
@@ -3300,11 +3299,9 @@ module generic_WOMBATlite
             print *, " "
             print *, "--------------------------------------------"
             call mpp_error(FATAL, trim(error_header) // " Terminating run due to non-conservation of tracer")
-            endif
           endif
         endif
       endif
-
 
       enddo; enddo; enddo
     enddo !} nested timestep (ts_npzd)
