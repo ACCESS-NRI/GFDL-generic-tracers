@@ -4179,6 +4179,9 @@ module generic_WOMBATmid
                                     (wombat%phy_lfer(i,j,k) + 0.5) )
         wombat%phy_fedoreg(i,j,k) = max(0.0, (1.0 - phyfe_mmolm3/phy_maxqfe) / &
                                     abs(1.05 - phyfe_mmolm3/phy_maxqfe) )
+      else
+        wombat%phy_feupreg(i,j,k) = 1.0
+        wombat%phy_fedoreg(i,j,k) = 1.0
       endif
       ! wombat%phy_dfeupt is handled semi-implicitly. Calculate the semi-implicit rate
       ! constant to be applied in the application of the tracer tendencies (dissolved Fe
@@ -4195,6 +4198,9 @@ module generic_WOMBATmid
                                     (wombat%dia_lfer(i,j,k) + 0.5) )
         wombat%dia_fedoreg(i,j,k) = max(0.0, (1.0 - diafe_mmolm3/dia_maxqfe) / &
                                     abs(1.05 - diafe_mmolm3/dia_maxqfe) )
+      else
+        wombat%dia_feupreg(i,j,k) = 1.0
+        wombat%dia_fedoreg(i,j,k) = 1.0
       endif
       ! wombat%dia_dfeupt is handled semi-implicitly. Calculate the semi-implicit rate
       ! constant to be applied in the application of the tracer tendencies (dissolved Fe

@@ -2736,8 +2736,8 @@ module generic_WOMBATlite
         wombat%phy_fedoreg(i,j,k) = max(0.0, (1.0 - phyfe_mmolm3/phy_maxqfe) / &
                                     abs(1.05 - phyfe_mmolm3/phy_maxqfe) )
       else
-        wombat%phy_feupreg(i,j,k) = 0.0
-        wombat%phy_fedoreg(i,j,k) = 0.0
+        wombat%phy_feupreg(i,j,k) = 1.0
+        wombat%phy_fedoreg(i,j,k) = 1.0
       endif
 
       ! wombat%phy_dfeupt is handled semi-implicitly. Calculate the semi-implicit rate
