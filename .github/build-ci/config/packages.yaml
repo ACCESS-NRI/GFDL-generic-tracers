@@ -1,0 +1,4 @@
+packages:
+  fms:
+    require:
+    - '@2025.03 ~openmp precision=64'

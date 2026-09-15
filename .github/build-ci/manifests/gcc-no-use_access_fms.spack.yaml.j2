@@ -4,8 +4,4 @@ spack:
   - path: $SPACK_MANIFEST_REPOSITORY_PATH/.github/build-ci/config
   specs:
   - access-generic-tracers@git.{{ ref }} ~use_access_fms %%access_gcc
-  packages:
-    fms:
-      require:
-        - '@2025.03 ~openmp precision=64'
   view: false
