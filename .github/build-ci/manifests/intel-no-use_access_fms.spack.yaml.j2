@@ -3,5 +3,9 @@ spack:
   # Include configuration from this repository, with the environment variable defined in build-ci
   - path: $SPACK_MANIFEST_REPOSITORY_PATH/.github/build-ci/config
   specs:
-  - access-generic-tracers@git.{{ ref }} ~use_access_fms %%access_intel
+  - access-generic-tracers@git.{{ ref }} ~use_access_fms
+  packages:
+    all:
+      require:
+      - '%access_intel'
   view: false
