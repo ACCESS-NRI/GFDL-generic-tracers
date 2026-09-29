@@ -14,7 +14,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up matrix
         id: set-matrix
@@ -32,10 +32,9 @@ jobs:
       max-parallel: 3
       matrix:
         file: ${{ fromJson(needs.pre-ci.outputs.matrix) }}
-    uses: access-nri/build-ci/.github/workflows/ci.yml@v3
+    uses: access-nri/build-ci/.github/workflows/ci.yml@v4
     with:
       spack-manifest-path: ${{ matrix.file }}
-      spack-manifest-data-path: .github/build-ci/data/standard.json
       allow-ssh-into-spack-install: false  # If true, PR author must ssh into instance to complete job
-      # Default args (including explicit spack/spack-packages/spack-config versions) 
-      # are specified in https://github.com/ACCESS-NRI/build-ci/tree/v3/.github/workflows#inputs
+      # Default args (including explicit spack/spack-config versions) 
+      # are specified in https://github.com/ACCESS-NRI/build-ci/tree/v4/.github/workflows#inputs
