@@ -241,6 +241,7 @@ module generic_WOMBATlite
         ligS, &
         dfefloor, &
         detfesedfloor, &
+        ffeburymax, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -1520,9 +1521,13 @@ module generic_WOMBATlite
     call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.05)
 
     ! Set floor on the detrital iron sediment reservoir [umol/m2] in shallow (<=200m) columns.
-    ! This replaces the previous approach (taken from WOMBAT legace) of setting the bottom cell
+    ! This replaces the previous approach (taken from WOMBAT legacy) of setting the bottom cell
     ! dFe concentration to 1 nM, which led to sharp gradients and associated issues.
     call g_tracer_add_param('detfesedfloor', wombat%detfesedfloor, 30.0)
+
+    ! Set maximum fraction of detrital iron that is buried in the sediments.
+    ! Recommend between 0.XX and 0.XX to prevent unrealistic accumulation or depletion.
+    call g_tracer_add_param('ffeburymax', wombat%ffeburymax, 0.90)
 
     ! Scavenging of Fe` onto biogenic particles [(mmol/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -1953,7 +1958,7 @@ module generic_WOMBATlite
 
     ! Calculate burial of deposited detritus (Dunne et al., 2007) and deposited iron (Dale et al., 2015)
     wombat%fbury(:,:) = 0.0
-    wombat%ffebury(:,:) = 0.90 ! 90% of iron is buried when do_burial == .false. to avoid unrealistic accumulation
+    wombat%ffebury(:,:) = wombat%ffeburymax ! % iron buried when do_burial == .false. to avoid accumulation
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
@@ -1961,7 +1966,7 @@ module generic_WOMBATlite
             orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
             wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
             boto2 = wombat%sedo2(i,j) / mmol_m3_to_mol_kg
-            wombat%ffebury(i,j) = max(0.5, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
+            wombat%ffebury(i,j) = max(0.5, wombat%ffeburymax - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
           endif
         enddo
       enddo
