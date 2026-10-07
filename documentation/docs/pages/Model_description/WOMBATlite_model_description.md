@@ -257,7 +257,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `trichlc`          | Trichodesmium chlorophyll to carbon ratio [mol Chl (mol C)<sup>-1</sup>]    | 0.01               |
 | `trin2c`           | Trichodesmium nitrogen to carbon ratio [molN (mol C)<sup>-1</sup>]          | 50/300             |
 | `zooCingest`       | Zooplankton ingestion efficiency of carbon [molC/molC]                      | 0.86               |
-| `zooCassim`        | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.10               |
+| `zooCassim`        | Zooplankton assimilation efficiency of carbon [molC/molC]                   | 0.40               |
 | `zooFeingest`      | Zooplankton ingestion efficiency of iron [molFe/molFe]                      | 0.20               |
 | `zooFeassim`       | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.86               |
 | `fgutdiss`         | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
@@ -286,11 +286,13 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `ligS`             | Strong ligand background concentration [µmol/m³]                            | 0.4                |
 | `dfefloor`         | Minimum dissolved Fe concentration [µmol/m³]                                | 0.05               |
 | `detfesedfloor`    | Minimum detrital Fe sediment reservoir in shallow (≤200m) columns [µmol/m²] | 30.0               |
+| `ffeburymax`       | Maximum fraction of particulate iron permanently buried [dimensionless]     | 0.90               |
+| `ffeburymin`       | Minimum fraction of particulate iron permanently buried [dimensionless]     | 0.50               |
 | `kscav_dfe`        | Fe scavenging rate [(mmol/m³)⁻¹ s⁻¹]                                        | 0.01/86400         |
-| `kcoag_dfe`        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-6/86400         |
+| `kcoag_dfe`        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-7/86400         |
 | `kagg_col`         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | `kagg_kcol`        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
-| `bottom_thickness` | Bottom layer thickness [m]                                                  | 1.0                |
+| `bottom_thickness` | Bottom layer thickness [m]                                                  | 0.1                |
 
 ---
 
@@ -656,7 +658,7 @@ Treatment of dissolved iron (`fe_umolm3`, $dFe$, [nmol Fe kg<sup>-1</sup>]) foll
 
 _NOTE: WOMBAT-lite differs from WOMBAT-mid in that sinking authigenic pools of iron are not resolved._
 
-We first estimate the **solubility of free Fe from Fe<sup>3+</sup>** in solution using temperature, pH and salinity using the thermodynamic equilibrium equations of [Liu & Millero (2002)](https://www.sciencedirect.com/science/article/abs/pii/S0304420301000743). 
+We first estimate the **solubility of free Fe from Fe<sup>3+</sup>** in solution using temperature, pH and salinity using the thermodynamic equilibrium equations of [Liu & Millero (1999)](https://www.sciencedirect.com/science/article/pii/S0016703799002707). 
 
 $$
 \begin{align}
