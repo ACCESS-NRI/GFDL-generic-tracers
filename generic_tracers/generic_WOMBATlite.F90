@@ -1971,8 +1971,8 @@ module generic_WOMBATlite
             orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
             wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
             boto2 = wombat%sedo2(i,j) / mmol_m3_to_mol_kg
-            wombat%ffebury(i,j) = max(wombat%ffeburymin, &
-                                      wombat%ffeburymax - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
+            wombat%ffebury(i,j) = wombat%ffeburymin + (wombat%ffeburymax - wombat%ffeburymin) &
+                                  * (1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
           endif
         enddo
       enddo

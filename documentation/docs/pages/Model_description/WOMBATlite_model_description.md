@@ -731,7 +731,7 @@ _where_ <br>
 - $T_K$ is in situ water temperature (`ztemk`, [ºK]) <br>
 - $PAR$ is the total photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>]) <br>
 - pH is the in situ pH <br>
-- $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left( 1 - \min\left(L_{phy}^{N} \ , \ L_{phy}^{Fe}\right) \right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
+- $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left(1 - L_{phy}^{N}\right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
 
 After finding $Lig_{s}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
@@ -851,7 +851,7 @@ _where_ <br>
 - $H_{mix}$ is a Heaviside step function that is equalt to 1 in the mixed layer and 0.01 beneath the mixed layer (`shear`, [dimensionless]) <br>
 - $F_{coag}$ is a phytoplankton concentration dependent coagulation factor (`biof`, [dimensionless])  <br>
 - $B_{phy}^{C}$ is the concentrations of phytoplankton biomass (`phy_mmolm3`, [mmol C m<sup>-3</sup>])  <br>
-- $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left( 1 - \min\left(L_{phy}^{N} \ , \ L_{phy}^{Fe}\right) \right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
+- $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left(1 - L_{phy}^{N}\right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
 - $B_{det}^{C}$ is the concentration of organic detrital particles (`det_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $\gamma_{dFe}^{agg}$ is the colloidal iron aggregation rate constant (`kagg_col`, [s<sup>-1</sup>]) <br>
 - $K_{dFe}^{agg}$ is the half-saturation coefficient for colloidal iron aggregation (`kagg_kcol`, [µmol m<sup>-3</sup>]) <br>
@@ -1607,16 +1607,23 @@ F_{bury}^{C} =& \quad 0.013 + 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_
 \end{align}
 $$
 
-where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CaCO_3$ that is buried increases.
+_where_ <br>
+- $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. 
+
+As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CaCO_3$ that is buried increases.
 
 The burial of iron that sinks to the sediment is treated differently to organic matter. According to [Dale et al. (2015)](https://doi.org/10.1002/2014GB005017), the flux of iron from the sediments into the overlying water column is a function of oxygen and the amount of organic carbon being remineralised in the sediment, with oxic sediments having much lower fluxes than reducing, anoxic sediments. We derive instead an estimate of the fraction of iron that is permanently buried (`ffebury(i,j)`, $F_{bury}^{Fe}$, [dimensionless]) from their relationship. Specifically, the fraction of iron that rains onto the sedimment and is permanently buried is equal to:
 
 $$
 \begin{align}
-F_{bury}^{Fe} =& \quad \max \left(0.5, 1 - \tanh \left( \dfrac{f_{org}}{O_2} \right) \right)
+F_{bury}^{Fe} =& \quad F_{burymin}^{Fe} + \left(F_{burymax}^{Fe} - F_{burymin}^{Fe} \right) \left(1 - \tanh \left( \dfrac{f_{org}}{O_2} \right) \right)
 \end{align}
 $$
 
-where $O_2$ is the oxygen content of the overlying water column (`boto2`, [mmol m<sup>-3</sup>]). Furthermore, we set a minimum burial fraction of 50% of the total iron hitting sediments even in anoxic conditions to account for the formation of iron sulphides ([Wijsman, Middelburg & Help, 2001](https://doi.org/10.1016/S0025-3227(00)00122-5)).
+_where_ <br>
+- $O_2$ is the oxygen content of the overlying water column (`boto2`, [mmol m<sup>-3</sup>]). <br>
+- $F_{burymin}^{Fe}$ and $F_{burymax}^{Fe}$ are the minimum and maximum fraction of particulate iron that is permanently buried in sediments (`ffeburymin`, `ffeburymax`, [dimensionless]).
+
+We suggest a minimum burial fraction of 50% of the total iron hitting sediments even in anoxic conditions to account for the formation of iron sulphides ([Wijsman, Middelburg & Help, 2001](https://doi.org/10.1016/S0025-3227(00)00122-5)).
 
 ---
