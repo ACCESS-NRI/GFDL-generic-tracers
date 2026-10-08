@@ -334,6 +334,8 @@ module generic_WOMBATfull
         ligS, &
         dfefloor, &
         detfesedfloor, &
+        ffeburymax, &
+        ffeburymin, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -3198,6 +3200,14 @@ module generic_WOMBATfull
     ! dFe concentration to 1 nM, which led to sharp gradients and associated issues.
     call g_tracer_add_param('detfesedfloor', wombat%detfesedfloor, 30.0)
 
+    ! Set minimum fraction of detrital iron that is buried in the sediments.
+    ! Recommend between 0.40 and 0.60 to prevent unrealistic accumulation or depletion.
+    call g_tracer_add_param('ffeburymin', wombat%ffeburymin, 0.50)
+
+    ! Set maximum fraction of detrital iron that is buried in the sediments.
+    ! Recommend between 0.70 and 0.90 to prevent unrealistic accumulation or depletion.
+    call g_tracer_add_param('ffeburymax', wombat%ffeburymax, 0.90)
+
     ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
     ! Ye et al., 2011 (Biogeosciences) find scavenging rates of 30 - 750
@@ -4130,7 +4140,7 @@ module generic_WOMBATfull
 
     ! Calculate burial of deposited detritus (Dunne et al., 2007)
     wombat%fbury(:,:) = 0.0
-    wombat%ffebury(:,:) = wombat%ffeburymax ! 90% of iron is buried when do_burial == .false. to avoid unrealistic accumulation
+    wombat%ffebury(:,:) = wombat%ffeburymax ! % iron buried when do_burial == .false. to avoid accumulation
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec

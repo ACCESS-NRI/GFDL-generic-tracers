@@ -309,6 +309,8 @@ module generic_WOMBATmid
         ligS, &
         dfefloor, &
         detfesedfloor, &
+        ffeburymax, &
+        ffeburymin, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -2418,6 +2420,14 @@ module generic_WOMBATmid
     ! This replaces the previous approach (taken from WOMBAT legace) of setting the bottom cell
     ! dFe concentration to 1 nM, which led to sharp gradients and associated issues.
     call g_tracer_add_param('detfesedfloor', wombat%detfesedfloor, 30.0)
+
+    ! Set minimum fraction of detrital iron that is buried in the sediments.
+    ! Recommend between 0.40 and 0.60 to prevent unrealistic accumulation or depletion.
+    call g_tracer_add_param('ffeburymin', wombat%ffeburymin, 0.50)
+
+    ! Set maximum fraction of detrital iron that is buried in the sediments.
+    ! Recommend between 0.70 and 0.90 to prevent unrealistic accumulation or depletion.
+    call g_tracer_add_param('ffeburymax', wombat%ffeburymax, 0.90)
 
     ! Scavenging of Fe` onto biogenic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
