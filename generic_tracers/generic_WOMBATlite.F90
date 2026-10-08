@@ -241,6 +241,8 @@ module generic_WOMBATlite
         ligS, &
         dfefloor, &
         detfesedfloor, &
+        ffeburymin, &
+        ffeburymax, &
         kscav_dfe, &
         kcoag_dfe, &
         kagg_col, &
@@ -1520,9 +1522,17 @@ module generic_WOMBATlite
     call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.05)
 
     ! Set floor on the detrital iron sediment reservoir [umol/m2] in shallow (<=200m) columns.
-    ! This replaces the previous approach (taken from WOMBAT legace) of setting the bottom cell
+    ! This replaces the previous approach (taken from WOMBAT legacy) of setting the bottom cell
     ! dFe concentration to 1 nM, which led to sharp gradients and associated issues.
     call g_tracer_add_param('detfesedfloor', wombat%detfesedfloor, 30.0)
+
+    ! Set minimum fraction of detrital iron that is buried in the sediments.
+    ! Recommend between 0.40 and 0.60 to prevent unrealistic accumulation or depletion.
+    call g_tracer_add_param('ffeburymin', wombat%ffeburymin, 0.50)
+
+    ! Set maximum fraction of detrital iron that is buried in the sediments.
+    ! Recommend between 0.70 and 0.90 to prevent unrealistic accumulation or depletion.
+    call g_tracer_add_param('ffeburymax', wombat%ffeburymax, 0.90)
 
     ! Scavenging of Fe` onto biogenic particles [(mmol/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -1540,12 +1550,12 @@ module generic_WOMBATlite
     ! Colloigal coagulation rates are the principal way to remove dFe at high
     ! concentrations. Effectively, when `do_colloidal_shunt == .true.`, the
     ! `kcoag_dfe` parameter sets the maximum dFe concentration via:
-    !    [dFe remaining in solution] = dFe_sources / kcoag_dfe
-    !  1e-5 ---> coagulation at roughly 0.1 per day in productive surface waters
-    !            and 1/1000 per day in deep ocean
-    !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
-    !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-6/86400.0)
+    !    [colloidal dFe remaining at equilibrium] = dFe_sources / coagulation_rate
+    !  At typical conditions of the deep ocean, colloidal dFe will be:
+    !  [colloidal dFe] = 2.18 nM at kcoag_dfe = 1e-8 / 86400.0
+    !  [colloidal dFe] = 0.21 nM at kcoag_dfe = 1e-7 / 86400.0
+    !  [colloidal dFe] = 0.021 nM at kcoag_dfe = 1e-6 / 86400.0
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1.0e-7/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
@@ -1953,7 +1963,7 @@ module generic_WOMBATlite
 
     ! Calculate burial of deposited detritus (Dunne et al., 2007) and deposited iron (Dale et al., 2015)
     wombat%fbury(:,:) = 0.0
-    wombat%ffebury(:,:) = 0.90 ! 90% of iron is buried when do_burial == .false. to avoid unrealistic accumulation
+    wombat%ffebury(:,:) = wombat%ffeburymax ! % iron buried when do_burial == .false. to avoid accumulation
     if (do_burial) then
       do i = isc, iec
         do j = jsc, jec
@@ -1961,7 +1971,8 @@ module generic_WOMBATlite
             orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
             wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
             boto2 = wombat%sedo2(i,j) / mmol_m3_to_mol_kg
-            wombat%ffebury(i,j) = max(0.5, 1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
+            wombat%ffebury(i,j) = wombat%ffeburymin + (wombat%ffeburymax - wombat%ffeburymin) &
+                                  * (1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
           endif
         enddo
       enddo
@@ -2758,7 +2769,7 @@ module generic_WOMBATlite
       !-----------------------------------------------------------------------!
 
       ! Estimate solubility of Fe3+ (free Fe) in solution using temperature,
-      ! pH and salinity using the equations of Liu & Millero (2002)
+      ! pH and salinity using the equations of Liu & Millero (1999)
       ztemk = max(5.0, Temp(i,j,k)) + 273.15    ! temperature in kelvin
       I_ztemk = 1.0 / ztemk
       zval = 19.924 * Salt(i,j,k) / ( 1000. - 1.005 * Salt(i,j,k))
@@ -2793,7 +2804,7 @@ module generic_WOMBATlite
       ! comes from Ye et al. (2020) and increases binding strength at lower pH and higher
       ! concentrations of DOC.
       fe_sfe = max(0.0, fe_umolm3 - wombat%fecol(i,j,k))
-      biodoc = 40.0 + (1.0 - min(wombat%phy_lnit(i,j,k), wombat%phy_lfer(i,j,k))) * 40.0 ! proxy of DOC (mmol/m3)
+      biodoc = 40.0 + (1.0 - wombat%phy_lnit(i,j,k)) * 40.0 ! proxy of DOC (mmol/m3)
       wombat%ligK(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
                                   - 0.7 * wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) ) &
                                   + 10.0**( (-2e-4*biodoc + 0.034)*biodoc  - 1.67*(-log10(hp)) + 24.36 ) )
