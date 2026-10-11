@@ -550,6 +550,8 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
 | `dfefloor`         | Minimum open water concentration of dissolved iron (detection limit)        | 0.025         | µmol Fe m<sup>-3</sup>                                               |
 | `detfesedfloor`    | Minimum detrital iron sediment reservoir in shallow (≤200m) columns         | 30.0          | µmol Fe m<sup>-2</sup>                                               |
+| `ffeburymax`       | Maximum fraction of particulate iron permanently buried                     | 0.90          | dimensionless                                                        |
+| `ffeburymin`       | Minimum fraction of particulate iron permanently buried                     | 0.50          | dimensionless                                                        |
 | `kscav_dfe`        | Free dissolved iron scavenging rate                                         | 0.01/86400.0  | (mmol mass of particle m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>   |
 | `kcoag_dfe`        | Colloidal dissolved iron coagulation rate                                   | 1e-5/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `kagg_col`         | Colloidal dissolved iron aggregation rate                                   | 0.1/86400.0   | s<sup>-1</sup>                                                       |
