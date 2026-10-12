@@ -446,6 +446,8 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `ligS`             | Strong ligand concentration                                                 | 0.4           | µmol m<sup>-3</sup>                                                  |
 | `dfefloor`         | Minimum open water concentration of dissolved iron (detection limit)        | 0.025         | µmol Fe m<sup>-3</sup>                                               |
 | `detfesedfloor`    | Minimum detrital iron sediment reservoir in shallow (≤200m) columns         | 30.0          | µmol Fe m<sup>-2</sup>                                               |
+| `ffeburymax`       | Maximum fraction of particulate iron permanently buried                     | 0.90          | dimensionless                                                        |
+| `ffeburymin`       | Minimum fraction of particulate iron permanently buried                     | 0.50          | dimensionless                                                        |
 | `kscav_dfe`        | Free dissolved iron scavenging rate                                         | 0.01/86400.0  | (mmol mass of particle m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>   |
 | `kcoag_dfe`        | Colloidal dissolved iron coagulation rate                                   | 1e-5/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
 | `kagg_col`         | Colloidal dissolved iron aggregation rate                                   | 0.1/86400.0   | s<sup>-1</sup>                                                       |
@@ -2724,11 +2726,15 @@ The burial of iron that sinks to the sediment is treated differently to organic 
 
 $$
 \begin{align}
-F_{bury}^{Fe} =& \quad \max \left(0.5, 1 - \tanh \left( \dfrac{f_{org}}{O_2} \right) \right)
+F_{bury}^{Fe} =& \quad F_{burymin}^{Fe} + \left(F_{burymax}^{Fe} - F_{burymin}^{Fe} \right) \left(1 - \tanh \left( \dfrac{f_{org}}{O_2} \right) \right)
 \end{align}
 $$
 
-where $O_2$ is the oxygen content of the overlying water column (`boto2`, [mmol m<sup>-3</sup>]). Furthermore, we set a minimum burial fraction of 50% of the total iron hitting sediments even in anoxic conditions to account for the formation of iron sulphides ([Wijsman, Middelburg & Help, 2001](https://doi.org/10.1016/S0025-3227(00)00122-5)).
+_where_ <br>
+- $O_2$ is the oxygen content of the overlying water column (`boto2`, [mmol m<sup>-3</sup>]). <br>
+- $F_{burymin}^{Fe}$ and $F_{burymax}^{Fe}$ are the minimum and maximum fraction of particulate iron that is permanently buried in sediments (`ffeburymin`, `ffeburymax`, [dimensionless]).
+
+We suggest a minimum burial fraction of 50% of the total iron hitting sediments even in anoxic conditions to account for the formation of iron sulphides ([Wijsman, Middelburg & Help, 2001](https://doi.org/10.1016/S0025-3227(00)00122-5)).
 
 ### Permanent burial of authigenic iron.
 
