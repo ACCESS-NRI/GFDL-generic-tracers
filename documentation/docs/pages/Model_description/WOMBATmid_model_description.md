@@ -363,7 +363,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `phymaxqf`         | Max Fe:C (nano-phytoplankton)                                               | 50e-6         | mol Fe (mol C)<sup>-1</sup>                                          |
 | `phylmor`          | Linear mortality rate (nano-phytoplankton)                                  | 0.0025/86400.0 | s<sup>-1</sup>                                                       |
 | `phyqmor`          | Quadratic mortality rate (nano-phytoplankton)                               | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `phybiot`          | Biomass threshold (nano-phytoplankton)                                      | 1.0           | mmol C m<sup>-3</sup>                                                |
+| `phybiot`          | Biomass threshold (nano-phytoplankton)                                      | 0.6           | mmol C m<sup>-3</sup>                                                |
 | `alphabio_dia`     | Initial slope of P–I curve (micro-phytoplankton)                            | 3.0           | mol C (mol Chl)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>         |
 | `abioa_dia`        | Max growth rate parameter a (micro-phytoplankton)                           | 1.4/86400.0   | s<sup>-1</sup>                                                       |
 | `bbioa_dia`        | Max growth rate parameter b (micro-phytoplankton) (Q10 = b^(10))            | 1.060         | dimensionless                                                        |
@@ -381,7 +381,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `diaVmaxs`         | Max Si uptake (micro-phytoplankton)                                         | 0.14/86400.0   | mol Si (mol C)<sup>-1</sup> s<sup>-1</sup>                           |
 | `dialmor`          | Linear mortality rate (micro-phytoplankton)                                 | 0.0025/86400.0 | s<sup>-1</sup>                                                       |
 | `diaqmor`          | Quadratic mortality rate (micro-phytoplankton)                              | 0.05/86400.0  | (mmol C m<sup>-3</sup>)<sup>-1</sup> s<sup>-1</sup>                  |
-| `diabiot`          | Biomass threshold (micro-phytoplankton)                                     | 0.5           | mmol C m<sup>-3</sup>                                                |
+| `diabiot`          | Biomass threshold (micro-phytoplankton)                                     | 0.6           | mmol C m<sup>-3</sup>                                                |
 | `alphabio_tri`     | Initial slope of P–I curve (trichodesmium)                                  | 1.0           | mol C (mol Chl)<sup>-1</sup> (W m<sup>-2</sup>)<sup>-1</sup>         |
 | `trikf`            | Fe half-saturation coefficient (trichodesmium)                              | 0.125         | µmol Fe m<sup>-3</sup>                                               |
 | `trichlc`          | Chl:C (trichodesmium)                                                       | 0.01          | mol Chl (mol C)<sup>-1</sup>                                         |
@@ -409,7 +409,7 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `mesFeingest`      | Meso-zooplankton Fe ingestion                                               | 0.21          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `mesFeassim`       | Meso-zooplankton Fe assimilation                                            | 0.65          | mol Fe (mol Fe)<sup>-1</sup>                                         |
 | `mesexcrdom`       | Meso-zooplankton excretion fraction routed to DOM                           | 0.12          | dimensionless                                                        |
-| `mesgmax`          | Meso-zooplankton maximum grazing rate                                       | 0.175/86400.0  | s<sup>-1</sup>                                                       |
+| `mesgmax`          | Meso-zooplankton maximum grazing rate                                       | 0.80/86400.0   | s<sup>-1</sup>                                                       |
 | `mesepsphy`        | Meso-zooplankton prey capture efficiency (nano-phytoplankton)               | 0.175/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepsdia`        | Meso-zooplankton prey capture efficiency (micro-phytoplankton)              | 0.175/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
 | `mesepssdet`       | Meso-zooplankton prey capture efficiency (small detritus)                   | 0.175/86400.0  | m<sup>6</sup> mmol<sup>-2</sup> s<sup>-1</sup>                       |
