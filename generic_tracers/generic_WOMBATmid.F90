@@ -1995,16 +1995,16 @@ module generic_WOMBATmid
 
     ! Initial slope of P-I curve for phytoplankton [mol Chl (mol C)-1 (W m-2)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('alphabio_phy', wombat%alphabio_phy, 1.5)
+    call g_tracer_add_param('alphabio_phy', wombat%alphabio_phy, 3.50)
 
     ! Autotrophy maximum growth rate parameter a for phytoplankton [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('abioa_phy', wombat%abioa_phy, 0.7/86400.0)
+    call g_tracer_add_param('abioa_phy', wombat%abioa_phy, 1.25/86400.0)
 
     ! Autotrophy maximum growth rate parameter b for phytoplankton [dimensionless]
     ! Q10 = b^(10)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bbioa_phy', wombat%bbioa_phy, 1.055)
+    call g_tracer_add_param('bbioa_phy', wombat%bbioa_phy, 1.050)
 
     ! Initial slope of P-I curve for microphytoplankton [mol Chl (mol C)-1 (W m-2)-1]
     ! "When diatoms are compared to other groups of phytoplankton, they tend to differ
@@ -2012,21 +2012,21 @@ module generic_WOMBATmid
     !  [quote from Litchman (2022): Trait-based diatom ecology, in "The Molecular Life of Diatoms"]
     !  [Edwards et al. 2015 Limnol Oceanogr 60:540–552]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('alphabio_dia', wombat%alphabio_dia, 2.5)
+    call g_tracer_add_param('alphabio_dia', wombat%alphabio_dia, 3.0)
 
     ! Initial slope of P-I curve for trichodesmium [mol Chl (mol C)-1 (W m-2)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('alphabio_tri', wombat%alphabio_tri, 1.8)
+    call g_tracer_add_param('alphabio_tri', wombat%alphabio_tri, 1.0)
 
     ! Autotrophy maximum growth rate parameter a for microphytoplankton [s-1]
     ! [Anderson et al., 2021 Nat Communications]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('abioa_dia', wombat%abioa_dia, 1.0/86400.0)
+    call g_tracer_add_param('abioa_dia', wombat%abioa_dia, 1.40/86400.0)
 
     ! Autotrophy maximum growth rate parameter b for microphytoplankton [dimensionless]
     ! Q10 = b^(10)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bbioa_dia', wombat%bbioa_dia, 1.070)
+    call g_tracer_add_param('bbioa_dia', wombat%bbioa_dia, 1.060)
 
     ! Heterotrophy maximum growth rate parameter b [dimensionless]
     ! Q10 = b^(10)
@@ -2035,11 +2035,11 @@ module generic_WOMBATmid
 
     ! Phytoplankton half saturation constant for nitrogen uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phykn', wombat%phykn, 1.0)
+    call g_tracer_add_param('phykn', wombat%phykn, 1.5)
 
     ! Phytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phykf', wombat%phykf, 1.0)
+    call g_tracer_add_param('phykf', wombat%phykf, 0.7)
 
     ! Nano-phytoplankton preference for ammonium over nitrate [dimensionless]
     !-----------------------------------------------------------------------
@@ -2047,11 +2047,11 @@ module generic_WOMBATmid
 
     ! Phytoplankton minimum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.008)
+    call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.004)
 
     ! Phytoplankton maximum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.065)
+    call g_tracer_add_param('phymaxqc', wombat%phymaxqc, 0.025)
 
     ! Phytoplankton optimal quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
@@ -2063,7 +2063,7 @@ module generic_WOMBATmid
 
     ! Phytoplankton linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phylmor', wombat%phylmor, 0.001/86400.0)
+    call g_tracer_add_param('phylmor', wombat%phylmor, 0.0025/86400.0)
 
     ! Phytoplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -2071,18 +2071,18 @@ module generic_WOMBATmid
 
     ! microphytoplankton half saturation constant for nitrogen uptake [mmolN/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diakn', wombat%diakn, 2.4)
+    call g_tracer_add_param('diakn', wombat%diakn, 2.7)
 
     ! microphytoplankton half saturation constant for iron uptake [umolFe/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diakf', wombat%diakf, 2.7)
+    call g_tracer_add_param('diakf', wombat%diakf, 1.0)
 
     ! microphytoplankton half saturation constant for silicic acid uptake [mmolSi/m3]
     !-----------------------------------------------------------------------
     !  - minimal Ks in natural assemblages of 0.5 - 0.9 mmolSi/m3
     !    [Nelson & Brzezinski, 1990, Marine Ecology Progress Series, 62, 283-292]
     !  - We set 5.0 here as default due to recalculation of variable Ksi below
-    call g_tracer_add_param('diaks', wombat%diaks, 6.7)
+    call g_tracer_add_param('diaks', wombat%diaks, 6.6)
 
     ! Micro-phytoplankton preference for ammonium over nitrate [dimensionless]
     !-----------------------------------------------------------------------
@@ -2094,7 +2094,7 @@ module generic_WOMBATmid
 
     ! microphytoplankton maximum quota of chlorophyll to carbon [mol Chl (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diamaxqc', wombat%diamaxqc, 0.060)
+    call g_tracer_add_param('diamaxqc', wombat%diamaxqc, 0.045)
 
     ! microphytoplankton optimal quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
@@ -2102,7 +2102,7 @@ module generic_WOMBATmid
 
     ! microphytoplankton maximum quota of iron to carbon [mol Fe (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diamaxqf', wombat%diamaxqf, 65e-6)
+    call g_tracer_add_param('diamaxqf', wombat%diamaxqf, 50e-6)
 
     ! microphytoplankton minimal quota of silicon to carbon to build a valve [mol Si (mol C)-1]
     !   Brzezinksi (1985) J. Phycology, 21, 347-357
@@ -2117,7 +2117,7 @@ module generic_WOMBATmid
     ! microphytoplankton maximum quota of silicon to carbon [mol Si (mol C)-1]
     !  Brzezinski et al., (2003) Deep-Sea Research II, 50, 619-633
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diamaxqs', wombat%diamaxqs, 0.60)
+    call g_tracer_add_param('diamaxqs', wombat%diamaxqs, 0.42)
 
     ! microphytoplankton maximum uptake rate of silicon to carbon [mol Si (mol C)-1 s-1]
     !  1.2 - 950 fmol Si cell h-1 [Kolbe & Brunner 2022, in "Molecular Life of Diatoms"]
@@ -2125,11 +2125,11 @@ module generic_WOMBATmid
     !  for a 100 pg C cell (8.3 pmol), this maps to roughly 0.0012 - 0.012 mol Si/mol C h-1
     !  which is roughly 0.03 to 0.3 mol Si/mol C day-1
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diaVmaxs', wombat%diaVmaxs, 0.1/86400.0)
+    call g_tracer_add_param('diaVmaxs', wombat%diaVmaxs, 0.14/86400.0)
 
     ! microphytoplankton linear mortality rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dialmor', wombat%dialmor, 0.001/86400.0)
+    call g_tracer_add_param('dialmor', wombat%dialmor, 0.0025/86400.0)
 
     ! microphytoplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -2157,45 +2157,45 @@ module generic_WOMBATmid
 
     ! Zooplankton carbon bulk ingestion efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCingest', wombat%zooCingest, 0.70)
+    call g_tracer_add_param('zooCingest', wombat%zooCingest, 0.95)
 
     ! Zooplankton carbon assimilation efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.40)
+    call g_tracer_add_param('zooCassim', wombat%zooCassim, 0.45)
 
     ! Zooplankton iron bulk ingestion efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooFeingest', wombat%zooFeingest, 0.06)
+    call g_tracer_add_param('zooFeingest', wombat%zooFeingest, 0.20)
 
     ! Zooplankton iron assimilation efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.60)
+    call g_tracer_add_param('zooFeassim', wombat%zooFeassim, 0.82)
 
     ! Zooplankton fraction of excretion to DOC [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooexcrdom', wombat%zooexcrdom, 0.70)
+    call g_tracer_add_param('zooexcrdom', wombat%zooexcrdom, 0.35)
 
     ! Zooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoogmax', wombat%zoogmax, 3.3/86400.0)
+    call g_tracer_add_param('zoogmax', wombat%zoogmax, 2.5/86400.0)
 
     ! Zooplankton prey capture rate constant for nanophytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., ciliates feeding on small (nano/pico)phytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.40/86400.0)
+    call g_tracer_add_param('zooepsphy', wombat%zooepsphy, 0.20/86400.0)
 
     ! Zooplankton prey capture rate constant for microphytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., larger ciliates feeding on smaller diatoms and other microphytoplankton
     !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepsdia', wombat%zooepsdia, 0.40/86400.0)
+    call g_tracer_add_param('zooepsdia', wombat%zooepsdia, 0.20/86400.0)
 
     ! Zooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., protozoa grazing on slowly sinking detrital particles
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zooepssdet', wombat%zooepssdet, 0.40/86400.0)
+    call g_tracer_add_param('zooepssdet', wombat%zooepssdet, 0.20/86400.0)
 
     ! Zooplankton preference for nano-phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
@@ -2203,7 +2203,7 @@ module generic_WOMBATmid
 
     ! Zooplankton preference for microphytoplankton [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zprefdia', wombat%zprefdia, 0.25)
+    call g_tracer_add_param('zprefdia', wombat%zprefdia, 0.70)
 
     ! Zooplankton preference for small detritus [dimensionless]
     !-----------------------------------------------------------------------
@@ -2211,7 +2211,7 @@ module generic_WOMBATmid
 
     ! Zooplankton respiration rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoolmor', wombat%zoolmor, 0.002/86400.0)
+    call g_tracer_add_param('zoolmor', wombat%zoolmor, 0.02/86400.0)
 
     ! Zooplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -2219,23 +2219,23 @@ module generic_WOMBATmid
 
     ! Mesozooplankton carbon bulk ingestion efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesCingest', wombat%mesCingest, 0.75)
+    call g_tracer_add_param('mesCingest', wombat%mesCingest, 0.85)
 
     ! Mesozooplankton carbon assimilation efficiency [mol C (mol C)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesCassim', wombat%mesCassim, 0.50)
+    call g_tracer_add_param('mesCassim', wombat%mesCassim, 0.575)
 
     ! Mesozooplankton iron bulk ingestion efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesFeingest', wombat%mesFeingest, 0.43)
+    call g_tracer_add_param('mesFeingest', wombat%mesFeingest, 0.21)
 
     ! Mesozooplankton iron assimilation efficiency [mol Fe (mol Fe)-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesFeassim', wombat%mesFeassim, 0.75)
+    call g_tracer_add_param('mesFeassim', wombat%mesFeassim, 0.65)
 
     ! Mesozooplankton fraction of excretion to DOC [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesexcrdom', wombat%mesexcrdom, 0.35)
+    call g_tracer_add_param('mesexcrdom', wombat%mesexcrdom, 0.12)
 
     ! Zooplankton dissolution efficiency of CaCO3 within guts [dimensionless]
     !-----------------------------------------------------------------------
@@ -2243,41 +2243,41 @@ module generic_WOMBATmid
 
     ! Mesozooplankton maximum grazing rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesgmax', wombat%mesgmax, 0.30/86400.0)
+    call g_tracer_add_param('mesgmax', wombat%mesgmax, 0.80/86400.0)
 
     ! Mesozooplankton prey capture rate constant for nanophytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on small phytoplankton
     !  - aim for half-saturation coefficent B1/2 = 3.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsphy', wombat%mesepsphy, 0.11/86400.0)
+    call g_tracer_add_param('mesepsphy', wombat%mesepsphy, 0.175/86400.0)
 
     ! Mesozooplankton prey capture rate constant for microphytoplankton [(mmol C m-3)-2 s-1]
     !  - e.g., copepods preying on diatoms and other microphytoplankton
     !  - aim for half-saturation coefficent B1/2 = 2.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.20/86400.0)
+    call g_tracer_add_param('mesepsdia', wombat%mesepsdia, 0.175/86400.0)
 
     ! Mesozooplankton prey capture rate constant for small detritus [(mmol C m-3)-2 s-1]
     !  - e.g., appendicularians filter feeding on fine detritus
     !  - aim for half-saturation coefficent B1/2 = 3.5 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepssdet', wombat%mesepssdet, 0.05/86400.0)
+    call g_tracer_add_param('mesepssdet', wombat%mesepssdet, 0.175/86400.0)
 
     ! Mesozooplankton prey capture rate constant for large detritus [(mmol C m-3)-2 s-1]
     !  - e.g., copepods consuming sinking aggregates of marine snow
     !  - aim for half-saturation coefficent B1/2 = 10.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepsldet', wombat%mesepsldet, 0.10/86400.0)
+    call g_tracer_add_param('mesepsldet', wombat%mesepsldet, 0.175/86400.0)
 
     ! Mesozooplankton prey capture rate constant for microzooplankton [(mmol C m-3)-2 s-1]
     !  - e.g., chaetognaths preying on copepods; copepods consuming ciliates
     !  - aim for half-saturation coefficent B1/2 = 5.0 mmolC/m3, where B1/2 = (gmax/eps)^(0.5)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.10/86400.0)
+    call g_tracer_add_param('mesepszoo', wombat%mesepszoo, 0.175/86400.0)
 
     ! Mesozooplankton preference for phytoplankton [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.5)
+    call g_tracer_add_param('mprefphy', wombat%mprefphy, 0.1)
 
     ! Mesozooplankton preference for microphytoplankton [dimensionless]
     !-----------------------------------------------------------------------
@@ -2297,33 +2297,33 @@ module generic_WOMBATmid
 
     ! Mesozooplankton respiration rate constant [s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('meslmor', wombat%meslmor, 0.002/86400.0)
+    call g_tracer_add_param('meslmor', wombat%meslmor, 0.001/86400.0)
 
     ! Mesozooplankton quadratic mortality rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesqmor', wombat%mesqmor, 0.75/86400.0)
+    call g_tracer_add_param('mesqmor', wombat%mesqmor, 0.25/86400.0)
 
     ! Prey switching exponent for microzooplantkon [van Leeuwen et al. (2013), J. Theor. Biol.]
     ! when <1, more even feeding across prey items
     ! when =1, grazing proportional to prey biomasses
     ! when >1, overweighting abundant prey and downweighting scarce prey
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoopreyswitch', wombat%zoopreyswitch, 1.8)
+    call g_tracer_add_param('zoopreyswitch', wombat%zoopreyswitch, 2.0)
 
     ! Prey switching exponent for mesozooplantkon [van Leeuwen et al. (2013), J. Theor. Biol.]
     ! when <1, more even feeding across prey items
     ! when =1, grazing proportional to prey biomasses
     ! when >1, overweighting abundant prey and downweighting scarce prey
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mespreyswitch', wombat%mespreyswitch, 1.8)
+    call g_tracer_add_param('mespreyswitch', wombat%mespreyswitch, 2.0)
 
     ! Detritus hydrolyzation rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('detqrem', wombat%detqrem, 0.7/86400.0)
+    call g_tracer_add_param('detqrem', wombat%detqrem, 1.0/86400.0)
 
     ! Dissolved organic matter remineralisation rate constant [(mmol C m-3)-1 s-1]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('docqrem', wombat%docqrem, 0.2/86400.0)
+    call g_tracer_add_param('docqrem', wombat%docqrem, 0.01/86400.0)
 
     ! Detritus hydrolyzation rate constant in sediments [s-1]
     !-----------------------------------------------------------------------
@@ -2331,36 +2331,36 @@ module generic_WOMBATmid
 
     ! Porosity of sinking small detritus [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('sdetphi', wombat%sdetphi, 0.25)
+    call g_tracer_add_param('sdetphi', wombat%sdetphi, 0.10)
 
     ! Porosity of sinking large aggregated detritus [dimensionless]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ldetphi', wombat%ldetphi, 0.75)
+    call g_tracer_add_param('ldetphi', wombat%ldetphi, 0.95)
 
     ! Base radius of nanophytoplankton [µm]
     !  2–20 µm in diameter
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phyrad0', wombat%phyrad0, 10.0)
+    call g_tracer_add_param('phyrad0', wombat%phyrad0, 15.0)
 
     ! Base radius of microphytoplankton [µm]
     !  20–200 µm in diameter
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diarad0', wombat%diarad0, 50.0)
+    call g_tracer_add_param('diarad0', wombat%diarad0, 100.0)
 
     ! Base radius of microzooplankton [µm]
     !  takes into account fecal pellets / waste produced
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('zoorad0', wombat%zoorad0, 30.0)
+    call g_tracer_add_param('zoorad0', wombat%zoorad0, 32.0)
 
     ! Base radius of mesoozooplankton [µm]
     !  takes into account fecal pellets / waste produced
     !  [Hatton et al. 2021 Sci Adv - near 1mm]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('mesrad0', wombat%mesrad0, 1000.0)
+    call g_tracer_add_param('mesrad0', wombat%mesrad0, 650.0)
 
     ! Density of organic detritus [kg/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('detrho', wombat%detrho, 1375.0)
+    call g_tracer_add_param('detrho', wombat%detrho, 1250.0)
 
     ! Density of calcium carbonate [kg/m3]
     !-----------------------------------------------------------------------
@@ -2372,11 +2372,11 @@ module generic_WOMBATmid
 
     ! Phytoplankton biomass threshold to scale recycling [mmolC/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('phybiot', wombat%phybiot, 1.0)
+    call g_tracer_add_param('phybiot', wombat%phybiot, 0.6)
 
     ! Microphytoplankton biomass threshold to scale recycling [mmolC/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('diabiot', wombat%diabiot, 0.5)
+    call g_tracer_add_param('diabiot', wombat%diabiot, 0.6)
 
     ! CaCO3 dissolution rate constant (base rate) [s-1]
     !-----------------------------------------------------------------------
@@ -2392,29 +2392,29 @@ module generic_WOMBATmid
 
     ! CaCO3 dissolution factor due to calcite undersaturation (s-1)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('disscal', wombat%disscal, 0.10/86400.0)
+    call g_tracer_add_param('disscal', wombat%disscal, 0.35/86400.0)
 
     ! CaCO3 dissolution factor due to aragonite undersaturation (s-1)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dissara', wombat%dissara, 0.10/86400.0)
+    call g_tracer_add_param('dissara', wombat%dissara, 0.02/86400.0)
 
     ! CaCO3 dissolution factor due to detritus remineralisation creating
     !  anoxic microenvironment (mol C in CaCO3 per mol C remineralised)
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dissdet', wombat%dissdet, 0.20)
+    call g_tracer_add_param('dissdet', wombat%dissdet, 0.41)
 
     ! Background concentration of weak iron-binding ligand [µmol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ligW', wombat%ligW, 1.7)
+    call g_tracer_add_param('ligW', wombat%ligW, 2.0)
 
     ! Background concentration of strong iron-binding ligand [µmol/m3]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('ligS', wombat%ligS, 0.4)
+    call g_tracer_add_param('ligS', wombat%ligS, 0.7)
 
     ! Set floor for dissolved iron concentration based on the measurement detection limit [µmol/m3]
     ! Worsford et al., 2014 Mar. Chem. says anywhere between 10 - 50 pM
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.025)
+    call g_tracer_add_param('dfefloor', wombat%dfefloor, 0.040)
 
     ! Set floor on the detrital iron sediment reservoir [umol/m2] in shallow (<=200m) columns.
     ! This replaces the previous approach (taken from WOMBAT legace) of setting the bottom cell
@@ -2438,7 +2438,7 @@ module generic_WOMBATmid
     ! that roughly 40,000 mmol C kg-1), this translates to scavenging rates
     ! of 0.001 to 0.02 (mmol mass particles / m3)-1 day-1.
     ! NOTE that scavenging becomes less important when colloids dominate.
-    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.01/86400.0)
+    call g_tracer_add_param('kscav_dfe', wombat%kscav_dfe, 0.03/86400.0)
 
     ! Coagulation of dFe onto organic particles [(mmolC/m3)-1 s-1]
     !-----------------------------------------------------------------------
@@ -2450,7 +2450,7 @@ module generic_WOMBATmid
     !            and 1/1000 per day in deep ocean
     !  1e-6 ---> coagulation at roughly 0.01 per day in productive surface waters
     !            and 1/10000 per day in deep ocean
-    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 1e-5/86400.0)
+    call g_tracer_add_param('kcoag_dfe', wombat%kcoag_dfe, 3.0e-7/86400.0)
 
     ! Rate of aggregation of colloidal iron into authigenic Fe particles [s-1]
     !-----------------------------------------------------------------------
@@ -2474,13 +2474,13 @@ module generic_WOMBATmid
 
     ! Sinking speed of large authigenic iron (oxyhydroxide) [m/s]
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('wlafe', wombat%wlafe, 5.0/86400.0)
+    call g_tracer_add_param('wlafe', wombat%wlafe, 6.0/86400.0)
 
     ! Intercept of temperature-dependency of biogenic silica dissolution [Kamatani 1982 Marine Biology]
     !  According to Kamatani (1982), this intercept varies between -7.35 to -10.38 depending on
     !  the diatom species and possibly the degree roughness and biological film strength
     !-----------------------------------------------------------------------
-    call g_tracer_add_param('bsi_alpha', wombat%bsi_alpha, -10.0)
+    call g_tracer_add_param('bsi_alpha', wombat%bsi_alpha, -8.4)
 
     ! Factor increase in biogenic silica dissolution caused by bacterial activity [dimensionless]
     !  Bidle & Azam (1999) found 10x increase in dissolution with bacterial activity
