@@ -243,6 +243,9 @@ module generic_WOMBATlite
         caco3lrem_sed, &
         omegamax_sed, &
         caco3rem_sedexp, &
+        detsedimentmax, &
+        detfesedimentmax, &
+        caco3sedimentmax, &
         seddenitmax, &
         f_inorg, &
         pic2pocmax, &
@@ -1547,6 +1550,18 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('caco3rem_sedexp', wombat%caco3rem_sedexp, 4.5)
 
+    ! Maximum fraction of detrital carbon that can be present in the active sediment pool [mol/m2]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('detsedimentmax', wombat%detsedimentmax, 1.0)
+
+    ! Maximum fraction of detrital iron that can be present in the active sediment pool [mol/m2]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('detfesedimentmax', wombat%detfesedimentmax, 1000.0e-6)
+
+    ! Maximum fraction of detrital carbon that can be present in the active sediment pool [mol/m2]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('caco3sedimentmax', wombat%caco3sedimentmax, 1.0)
+
     ! Maximum fraction of organic carbon that is remineralised with denitrification [1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('seddenitmax', wombat%seddenitmax, 0.9)
@@ -2064,6 +2079,13 @@ module generic_WOMBATlite
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment)
     wombat%p_caco3_sediment(:,:,1) =  wombat%p_caco3_sediment(:,:,1) + wombat%caco3_btm(:,:) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'caco3', 'btm_reservoir', 0.0)
+
+    ! Cap (i.e., bury permanently) any organic detritus and CaCO3 greater than a threshold concentration.
+    ! This avoids an unrealistic accumulation of material that exchanges with the overlying water column.
+    wombat%p_det_sediment(:,:,1) = min(wombat%p_det_sediment(:,:,1), wombat%detsedimentmax)
+    wombat%p_detfe_sediment(:,:,1) = min(wombat%p_detfe_sediment(:,:,1), wombat%detfesedimentmax)
+    wombat%p_caco3_sediment(:,:,1) = min(wombat%p_caco3_sediment(:,:,1), wombat%caco3sedimentmax)
+
 
     ! Send diagnostics
     !-----------------------------------------------------------------------
