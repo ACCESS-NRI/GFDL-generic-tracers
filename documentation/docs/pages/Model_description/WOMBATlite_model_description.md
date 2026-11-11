@@ -244,6 +244,8 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `bbioh`            | Heterotrophy maximum growth rate parameter b [1]                            | 1.072              |
 | `phykn`            | Phytoplankton half saturation constant for nitrogen uptake [mmolN/m³]       | 2.0                |
 | `phykf`            | Phytoplankton half saturation constant for iron uptake [µmolFe/m³]          | 1.0                |
+| `phykminscale`     | Phytoplankton half saturation minimum scaler [dimensionless]                | 0.1                |
+| `phykallomexp`     | Phytoplankton allometric exponent for half-saturation coefficient [dimensionless] | 0.37         |
 | `phyminqc`         | Phytoplankton minimum chlorophyll:C quota [mg/mg]                           | 0.004              |
 | `phymaxqc`         | Phytoplankton maximum chlorophyll:C quota [mg/mg]                           | 0.030              |
 | `phytauqc`         | Phytoplankton timescale for chlorophyll:C adjustment [s]                    | 86400.0            |
@@ -262,6 +264,7 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `zooFeassim`       | Zooplankton assimilation efficiency iron [molFe/molFe]                      | 0.86               |
 | `fgutdiss`         | CaCO₃ dissolution efficiency in zooplankton guts [molC/molC]                | 0.75               |
 | `zookz`            | Half-saturation coefficient for zooplankton mortality [mmolC/m³]            | 0.25               |
+| `zooo2efold`       | Zooplankton reduced grazing efficiency at low oxygen concentrations [mmolC/m³]  | 10.0           |
 | `zoogmax`          | Zooplankton maximum grazing rate [s⁻¹]                                      | 3.3/86400.0        |
 | `zooepsphy`        | Zooplankton prey capture rate coefficient for phytoplankton [m⁶/mmol²/s]    | 0.30/86400.0       |
 | `zooepsdet`        | Zooplankton prey capture rate coefficient for detritus [m⁶/mmol²/s]         | 1.00/86400.0       |
@@ -273,12 +276,21 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `detlrem`          | Detritus remineralisation rate [(mmolC/m³)⁻¹ s⁻¹]                           | 0.3/86400.0        |
 | `wdetbio`          | Base detritus sinking rate [m/s]                                            | 25.0/86400.0       |
 | `wdetmax`          | Maximum detritus sinking rate [m/s]                                         | 42.0/86400.0       |
+| `wdetphyexp`       | Sinking rate allometric exponent on phytoplankton biomass [dimensionless]   | 0.21               |
+| `wdetballast`      | Detritus sinking rate acceleration due to ballasting of CaCO3 [m/s]         | 10.0/86400.0       |
+| `wdetzscale`       | Depth at which detrital sinking rate reaches its maximum [m]                | 5000.0             |
 | `wcaco3`           | CaCO₃ sinking rate [m/s]                                                    | 12.5/86400.0       |
 | `detlrem_sed`      | Sediment detritus remineralisation [s⁻¹]                                    | 0.01/86400.0       |
 | `caco3lrem`        | Base CaCO₃ remineralisation [s⁻¹]                                           | 0.01/86400.0       |
 | `caco3lrem_sed`    | Sediment CaCO₃ remineralisation [s⁻¹]                                       | 0.01/86400.0       |
 | `omegamax_sed`     | Omega ceiling in sediments [dimenionless]                                   | 0.8                |
+| `caco3rem_sedexp`  | Exponent for CaCO3 dissolution due to undersaturation in sediments [dimensionless] | 4.5         |
+| `detsedimentmax`   | Maximum allowable concentration of detrital carbon in active pool [mmol/m²] | 1.0                |
+| `detfesedimentmax` | Maximum allowable concentration of detrital iron in active pool [mmol/m²]   | 0.001              |
+| `caco3sedimentmax` | Maximum allowable concentration of CaCO3 carbon in active pool [mmol/m²]    | 1.0                |
+| `seddenitmax`      | Maximum fraction of organic carbon remineralised with denitrification [dimensionless] | 0.9      |
 | `f_inorg`          | Base inorganic fraction of CaCO₃ within detritus [molC/molC]                | 0.045              |
+| `pic2pocmax`       | Maximum fraction of PIC to POC during production of CaCO3 [molC/molC]       | 0.30               |
 | `disscal`          | Calcite dissolution factor [s⁻¹]                                            | 0.10/86400.0       |
 | `dissara`          | Aragonite dissolution factor [s⁻¹]                                          | 0.10/86400.0       |
 | `dissdet`          | Dissolution factor from detritus remineralisation [molC/molC]               | 0.200              |
@@ -292,7 +304,13 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `kcoag_dfe`        | Fe coagulation rate [(mmolC/m³)⁻¹ s⁻¹]                                      | 1e-7/86400         |
 | `kagg_col`         | Colloidal Fe aggregation rate [s⁻¹]                                         | 0.1/86400.0        |
 | `kagg_kcol`        | Half-saturation for colloidal Fe aggregation [µmolFe/m³]                    | 2.0                |
+| `fecolminfrac`     | Minimum fraction of dissolved iron apportioned to colloidal iron [mol/mol]  | 0.1                |
+| `biodocbase`       | Base concentration of DOC in the ocean [mmol/m³]                            | 40.0               |
+| `biodocscale`      | DOC in the ocean scaled against nitrogen limitation [mmol/m³]               | 40.0               |
 | `bottom_thickness` | Bottom layer thickness [m]                                                  | 0.1                |
+| `fburymin`         | Minimum fraction of particulate carbon permanently buried [dimensionless]   | 0.05               |
+| `fburyscaler`      | Scaler on fraction of particulate carbon permanently buried [dimensionless] | 0.70               |
+| `fburykflux`       | Half-saturation coefficient for the burial of detrital carbon [mmol/m²/day] | 7.0                |
 
 ---
 
@@ -392,10 +410,15 @@ With this information, we allow the half-saturation terms for nitrate (`phy_kni(
 
 $$
 \begin{align}
-K_{phy}^{N} =& \quad K_{phy}^{N,0} \cdot \max\left(0.1, \max\left(0.0, B_{phy}-B_{phy}^{thresh}\right)^{0.37} \right) \\
-K_{phy}^{Fe} =& \quad K_{phy}^{Fe,0} \cdot \max\left(0.1, \max\left(0.0, B_{phy}-B_{phy}^{thresh}\right)^{0.37} \right)
+K_{phy}^{N} =& \quad K_{phy}^{N,0} \cdot \max\left(K_{phy}^{minscale}, \max\left(0.0, B_{phy}-B_{phy}^{thresh}\right)^{K_{phy}^{allomexp}} \right) \\
+K_{phy}^{Fe} =& \quad K_{phy}^{Fe,0} \cdot \max\left(K_{phy}^{minscale}, \max\left(0.0, B_{phy}-B_{phy}^{thresh}\right)^{K_{phy}^{allomexp}} \right)
 \end{align}
 $$
+
+_where_ <br>
+- $K_{phy}^{minscale}$ is minimum factor that $K_{phy}^{N}$ or $K_{phy}^{Fe}$ can be reduced to (`phykminscale`, [dimensionless]) <br>
+- $K_{phy}^{allomexp}$ is the allometic scaling coefficient (`phykallomexp`, [dimensionless]) normally set at 0.37 <br>
+
 
 **Limitation of phytoplankton growth by nitrate** (`phy_lnit(i,j,k)`, $L_{phy}^{N}$), [dimensionless]) then follows the Monod equation:
 
@@ -405,7 +428,7 @@ L_{phy}^{N} =& \quad \dfrac{NO_3}{NO_3 + K_{phy}^{N}}
 \end{align}
 $$
  
-_where _ <br>
+_where_ <br>
 - $NO_3$ is the ambient nitrate concentration (`no3_mmolm3`, $NO_3$, [mmol N m<sup>-3</sup>]) <br>
 - $K_{phy}^{N}$ is the michaelis-menten half-saturation coefficient (`phy_kni(i,j,k)`, [mmol N m<sup>-3</sup>]) <br>
 
@@ -699,9 +722,12 @@ Next we **estimate the concentration of colloidal iron** in solution following [
 
 $$
 \begin{align}
-dFe_{col} =& \quad \max\left(0.1 dFe, \ dFe - dFe_{sol} \right)
+dFe_{col} =& \quad \max\left(f_{colloid}^{min} dFe, \ dFe - dFe_{sol} \right)
 \end{align}
 $$
+
+_where_ <br>
+- $f_{colloid}^{min}$ is minimum fraction of in situ dissolved iron apportioned to colloids (`fecolminfrac`, [mol/mol]) <br>
 
 Following solving for colloidal dFe, we **partition the remaining dissolved Fe into ligand-bound and free iron**. To do so, we find the remaining dissolved iron not in colloidal form (`fe_sfe`, $dFe_{sFe}$, [mmol Fe m<sup>-3</sup>]), 
 
@@ -731,7 +757,9 @@ _where_ <br>
 - $T_K$ is in situ water temperature (`ztemk`, [ºK]) <br>
 - $PAR$ is the total photosynthetically available radiation (`radbio`, [W m<sup>-2</sup>]) <br>
 - pH is the in situ pH <br>
-- $[DOC]$ is an empirical concentration of DOC and is equal to $40 + 40 \left(1 - L_{phy}^{N}\right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
+- $[DOC]$ is an empirical concentration of DOC and is equal to $[DOC]_{base} + [DOC]_{scale} \left(1 - L_{phy}^{N}\right)$ (`biodoc`, [mmol m<sup>-3</sup>]) <br>
+- $[DOC]_{base}$ is the base concentration of DOC in the ocean (`biodocbase`, [mmol m<sup>-3</sup>]) <br>
+- $[DOC]_{scale}$ is the scaled concentration of DOC in the ocean dependent on nutrient limitation (`biodocscale`, [mmol m<sup>-3</sup>]) <br>
 
 After finding $Lig_{s}^{K}$ we solve for the free dissolved Fe concentration (`feIII`, $dFe_{free}$, [nmol Fe kg<sup>-1</sup>]) via the analytic method when `do_two_ligands == .false.`:
 
@@ -971,9 +999,12 @@ We apply an oxygen limitation to grazing at low oxygen concentrations (`o2lim`, 
 
 $$
 \begin{align}
-L_{zoo}^{O_2} =& \quad \left(1 - e^{\left(-\dfrac{O_2}{10}\right)}\right)
+L_{zoo}^{O_2} =& \quad \left(1 - e^{\left(-\dfrac{O_2}{f_{zoo}^{o2efold}}\right)}\right)
 \end{align}
 $$
+
+_where_ <br>
+- $f_{zoo}^{o2efold}$ is the oxygen concentration at which grazing is decelerated by 1-1/e (`zooo2efold`, [mmol O2 m<sup>-3</sup>]) <br>
 
 The normalized prey preferences (i.e., dietary fractions) are modified from initial values by prey switching prior to computation of total prey biomass ([Gentleman et al., 2003](https://doi.org/10.1016/j.dsr2.2003.07.001)) such that
 
@@ -1123,11 +1154,12 @@ In the above, the $PIC:POC$ ratio is formulated as:
 
 $$
 \begin{align}
-PIC:POC =& \quad \min \left( 0.3,  \left( f_{inorg} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)
+PIC:POC =& \quad \min \left( f_{PIC:POC}^{max},  \left( f_{inorg} + 10^{-3 + 4.31 \times 10^{-6} \left( \dfrac{[HCO_3^-]}{[H^+]} \right)} \right) F_T \right)
 \end{align}
 $$
 
 _where_ <br>
+- $f_{PIC:POC}^{max}$ is the maximum PIC:POC ratio (`pic2pocmax`, [mol C (mol C)<sup>-1</sup>]) <br>
 - $f_{inorg}$ is the background PIC:POC ratio (`f_inorg`, [mol C (mol C)<sup>-1</sup>]) <br>
 - $[HCO_{3}^{-}]$ is the concentration of bicarbonate ions (`hco3`, [mol kg<sup>-1</sup>]) <br>
 - $[H^{+}]$ is concentration of free hydrogen ions (`htotal(i,j,k)`, [µmol kg<sup>-1</sup>]) <br>
@@ -1433,7 +1465,7 @@ As phytoplankton concentrations are negligible beneath the euphotic zone we use 
 
 $$
 \begin{align}
-\omega_{det} =& \quad \omega_{det}^{0} \cdot \max \left( 0.0, B_{phy}^{C,k=1} - B_{phy}^{thresh} \right)^{0.21}
+\omega_{det} =& \quad \omega_{det}^{0} \cdot \max \left( 0.0, B_{phy}^{C,k=1} - B_{phy}^{thresh} \right)^{\omega_{det}^{phyexp}}
 \end{align}
 $$
 
@@ -1441,16 +1473,17 @@ Sinking speeds are then accelerated depending on the fraction of $CaCO_3$ within
 
 $$
 \begin{align}
-\omega_{det} =& \quad \omega_{det} + \dfrac{10}{86400} \cdot \min \left( 1, \dfrac{B_{CaCO_3}^{C}}{B_{CaCO_3}^{C} + B_{det}^{C}} \right)
+\omega_{det} =& \quad \omega_{det} + \omega_{det}^{ballast} \cdot \min \left( 1, \dfrac{B_{CaCO_3}^{C}}{B_{CaCO_3}^{C} + B_{det}^{C}} \right)
 \end{align}
 $$
 
 _where_ <br>
 - $B_{phy}^{C,k=1}$ is the concentration of phytoplankton biomass at the surface (`phy_mmolm3`, [mmol C m<sup>-3</sup>]) <br>
 - $B_{phy}^{thresh}$ is the phytoplankton biomass threshold above which the community cell size begins to increase (`phybiot`, [mmol C m<sup>-3</sup>]) <br>
+- $\omega_{det}^{phyexp}$ is the allometric scaler on sinking speeds due to phytoplankton biomass (`wdetphyexp`, [dimensionless]) <br>
 - $B_{CaCO_3}^{C}$ is the in situ concentration of $CaCO_3$ biomass (`p_caco3(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
 - $B_{det}^{C}$ is the in situ concentration of organic detrital biomass (`p_det(i,j,k,tau)`, [mol C kg<sup>-1</sup>]) <br>
-
+- $\omega_{det}^{ballast}$ is the additional sinking rate caused by CaCO<sub>3</sub> (`wdetballast`, [m s<sup>-1</sup>]) <br>
 
 and where we chose a maximum increase of 10 metres per day based on the more modest effect observed in mesocosm experiments ([Bach et al., 2016](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2016GB005372).
 
@@ -1458,12 +1491,13 @@ Finally, we apply a linear increase to sinking speeds with depth to ensure that 
 
 $$
 \begin{align}
-\omega_{det} =& \quad \omega_{det} + \max\left(0.0, \dfrac{z}{5000} \cdot \left(\omega_{det}^{max} - \omega_{det} \right)\right)
+\omega_{det} =& \quad \omega_{det} + \max\left(0.0, \dfrac{z}{\omega_{det}^{zscale}} \cdot \left(\omega_{det}^{max} - \omega_{det} \right)\right)
 \end{align}
 $$
 
 _where_ <br>
 - $z$ is the in situ depth (`zw(i,j,k)`, [m]) <br>
+- $\omega_{det}^{zscale}$ is the depth at which sinking reaches its maximum velocity (`wdetzscale`, [m]) <br>
 - $\omega_{det}^{max}$ is the terminal sinking rate of organic detritus (`wdetmax`, [m s<sup>-1</sup>]) <br>
 
 
@@ -1533,13 +1567,14 @@ Alk and DIC are in turn affected by dissolution of the sedimenary $CaCO_3$ pool,
 
 $$
 \begin{align}
-D_{cal,sed} =& \quad d_{cal,sed} (β_{hete})^{T} \max\left(1 - \Omega_{cal,+sed},  1 - \Omega_{cal,sed}\right)^{4.5}
+D_{cal,sed} =& \quad d_{cal,sed} (β_{hete})^{T} \max\left(1 - \Omega_{cal,+sed},  1 - \Omega_{cal,sed}\right)^{\Omega_{cal,sedscaler}}
 \end{align}
 $$
 
 _where_ <br>
 - $d_{cal,sed}$ is a base rate of dissolution (`caco3lrem_sed`, [s<sup>-1</sup>]) <br>
 - $\Omega_{cal,+sed}$ is the maximum possible saturation state within sediment pore water (`omegamax_sed`, [dimensionless]) <br>
+- $\Omega_{cal,sedscaler}$ is the exponent for CaCO3 dissolution due to undersaturation in sediments (`caco3rem_sedexp`, [dimensionless]) <br>
 
 The $\Omega_{cal,sed}$ is calculated using the [`mocsy`](https://github.com/ACCESS-NRI/mocsy) package for solving carbonate chemistry of seawater ([Orr & Epitalon, 2015](https://doi.org/10.5194/gmd-8-485-2015)). These routines require Alk and DIC as inputs, along with nutrient concentrations and temperature and salinity of bottom waters. For DIC, we chose to sum the water column concentration of DIC and the organic carbon content of the sediment to approximate the interstitial (i.e., porewater) DIC concentration. We assume that the organic carbon content of the sediment (`p_det_sediment` [mol m<sup>-2</sup>]) is relevant over one meter, and therefore can be automatically converted to [mol m<sup>-3</sup>]. With this assumption these arrays can be added together and approximates the reducing conditions of organic-rich sediments, which have lower $\Omega_{cal,sed}$. This ensures a greater rate of $CaCO_3$ dissolution within the sediment as organic matter accumulates.
 
@@ -1549,12 +1584,12 @@ We also consider the consumption of NO<sub>3</sub> via benthic denitrification. 
 
 $$
 \begin{align}
-\gamma_{det,sed}^{denit} =& \quad \gamma_{det,sed}^{C} \min\left(0.9 \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)
+\gamma_{det,sed}^{denit} =& \quad \gamma_{det,sed}^{C} \min\left(f_{denit}^{max} \dfrac{94}{122}, \left(0.083 + 0.21 \cdot 0.98^{O_2 - NO_3} \right) \right)
 \end{align}
 $$
 
 _where_ <br>
-- $0.9$ is a hard upper limit stating that 90% of organic matter hydrolysation can potentially be performed anaerobically via denitrification <br>
+- $f_{denit}^{max}$ is the maximum fraction of organic matter hydrolysation that can potentially be performed anaerobically via denitrification (`seddenitmax`, [molC/molC]) <br>
 - $\dfrac{94}{122}$ is the stoichiometry of nitrate demand per mol of organic carbon hydrolysed ([Paulmier et al., 2009](https://doi.org/10.5194/bg-6-923-2009)) <br>
 - O<sub>2</sub> is the bottom water concentration of dissolved oxygen (mmol m<sup>-3</sup>) <br>
 - NO<sub>3</sub> is the bottom water concentration of nitrate (mmol m<sup>-3</sup>) <br>
@@ -1603,12 +1638,15 @@ The fraction of organic matter buried (`fbury(i,j)`, $F_{bury}^{C}$, [dimensionl
 
 $$
 \begin{align}
-F_{bury}^{C} =& \quad 0.013 + 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury}^{C} =& \quad F_{bury}^{C,min} + F_{bury}^{C,scaler} \dfrac{\left(f_{org}\right)^{2}}{\left(F_{bury}^{C,K} + f_{org}\right)^{2}}
 \end{align}
 $$
 
 _where_ <br>
-- $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. 
+- $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>].  <br>
+- $F_{bury}^{C,min}$ is the minimum fraction of organic carbon buried on contact with the sea floor (`fburymin`, [mol C (mol C)<sup>-1</sup>]). <br>
+- $F_{bury}^{C,scaler}$ is the scaler increasing organic carbon burial with rain rate (`fburyscaler`, [mol C (mol C)<sup>-1</sup>]). <br>
+- $F_{bury}^{C,K}$ is the half-saturation constant for the burial of detrital carbon (`fburykflux`, [mol C m<sup>-2</sup> day<sup>-1</sup>]).
 
 As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CaCO_3$ that is buried increases.
 

@@ -287,6 +287,9 @@ module generic_WOMBATmid
         detqrem, &
         docqrem, &
         bottom_thickness, &
+        fburymin, &
+        fburyscaler, &
+        fburykflux, &
         detlrem_sed, &
         sdetphi, &
         ldetphi, &
@@ -2523,6 +2526,18 @@ module generic_WOMBATmid
     ! Thickness over which tracer values are integrated to define the bottom layer
     call g_tracer_add_param('bottom_thickness', wombat%bottom_thickness, 0.1)
 
+    ! Set minimum fraction of detrital carbon that is buried in the sediments.
+    ! Recommend between 0.01 and 0.2 to prevent unrealistic accumulation in sediments.
+    call g_tracer_add_param('fburymin', wombat%fburymin, 0.05)
+
+    ! Set scaler on the fraction of detrital carbon that is buried in the sediments.
+    ! Dunne et al., 2007 set this at 0.53, but we set at 0.7 to reduce accumulation.
+    call g_tracer_add_param('fburyscaler', wombat%fburyscaler, 0.70)
+
+    ! Set the half-saturation constant for the burial of detrital carbon.
+    ! This parameter controls the sensitivity of the burial rate to the organic carbon concentration.
+    call g_tracer_add_param('fburykflux', wombat%fburykflux, 7.0)
+
     ! Nested timestep for the ecosystem model [s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('dt_npzd', wombat%dt_npzd, 900.)
@@ -3086,7 +3101,8 @@ module generic_WOMBATmid
         do j = jsc, jec
           if (grid_kmt(i,j) > 0) then
             orgflux = (wombat%sdet_btm(i,j) + wombat%ldet_btm(i,j)) / dt * 86400 * 1e3 ! mmol C m-2 day-1
-            wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
+            wombat%fbury(i,j) = max(0.0, min(1.0, wombat%fburymin &
+                              + wombat%fburyscaler * (orgflux / (wombat%fburykflux + orgflux))**2.0 ) )  ! Eq. 3 Dunne et al. 2007
             boto2 = wombat%sedo2(i,j) / mmol_m3_to_mol_kg
             wombat%ffebury(i,j) = wombat%ffeburymin + (wombat%ffeburymax - wombat%ffeburymin) &
                                   * (1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015

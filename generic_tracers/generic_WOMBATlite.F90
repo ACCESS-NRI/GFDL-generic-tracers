@@ -198,6 +198,8 @@ module generic_WOMBATlite
         bbioh, &
         phykn, &
         phykf, &
+        phykminscale, &
+        phyallomexp, &
         phyminqc, &
         phymaxqc, &
         phytauqc, &
@@ -215,6 +217,7 @@ module generic_WOMBATlite
         zooFeassim, &
         fgutdiss, &
         zookz, &
+        zooo2efold, &
         zoogmax, &
         zooepsphy, &
         zooepsdet, &
@@ -225,15 +228,27 @@ module generic_WOMBATlite
         zooqmor, &
         detlrem, &
         bottom_thickness, &
+        fburymin, &
+        fburyscaler, &
+        fburykflux, &
         detlrem_sed, &
         wdetbio, &
         wdetmax, &
+        wdetphyexp, &
+        wdetballast, &
+        wdetzscale, &
         phybiot, &
         wcaco3, &
         caco3lrem, &
         caco3lrem_sed, &
         omegamax_sed, &
+        caco3rem_sedexp, &
+        detsedimentmax, &
+        detfesedimentmax, &
+        caco3sedimentmax, &
+        seddenitmax, &
         f_inorg, &
+        pic2pocmax, &
         disscal, &
         dissara, &
         dissdet, &
@@ -247,6 +262,9 @@ module generic_WOMBATlite
         kcoag_dfe, &
         kagg_col, &
         kagg_kcol, &
+        fecolminfrac, &
+        biodocbase, &
+        biodocscale, &
         dt_npzd, &
         sal_global, &
         dic_global, &
@@ -1337,6 +1355,15 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phykf', wombat%phykf, 1.0)
 
+    ! Phytoplankton half saturation minimum scaler [dimensionless]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('phykminscale', wombat%phykminscale, 0.1)
+
+    ! Phytoplankton allometric exponent for half-saturation coefficient
+    !  Wickman et al. (2024) suggests 0.37
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('phyallomexp', wombat%phyallomexp, 0.37)
+
     ! Phytoplankton minimum quota of chlorophyll to carbon [mg/mg]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('phyminqc', wombat%phyminqc, 0.004)
@@ -1409,6 +1436,10 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zookz', wombat%zookz, 0.25)
 
+    ! Zooplankton reduced grazing efficiency at low oxygen concentrations [mmol O2/m3]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('zooo2efold', wombat%zooo2efold, 10.0)
+
     ! Zooplankton maximum grazing rate constant [1/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('zoogmax', wombat%zoogmax, 3.3/86400.0)
@@ -1464,6 +1495,18 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('wdetmax', wombat%wdetmax, 42.0/86400.0)
 
+    ! Detritus sinking rate allometric exponent dependence on phytoplankton biomass [1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('wdetphyexp', wombat%wdetphyexp, 0.21)
+
+    ! Detritus sinking rate acceleration due to ballasting of CaCO3 [m/s]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('wdetballast', wombat%wdetballast, 10.0/86400.0)
+
+    ! Depth at which detrital sinking rate reaches its maximum [m]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('wdetzscale', wombat%wdetzscale, 5000.0)
+
     ! Base CaCO3 sinking rate coefficient [m/s]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('wcaco3', wombat%wcaco3, 12.5/86400.0)
@@ -1472,6 +1515,18 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     ! Thickness over which tracer values are integrated to define the bottom layer
     call g_tracer_add_param('bottom_thickness', wombat%bottom_thickness, 0.1)
+
+    ! Set minimum fraction of detrital carbon that is buried in the sediments.
+    ! Recommend between 0.01 and 0.2 to prevent unrealistic accumulation in sediments.
+    call g_tracer_add_param('fburymin', wombat%fburymin, 0.05)
+
+    ! Set scaler on the fraction of detrital carbon that is buried in the sediments.
+    ! Dunne et al., 2007 set this at 0.53, but we set at 0.7 to reduce accumulation.
+    call g_tracer_add_param('fburyscaler', wombat%fburyscaler, 0.70)
+
+    ! Set the half-saturation constant for the burial of detrital carbon.
+    ! This parameter controls the sensitivity of the burial rate to the organic carbon concentration.
+    call g_tracer_add_param('fburykflux', wombat%fburykflux, 5.0)
 
     ! Detritus remineralisation rate constant in sediments [1/s]
     !-----------------------------------------------------------------------
@@ -1491,9 +1546,33 @@ module generic_WOMBATlite
     !-----------------------------------------------------------------------
     call g_tracer_add_param('omegamax_sed', wombat%omegamax_sed, 0.8)
 
+    ! Exponent for CaCO3 dissolution due to undersaturation in sediments [1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('caco3rem_sedexp', wombat%caco3rem_sedexp, 4.5)
+
+    ! Maximum fraction of detrital carbon that can be present in the active sediment pool [mol/m2]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('detsedimentmax', wombat%detsedimentmax, 1.0)
+
+    ! Maximum fraction of detrital iron that can be present in the active sediment pool [mol/m2]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('detfesedimentmax', wombat%detfesedimentmax, 1000.0e-6)
+
+    ! Maximum fraction of detrital carbon that can be present in the active sediment pool [mol/m2]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('caco3sedimentmax', wombat%caco3sedimentmax, 1.0)
+
+    ! Maximum fraction of organic carbon that is remineralised with denitrification [1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('seddenitmax', wombat%seddenitmax, 0.9)
+
     ! CaCO3 inorganic fraction [1]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('f_inorg', wombat%f_inorg, 0.045)
+
+    ! Maximum fraction of PIC to POC during production of CaCO3 [molC/molC]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('pic2pocmax', wombat%pic2pocmax, 0.3)
 
     ! CaCO3 dissolution factor due to calcite undersaturation (s-1)
     !-----------------------------------------------------------------------
@@ -1564,6 +1643,16 @@ module generic_WOMBATlite
     ! Half-saturation coefficient modulating aggregation of colloidal iron [umolFe/m3]
     !-----------------------------------------------------------------------
     call g_tracer_add_param('kagg_kcol', wombat%kagg_kcol, 2.0)
+
+    ! Minimum fraction of dissolved iron apportioned to colloidal iron [1]
+    !-----------------------------------------------------------------------
+    call g_tracer_add_param('fecolminfrac', wombat%fecolminfrac, 0.1)
+
+    ! Base concentration of DOC in the ocean [mmolC/m3]
+    call g_tracer_add_param('biodocbase', wombat%biodocbase, 40.0)
+
+    ! Additional concentration of DOC in the ocean scaled against nitrogen limitation [mmolC/m3]
+    call g_tracer_add_param('biodocscale', wombat%biodocscale, 40.0)
 
     ! Nested timestep for the ecosystem model [s]
     !-----------------------------------------------------------------------
@@ -1969,7 +2058,8 @@ module generic_WOMBATlite
         do j = jsc, jec
           if (grid_kmt(i,j) > 0) then
             orgflux = wombat%det_btm(i,j) / dt * 86400.0 * 1e3 ! mmol C m-2 day-1
-            wombat%fbury(i,j) = max(0.0, 0.013 + 0.53 * (orgflux / (7.0 + orgflux))**2.0)  ! Eq. 3 Dunne et al. 2007
+            wombat%fbury(i,j) = max(0.0, min(1.0, wombat%fburymin &
+                              + wombat%fburyscaler * (orgflux / (wombat%fburykflux + orgflux))**2.0 ) )  ! Eq. 3 Dunne et al. 2007
             boto2 = wombat%sedo2(i,j) / mmol_m3_to_mol_kg
             wombat%ffebury(i,j) = wombat%ffeburymin + (wombat%ffeburymax - wombat%ffeburymin) &
                                   * (1.0 - tanh(orgflux / max(epsi, boto2))) ! Dale et al., 2015
@@ -1989,6 +2079,13 @@ module generic_WOMBATlite
     call g_tracer_get_pointer(tracer_list, 'caco3_sediment', 'field', wombat%p_caco3_sediment)
     wombat%p_caco3_sediment(:,:,1) =  wombat%p_caco3_sediment(:,:,1) + wombat%caco3_btm(:,:) * (1.0-wombat%fbury(:,:)) ! [mol/m2]
     call g_tracer_set_values(tracer_list, 'caco3', 'btm_reservoir', 0.0)
+
+    ! Cap (i.e., bury permanently) any organic detritus and CaCO3 greater than a threshold concentration.
+    ! This avoids an unrealistic accumulation of material that exchanges with the overlying water column.
+    wombat%p_det_sediment(:,:,1) = min(wombat%p_det_sediment(:,:,1), wombat%detsedimentmax)
+    wombat%p_detfe_sediment(:,:,1) = min(wombat%p_detfe_sediment(:,:,1), wombat%detfesedimentmax)
+    wombat%p_caco3_sediment(:,:,1) = min(wombat%p_caco3_sediment(:,:,1), wombat%caco3sedimentmax)
+
 
     ! Send diagnostics
     !-----------------------------------------------------------------------
@@ -2640,8 +2737,10 @@ module generic_WOMBATlite
       ! 1. Allometric scaling of 0.37 (Wickman et al., 2024; Science)
       ! 2. Apply variable K to set limitation term
 
-      wombat%phy_kni(i,j,k) = wombat%phykn * max(0.1, max(0.0, (phy_mmolm3-wombat%phybiot))**0.37)
-      wombat%phy_kfe(i,j,k) = wombat%phykf * max(0.1, max(0.0, (phy_mmolm3-wombat%phybiot))**0.37)
+      wombat%phy_kni(i,j,k) = wombat%phykn * max(wombat%phykminscale, &
+                                             max(0.0, (phy_mmolm3-wombat%phybiot))**(wombat%phyallomexp))
+      wombat%phy_kfe(i,j,k) = wombat%phykf * max(wombat%phykminscale, &
+                                             max(0.0, (phy_mmolm3-wombat%phybiot))**(wombat%phyallomexp))
       ! Nitrogen limitation (currently Michaelis-Menten term)
       wombat%phy_lnit(i,j,k) = no3_mmolm3 / (no3_mmolm3 + wombat%phy_kni(i,j,k) + epsi)
       ! Iron limitation (Quota model, constants from Flynn & Hipkin 1999)
@@ -2790,7 +2889,7 @@ module generic_WOMBATlite
       ! Colloidal dFe is considered to be whatever exceeds the inorganic solubility
       ! ceiling, although there is always a hard lower limit of 10% of total dFe.
       if (do_colloidal_shunt) then
-        wombat%fecol(i,j,k) = max(0.1 * fe_umolm3, fe_umolm3 - fe3sol)
+        wombat%fecol(i,j,k) = max(wombat%fecolminfrac * fe_umolm3, fe_umolm3 - fe3sol)
       else
         wombat%fecol(i,j,k) = 0.0
       endif
@@ -2804,7 +2903,7 @@ module generic_WOMBATlite
       ! comes from Ye et al. (2020) and increases binding strength at lower pH and higher
       ! concentrations of DOC.
       fe_sfe = max(0.0, fe_umolm3 - wombat%fecol(i,j,k))
-      biodoc = 40.0 + (1.0 - wombat%phy_lnit(i,j,k)) * 40.0 ! proxy of DOC (mmol/m3)
+      biodoc = wombat%biodocbase + (1.0 - wombat%phy_lnit(i,j,k)) * wombat%biodocscale ! proxy of DOC (mmol/m3)
       wombat%ligK(i,j,k) = 1e-9 * ( 10.0**( (17.27 - 1565.7 * I_ztemk ) &
                                   - 0.7 * wombat%radbio(i,j,k) / (wombat%radbio(i,j,k) + 10.0) ) &
                                   + 10.0**( (-2e-4*biodoc + 0.034)*biodoc  - 1.67*(-log10(hp)) + 24.36 ) )
@@ -2932,7 +3031,7 @@ module generic_WOMBATlite
       Xzoo = (  wombat%zooepsphy * zval1 + wombat%zooepsdet * zval2 )
 
       ! Oxygen limitation term reducing zooplankton grazing pressure in low-oxygen waters
-      o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3/10.0)))
+      o2lim = max(0.0, min(1.0, 1.0 - exp(-o2_mmolm3/wombat%zooo2efold)))
 
       ! Grazing rate of zooplankton
       g_zoo = wombat%zoogmax * fbc * o2lim * Xzoo / (wombat%zoogmax * fbc + Xzoo)
@@ -2982,9 +3081,9 @@ module generic_WOMBATlite
         hco3 = wombat%p_dic(i,j,k,tau) - wombat%co3(i,j,k) - wombat%co2_star(i,j,k)
         ! Note the min(2.0, ...) in the exponent is just to prevent potential overflow. It does
         ! not affect answers as pic2poc is capped at 0.3
-        wombat%pic2poc(i,j,k) = min(0.3, (wombat%f_inorg + 10.0**(min(2.0, -3.0 + 4.31e-6 * &
-                                          hco3 / wombat%htotal(i,j,k)))) * &
-                                         (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
+        wombat%pic2poc(i,j,k) = min(wombat%pic2pocmax, (wombat%f_inorg + 10.0**(min(2.0, -3.0 + 4.31e-6 * &
+                                                         hco3 / wombat%htotal(i,j,k)))) * &
+                                                        (0.55 + 0.45 * tanh(Temp(i,j,k) - 4.0)) )
         ! The dissolution rate is a function of omegas for calcite and aragonite, as well the
         !  concentration of POC, following Kwon et al., 2024, Science Advances; Table S1, and
         !  we account for the dissolution due to zooplankton grazing on particulates
@@ -3382,13 +3481,13 @@ module generic_WOMBATlite
     do j = jsc,jec; do i = isc,iec;
       if (grid_kmt(i,j)>0) then
         phy_mmolm3  = wombat%p_phy(i,j,1,tau) / mmol_m3_to_mol_kg ! [mmol/m3]
-        wsink(:) = wombat%wdetbio * max(0.0, phy_mmolm3 - wombat%phybiot)**(0.21)
+        wsink(:) = wombat%wdetbio * max(0.0, phy_mmolm3 - wombat%phybiot)**(wombat%wdetphyexp)
         do k=1,nk
-          wsink(k) = wsink(k) + 10.0/86400.0 * min(1.0, &
+          wsink(k) = wsink(k) + wombat%wdetballast * min(1.0, &
                      (max(0.0, wombat%p_caco3(i,j,k,tau)) / &
                      (max(0.0, wombat%p_det(i,j,k,tau)) + max(0.0, wombat%p_caco3(i,j,k,tau)) + epsi)))
           ! Increase sinking rate with depth to achieve power law behaviour
-          wsink(k) = wsink(k) + max(0.0, wombat%zw(i,j,k)/5000.0 * (wombat%wdetmax - wsink(k)))
+          wsink(k) = wsink(k) + max(0.0, wombat%zw(i,j,k)/wombat%wdetzscale * (wombat%wdetmax - wsink(k)))
           ! CaCO3 sinks slower than general detritus because it tends to be smaller
           wsinkcal(k) = wsink(k) * wombat%wcaco3/wombat%wdetbio
         enddo
@@ -3510,10 +3609,10 @@ module generic_WOMBATlite
       !!!~~~ CaCO3 dissolution ~~~!!!
       if (do_caco3_dynamics) then
         wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
-                                      * max((1.0-wombat%omegamax_sed), (1.0-wombat%sedomega_cal(i,j)))**(4.5)
+                                      * max((1.0-wombat%omegamax_sed), (1.0-wombat%sedomega_cal(i,j)))**(wombat%caco3rem_sedexp)
       else
         wombat%caco3_sed_remin(i,j) = wombat%caco3lrem_sed * fbc * wombat%p_caco3_sediment(i,j,1) &
-                                      * (1.0 - 0.2081)**(4.5)
+                                      * (1.0 - 0.2081)**(wombat%caco3rem_sedexp)
       endif
 
       !!!~~~ Benthic denitrification ~~~!!!
@@ -3521,7 +3620,7 @@ module generic_WOMBATlite
         ! sedimentary denitrification (Bohlen et al., 2012 Global Biogeochemical Cycles)
         !   Stoichiometry of 94 mol NO3 used per 122 mol organic carbon oxidised (Paulmier et al, 2009 BG)
         !   Hard limit where denitrification is at maximum 90% responsible for organic matter remin
-        wombat%det_sed_denit(i,j) = wombat%det_sed_remin(i,j) * min(0.9 * 94.0/122.0, &
+        wombat%det_sed_denit(i,j) = wombat%det_sed_remin(i,j) * min(wombat%seddenitmax * 94.0/122.0, &
                                     (0.083 + 0.21 * 0.98**((wombat%sedo2(i,j) - wombat%sedno3(i,j))/mmol_m3_to_mol_kg)))
         wombat%fdenit(i,j) = wombat%det_sed_denit(i,j) * 122.0/94.0 / (wombat%det_sed_remin(i,j) + epsi)
       else

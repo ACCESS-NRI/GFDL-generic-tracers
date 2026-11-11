@@ -466,6 +466,9 @@ The model carries tracers in [mol kg-1]. That is, moles of solute/tracer per kil
 | `aoxkn`            | Anammox NH<sub>4</sub> half-saturation coefficient                          | 0.5           | mmol N m<sup>-3</sup>                                                |
 | `aoxmumax`         | Anammox maximum growth rate                                                 | 0.0025/86400  | s<sup>-1</sup>                                                       |
 | `bottom_thickness` | Bottom layer thickness                                                      | 0.1           | m                                                                    |
+| `fburymin`         | Minimum fraction of particulate carbon permanently buried                   | 0.05          | dimensionless |
+| `fburyscaler`      | Scaler on fraction of particulate carbon permanently buried                 | 0.70          | dimensionless |
+| `fburykflux`      | Half-saturation coefficient for the burial of detrital carbon                | 7.0           | mmol C m<sup>-2</sup> day<sup>-2</sup>                                               |
 
 
 ---
@@ -2715,11 +2718,17 @@ The fraction of organic matter buried (`fbury(i,j)`, $F_{bury}^{C}$, [dimensionl
 
 $$
 \begin{align}
-F_{bury}^{C} =& \quad 0.013 + 0.53 \dfrac{\left(f_{org}\right)^{2}}{\left(7 + f_{org}\right)^{2}}
+F_{bury}^{C} =& \quad F_{bury}^{C,min} + F_{bury}^{C,scaler} \dfrac{\left(f_{org}\right)^{2}}{\left(F_{bury}^{C,K} + f_{org}\right)^{2}}
 \end{align}
 $$
 
-where $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>]. As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, organic iron and $CaCO_3$ that is buried increases.
+_where_ <br>
+- $f_{org}$ is the rain rate of organic carbon detritus on the seafloor in [mmol C m<sup>-2</sup> s<sup>-1</sup>].  <br>
+- $F_{bury}^{C,min}$ is the minimum fraction of organic carbon buried on contact with the sea floor (`fburymin`, [mol C (mol C)<sup>-1</sup>]). <br>
+- $F_{bury}^{C,scaler}$ is the scaler increasing organic carbon burial with rain rate (`fburyscaler`, [mol C (mol C)<sup>-1</sup>]). <br>
+- $F_{bury}^{C,K}$ is the half-saturation constant for the burial of detrital carbon (`fburykflux`, [mol C m<sup>-2</sup> day<sup>-1</sup>]).
+
+As organic matter rains down at a more rapid rate, the fraction of incident organic carbon, silica and $CaCO_3$ that is buried increases.
 
 The burial of iron that sinks to the sediment is treated differently to organic matter. According to [Dale et al. (2015)](https://doi.org/10.1002/2014GB005017), the flux of iron from the sediments into the overlying water column is a function of oxygen and the amount of organic carbon being remineralised in the sediment, with oxic sediments having much lower fluxes than reducing, anoxic sediments. We derive instead an estimate of the fraction of iron that is permanently buried (`ffebury(i,j)`, $F_{bury}^{Fe}$, [dimensionless]) from their relationship. Specifically, the fraction of iron that rains onto the sedimment and is permanently buried is equal to:
 
