@@ -285,6 +285,9 @@ The model carries tracers in [mol kg<sup>-1</sup>]. That is, moles of solute/tra
 | `caco3lrem_sed`    | Sediment CaCO₃ remineralisation [s⁻¹]                                       | 0.01/86400.0       |
 | `omegamax_sed`     | Omega ceiling in sediments [dimenionless]                                   | 0.8                |
 | `caco3rem_sedexp`  | Exponent for CaCO3 dissolution due to undersaturation in sediments [dimensionless] | 4.5         |
+| `detsedimentmax`   | Maximum allowable concentration of detrital carbon in active pool [mmol/m²] | 1.0                |
+| `detfesedimentmax` | Maximum allowable concentration of detrital iron in active pool [mmol/m²]   | 0.001              |
+| `caco3sedimentmax` | Maximum allowable concentration of CaCO3 carbon in active pool [mmol/m²]    | 1.0                |
 | `seddenitmax`      | Maximum fraction of organic carbon remineralised with denitrification [dimensionless] | 0.9      |
 | `f_inorg`          | Base inorganic fraction of CaCO₃ within detritus [molC/molC]                | 0.045              |
 | `pic2pocmax`       | Maximum fraction of PIC to POC during production of CaCO3 [molC/molC]       | 0.30               |
